@@ -1,0 +1,36 @@
+.quoteBand {
+  padding: 5vw 0;
+  text-align: center;
+}
+
+/* Styled as the original h5 quote (Playfair 32px bold). */
+.quote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 46px;
+  color: var(--white);
+}
+
+.commitment {
+  margin: 30px 0 8px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 33px;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+@media (max-width: 690px) {
+  .quote {
+    font-size: 22px;
+    line-height: 32px;
+  }
+
+  .commitment {
+    font-size: 16px;
+    line-height: 24px;
+  }
+}

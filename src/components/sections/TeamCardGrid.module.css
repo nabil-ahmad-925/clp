@@ -1,0 +1,27 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--card-gap);
+}
+
+.column {
+  min-width: 0;
+}
+
+@media (max-width: 999px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 690px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The original's "partnership" rows set the card titles smaller than the sport pages do. */
+.grid .column h3 {
+  font-size: 25px;
+  line-height: 38px;
+}

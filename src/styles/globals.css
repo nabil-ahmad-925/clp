@@ -1,0 +1,193 @@
+/* Design tokens and base styles for Compete Like Pros.
+ * Values are measured from the original site so the rebuild matches it exactly. */
+
+:root {
+  --gold: #dfbe75;
+  --gold-strong: #e3bd66;
+  --gold-deep: #bd8300;
+  --gold-name: #b58820;
+  --gold-heading-gradient: linear-gradient(180deg, #e1be6e, #8b5801);
+  --gold-border-gradient: linear-gradient(to right bottom, #bd8300 0%, #dfbe75 100%);
+  --black: #000;
+  --white: #fff;
+  --grey-muted: #b6b2b2;
+  --hero-bg: #0a0a0a;
+
+  --font-body: var(--font-open-sans), Helvetica, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-heading: var(--font-montserrat), Helvetica, sans-serif;
+  --font-condensed: var(--font-oswald), Impact, sans-serif;
+  --font-roboto-stack: var(--font-roboto), Helvetica, sans-serif;
+  --font-lato-stack: var(--font-lato), Helvetica, sans-serif;
+  --font-poppins-stack: var(--font-poppins), Helvetica, sans-serif;
+
+  --header-height: 116px;
+  --container-max: 1425px;
+  --container-pad: 90px;
+  --ease-out: cubic-bezier(0.25, 1, 0.33, 1);
+}
+
+@media (max-width: 999px) {
+  :root {
+    --header-height: 48px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 27px;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+figure,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 70px;
+  line-height: 106px;
+  margin-bottom: 7px;
+}
+
+h2 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 50px;
+  margin-bottom: 7px;
+}
+
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 42px;
+  margin-bottom: 8px;
+}
+
+h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 18px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* The original only loads Playfair 400/700/900, so its 600-weight h5 renders at 700. */
+h5 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+  margin-bottom: 7px;
+}
+
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
+  margin-bottom: 7px;
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  h1 { line-height: 79.5px; }
+  h2 { font-size: 42.5px; line-height: 42.5px; }
+  h3 { font-size: 32.3px; line-height: 35.7px; }
+}
+
+@media (min-width: 691px) and (max-width: 999px) {
+  h1 { line-height: 74.2px; }
+  h2 { font-size: 40px; line-height: 40px; }
+  h3 { font-size: 30.4px; line-height: 33.6px; }
+}
+
+@media (max-width: 690px) {
+  h1 { font-size: 30px; line-height: 40px; }
+  h2 { font-size: 22px; line-height: 28px; }
+  h3 { font-size: 30.4px; line-height: 33.6px; }
+  h4 { font-size: 16.2px; line-height: 16.2px; }
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100000;
+  padding: 10px 16px;
+  background: var(--white);
+  color: var(--black);
+}
+
+.skip-link:focus {
+  left: 10px;
+  top: 10px;
+}

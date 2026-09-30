@@ -1,0 +1,44 @@
+.testimonialsHeading {
+  padding: 50px 0 0;
+  text-align: center;
+}
+
+/* 5% of the content width below the heading (the padding of the original's inner row). */
+.testimonialsHeading h2 {
+  max-width: 610px;
+  margin: 0 auto;
+  padding-bottom: 5%;
+  font-size: 50px;
+  line-height: 60px;
+  color: var(--black);
+}
+
+.testimonials {
+  background: var(--white);
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .testimonialsHeading h2 {
+    font-size: 42.5px;
+    line-height: 51px;
+  }
+}
+
+@media (min-width: 691px) and (max-width: 999px) {
+  .testimonialsHeading h2 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+@media (max-width: 690px) {
+  .testimonialsHeading {
+    padding-bottom: 43px;
+  }
+
+  .testimonialsHeading h2 {
+    padding-bottom: 0;
+    font-size: 22px;
+    line-height: 26.4px;
+  }
+}

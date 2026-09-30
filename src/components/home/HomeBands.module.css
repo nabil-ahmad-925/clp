@@ -1,0 +1,137 @@
+.intro > .padded,
+.hashtag > .padded {
+  padding-left: calc(var(--container-pad) + 28px);
+  padding-right: calc(var(--container-pad) + 28px);
+}
+
+/* ---- Intro band ---- */
+
+.intro {
+  padding: 50px 0;
+  text-align: center;
+}
+
+.statement,
+.supporting {
+  margin: -15px 0 30px;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 59px;
+}
+
+.supporting {
+  font-family: var(--font-roboto-stack);
+  font-size: 24px;
+  line-height: 30px;
+}
+
+/* ---- Hashtag band ---- */
+
+.hashtag {
+  position: relative;
+  z-index: 2;
+  padding: 50px 0;
+  text-align: center;
+}
+
+.hashtag::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  z-index: 99;
+  width: 0;
+  height: 0;
+  margin-left: -30px;
+  border-top: 30px solid #050505;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+}
+
+.hashtagText {
+  margin: 0 0 30px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 60px;
+  color: var(--white);
+}
+
+/* ---- Trusted by ---- */
+
+.trusted {
+  padding: 50px 0;
+  text-align: center;
+}
+
+.trustedTitle {
+  margin: 0 0 50px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 40px;
+  color: var(--grey-muted);
+}
+
+.logos {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  column-gap: 24px;
+  row-gap: 25px;
+  padding: 0 28px;
+  list-style: none;
+}
+
+.logos img {
+  width: 100%;
+  height: auto;
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+@media (max-width: 999px) {
+  .intro > .padded,
+  .hashtag > .padded {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .statement,
+  .supporting,
+  .hashtagText,
+  .trustedTitle {
+    font-size: 30.4px;
+    line-height: 33.6px;
+  }
+
+  .logos {
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 13px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hashtagText {
+    font-size: 20px;
+    line-height: 28px;
+  }
+}
+
+@media (max-width: 690px) {
+  .statement,
+  .supporting,
+  .trustedTitle {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .logos {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 6px;
+  }
+}

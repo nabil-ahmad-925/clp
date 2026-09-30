@@ -1,0 +1,136 @@
+.footer {
+  position: relative;
+}
+
+.main {
+  background: var(--black);
+  padding: 50px 0;
+  text-align: center;
+}
+
+/* Six 60px icon boxes in a 400px row (matches the original's left-packed alignment). */
+.social {
+  display: flex;
+  max-width: 400px;
+  margin: 0 auto;
+  list-style: none;
+}
+
+.social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  color: var(--white);
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  top: -2px;
+}
+
+.iconSmall {
+  width: 26px;
+  height: 26px;
+}
+
+.links {
+  margin: 30px 0;
+  padding: 0 5%;
+}
+
+.links ul {
+  list-style: none;
+}
+
+.links li {
+  display: inline-block;
+  margin: 10px 20px;
+  line-height: 27px;
+}
+
+.links a {
+  color: var(--white);
+  font-size: 16px;
+}
+
+.copyright {
+  background: var(--gold);
+  padding: 15px 0;
+  color: var(--white);
+}
+
+.copyrightInner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.copyright p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 27px;
+  text-align: center;
+}
+
+.copyLine {
+  font-weight: 600;
+}
+
+.trademark {
+  font-weight: 400;
+}
+
+.copyright a {
+  color: var(--white);
+}
+
+@media (max-width: 999px) {
+  .copyrightInner {
+    max-width: 88%;
+    padding: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .trademark {
+    margin-top: 2px;
+    padding: 20px;
+    font-size: 12px !important;
+    line-height: 18px !important;
+  }
+}
+
+@media (max-width: 690px) {
+  .social {
+    max-width: none;
+    justify-content: center;
+  }
+
+  .social a {
+    width: 40px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .iconSmall {
+    width: 18px;
+    height: 18px;
+  }
+
+  .links li {
+    display: block;
+    margin: 5px 0;
+    line-height: 28px;
+  }
+
+  .links a {
+    font-size: 13px;
+  }
+}

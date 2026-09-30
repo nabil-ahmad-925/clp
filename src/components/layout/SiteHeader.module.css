@@ -1,0 +1,160 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.transparent {
+  background: transparent;
+  pointer-events: none;
+}
+
+.solid {
+  background: var(--black);
+  box-shadow: rgba(0, 0, 0, 0.15) 0 3px 45px;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+}
+
+.logo {
+  position: relative;
+  display: block;
+  margin: 28px 0;
+  line-height: 0;
+  pointer-events: auto;
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 60px;
+  transition: opacity 0.4s, height 0.32s;
+}
+
+.logoDark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.dark .logoLight {
+  opacity: 0;
+}
+
+.dark .logoDark {
+  opacity: 1;
+}
+
+/* ---- Hamburger / close toggle (Salient "x2" animation) ---- */
+
+.toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 60px;
+  pointer-events: auto;
+  --line-color: var(--white);
+  --line-w: 48px;
+  --line-h: 4.5px;
+  --line-gap: 13.5px;
+}
+
+.dark .toggle {
+  --line-color: var(--black);
+}
+
+.lines,
+.lines::before,
+.lines::after {
+  display: block;
+  width: var(--line-w);
+  height: var(--line-h);
+  border-radius: 3px;
+  background-color: var(--line-color);
+}
+
+.lines {
+  position: relative;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.lines::before,
+.lines::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  transform-origin: 50% 50%;
+  transition: top 0.4s 0.45s ease, transform 0.3s ease, background-color 0.2s ease;
+}
+
+.lines::before {
+  top: calc(var(--line-gap) * -1);
+}
+
+.lines::after {
+  top: var(--line-gap);
+}
+
+.toggle:hover,
+.toggle:focus-visible {
+  opacity: 0.8;
+  --line-color: var(--gold);
+}
+
+.menuOpen .lines {
+  background-color: transparent;
+}
+
+.menuOpen .lines::before,
+.menuOpen .lines::after {
+  top: 0;
+  transition: top 0.5s ease, transform 0.3s 0.4s ease, background-color 0.2s ease;
+}
+
+.menuOpen .lines::before {
+  transform: rotate(-45deg);
+}
+
+.menuOpen .lines::after {
+  transform: rotate(45deg);
+}
+
+@media (max-width: 999px) {
+  .header {
+    padding: 12px 0;
+  }
+
+  .logo {
+    margin: 0;
+  }
+
+  .logo img {
+    height: 24px;
+  }
+
+  .toggle {
+    width: 22px;
+    height: 24px;
+    --line-w: 22px;
+    --line-h: 2px;
+    --line-gap: 6px;
+  }
+}
+
+@media (max-width: 690px) {
+  .inner {
+    padding: 0 18px;
+  }
+}

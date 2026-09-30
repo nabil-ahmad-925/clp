@@ -1,0 +1,35 @@
+.section {
+  background: var(--white);
+  color: var(--black);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 -10px 20px;
+}
+
+.column {
+  padding: 0 10px;
+}
+
+/* 1st and 3rd cards sit 80px lower, giving the staggered look. */
+.grid > .column:nth-child(odd) {
+  margin-top: 80px;
+}
+
+@media (max-width: 999px) {
+  .grid {
+    grid-template-columns: 1fr;
+    margin: 0 0 20px;
+  }
+
+  .grid > .column {
+    padding: 0;
+    margin-bottom: 25px;
+  }
+
+  .grid > .column:nth-child(odd) {
+    margin-top: 0;
+  }
+}

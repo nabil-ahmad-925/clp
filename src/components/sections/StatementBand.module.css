@@ -1,0 +1,48 @@
+.band {
+  text-align: center;
+}
+
+.gold {
+  padding: 17vw 0;
+  background: var(--gold);
+  color: var(--white);
+}
+
+.plain {
+  padding: 15vw 28px;
+  background: var(--white);
+  color: var(--black);
+}
+
+.plain .text {
+  color: var(--black);
+}
+
+/* Styled like the original H1 (Playfair 70px); rendered as h2 so each page keeps one h1. */
+.text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 70px;
+  line-height: 106px;
+  color: var(--white);
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .text {
+    line-height: 79.5px;
+  }
+}
+
+@media (min-width: 691px) and (max-width: 999px) {
+  .text {
+    line-height: 74.2px;
+  }
+}
+
+@media (max-width: 690px) {
+  .text {
+    font-size: 30px;
+    line-height: 40px;
+  }
+}

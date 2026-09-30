@@ -1,0 +1,160 @@
+/* Salient "nectar-post-grid" (content overlaid, all bottom left + shadow, 5px spacing, 10px radius). */
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -5px;
+}
+
+.item {
+  position: relative;
+  width: calc(100% / var(--columns) - 10px);
+  height: 40vh;
+  min-height: 300px;
+  margin: 0 5px 5px;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* Bottom shadow behind the text. */
+.inner::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: block;
+  width: 100%;
+  height: 55%;
+  opacity: 0.9;
+  background: linear-gradient(to bottom, rgba(15, 15, 15, 0), rgba(15, 15, 15, 0.75) 100%);
+  pointer-events: none;
+}
+
+.bgWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #000;
+  opacity: 0.3;
+  transition: opacity 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.item:hover .overlay {
+  opacity: 0.4;
+}
+
+.item:hover .bg {
+  transform: scale(1.1);
+}
+
+.content {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  align-items: flex-end;
+  padding: 35px;
+  color: #fff;
+}
+
+.link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.main {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.main a {
+  pointer-events: auto;
+}
+
+.heading {
+  margin: 0 0 14px;
+  font-size: min(24px, max(18px, 1.3vw));
+  line-height: 1.3;
+  color: #fff;
+}
+
+.heading a {
+  color: #fff;
+}
+
+/* Animated underline on hover. */
+.heading span {
+  background-image: linear-gradient(to right, #fff 0, #fff 100%);
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 0% 2px;
+  transition: background-size 0.55s cubic-bezier(0.2, 0.75, 0.5, 1);
+}
+
+.item:hover .heading span {
+  background-size: 100% 2px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.date::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 8px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.author + .date::before {
+  display: inline-block;
+}
+
+.date:first-child::before {
+  display: none;
+}
+
+@media (max-width: 999px) {
+  .heading {
+    font-size: 20px;
+  }
+
+  .item {
+    width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 690px) {
+  .item {
+    width: calc(100% - 10px);
+  }
+}

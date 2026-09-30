@@ -1,0 +1,226 @@
+/* WP Google Map Pro directory (listing layout 3) with the site's custom CSS, values measured from the original. */
+
+.container {
+  display: table;
+  width: 100%;
+  margin-bottom: 24px;
+  font-size: 16px;
+}
+
+.filterWrap {
+  display: inline-block;
+  width: 100%;
+  /* 20px, plus the 8px the original's inline-block filter bar leaves below its baseline. */
+  margin-bottom: 28px;
+  padding: 20px;
+  border-radius: 2px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.select {
+  display: block;
+  width: 170px;
+  max-width: 170px;
+  height: 45.19px;
+  margin: 5px;
+  padding: 10px 40px 10px 10px;
+  border: none;
+  border-radius: 46px;
+  outline: none;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath fill='%2362636f' d='m5.293 9.707 6 6a.999.999 0 0 0 1.414 0l6-6a.999.999 0 1 0-1.414-1.414L12 13.586 6.707 8.293a.999.999 0 1 0-1.414 1.414z'/%3E%3C/svg%3E")
+    no-repeat right 14px center / 16px;
+  box-shadow: 0 2px 32px rgba(91, 97, 110, 0.2);
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 25.2px;
+  text-transform: capitalize;
+  appearance: none;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: #dfbe75 solid 2px;
+  outline-offset: -2px;
+}
+
+.body {
+  display: flex;
+  gap: 36px;
+}
+
+.mapSide,
+.listSide {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mapSide {
+  padding-right: 6.21875px;
+}
+
+.listSide {
+  padding-left: 6.21875px;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #e5e3df;
+}
+
+/* ---- Listing ---- */
+
+.listing {
+  width: 100%;
+}
+
+.location {
+  float: left;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #f1f1f1;
+  background: #fff;
+  font-family: var(--font-heading), sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 21.4286px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.head {
+  display: block;
+}
+
+.title {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.title a {
+  font-size: 19.2px;
+  font-weight: 400;
+  line-height: 21.4286px;
+  color: rgb(33, 47, 61);
+  text-transform: capitalize;
+}
+
+.meta {
+  float: right;
+  margin-bottom: 20px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0 10px;
+  border: 1px solid #e3bd66;
+  border-radius: 32px;
+  background: #fff;
+  color: #e3bd66;
+  font-size: 13.125px;
+  line-height: 19.6875px;
+}
+
+.image {
+  float: left;
+  clear: left;
+  width: 141.5px;
+}
+
+.image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.content {
+  float: left;
+  width: 71%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 21.4286px;
+  color: rgba(0, 0, 0, 0.58);
+}
+
+.image + .content {
+  width: calc(71% - 0px);
+  margin-left: 0;
+}
+
+.learnMore {
+  float: left;
+  margin-left: 141.5px;
+  text-align: left;
+}
+
+.learnMore a {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 100 !important;
+  line-height: 18px;
+}
+
+.foot {
+  float: left;
+  width: 100%;
+}
+
+.pagination {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 27px;
+  text-align: center;
+}
+
+/* A pagination bar with page links sits 6px taller on the original (its inline boxes' line gap). */
+.pagination:not(:empty) {
+  padding-bottom: 6px;
+}
+
+.pageCurrent,
+.pageLink {
+  display: inline-block;
+  margin-right: 4px;
+  padding: 0 10px;
+}
+
+.pageCurrent {
+  background: #000;
+  color: #fff;
+}
+
+.pageLink {
+  background: #e3bd66;
+  color: #000;
+}
+
+@media (max-width: 767px) {
+  .body {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .select {
+    width: calc(50% - 10px);
+    max-width: none;
+  }
+}

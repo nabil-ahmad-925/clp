@@ -1,0 +1,253 @@
+.slider {
+  outline: none;
+}
+
+.viewport {
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+}
+
+.slide {
+  flex: 0 0 33%;
+  min-width: 0;
+  margin: 0 0 30px;
+  padding: 15px;
+  text-align: center;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--black);
+}
+
+.selected {
+  opacity: 1;
+}
+
+.quote {
+  position: relative;
+  margin: 0 0 40px;
+  padding: 50px 50px 50px 100px;
+  border-radius: 10px;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.quote::before {
+  content: '\201C';
+  position: absolute;
+  top: 50px;
+  left: 29px;
+  font-family: sans-serif;
+  font-size: 130px;
+  line-height: 115px;
+  opacity: 0.4;
+}
+
+.selected .quote {
+  background-color: var(--gold);
+  color: var(--white);
+}
+
+.selected .quote::before {
+  color: rgba(0, 0, 0, 0.27);
+}
+
+/* Speech-bubble pointer under the selected quote. */
+.arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: -19px 0 0 -14px;
+  overflow: hidden;
+  border-radius: 5px;
+  transform: rotate(-135deg);
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.arrow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 22px 22px 0 0;
+  border-color: var(--gold) transparent transparent transparent;
+}
+
+.selected .arrow {
+  opacity: 1;
+}
+
+.avatar {
+  display: block;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 17px;
+  border-radius: 100px;
+  background-size: cover;
+  background-position: center center;
+}
+
+.avatarShadow {
+  box-shadow: rgba(0, 0, 0, 0.15) 0 15px 37px;
+}
+
+.name,
+.title {
+  display: block;
+  line-height: 1.4;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--gold-name);
+}
+
+.title {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* ---- Prev / next arrows ---- */
+
+/* The arrows overlap the bottom of the slides by 25px, as on the original. */
+.controls {
+  margin-top: -25px;
+  padding-bottom: 25px;
+  text-align: center;
+}
+
+.navButton {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  margin: 12px;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.navButton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background-color: var(--white);
+  transition:
+    transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1),
+    opacity 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.navButton::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 7px;
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin-top: -1px;
+  background-color: var(--black);
+  transform-origin: right;
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.navButton svg {
+  position: relative;
+  width: 12px;
+  height: 100%;
+  fill: var(--black);
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.navButton:hover::before {
+  transform: scale(1.15);
+}
+
+.previous svg {
+  transform: translateX(-4px);
+}
+
+.previous::after {
+  left: 18px;
+  transform: scaleX(0.9);
+  transform-origin: left;
+}
+
+.previous:hover svg {
+  transform: translateX(-6px);
+}
+
+.previous:hover::after {
+  transform: scaleX(1.1) translateX(-1px);
+}
+
+.next svg {
+  transform: translateX(5px) rotate(180deg);
+}
+
+.next::after {
+  transform: scaleX(0.9) translateX(8px);
+}
+
+.next:hover svg {
+  transform: translateX(7px) rotate(180deg);
+}
+
+.next:hover::after {
+  transform: scaleX(1.1) translateX(8px);
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .slide {
+    flex-basis: 50%;
+  }
+}
+
+@media (max-width: 999px) {
+  .slide {
+    flex-basis: 60%;
+    font-size: 22px;
+    line-height: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .slider {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 690px) {
+  .slide {
+    flex-basis: 85%;
+    margin-bottom: 0;
+  }
+
+  .quote {
+    padding: 30px;
+  }
+
+  .quote::before {
+    display: none;
+  }
+
+  .navButton {
+    margin: 6px;
+    transform: scale(0.8);
+  }
+}

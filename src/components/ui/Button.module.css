@@ -1,0 +1,94 @@
+.button {
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+  margin-bottom: 10px;
+  border-style: solid;
+  border-image: var(--gold-border-gradient) 1;
+  background-color: transparent;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+  text-align: center;
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.45s var(--ease-out),
+    color 0.45s var(--ease-out);
+}
+
+.button span {
+  position: relative;
+  z-index: 100;
+  display: inline-block;
+}
+
+/* Gradient fill that sweeps in from the left on hover. */
+.button::after {
+  content: '';
+  position: absolute;
+  top: -2%;
+  left: -1%;
+  z-index: -1;
+  width: 101.5%;
+  height: 104%;
+  background: linear-gradient(to right bottom, #bd8300, #dfbe75);
+  background-size: 225% 100%;
+  background-position: right center;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition:
+    transform 0.38s cubic-bezier(0.2, 0.95, 0.4, 0.95),
+    background-size 0.38s;
+}
+
+.button:hover::after,
+.button:focus-visible::after {
+  background-size: 100% 100%;
+  background-position: left center;
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.light,
+.light:hover {
+  color: var(--white);
+}
+
+.dark {
+  color: var(--black);
+}
+
+.dark:hover {
+  color: var(--white);
+}
+
+.jumbo {
+  border-width: 4px;
+  padding: 21px 40px;
+  font-size: 18px;
+}
+
+.regular {
+  border-width: 3px;
+  padding: 13px 18px;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .compact.jumbo {
+    border-width: 3px;
+    padding: 8px 8px;
+  }
+}
+
+@media (max-width: 690px) {
+  .jumbo {
+    padding: 11px 30px;
+    font-size: 13px;
+  }
+
+  .compact.jumbo {
+    padding: 8px;
+  }
+}

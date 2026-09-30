@@ -1,0 +1,61 @@
+.section {
+  background: var(--white);
+  color: var(--black);
+  text-align: center;
+}
+
+.spaced {
+  padding-top: 50px;
+}
+
+/* 5% of the container width below the heading, as in the original row. */
+.inner {
+  max-width: 66%;
+  margin: 0 auto;
+  padding-bottom: 5%;
+}
+
+/* A 6-of-12 column: half the row (with its 12.44px side margins) less the column's 12.69px padding. */
+.narrow {
+  max-width: calc((100% + 24.875px) / 2 - 25.375px);
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 60px;
+  color: var(--black);
+}
+
+.text {
+  margin-top: 24px;
+  font-size: 15px;
+  line-height: 27px;
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .title {
+    font-size: 42.5px;
+    line-height: 51px;
+  }
+}
+
+@media (max-width: 999px) {
+  .inner {
+    max-width: none;
+    padding-bottom: 5%;
+  }
+
+  .title {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+@media (max-width: 690px) {
+  .title {
+    font-size: 22px;
+    line-height: 26.4px;
+  }
+}

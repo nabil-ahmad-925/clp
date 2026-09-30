@@ -1,0 +1,60 @@
+.toTop {
+  position: fixed;
+  right: 17px;
+  bottom: 17px;
+  z-index: 9994;
+  display: block;
+  width: 29px;
+  height: 29px;
+  overflow: hidden;
+  border-radius: 200px;
+  background: var(--gold-strong);
+  color: var(--white);
+  transform: translateY(calc(100% + 17px));
+  transition: transform 0.45s var(--ease-out), background-color 0.05s linear;
+}
+
+.visible {
+  transform: translateY(0);
+}
+
+/* Black fill that scales in on hover. */
+.toTop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 100px;
+  background-color: var(--black);
+  transform: scale(0);
+  transition: transform 0.3s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.toTop:hover::after {
+  transform: scale(1);
+}
+
+.arrows {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.arrows svg {
+  flex: none;
+  width: 29px;
+  height: 29px;
+  padding: 7px;
+}
+
+.toTop:hover .arrows {
+  transform: translateY(-29px);
+}
+
+@media (max-width: 999px) {
+  .toTop {
+    display: none;
+  }
+}

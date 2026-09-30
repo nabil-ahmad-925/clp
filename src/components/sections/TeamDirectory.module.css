@@ -1,0 +1,181 @@
+/* Team plugin container/grid (per-widget variables) plus the site's custom overrides. */
+
+.directory {
+  width: 100%;
+  max-width: var(--dir-width);
+  margin: 0 auto;
+  --dir-col-width: 25%;
+  --dir-filter-items: 4;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 40px 0;
+}
+
+.filters > * {
+  min-width: 250px;
+  width: calc(100% / var(--dir-filter-items) - 16px + 16px / var(--dir-filter-items));
+}
+
+/* Site CSS for some widgets (workshops, activations, camps, trips): three menus to a row on tablets and up. */
+@media (min-width: 768px) {
+  .thirds > * {
+    flex: 0 1 calc(33.333% - 20px);
+  }
+}
+
+/* Without filters the plugin's empty filter bar still leaves its 40px margin. */
+.noFilters {
+  height: 0;
+  margin-top: 40px;
+}
+
+.inner {
+  position: relative;
+  min-height: 155px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: calc(var(--dir-row-gap) * -1);
+  margin-left: calc(var(--dir-col-gap) * -1);
+}
+
+/* Shown when no items match the chosen filters (or the widget has none yet), as on the live site. */
+.emptyWrap {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.empty {
+  display: inline-block;
+  padding: 6px 24px;
+  border-radius: 4px;
+  background: var(--white);
+  box-shadow: 0 0 24px rgba(147, 149, 165, 0.2);
+  color: #64656e;
+  font-family: Roboto, sans-serif; /* declared but never loaded on the original */
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 27px;
+}
+
+.col {
+  width: var(--dir-col-width);
+  padding-top: var(--dir-row-gap);
+  padding-left: var(--dir-col-gap);
+  animation: reveal 0.4s ease;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.001);
+  }
+}
+
+@media (max-width: 1024px) {
+  .directory {
+    max-width: 90%;
+    --dir-col-width: 33.333%;
+  }
+}
+
+@media (max-width: 767px) {
+  .directory {
+    --dir-col-width: 50%;
+    --dir-filter-items: 2;
+  }
+}
+
+@media (max-width: 690px) {
+  .directory {
+    width: 96%;
+  }
+}
+
+@media (max-width: 480px) {
+  .directory {
+    width: 100%;
+    max-width: 100%;
+    --dir-col-width: 100%;
+    --dir-filter-items: 1;
+  }
+
+  .row {
+    margin-left: 0;
+  }
+
+  .col {
+    padding-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .col {
+    animation: none;
+  }
+}
+
+/* Site custom CSS: 32px column spacing on tablets and up. */
+@media (min-width: 768px) {
+  .col {
+    padding-left: 32px;
+  }
+}
+
+/* "Load More" under paged widgets; hidden once every card is shown. */
+.loadMore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-family: Roboto, sans-serif;
+}
+
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 4px 14px;
+  border: 2px solid rgba(120, 123, 129, 0.32);
+  border-radius: 200px;
+  background: transparent;
+  color: #53565a;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 27px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.loadMoreBtn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.loadMoreBtn:hover {
+  border-color: #e3bd66;
+  background: #e3bd66;
+}
+
+.loadStatus {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 27px;
+  color: #444950;
+}

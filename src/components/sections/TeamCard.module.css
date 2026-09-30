@@ -1,0 +1,133 @@
+/* Photo card shared by the facility grids and team directories (values measured from the original). */
+
+.card {
+  position: relative;
+  margin: 7px 0 24px;
+  padding-bottom: 7px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Black fade over the photo, turning gold on hover. */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 99%;
+  border-radius: 10px;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.79) 100%);
+}
+
+.card:hover::before,
+.card:focus-visible::before {
+  z-index: 5;
+  background: linear-gradient(rgba(0, 0, 0, 0), var(--gold-strong) 100%);
+}
+
+.image {
+  overflow: hidden;
+  height: 434px;
+  border-radius: 10px;
+  line-height: 0;
+}
+
+.image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Retina tablets get slightly taller cards on the original site. */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) {
+  .image {
+    height: 450px;
+  }
+}
+
+.meta {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 9;
+  width: 90%;
+  margin: auto;
+  color: var(--white);
+  text-align: center;
+  transition:
+    opacity 0.65s cubic-bezier(0.05, 0.2, 0.1, 1),
+    transform 0.65s cubic-bezier(0.05, 0.2, 0.1, 1);
+}
+
+.card:hover .meta,
+.card:focus-visible .meta {
+  transform: translateY(-55px);
+}
+
+.meta h5 {
+  margin-bottom: 5px;
+  font-size: 18px;
+  line-height: 1em;
+  color: var(--white);
+}
+
+.meta h3 {
+  margin-bottom: 10px;
+  color: var(--white);
+}
+
+.meta p {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.65s cubic-bezier(0.05, 0.2, 0.1, 1),
+    transform 0.65s cubic-bezier(0.05, 0.2, 0.1, 1);
+}
+
+.card:hover .meta p,
+.card:focus-visible .meta p {
+  position: relative;
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .meta h3 {
+    font-size: 20px;
+  }
+}
+
+/* ---- Team-directory plugin card ("wps"): no spacing around the photo; site CSS sizes the title ---- */
+
+.wps {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.wps::before {
+  height: 100%;
+}
+
+.wps .meta h5 {
+  margin-bottom: 0;
+  line-height: 28px;
+}
+
+.wps .meta h3 {
+  margin-bottom: 8px;
+  font-size: 22px;
+  line-height: 42px;
+}
+
+.wps .meta h3 span {
+  font-size: 30px;
+  line-height: 30px;
+}

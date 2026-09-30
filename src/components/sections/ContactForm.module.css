@@ -1,0 +1,110 @@
+/* Contact Form 7 with the theme's inputs and the site's custom CSS, values measured from the original. */
+
+.container {
+  margin-bottom: 24px;
+}
+
+.outer {
+  width: 100%;
+  max-width: 700px;
+  margin: auto;
+  padding: 30px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.paragraph {
+  padding-bottom: 28px;
+}
+
+.wrap {
+  position: relative;
+  display: block;
+}
+
+.input,
+.select {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  color: #555;
+  font-size: 14px;
+}
+
+.input {
+  height: 58px;
+  padding: 16px;
+  background: transparent;
+  font-family: var(--font-body);
+  line-height: 24px;
+}
+
+/* A native drop-down in the browser's own font, as on the original. */
+.select {
+  height: 60px;
+  padding: 10px;
+  background: #fff;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+
+.tip {
+  display: block;
+  padding: 2px 6px;
+  color: #f00;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 27px;
+}
+
+.submitRow {
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.submit {
+  display: inline-block;
+  height: 50px;
+  margin: 0;
+  padding: 16px 23px;
+  border: none;
+  border-radius: 200px;
+  background: #dfbe75;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: normal;
+  text-transform: uppercase;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    opacity 0.45s var(--ease-out),
+    background-color 0.45s var(--ease-out);
+}
+
+.submit:hover {
+  opacity: 0.85;
+}
+
+/* The plugin's (hidden) spinner still takes its place beside the button. */
+.spinner {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin: 0 24px;
+  visibility: hidden;
+}
+
+.response {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  background: #e1be6e;
+  color: #fff;
+}

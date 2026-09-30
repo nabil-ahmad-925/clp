@@ -1,0 +1,30 @@
+.heading {
+  margin: 0;
+}
+
+.word {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+.inner {
+  position: relative;
+  display: inline-block;
+  transform: translateY(1.3em);
+  transition: transform 650ms linear;
+}
+
+.shown .inner {
+  transform: none;
+}
+
+/* The original only animates on desktop; touch devices and reduced motion show it straight away. */
+@media (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .inner {
+    transform: none;
+    transition: none;
+  }
+}

@@ -1,0 +1,38 @@
+.richText {
+  font-size: 15px;
+  line-height: 27px;
+  color: var(--black);
+}
+
+.richText p {
+  padding-bottom: 27px;
+}
+
+.richText p:last-child {
+  padding-bottom: 0;
+}
+
+.richText ul,
+.richText ol {
+  margin: 0 0 30px 30px;
+}
+
+.richText ul {
+  list-style: disc;
+}
+
+.richText li {
+  margin: 0;
+}
+
+.richText strong {
+  font-weight: 600;
+}
+
+.richText a {
+  color: var(--gold);
+}
+
+.richText a:hover {
+  color: inherit;
+}

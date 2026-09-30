@@ -1,0 +1,72 @@
+/* NextGEN compact album, default view (values measured from the original). */
+
+/* No space below: the album is the text column's last element, and the column keeps none either. */
+div.overview {
+  width: 100%;
+  margin-top: 40px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+/* Cards shrink-wrap to the 300px cover (or a wider title, up to 320px) and flow centred, 10px apart. */
+.card {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  padding: 10px;
+  border: 1px solid rgba(150, 150, 150, 0.3);
+  box-shadow: 0 0 4px 2px rgba(150, 150, 150, 0.1);
+  vertical-align: baseline;
+  text-align: center;
+}
+
+.box {
+  position: relative;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.link {
+  display: block;
+  height: 308px;
+}
+
+.link img {
+  display: block;
+  width: 300px;
+  max-width: 100%;
+  height: 300px;
+  margin: 0 auto;
+}
+
+.title {
+  margin: 10px 0 8px;
+  padding: 0;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+
+.title a {
+  display: block;
+  max-width: 320px;
+  height: 54px;
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--gold);
+  transition: color 0.3s;
+}
+
+.counter {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 27px;
+  color: var(--black);
+}
+
+.counter strong {
+  font-weight: 600;
+}

@@ -1,0 +1,38 @@
+.reveal {
+  transition:
+    transform 650ms linear var(--reveal-delay, 0ms),
+    opacity 650ms linear var(--reveal-delay, 0ms);
+}
+
+.reveal[data-animation='fade-in-from-bottom'] {
+  opacity: 0;
+  transform: translateY(100px);
+}
+
+.reveal[data-animation='fade-in-from-right'] {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+.reveal[data-animation='fade-in-from-left'] {
+  opacity: 0;
+  transform: translateX(-100px);
+}
+
+.reveal[data-animation='fade-in'] {
+  opacity: 0;
+}
+
+.reveal[data-shown] {
+  opacity: 1;
+  transform: none;
+}
+
+/* The original disables entrance animations on touch devices, and for reduced-motion users. */
+@media (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .reveal {
+    transition: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

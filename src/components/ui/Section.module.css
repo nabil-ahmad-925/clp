@@ -1,0 +1,32 @@
+.section {
+  position: relative;
+  background-color: var(--white);
+}
+
+.light {
+  color: var(--white);
+}
+
+.dark {
+  color: var(--black);
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-pad);
+}
+
+.full {
+  position: relative;
+  width: 100%;
+}
+
+@media (max-width: 999px) {
+  .container {
+    max-width: 88%;
+    padding: 0;
+  }
+}

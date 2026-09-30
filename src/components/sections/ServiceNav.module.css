@@ -1,0 +1,131 @@
+.nav {
+  width: 100%;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--gold);
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  padding: 2% 0;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.item:hover {
+  background: linear-gradient(to bottom right, var(--gold-deep) 0, var(--gold) 100%);
+}
+
+/* A lone "Next Service" (first page) keeps to the right half. */
+.next:only-child {
+  margin-left: auto;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.heading {
+  position: relative;
+  width: 100%;
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  line-height: 42px;
+  color: var(--white);
+  transition: transform 0.4s cubic-bezier(0.05, 0.2, 0.1, 1);
+}
+
+/* On hover the text slides 40px away from the arrow that fades in beside it. */
+.previous:hover .heading {
+  transform: translateX(40px);
+}
+
+.next:hover .heading {
+  transform: translateX(-40px);
+}
+
+.arrow {
+  position: absolute;
+  top: 41%;
+  font-size: 40px;
+  opacity: 0;
+}
+
+.previous .arrow {
+  left: 24%;
+  transform: rotate(180deg);
+}
+
+.next .arrow {
+  right: 24%;
+}
+
+.previous:hover .arrow {
+  opacity: 1;
+  animation: arrowInPrevious 0.4s cubic-bezier(0.05, 0.2, 0.1, 1) forwards;
+}
+
+.next:hover .arrow {
+  opacity: 1;
+  animation: arrowInNext 0.4s cubic-bezier(0.05, 0.2, 0.1, 1) forwards;
+}
+
+@keyframes arrowInPrevious {
+  from {
+    opacity: 0;
+    transform: rotate(180deg) translateX(-20px);
+  }
+}
+
+@keyframes arrowInNext {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+.label {
+  display: block;
+  font-size: 16px;
+  line-height: 42px;
+  color: var(--white);
+}
+
+.title {
+  display: block;
+  color: var(--white);
+}
+
+@media (max-width: 767px) {
+  .item {
+    width: 100%;
+  }
+}
+
+@media (max-width: 690px) {
+  .heading {
+    font-size: 1.4rem;
+  }
+
+  .arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) and (orientation: portrait) {
+  .previous {
+    border-bottom: 1px solid var(--white);
+  }
+}

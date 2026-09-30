@@ -1,0 +1,192 @@
+.section {
+  padding-bottom: 30px;
+  background: var(--white);
+}
+
+/* Keeps the 50px above and below the tiles inside the carousel (they don't collapse into the heading's gap). */
+.carousel {
+  position: relative;
+  display: flow-root;
+}
+
+.viewport {
+  margin: 50px 0;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* The caption keeps its 38px in the flow below the image on the original, so tiles are 38px taller than the photo. */
+.cell {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0 10px;
+  padding-bottom: 38px;
+  overflow: hidden;
+}
+
+/* Fixed-height tiles; width follows each image's aspect ratio. */
+.cell img {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 600px;
+}
+
+.link {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* Shifted up by half the tile from its place below the image. */
+.meta {
+  position: absolute;
+  top: calc(50% - 38px);
+  left: 25px;
+  z-index: 1;
+  width: 90%;
+  padding-top: 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.meta h4 {
+  margin-bottom: 5px;
+  font-weight: 900;
+  font-size: 42px;
+  line-height: 18px;
+  color: var(--white);
+}
+
+/* ---- Overlaid round arrows ---- */
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  padding: 0;
+}
+
+.arrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: var(--white);
+  transition: all 0.45s cubic-bezier(0.15, 0.2, 0.1, 1);
+}
+
+.arrow:hover::before {
+  transform: scale(1.2);
+}
+
+.arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  display: block;
+  width: 15px;
+  height: 2px;
+  margin-top: -1px;
+  background-color: var(--black);
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.arrow svg {
+  position: absolute;
+  top: 9px;
+  width: 12px;
+  height: 22px;
+  fill: var(--black);
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.previous {
+  left: 50px;
+}
+
+.previous svg {
+  left: 10px;
+}
+
+.previous::after {
+  left: 13px;
+  transform: scaleX(1) translateX(1px);
+  transform-origin: left;
+}
+
+.previous:hover svg {
+  transform: translateX(-2px);
+}
+
+.previous:hover::after {
+  transform: scaleX(1.3) translateX(-1px);
+}
+
+.next {
+  right: 50px;
+}
+
+.next svg {
+  right: 10px;
+  transform: rotate(180deg);
+}
+
+.next::after {
+  left: 12px;
+  transform: scaleX(1) translateX(0);
+  transform-origin: right;
+}
+
+.next:hover svg {
+  transform: translateX(2px) rotate(180deg);
+}
+
+.next:hover::after {
+  transform: scaleX(1.3) translateX(1px);
+}
+
+@media (max-width: 1300px) {
+  .cell img {
+    height: 400px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .cell img {
+    height: 350px;
+  }
+
+  .arrow {
+    transform: scale(0.75);
+  }
+}
+
+@media (max-width: 690px) {
+  .cell img {
+    height: 300px;
+  }
+
+  .meta h4 {
+    line-height: 16.2px;
+  }
+
+  .arrow {
+    transform: scale(0.65);
+  }
+
+  .previous {
+    left: 35px;
+  }
+
+  .next {
+    right: 35px;
+  }
+}

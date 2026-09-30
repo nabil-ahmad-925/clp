@@ -1,0 +1,178 @@
+/* ---- Text blocks ---- */
+
+.block {
+  padding: 5vw 0;
+  background: var(--white);
+  color: var(--black);
+  text-align: center;
+}
+
+.blockFull .fullInner {
+  padding: 0 5vw;
+}
+
+.blockTitle {
+  margin: 0 0 7px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 70px;
+  line-height: 106px;
+  color: var(--black);
+}
+
+.blockText {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 42px;
+  color: var(--black);
+}
+
+.blockText:last-child {
+  margin-bottom: 10px;
+}
+
+/* ---- Divider ---- */
+
+.divider {
+  margin-bottom: 35px;
+  background: var(--white);
+}
+
+.divider span {
+  display: block;
+  width: 20%;
+  height: 2px;
+  margin: 12.5px auto;
+  background-color: var(--black);
+}
+
+/* ---- How we work ---- */
+
+.how {
+  padding-top: 5vw;
+  background: #e1be6e;
+  color: var(--white);
+  text-align: center;
+}
+
+.howTitle {
+  margin: 0;
+  color: var(--white);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.step {
+  padding: 7vw;
+  padding-top: calc(7vw + 10px);
+}
+
+.step h3 {
+  margin: 0 0 8px;
+  color: var(--white);
+}
+
+.step p {
+  color: var(--white);
+}
+
+/* ---- Morphing outline CTA ---- */
+
+.cta {
+  padding: 5vw 0;
+  background: var(--black);
+  color: var(--white);
+  text-align: center;
+}
+
+.morph {
+  padding: 90px 50px;
+}
+
+.morphInner {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  line-height: 1;
+  color: var(--white);
+  transition: color 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.morphInner::after {
+  content: '';
+  position: absolute;
+  top: -92px;
+  left: -62px;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 80px 50px;
+  border: 12px solid var(--white);
+  border-radius: 50%;
+  box-sizing: content-box;
+  transition: all 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.cta:hover .morphInner::after,
+.morphInner:focus-visible::after {
+  border-radius: 0;
+}
+
+.morphText {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 50px;
+  color: var(--white);
+}
+
+/* ---- Closing image band ---- */
+
+.imageBand {
+  height: calc(16vw + 242px);
+}
+
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .step h3 {
+    font-size: 32.3px;
+    line-height: 35.7px;
+  }
+}
+
+@media (max-width: 999px) {
+  .blockText {
+    line-height: 33.6px;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .morphText {
+    font-size: 40px;
+    line-height: 40px;
+  }
+}
+
+@media (max-width: 690px) {
+  .blockTitle {
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .morph {
+    padding: 90px 20px;
+  }
+
+  .morphText {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}

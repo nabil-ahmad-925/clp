@@ -1,0 +1,159 @@
+.band {
+  padding: 50px 0;
+  background: var(--gold);
+}
+
+.carousel {
+  position: relative;
+  margin: 0 -10px;
+}
+
+/* Small arrows centred above the carousel. */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  height: 23px;
+  margin-bottom: 7px;
+}
+
+.prev,
+.next {
+  position: relative;
+  width: 30px;
+  height: 23px;
+  padding: 0 10px;
+  font-size: 22px;
+  line-height: 18px;
+  color: var(--black);
+  transition: transform 0.25s cubic-bezier(0.12, 0.75, 0.4, 1);
+}
+
+.prev svg,
+.next svg {
+  display: block;
+  width: 10px;
+  height: 23px;
+}
+
+.prev::after,
+.next::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 3px;
+  width: 24px;
+  height: 2px;
+  background-color: var(--black);
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.12, 0.75, 0.4, 1);
+}
+
+.prev::after {
+  transform: translateX(20px);
+}
+
+.next::after {
+  transform: translateX(-20px);
+}
+
+.prev:hover::after,
+.next:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.viewport {
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  list-style: none;
+  touch-action: pan-y pinch-zoom;
+}
+
+.slide {
+  flex: 0 0 33.3333%;
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.item {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  color: var(--white);
+  text-align: center;
+}
+
+/* The live site shows the theme's plain black "no image added yet" placeholder (600×403). */
+.image {
+  display: block;
+  aspect-ratio: 600 / 403;
+  background: #000;
+  transition: transform 0.38s cubic-bezier(0.05, 0.2, 0.1, 1);
+}
+
+.item:hover .image {
+  transform: scale(1.12);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-color: #282b30;
+  opacity: 0.45;
+  transition: opacity 0.35s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.item:hover .shade {
+  opacity: 0;
+}
+
+.info {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.info h3 {
+  margin: 0 0 5px;
+  color: var(--white);
+}
+
+.band .terms {
+  max-width: 900px;
+  margin: 24px auto 0;
+  font-size: 12px;
+  line-height: 15px;
+  color: var(--white);
+  text-align: center;
+}
+
+.band .terms :global(p),
+.band .terms :global(strong) {
+  color: var(--white);
+}
+
+@media (max-width: 999px) {
+  .slide {
+    flex-basis: 50%;
+  }
+}
+
+@media (max-width: 690px) {
+  .slide {
+    flex-basis: 100%;
+  }
+
+  .info h3 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}

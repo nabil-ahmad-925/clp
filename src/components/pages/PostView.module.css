@@ -1,0 +1,84 @@
+/* Salient single post ("default minimal" header, no sidebar). */
+
+.body {
+  position: relative;
+  background: var(--white);
+  color: var(--black);
+}
+
+.article {
+  max-width: 1000px;
+  margin: 0 auto 24px;
+  padding: 80px 0 0;
+}
+
+.content {
+  padding-bottom: 80px;
+}
+
+/* Article headings sit 10px below the preceding block. */
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+  margin-top: 10px;
+}
+
+/* Images show at their natural size (capped at the column), inline like the original. */
+.content img {
+  display: inline;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  margin-bottom: 15px;
+}
+
+.content figure {
+  margin: 0;
+}
+
+.content figure img {
+  vertical-align: bottom;
+}
+
+.content table {
+  width: 100%;
+  margin-bottom: 27px;
+  border-collapse: collapse;
+}
+
+.content td,
+.content th {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.related {
+  margin-top: 0;
+}
+
+.relatedTitle {
+  margin: 0 0 20px;
+  padding-top: 8%;
+  text-align: center;
+}
+
+.comments {
+  height: 40px;
+}
+
+@media (max-width: 1100px) {
+  .article {
+    max-width: none;
+    margin: 0 var(--container-pad);
+  }
+}
+
+@media (max-width: 999px) {
+  .article {
+    max-width: 88%;
+    margin: 0 auto;
+  }
+}

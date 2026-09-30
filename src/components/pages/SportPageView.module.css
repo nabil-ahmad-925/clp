@@ -1,0 +1,7 @@
+/* 30px above the button (its row's margin, collapsing with the 20px below the cards) and 20px below. */
+.viewAll {
+  padding-top: 10px;
+  padding-bottom: 20px;
+  background: var(--white);
+  text-align: center;
+}

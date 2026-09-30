@@ -1,0 +1,69 @@
+/* Salient page content area (the Ascend skin forces it white). */
+.content {
+  position: relative;
+  background-color: #fff;
+  color: var(--black);
+}
+
+/* Pages without a hero start below the solid header. */
+.headerSpace {
+  height: var(--header-height);
+  box-sizing: content-box;
+}
+
+/* Rows are 35px apart; the last contained row keeps 1.5em below it; full-width rows have none. */
+.row {
+  position: relative;
+  margin-bottom: 35px;
+}
+
+.row:last-child {
+  margin-bottom: 1.5em;
+}
+
+.row.fullWidth {
+  margin-bottom: 0;
+}
+
+/* Light rows (on a coloured background) set their text and headings white. */
+.row.light,
+.row.light h1,
+.row.light h2,
+.row.light h3,
+.row.light h4 {
+  color: var(--white);
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Salient's grid: columns side by side keep a 2.127659% gutter between them. */
+.column {
+  width: calc((100% + 2.127659%) * var(--col-span) / 12 - 2.127659%);
+  min-width: 0;
+}
+
+.column + .column {
+  margin-left: 2.127659%;
+}
+
+/* Blocks inside a column: 24px apart, none after the last one (spacers never add margin). */
+.column > * {
+  margin-bottom: 24px;
+}
+
+.column > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 999px) {
+  .column {
+    width: 100%;
+  }
+
+  .column + .column {
+    margin-left: 0;
+  }
+}

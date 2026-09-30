@@ -1,0 +1,232 @@
+/* WPForms (modern markup) with the site's styles, values measured from the original. */
+
+.container {
+  margin-top: 24px;
+}
+
+.form {
+  font-size: 15px;
+  line-height: 27px;
+}
+
+.row {
+  display: flex;
+  margin: 0 -10px;
+}
+
+.column {
+  padding: 0 10px;
+}
+
+.field {
+  min-width: 0;
+  margin: 0;
+  padding: 15px 0;
+  border: none;
+}
+
+.label {
+  display: block;
+  margin: 0 0 15px;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.required {
+  font-weight: 400;
+  color: #d63637;
+}
+
+.input {
+  display: block;
+  width: 100%;
+  height: 43px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+  outline: none;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.7);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 16px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+select.input {
+  padding-right: 24px;
+  line-height: 27px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='4'%3E%3Cpath fill='%23aaa' d='M0 0h8L4 4z'/%3E%3C/svg%3E") no-repeat right 14px center;
+  appearance: none;
+  cursor: pointer;
+}
+
+.input:focus {
+  border-color: #066aab;
+  box-shadow: 0 0 0 1px #066aab;
+}
+
+.invalid,
+.invalid:focus {
+  border-color: #d63637;
+  box-shadow: 0 0 0 1px #d63637;
+}
+
+.textarea {
+  height: 120.4px;
+  padding: 14px;
+  line-height: 20.8px;
+  resize: vertical;
+}
+
+.sublabel {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  line-height: 17px;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.addressRow {
+  margin-bottom: 15px;
+}
+
+.addressBlock {
+  margin-bottom: 8px;
+}
+
+.addressBlock:last-child {
+  margin-bottom: 0;
+}
+
+.phone {
+  position: relative;
+}
+
+.phoneInput {
+  padding-left: 53px;
+}
+
+.country {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 14px;
+  font-size: 16px;
+}
+
+.country::after {
+  content: '';
+  border: 3px solid transparent;
+  border-top: 4px solid #555;
+  transform: translateY(2px);
+}
+
+.country select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.choices {
+  display: grid;
+  gap: 15px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.choices li {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 16px;
+}
+
+.choices input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 3.2px 0 0 2px;
+}
+
+.inline {
+  display: block;
+  padding-left: 12px;
+  font-size: 16px;
+  line-height: 20.8px;
+  color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+}
+
+/* The plugin's error text, which picks up the theme's Playfair on this site. */
+.error {
+  display: block;
+  margin-top: 15px;
+  padding-left: 5px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-style: normal;
+  line-height: 17px;
+  color: #d63637;
+}
+
+/* Warning triangle before the message, as the plugin draws it. */
+.error::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 11px;
+  margin-right: 5px;
+  vertical-align: -1px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 448'%3E%3Cpath fill='%23d63637' d='M505 400 280 16a28 28 0 0 0-48 0L7 400a28 28 0 0 0 24 48h450a28 28 0 0 0 24-48zM256 368a24 24 0 1 1 0-48 24 24 0 0 1 0 48zm24-96h-48l-8-128h64z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+.notice {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid #d63637;
+  border-radius: 3px;
+  background: #fcf0f1;
+  color: #d63637;
+  font-size: 15px;
+  line-height: 21px;
+}
+
+.submitWrap {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.submit {
+  width: 150px;
+  height: 48px;
+  margin: 15px 0 0;
+  padding: 0 20px;
+  border-width: 3px;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .column {
+    width: 100% !important;
+  }
+}

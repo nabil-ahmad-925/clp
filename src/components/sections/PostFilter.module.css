@@ -1,0 +1,322 @@
+/* Blog Filter plugin (template 1) with the site's colours, values measured from the original.
+   Its buttons ask for Raleway, which the site never loads, so they render in Arial. */
+
+.main {
+  width: 100%;
+}
+
+.filters {
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+  font-family: Raleway, Arial, sans-serif;
+  font-weight: 500;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.filters li {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* "snip0047" button: gold pill; hovering (desktop) or choosing it slides the label left and shows a check. */
+.button {
+  position: relative;
+  display: inline-block;
+  margin: 5px 3px;
+  padding: 8px 30px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  background-color: #e3bd66;
+  color: #fff;
+  font-family: Raleway, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.button:hover,
+.button:focus {
+  color: #fff;
+}
+
+.button span {
+  display: inline-block;
+  transition: all 0.3s;
+}
+
+.button svg {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 15px;
+  height: 15px;
+  opacity: 0;
+  transition: all 0.3s;
+  transition-delay: 0s;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+  transition-delay: 0.15s;
+}
+
+.button:active::before {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.active {
+  background-color: #000;
+}
+
+.active span {
+  transform: translate3d(-20px, 0, 0);
+}
+
+.active svg {
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+
+.active::before {
+  width: 38px;
+  border-radius: 5px;
+  transition-delay: 0s;
+}
+
+@media (min-width: 1025px) {
+  .button:hover span {
+    transform: translate3d(-20px, 0, 0);
+  }
+
+  .button:hover svg {
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
+  .button:hover::before {
+    width: 38px;
+    border-radius: 5px;
+    transition-delay: 0s;
+  }
+}
+
+.search {
+  position: relative;
+  text-align: center;
+}
+
+.searchTerm {
+  display: inline-block;
+  width: 45%;
+  height: 34px;
+  margin-right: -9px;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  background: #fff;
+  color: #555;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 24px;
+  transition: 0.2s;
+}
+
+.searchTerm:focus {
+  color: #00b4cc;
+}
+
+/* Cards are absolutely placed: column × card width across, the heights of the cards above it down. */
+.container {
+  position: relative;
+  width: 100%;
+  transition: height 0.8s;
+}
+
+.container::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.item {
+  float: left;
+  width: calc(100% / var(--bf-columns));
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.8s,
+    opacity 0.8s;
+}
+
+.item .card {
+  transform: scale3d(0.001, 0.001, 1);
+  transition: transform 0.8s;
+}
+
+.measured .item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  float: none;
+}
+
+.shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.shown .card {
+  transform: scale3d(1, 1, 1);
+}
+
+.card {
+  position: relative;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.card:hover {
+  box-shadow: rgb(0 0 0 / 10%) 0 10px 50px;
+}
+
+.thumbnail {
+  position: relative;
+  overflow: hidden;
+}
+
+.thumbnail figure {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Hover veil of the "snip1550" image effect. */
+.thumbnail figure::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  background-color: #fff;
+  opacity: 0;
+  transition: all 0.35s ease;
+}
+
+.thumbnail figure:hover::before {
+  opacity: 0.5;
+}
+
+.thumbnail img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  transition: all 0.3s linear;
+}
+
+.date {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  width: 55px;
+  height: 55px;
+  padding: 7.5px 0;
+  border-radius: 100%;
+  background: #000;
+  color: #fff;
+  font-weight: 700;
+  line-height: normal;
+  text-align: center;
+}
+
+.day {
+  font-size: 17px;
+}
+
+.month {
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.content {
+  width: 100%;
+  padding: 30px;
+  background: #fff;
+}
+
+.content > a {
+  color: var(--gold);
+}
+
+.title {
+  margin: 0;
+  padding: 0 0 10px;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  color: #000;
+  text-transform: none;
+  transition: all ease 0.3s;
+  cursor: pointer;
+}
+
+.title:hover {
+  color: #e3bd66;
+}
+
+.excerpt {
+  margin: 0;
+  padding: 0 0 28px;
+  font-size: 14px;
+  line-height: 1.8em;
+  color: #0a0a0a;
+}
+
+.meta {
+  margin: 30px 0 0;
+  font-size: 15px;
+  line-height: 27px;
+  color: #999;
+}
+
+.meta svg {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+}
+
+.readMore {
+  margin: 20px 0 5px;
+  text-align: center;
+}
+
+.pagination {
+  height: 1px;
+  margin: 20px 0;
+}
+
+@media (max-width: 767px) {
+  .searchTerm {
+    width: 90%;
+  }
+}
