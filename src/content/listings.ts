@@ -86,29 +86,60 @@ function get<T>(path: string): Promise<T> {
 }
 
 const filtersParam = (groups: string[][]) => `filters=${encodeURIComponent(encodeGroups(groups))}`;
-const listPath = (widgetId: number, groups: string[][], facets: number[]) =>
-  `/listings?widget=${widgetId}&${filtersParam(groups)}${facets.length ? `&facets=${facets.join(',')}` : ''}`;
+const listPath = (widgetId: number, groups: string[][], facets: number[], limit: number, cursor?: string) =>
+  `/listings?widget=${widgetId}&${filtersParam(groups)}${facets.length ? `&facets=${facets.join(',')}` : ''}&limit=${limit}` +
+  (cursor ? `&cursor=${encodeURIComponent(cursor)}` : '');
+
+/** The API's largest page; widgets without "Load More" read every page of this size. */
+export const MAX_PAGE = 100;
 
 /** Per-option counts of one filter group, counted with the other groups applied. */
 export type Facet = { total: number; counts: Record<string, number> };
-export type ListingsResult = { items: AddedItem[]; total: number; facets: Record<number, Facet> };
+/**
+ * Listings loaded so far (one or more pages, newest first). `total` counts every match; `nextCursor` continues the
+ * list (null: everything is loaded).
+ */
+export type ListingsResult = { items: AddedItem[]; total: number; facets: Record<number, Facet>; nextCursor: string | null; limit: number };
 
-type ListingsResponse = { items: Listing[]; total: number; facets?: Record<string, Facet> };
+type ListingsResponse = { items: Listing[]; total?: number; facets?: Record<string, Facet>; nextCursor: string | null; limit: number };
 const toResult = (data: ListingsResponse): ListingsResult => ({
   items: data.items.map(toItem),
-  total: data.total,
+  total: data.total ?? data.items.length,
   facets: Object.fromEntries(Object.entries(data.facets ?? {}).map(([g, f]) => [Number(g), f])),
+  nextCursor: data.nextCursor ?? null,
+  limit: data.limit,
 });
 
-/**
- * Published listings of a widget matching the filter groups (any value of each non-empty group), filtered by the
- * API in DynamoDB, newest first; with the counts of the `facets` groups. Rejects when the API fails or is slow.
- */
-export const queryListings = (widgetId: number, groups: string[][], facets: number[] = []) =>
-  get<ListingsResponse>(listPath(widgetId, groups, facets)).then(toResult);
+/** Every page after the first one (widgets that show all their cards at once). */
+async function rest(widgetId: number, groups: string[][], first: ListingsResult): Promise<ListingsResult> {
+  let result = first;
+  while (result.nextCursor) result = await moreListings(widgetId, groups, result);
+  return result;
+}
 
-/** The answer of queryListings if this session already has it (shown at once, without loading). */
-export function cachedListings(widgetId: number, groups: string[][], facets: number[] = []): ListingsResult | undefined {
-  const data = answers.get(`${API_URL}${listPath(widgetId, groups, facets)}`) as ListingsResponse | undefined;
-  return data && toResult(data);
+/**
+ * The first page of a widget's published listings matching the filter groups (any value of each non-empty group),
+ * filtered by the API in DynamoDB, newest first; with the total and the counts of the `facets` groups. `limit`
+ * omitted: every page is loaded. Rejects when the API fails or is slow.
+ */
+export const queryListings = (widgetId: number, groups: string[][], facets: number[] = [], limit?: number) =>
+  get<ListingsResponse>(listPath(widgetId, groups, facets, limit ?? MAX_PAGE))
+    .then(toResult)
+    .then((r) => (limit === undefined ? rest(widgetId, groups, r) : r));
+
+/** `loaded` with the next page appended (the same filters; `limit` items, by default the first page's size). */
+export async function moreListings(widgetId: number, groups: string[][], loaded: ListingsResult, limit = loaded.limit): Promise<ListingsResult> {
+  if (!loaded.nextCursor) return loaded;
+  const page = toResult(await get<ListingsResponse>(listPath(widgetId, groups, [], limit, loaded.nextCursor)));
+  // A listing can't repeat across pages, but one added meanwhile must not show twice either.
+  const seen = new Set(loaded.items.map((i) => i.id));
+  return { ...loaded, items: [...loaded.items, ...page.items.filter((i) => !seen.has(i.id))], nextCursor: page.nextCursor };
+}
+
+/** The first page of queryListings if this session already has it (shown at once, without loading). */
+export function cachedListings(widgetId: number, groups: string[][], facets: number[] = [], limit?: number): ListingsResult | undefined {
+  const data = answers.get(`${API_URL}${listPath(widgetId, groups, facets, limit ?? MAX_PAGE)}`) as ListingsResponse | undefined;
+  // Widgets that load every page can only use it when it was the only one.
+  if (!data || (limit === undefined && data.nextCursor)) return undefined;
+  return toResult(data);
 }

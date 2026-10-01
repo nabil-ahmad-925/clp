@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { LuAccessibility, LuCalendar, LuChartNoAxesColumn, LuDollarSign, LuHandshake, LuHeartPulse, LuMapPin, LuPlane, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
-import { cachedListings, listingsEnabled, queryListings, type AddedItem, type ListingsResult } from '@/content/listings';
+import { cachedListings, listingsEnabled, moreListings, queryListings, type AddedItem, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import TeamCard from './TeamCard';
@@ -48,7 +48,7 @@ const chipFor = (filter: DirectoryFilter) => {
 
 /** API mode: the listing service filters and counts in DynamoDB. Local mode: the built-in cards, filtered here. */
 type Mode = 'loading' | 'api' | 'local';
-type View = { mode: Mode; result: ListingsResult | null; resultKey: string; pending: boolean; error: boolean };
+type View = { mode: Mode; result: ListingsResult | null; resultKey: string; pending: boolean; error: boolean; more: boolean };
 
 /**
  * Filterable directory of partners (the team plugin's "filter" display): pill filters with checkbox panels above
@@ -56,8 +56,10 @@ type View = { mode: Mode; result: ListingsResult | null; resultKey: string; pend
  * Filters start on their `preset` option (the sport of the page); `hidden` ones apply without being shown.
  *
  * Widgets served by the listings API load their cards from it (a skeleton shows meanwhile); a filter is sent to the
- * API only when its "Show results" is pressed, and the answer brings the results and the option counts. When it has no listings for the page, fails or is slow, the
- * page falls back to its built-in cards, filtered in the browser.
+ * API only when its "Show results" is pressed, and the answer brings the first page of results, their total and the
+ * option counts. "Load More" fetches the next page from the API (paged widgets; the others load every page at once).
+ * When the API has no listings for the page, fails or is slow, the page falls back to its built-in cards, filtered
+ * (and paged) in the browser.
  */
 export default function TeamDirectory({ layout, filters, items: builtIn, paging, widgetId }: Props) {
   const enabled = listingsEnabled(widgetId);
@@ -68,24 +70,26 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
     .filter(({ filter }) => !filter.hidden && filter.options.length > 0);
   // API data covers the page's own preset (its sport) only, so there that menu stays on it: applied, not shown.
   const facetGroups = menus.filter(({ filter }) => !filter.preset).map(({ i }) => i);
+  // The API's page size: the widget's first page, or every listing at once for widgets without "Load More".
+  const pageLimit = paging?.first;
 
   const [chosen, setChosen] = useState<string[][]>(presets);
   const filterKey = JSON.stringify(chosen);
   const [view, setView] = useState<View>(() => {
-    const base = { resultKey: JSON.stringify(presets), pending: false, error: false };
+    const base = { resultKey: JSON.stringify(presets), pending: false, error: false, more: false };
     if (!enabled) return { ...base, mode: 'local', result: null };
-    const cached = cachedListings(widgetId, presets, facetGroups);
+    const cached = cachedListings(widgetId, presets, facetGroups, pageLimit);
     if (!cached) return { ...base, mode: 'loading', result: null };
     return cached.total > 0 ? { ...base, mode: 'api', result: cached } : { ...base, mode: 'local', result: null };
   });
   const { mode, result } = view;
 
   // First load (filters on their presets): API listings for this page, or the built-in cards when it has none.
-  const initial = useRef({ presets, facetGroups });
+  const initial = useRef({ presets, facetGroups, pageLimit });
   useEffect(() => {
     if (view.mode !== 'loading' || widgetId == null) return;
     let active = true;
-    queryListings(widgetId, initial.current.presets, initial.current.facetGroups).then(
+    queryListings(widgetId, initial.current.presets, initial.current.facetGroups, initial.current.pageLimit).then(
       (r) => active && setView((v) => ({ ...v, mode: r.total > 0 ? 'api' : 'local', result: r.total > 0 ? r : null })),
       () => active && setView((v) => ({ ...v, mode: 'local', result: null })),
     );
@@ -114,7 +118,10 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
   // Paged widgets start again from the first page whenever the filters change.
   const shownKey = mode === 'api' ? view.resultKey : filterKey;
   const [pages, setPages] = useState({ key: '', count: paging?.first ?? Infinity });
-  const limit = pages.key === shownKey ? pages.count : (paging?.first ?? Infinity);
+  // Built-in cards are paged here; API results show every card loaded so far.
+  const limit = mode === 'api' ? Infinity : pages.key === shownKey ? pages.count : (paging?.first ?? Infinity);
+  const totalFound = mode === 'api' ? (result?.total ?? 0) : filtered.length;
+  const hasMore = mode === 'api' ? Boolean(result?.nextCursor) : limit < filtered.length;
 
   // As on the original, "No Results Found" appears only when a filter change empties a grid that had cards
   // (a page whose preset already matches nothing stays blank), and goes away once cards match again.
@@ -131,13 +138,24 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
     }
     const request = ++latest.current;
     setView((v) => ({ ...v, pending: true, error: false }));
-    queryListings(widgetId, next, facetGroups).then(
+    queryListings(widgetId, next, facetGroups, pageLimit).then(
       (r) => {
         if (request !== latest.current) return;
         showCount(r.total);
-        setView((v) => ({ ...v, result: r, resultKey: JSON.stringify(next), pending: false }));
+        setView((v) => ({ ...v, result: r, resultKey: JSON.stringify(next), pending: false, more: false }));
       },
       () => request === latest.current && setView((v) => ({ ...v, pending: false, error: true })),
+    );
+  };
+  // The next page of API results (for the filters the shown results were loaded with).
+  const loadMore = () => {
+    if (!result?.nextCursor || widgetId == null || view.more) return;
+    const request = latest.current;
+    const groups = JSON.parse(view.resultKey) as string[][];
+    setView((v) => ({ ...v, more: true, error: false }));
+    moreListings(widgetId, groups, result, paging?.more).then(
+      (r) => request === latest.current && setView((v) => ({ ...v, result: r, more: false })),
+      () => request === latest.current && setView((v) => ({ ...v, more: false, error: true })),
     );
   };
   const withFilter = (i: number, values: string[]) => chosen.map((v, j) => (j === i ? values : v));
@@ -202,7 +220,7 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
               ? 'Loading…'
               : view.error
                 ? 'Could not update the results. Please try again.'
-                : `${filtered.length} ${filtered.length === 1 ? 'result' : 'results'} found`}
+                : `${totalFound} ${totalFound === 1 ? 'result' : 'results'} found`}
           </div>
         </div>
       )}
@@ -225,16 +243,21 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
             ))}
           </div>
         )}
-        {!loading && paging && limit < filtered.length && (
+        {!loading && paging && hasMore && (
           <div className={styles.loadMore}>
-            <button type="button" className={styles.loadMoreBtn} onClick={() => setPages({ key: shownKey, count: limit + paging.more })}>
+            <button
+              type="button"
+              className={styles.loadMoreBtn}
+              disabled={view.more}
+              onClick={() => (mode === 'api' ? loadMore() : setPages({ key: shownKey, count: limit + paging.more }))}
+            >
               <svg viewBox="0 0 32 32" aria-hidden>
                 <path d="M28,16c-1.219,0-1.797,0.859-2,1.766C25.269,21.03,22.167,26,16,26c-5.523,0-10-4.478-10-10S10.477,6,16,6 c2.24,0,4.295,0.753,5.96,2H20c-1.104,0-2,0.896-2,2s0.896,2,2,2h6c1.104,0,2-0.896,2-2V4c0-1.104-0.896-2-2-2s-2,0.896-2,2v0.518 C21.733,2.932,18.977,2,16,2C8.268,2,2,8.268,2,16s6.268,14,14,14c9.979,0,14-9.5,14-11.875C30,16.672,28.938,16,28,16z" />
               </svg>
-              <span>Load More</span>
+              <span>{view.more ? 'Loading…' : 'Load More'}</span>
             </button>
             <div className={styles.loadStatus}>
-              {limit} / {filtered.length}
+              {Math.min(limit, filtered.length)} / {totalFound}
             </div>
           </div>
         )}
