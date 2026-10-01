@@ -1,0 +1,75 @@
+name: Deploy site to prod (S3 + CloudFront)
+
+# Every push to main (a merged pull request included) builds the static export and deploys it to prod:
+# bucket clp-prod-web behind CloudFront distribution E1BXQFG5NE0FD8. The AWS role is created by
+# clp-api/scripts/github-deploy-role.sh and trusts only this repo's main branch.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write # required to mint the OIDC token for AssumeRoleWithWebIdentity
+  contents: read
+
+concurrency:
+  group: deploy-clp-prod
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: us-east-1
+  DEPLOY_ROLE_ARN: arn:aws:iam::335345887564:role/clp-github-actions-deploy
+  S3_BUCKET: clp-prod-web
+  CLOUDFRONT_DISTRIBUTION_ID: E1BXQFG5NE0FD8
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        run: npm run build
+        env:
+          STATIC_EXPORT: '1'
+          # Listings API + image bucket (clp-api). Repo variables override these defaults.
+          NEXT_PUBLIC_LISTINGS_API_URL: ${{ vars.NEXT_PUBLIC_LISTINGS_API_URL || 'https://yp2fairc3h.execute-api.us-east-1.amazonaws.com' }}
+          NEXT_PUBLIC_LISTINGS_MEDIA_URL: ${{ vars.NEXT_PUBLIC_LISTINGS_MEDIA_URL || 'https://clp-listings-media.s3.us-east-1.amazonaws.com' }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ vars.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+
+      - name: Check build output
+        run: test -f out/index.html
+
+      - name: Configure AWS credentials (GitHub OIDC, no static keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync build to S3
+        run: |
+          # Hashed build assets: cached for a year.
+          aws s3 sync out/_next/static "s3://${S3_BUCKET}/_next/static" --delete --only-show-errors \
+            --cache-control "public,max-age=31536000,immutable"
+          # Images: cached for 30 days.
+          aws s3 sync out/uploads "s3://${S3_BUCKET}/uploads" --delete --only-show-errors \
+            --cache-control "public,max-age=2592000"
+          # Pages and everything else: always revalidated.
+          aws s3 sync out "s3://${S3_BUCKET}" --delete --only-show-errors \
+            --exclude "_next/static/*" --exclude "uploads/*" \
+            --cache-control "public,max-age=0,must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*" --query Invalidation.Id --output text
