@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { LuAccessibility, LuCalendar, LuChartNoAxesColumn, LuDollarSign, LuHandshake, LuHeartPulse, LuMapPin, LuPlane, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
-import { cachedListings, listingsEnabled, moreListings, queryListings, type AddedItem, type ListingsResult } from '@/content/listings';
+import { listingsEnabled, moreListings, queryListings, type AddedItem, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import TeamCard from './TeamCard';
@@ -77,10 +77,8 @@ export default function TeamDirectory({ layout, filters, items: builtIn, paging,
   const filterKey = JSON.stringify(chosen);
   const [view, setView] = useState<View>(() => {
     const base = { resultKey: JSON.stringify(presets), pending: false, error: false, more: false };
-    if (!enabled) return { ...base, mode: 'local', result: null };
-    const cached = cachedListings(widgetId, presets, facetGroups, pageLimit);
-    if (!cached) return { ...base, mode: 'loading', result: null };
-    return cached.total > 0 ? { ...base, mode: 'api', result: cached } : { ...base, mode: 'local', result: null };
+    // API widgets always load fresh from the API (nothing is cached).
+    return { ...base, mode: enabled ? 'loading' : 'local', result: null };
   });
   const { mode, result } = view;
 

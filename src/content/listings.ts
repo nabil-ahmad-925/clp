@@ -63,26 +63,11 @@ const TIMEOUT_MS = 4000;
 /** Filter groups as the API takes them: "a|b,c||d" (groups by "|", a group's values by ","). */
 const encodeGroups = (groups: string[][]) => groups.map((g) => g.join(',')).join('|');
 
-// Answers are kept per URL for the session (same filters again, or going back to a page, need no request), and a
-// request in flight is shared (React's double effects).
-const requests = new Map<string, Promise<unknown>>();
-const answers = new Map<string, unknown>();
-
+/** One GET of the listings API. Nothing is cached: every call asks the API (the browser too: no-store). */
 function get<T>(path: string): Promise<T> {
-  const url = `${API_URL}${path}`;
-  let request = requests.get(url) as Promise<T> | undefined;
-  if (!request) {
-    request = fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`listings API ${res.status}`))))
-      .then((data: T) => {
-        answers.set(url, data);
-        return data;
-      });
-    // Failures are not kept: the next call tries again.
-    request.catch(() => requests.delete(url));
-    requests.set(url, request);
-  }
-  return request;
+  return fetch(`${API_URL}${path}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) }).then((res) =>
+    res.ok ? (res.json() as Promise<T>) : Promise.reject(new Error(`listings API ${res.status}`)),
+  );
 }
 
 const filtersParam = (groups: string[][]) => `filters=${encodeURIComponent(encodeGroups(groups))}`;
@@ -134,12 +119,4 @@ export async function moreListings(widgetId: number, groups: string[][], loaded:
   // A listing can't repeat across pages, but one added meanwhile must not show twice either.
   const seen = new Set(loaded.items.map((i) => i.id));
   return { ...loaded, items: [...loaded.items, ...page.items.filter((i) => !seen.has(i.id))], nextCursor: page.nextCursor };
-}
-
-/** The first page of queryListings if this session already has it (shown at once, without loading). */
-export function cachedListings(widgetId: number, groups: string[][], facets: number[] = [], limit?: number): ListingsResult | undefined {
-  const data = answers.get(`${API_URL}${listPath(widgetId, groups, facets, limit ?? MAX_PAGE)}`) as ListingsResponse | undefined;
-  // Widgets that load every page can only use it when it was the only one.
-  if (!data || (limit === undefined && data.nextCursor)) return undefined;
-  return toResult(data);
 }
