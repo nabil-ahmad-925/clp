@@ -5,28 +5,49 @@
   max-width: var(--dir-width);
   margin: 0 auto;
   --dir-col-width: 25%;
-  --dir-filter-items: 4;
 }
 
+.bar {
+  margin: 40px 0 32px;
+}
+
+/* Pill filters in a row, wrapping on narrow screens. */
 .filters {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin: 40px 0;
+  gap: 10px;
 }
 
-.filters > * {
-  min-width: 250px;
-  width: calc(100% / var(--dir-filter-items) - 16px + 16px / var(--dir-filter-items));
+.clearAll {
+  height: 44px;
+  padding: 0 8px;
+  border: none;
+  background: none;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
-/* Site CSS for some widgets (workshops, activations, camps, trips): three menus to a row on tablets and up. */
-@media (min-width: 768px) {
-  .thirds > * {
-    flex: 0 1 calc(33.333% - 20px);
-  }
+.clearAll:hover {
+  color: var(--gold-deep);
+}
+
+.clearAll:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.found {
+  margin-top: 16px;
+  color: #6b6b6b;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 /* Without filters the plugin's empty filter bar still leaves its 40px margin. */
@@ -94,7 +115,6 @@
 @media (max-width: 767px) {
   .directory {
     --dir-col-width: 50%;
-    --dir-filter-items: 2;
   }
 }
 
@@ -109,7 +129,6 @@
     width: 100%;
     max-width: 100%;
     --dir-col-width: 100%;
-    --dir-filter-items: 1;
   }
 
   .row {
@@ -127,10 +146,14 @@
   }
 }
 
-/* Site custom CSS: 32px column spacing on tablets and up. */
+/* Site custom CSS: 32px column spacing on tablets and up (the filter bar lines up with the first card). */
 @media (min-width: 768px) {
   .col {
     padding-left: 32px;
+  }
+
+  .bar {
+    padding-left: calc(32px - var(--dir-col-gap));
   }
 }
 
