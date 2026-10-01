@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync-uploads": "node scripts/sync-uploads.mjs"
+    "sync-uploads": "node scripts/sync-uploads.mjs",
+    "deploy:aws": "bash scripts/deploy-aws.sh"
   },
   "dependencies": {
     "embla-carousel-react": "^8.6.0",

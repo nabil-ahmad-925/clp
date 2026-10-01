@@ -18,18 +18,28 @@
   margin-top: 80px;
 }
 
+/* Below 1000px the original's row is a wrapping flex row of half-width columns (full width from 690px
+   down). Odd cards keep their 80px stagger and every card gains a 20px bottom margin (except the last one on
+   phones), so each wrapped line starts below the taller, staggered card of the line above. */
 @media (max-width: 999px) {
   .grid {
-    grid-template-columns: 1fr;
-    margin: 0 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
   }
 
   .grid > .column {
-    padding: 0;
-    margin-bottom: 25px;
+    width: 50%;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 690px) {
+  .grid > .column {
+    width: 100%;
   }
 
-  .grid > .column:nth-child(odd) {
-    margin-top: 0;
+  .grid > .column:last-child {
+    margin-bottom: 0;
   }
 }

@@ -17,7 +17,7 @@ export default function ServicePageView({ page }: { page: ServicePage }) {
       <PageHero {...hero} />
       <StatementBand text={intro} />
 
-      <SectionHeading title={support.title} text={support.text} spaced />
+      <SectionHeading title={support.title} text={support.text} textItalic={support.italic} spaced />
       <FacilityCards items={services.items} />
       {services.viewAll && (
         <section className={styles.viewAll} data-header-tone="dark">

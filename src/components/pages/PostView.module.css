@@ -42,16 +42,36 @@
   vertical-align: bottom;
 }
 
+/* Salient's table style: hairline grid, grey text, every odd row shaded; equal columns (fixed layout). */
 .content table {
   width: 100%;
-  margin-bottom: 27px;
+  margin-bottom: 20px;
+  table-layout: fixed;
   border-collapse: collapse;
+  border-top: 1px solid #ececec;
+  background: #fff;
+}
+
+.content tr:nth-child(odd) {
+  background: #fcfcfc;
 }
 
 .content td,
 .content th {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #ececec;
+  border-top: 0;
+  color: #676767;
+}
+
+.content td {
+  font-size: 14px;
+  text-align: center;
+}
+
+.content th {
+  font-size: 15px;
+  font-weight: 700;
   text-align: left;
 }
 

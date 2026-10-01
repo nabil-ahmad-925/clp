@@ -9,6 +9,10 @@ import styles from './TeamDirectory.module.css';
 
 type Props = { layout: DirectoryLayout; filters: DirectoryFilter[]; items: DirectoryItem[]; paging?: { first: number; more: number } };
 
+/** Cards matching every chosen filter value (an empty value matches all). */
+const matching = (items: DirectoryItem[], values: string[]) =>
+  items.filter((item) => values.every((value) => !value || item.tags.includes(value)));
+
 /**
  * Filterable directory of partners (the team plugin's "filter" display): drop-menu filters above a
  * four-column card grid; a card shows only when it matches every chosen filter. Cards open the full-screen bio.
@@ -22,10 +26,17 @@ export default function TeamDirectory({ layout, filters, items, paging }: Props)
   const filterKey = chosen.join('|');
   const limit = pages.key === filterKey ? pages.count : (paging?.first ?? Infinity);
 
-  const filtered = useMemo(
-    () => items.filter((item) => chosen.every((value) => !value || item.tags.includes(value))),
-    [items, chosen],
-  );
+  const filtered = useMemo(() => matching(items, chosen), [items, chosen]);
+
+  // As on the original, "No Results Found" appears only when a filter change empties a grid that had cards
+  // (a page whose preset already matches nothing stays blank), and goes away once cards match again.
+  const [emptyShown, setEmptyShown] = useState(false);
+  const choose = (i: number, value: string) => {
+    const next = chosen.map((v, j) => (j === i ? value : v));
+    const count = matching(items, next).length;
+    setEmptyShown((prev) => (count > 0 ? false : filtered.length > 0 ? true : prev));
+    setChosen(next);
+  };
 
   const shown = filters.map((filter, i) => ({ filter, i })).filter(({ filter }) => !filter.hidden);
 
@@ -47,7 +58,7 @@ export default function TeamDirectory({ layout, filters, items, paging }: Props)
               label={`Select ${filter.label}`}
               options={filter.options}
               value={chosen[i]}
-              onChange={(value) => setChosen((prev) => prev.map((v, j) => (j === i ? value : v)))}
+              onChange={(value) => choose(i, value)}
             />
           ))}
         </div>
@@ -74,7 +85,7 @@ export default function TeamDirectory({ layout, filters, items, paging }: Props)
             </div>
           </div>
         )}
-        {filtered.length === 0 && (
+        {filtered.length === 0 && emptyShown && (
           <div className={styles.emptyWrap} role="status">
             <div className={styles.empty}>No Results Found</div>
           </div>

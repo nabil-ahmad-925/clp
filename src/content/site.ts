@@ -68,7 +68,7 @@ export const mainNav: NavItem[] = [
   { label: 'SHOP', href: 'https://www.soxcessful.com/Competelikepros', external: true },
   { label: 'UPDATES & NEWS', href: '/updates/' },
   // NextGEN photo-store cart (the checkout lives on the original site).
-  { label: 'Cart', href: `${SITE_URL}/shopping-cart/`, icon: 'cart' },
+  { label: 'Cart', href: '/shopping-cart/', icon: 'cart' },
 ];
 
 export const socialLinks: SocialLink[] = [

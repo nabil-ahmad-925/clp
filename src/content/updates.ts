@@ -18,6 +18,13 @@ export const updatesSections: PostSectionData[] = [
     },
     posts: [
       {
+        title: "Rivaldo and Fernando Morientes in Boston: Inside the LALIGA x Walmart Legendary Kickoff",
+        href: "/rivaldo-and-fernando-morientes-in-boston-inside-the-laliga-x-walmart-legendary-kickoff/",
+        image: upload('/2026/06/20260626_172607-scaled.jpg'),
+        alt: "Compete Like pros",
+        date: "June 26, 2026"
+      },
+      {
         title: "Athlete Performance Training: Proven Methods to Elevate Your Game",
         href: "/athlete-performance-training-proven-methods-to-elevate-your-game/",
         image: upload('/2025/07/Athlete-Performance-Training-Proven-Methods-to-Elevate-Your-Game.png'),
@@ -44,13 +51,6 @@ export const updatesSections: PostSectionData[] = [
         image: upload('/2025/07/premium_photo-1661677875843-5c66d889cfe9-scaled.jpeg'),
         alt: "",
         date: "April 11, 2025"
-      },
-      {
-        title: "Athlete Sponsorship: How to Secure Support and Grow Your Career",
-        href: "/athlete-sponsorship-how-to-secure-support-and-grow-your-career/",
-        image: upload('/2025/07/multiethnic-athlete-group-talking-with-each-other-running-track-scaled.jpg'),
-        alt: "",
-        date: "March 10, 2025"
       }
     ],
     viewAll: {
@@ -67,27 +67,27 @@ export const updatesSections: PostSectionData[] = [
     },
     posts: [
       {
-        title: "Which Soccer Player Has the Most Trophies? A Record-Breaking Legacy",
-        href: "/which-soccer-player-has-the-most-trophies-a-record-breaking-legacy/",
-        image: upload('/2025/07/RFD-trophies-videoSixteenByNineJumbo1600.jpg'),
+        title: "Frantzdy Pierrot Day: Inside the Massachusetts State House Ceremony",
+        href: "/frantzdy-pierrot-day-inside-the-massachusetts-state-house-ceremony-that-honored-haitis-world-cup-striker/",
+        image: upload('/2026/05/20260526_135237.jpg.png'),
+        alt: "Compete Like pros"
+      },
+      {
+        title: "Can Basketball Make You Taller? Science Behind the Claim",
+        href: "/can-basketball-make-you-taller-science-behind-the-claim/",
+        image: upload('/2025/03/Basketball-Large.png'),
         alt: ""
       },
       {
-        title: "Can Soccer Players Smoke Weed? What Every US Athlete Should Know About Cannabis in Sports",
-        href: "/can-soccer-players-smoke-weed-what-every-us-athlete-should-know-about-cannabis-in-sports/",
-        image: upload('/2025/07/3198624E-C54D-458C-BB35B9DECED8F27D_source.webp'),
+        title: "Top Sports Industry Trends Every US Athlete and Sports Enthusiast Should Know",
+        href: "/top-sports-industry-trends-every-us-athlete-and-sports-enthusiast-should-know/",
+        image: upload('/2025/07/2024-09-17-092913722-Global_sports_industry_on_track_for_more_growth.jpg'),
         alt: ""
-      },
-      {
-        title: "How a Sports Analytics Company Is Revolutionizing Athlete Performance in the USA",
-        href: "/how-a-sports-analytics-company-is-revolutionizing-athlete-performance-in-the-usa/",
-        image: upload('/2025/07/1698753977351.jpeg'),
-        alt: "Sports Analytics"
       }
     ],
     viewAll: {
       label: "View all",
-      href: "https://competelikepros.com/briefs-field-reports/"
+      href: "/briefs-field-reports/"
     }
   },
   {
@@ -129,7 +129,7 @@ export const updatesSections: PostSectionData[] = [
     ],
     viewAll: {
       label: "View all",
-      href: "https://competelikepros.com/diet-recovery-injury-prevention-recovery/"
+      href: "/diet-recovery-injury-prevention-recovery/"
     }
   },
   {
@@ -161,7 +161,7 @@ export const updatesSections: PostSectionData[] = [
     ],
     viewAll: {
       label: "View all",
-      href: "https://competelikepros.com/product-reviews/"
+      href: "/product-reviews/"
     }
   },
   {
@@ -203,7 +203,7 @@ export const updatesSections: PostSectionData[] = [
     ],
     viewAll: {
       label: "View all",
-      href: "https://competelikepros.com/resilience-performance-training/"
+      href: "/resilience-performance-training/"
     }
   },
   {
@@ -235,7 +235,7 @@ export const updatesSections: PostSectionData[] = [
     ],
     viewAll: {
       label: "View all",
-      href: "https://competelikepros.com/strategy-insights/"
+      href: "/strategy-insights/"
     }
   }
 ];

@@ -4,6 +4,9 @@ import { sportPages } from '@/content/sports';
 import { servicePages } from '@/content/services';
 import { legalPages } from '@/content/legal';
 
+// Generated at build time (required for the static export).
+export const dynamic = 'force-static';
+
 const base = process.env.NEXT_PUBLIC_SITE_URL || SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {

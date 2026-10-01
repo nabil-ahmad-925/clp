@@ -64,7 +64,7 @@
   background: var(--white);
   box-shadow: 0 0 24px rgba(147, 149, 165, 0.2);
   color: #64656e;
-  font-family: Roboto, sans-serif; /* declared but never loaded on the original */
+  font-family: sans-serif; /* the original declares Roboto but never loads it */
   font-size: 15px;
   font-weight: 500;
   line-height: 27px;
@@ -140,7 +140,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  font-family: Roboto, sans-serif;
+  font-family: sans-serif;
 }
 
 .loadMoreBtn {

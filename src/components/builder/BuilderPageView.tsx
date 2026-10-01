@@ -3,6 +3,7 @@ import PageHero from '@/components/sections/PageHero';
 import { Container } from '@/components/ui/Section';
 import type { BuilderPage, BuilderRow } from '@/content/types';
 import BuilderBlock from './BuilderBlock';
+import PortfolioNav from './PortfolioNav';
 import styles from './BuilderPageView.module.css';
 
 /**
@@ -19,6 +20,7 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
           <Row key={i} row={row} />
         ))}
       </div>
+      {page.portfolioNav && <PortfolioNav links={page.portfolioNav} />}
     </>
   );
 }

@@ -93,17 +93,21 @@ export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
                   ))}
                 </>
               ) : (
-                <p>
-                  {card.bio}
-                  {card.cta && (
-                    <>
-                      <br />
-                      <Button href={card.cta.href || '#'} newTab={card.cta.newTab} size="regular" color="dark" className={styles.cta}>
-                        {card.cta.label}
-                      </Button>
-                    </>
-                  )}
-                </p>
+                // Paragraphs are separated by a blank line; the button follows the last one (after a line break
+                // when the bio is a single paragraph, as on the original).
+                card.bio.split('\n\n').map((text, i, paragraphs) => (
+                  <p key={i}>
+                    {card.bioItalic ? <i>{text}</i> : text}
+                    {card.cta && i === paragraphs.length - 1 && (
+                      <>
+                        {paragraphs.length === 1 && <br />}
+                        <Button href={card.cta.href || '#'} newTab={card.cta.newTab} size="regular" color="dark" className={styles.cta}>
+                          {card.cta.label}
+                        </Button>
+                      </>
+                    )}
+                  </p>
+                ))
               )}
               {card.socials.length > 0 && (
                 <div className={styles.socials}>

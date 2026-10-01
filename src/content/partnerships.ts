@@ -1,6 +1,5 @@
 // Content for /partnerships/, from the original site.
 import type { FaqData, PageHeroData } from './types';
-import { SITE_URL } from './site';
 
 export const partnershipsMeta = {
   title: 'PARTNERSHIPS - Compete Like Pros™',
@@ -16,7 +15,7 @@ export const partnershipsHero: PageHeroData = {
 
 export type PartnerCategory = { title: string[]; href: string };
 
-const category = (title: string[], slug: string): PartnerCategory => ({ title, href: `${SITE_URL}/portfolio/${slug}/` });
+const category = (title: string[], slug: string): PartnerCategory => ({ title, href: `/portfolio/${slug}/` });
 
 export const partnerCategories: PartnerCategory[] = [
   category(['Advancement & Educational', 'Partners'], 'advancement-educational-partners'),

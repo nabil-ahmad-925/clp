@@ -1,0 +1,130 @@
+/* Salient portfolio navigation ("after project 2"), measured from the original. */
+
+.nav {
+  position: relative;
+  background: rgba(0, 0, 0, 0.03);
+  text-align: center;
+}
+
+.nav ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav li {
+  position: relative;
+  display: flex;
+  flex: 1 1 50%;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  overflow: hidden;
+  padding: 2% 4%;
+  background: #dfbe75;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.nav h3 {
+  position: relative;
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: 28.8px;
+  font-weight: 700;
+  line-height: 42px;
+  color: #fff;
+}
+
+.label {
+  display: block;
+  font-size: 16px;
+}
+
+.previous .label {
+  text-align: right;
+}
+
+.next .label {
+  text-align: left;
+}
+
+.only .label {
+  text-align: center;
+}
+
+.text {
+  position: relative;
+}
+
+/* Hover underline (hidden at rest, as on the original). */
+.line {
+  position: absolute;
+  top: 50%;
+  left: -60px;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  transition: width 0.3s ease;
+}
+
+.nav li:hover .line {
+  width: 45px;
+}
+
+@media (max-width: 1299px) {
+  .nav h3 {
+    line-height: 36px;
+  }
+}
+
+@media (max-width: 999px) {
+  .nav h3 {
+    line-height: 34px;
+  }
+
+  .previous .label,
+  .next .label {
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav li {
+    padding: 6%;
+  }
+
+  .nav h3 {
+    font-size: 31px;
+  }
+}
+
+@media (max-width: 690px) {
+  .nav ul {
+    flex-direction: column;
+  }
+
+  .nav li {
+    min-height: 250px;
+  }
+
+  .text {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav li {
+    min-height: 150px;
+    padding: 4%;
+  }
+
+  .text {
+    font-size: 22.4px;
+  }
+}

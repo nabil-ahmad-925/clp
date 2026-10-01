@@ -177,6 +177,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "BRAND & PRODUCT DEVELOPEMENT FAQ's",
       items: [
         {
@@ -220,7 +221,8 @@ export const servicePages: ServicePage[] = [
     intro: "Content Creation And Licensing Are Essential Aspects Of Building A Strong Brand Presence, Ensuring Originality, And Maintaining Legal Compliance.",
     support: {
       title: "DIFFERENT WAYS WE CAN SUPPORT YOU",
-      text: "To enhance your brand, we can help you create and license content. Our services include producing compelling, high-quality content tailored to your needs, as well as securing all rights. Brands need content that drives engagement, builds loyalty, and elevates their presence."
+      text: "To enhance your brand, we can help you create and license content. Our services include producing compelling, high-quality content tailored to your needs, as well as securing all rights. Brands need content that drives engagement, builds loyalty, and elevates their presence.",
+      italic: true
     },
     services: {
       items: [
@@ -230,6 +232,7 @@ export const servicePages: ServicePage[] = [
           title: "Services",
           excerpt: "Our copywriting services create powerful messages that engage your audience and drive action.",
           bio: "We create captivating, persuasive content tailored to your brand’s voice, making sure every message resonates with your target audience, drives engagement, and inspires action, enhancing your marketing effectiveness and achieving your business goals.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/content-creation-licensing/inquiry/"
@@ -259,6 +262,7 @@ export const servicePages: ServicePage[] = [
           title: "Services",
           excerpt: "Your brand will stand out with stunning graphics designed to grab your audience's attention. In crowded markets, your visual identity should stand out.",
           bio: "With creativity and precision, our graphic design services bring your brand vision to life. From logos to marketing materials, we create designs that engage your target audience. Using both artistry and strategic thinking, our designers deliver designs that look stunning and align with your brand’s goals. No matter what your branding needs are, we can elevate your visual identity and help you make a lasting impression in today’s competitive environment.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/content-creation-licensing/inquiry/"
@@ -287,7 +291,8 @@ export const servicePages: ServicePage[] = [
           subtitle: "PHOTOGRAPHY",
           title: "Services",
           excerpt: "Photography captures moments, emotions, and stories, bringing life to your memories. With an eye for detail and a passion for storytelling, we deliver visuals that resonate with your audience and leave a lasting impression.",
-          bio: "Our photography services go beyond just clicking pictures; we tell stories through every frame. Each project is approached with creativity and precision, whether it is capturing the love and laughter of a wedding, the excitement of a corporate event, or the essence of a product.",
+          bio: "Our photography services go beyond just clicking pictures; we tell stories through every frame. Each project is approached with creativity and precision, whether it is capturing the love and laughter of a wedding, the excitement of a corporate event, or the essence of a product.\n\nOur team of experienced photographers understands the power of images to convey messages, emotions, and stories. Every shot we take is captured using advanced equipment and techniques.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/content-creation-licensing/inquiry/"
@@ -316,7 +321,7 @@ export const servicePages: ServicePage[] = [
           subtitle: "VIDEO PHOTOGRAPHY",
           title: "Services",
           excerpt: "Our video production services elevate your message and engage your audience through captivating visuals. To produce compelling videos that leave a lasting impression, we combine creativity and expertise.",
-          bio: "We offer more than just video production services; we are storytellers who weave narratives through moving images. The production of corporate videos, promotional campaigns, or creative projects is what we do best.",
+          bio: "We offer more than just video production services; we are storytellers who weave narratives through moving images. The production of corporate videos, promotional campaigns, or creative projects is what we do best.\n\nWith cutting-edge technology and innovative techniques, our talented videographers and editors deliver high-quality videos that resonate with viewers. Each aspect of your video will be meticulously crafted to convey your message effectively, from scripting and storyboarding to filming and post-production.",
           cta: {
             label: "Start a Project",
             href: "/content-creation-licensing/inquiry/"
@@ -373,6 +378,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "CONTENT CREATION / LICENSING FAQ's",
       items: [
         {
@@ -771,6 +777,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "FUNDRAISING/RETAILING FAQ's",
       items: [
         {
@@ -814,7 +821,8 @@ export const servicePages: ServicePage[] = [
     intro: "We Are Committed To Helping You Achieve Success In Training And Recovery. Advanced Training Methods And Recovery Strategies Will Enhance Your Performance, Letting You Reach New Levels.",
     support: {
       title: "DIFFERENT WAYS WE CAN SUPPORT YOU",
-      text: "With our nutrition & performance programming, you can maximize your athletic potential. To create tailored programs, we combine cutting-edge recovery techniques with performance-enhancing exercises. You can maximize results, prevent injuries, and stay at the top of your game with expert guidance. With our specialized training solutions, you will be able to take your game to a whole new level."
+      text: "With our nutrition & performance programming, you can maximize your athletic potential. To create tailored programs, we combine cutting-edge recovery techniques with performance-enhancing exercises. You can maximize results, prevent injuries, and stay at the top of your game with expert guidance. With our specialized training solutions, you will be able to take your game to a whole new level.",
+      italic: true
     },
     services: {
       items: [
@@ -824,6 +832,7 @@ export const servicePages: ServicePage[] = [
           title: "Counseling",
           excerpt: "We offer nutrition counseling to help you make the most of your physical activities and wellness journey. Nutritionists provide personalized dietary plans to enhance performance and recovery, ensuring you remain energized and at your best.",
           bio: "Improve your physical activity and wellness journey with our nutrition counseling services. Personalized dietary plans tailored to your unique needs enhance your performance and recovery. Our guidance ensures that you stay energized and in top condition no matter what you’re doing, from preparing for a big game to exploring a new city. To help you make the best food choices while traveling, we offer meal planning, nutritional assessments, and ongoing support.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/recovery-performance-training/inquiry/"
@@ -853,6 +862,7 @@ export const servicePages: ServicePage[] = [
           title: "Testing",
           excerpt: "Boost your athletic performance with our performance testing services. Assess your strengths, improve your weaknesses, and tailor your training to achieve peak performance with detailed assessments from expert trainers.",
           bio: "We offer advanced performance testing services to help you achieve your full athletic potential. Our trainers conduct comprehensive assessments to determine your strength, endurance, speed, and agility. With the latest technology, we identify your strengths and identify areas for improvement. Based on the results, we design a customized training plan that will enhance your performance and help you achieve your goals. Whether you’re a beginner or an experienced athlete, our performance testing ensures you train smarter and more efficiently",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/recovery-performance-training/inquiry/"
@@ -882,6 +892,7 @@ export const servicePages: ServicePage[] = [
           title: "Conditioning",
           excerpt: "Boost your athletic performance with our strength and conditioning programs. With personalized workouts, you'll build muscle, improve endurance, and boost your overall performance.",
           bio: "Our strength and conditioning programs will enhance your athletic performance. Our trainers design customized workout programs tailored to your individual goals, whether you want to build muscle, improve your endurance, or enhance your overall wellness. We improve your strength, agility, and resilience by utilizing cutting-edge techniques and equipment. All levels of athletes are welcome, from beginners to elite athletes. We ensure progressive and safe training at all levels.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/recovery-performance-training/inquiry/"
@@ -911,6 +922,7 @@ export const servicePages: ServicePage[] = [
           title: "Programs",
           excerpt: "Get the right training program for you and achieve your physical activities and wellness goals. The program will provide training regimens that will boost your performance, boost your strength, and sharpen your skills.",
           bio: "We specialize in creating training programs that will help you reach your athletic potential. Based on your unique goals and abilities, our coaches customize routines aimed at strengthening your body, improving your skills, and enhancing performance. No matter what sport, event, or fitness goal you’re trying to achieve, our programs incorporate cutting-edge techniques and equipment to help you succeed. All levels, including beginners and elite athletes, can benefit from our measurable results-oriented training programs. Let us support and guide you along your athletic journey as you commit to your goals.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/recovery-performance-training/inquiry/"
@@ -970,6 +982,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "NUTRITION & PERFORMANCE PROGRAMMING FAQ's",
       items: [
         {
@@ -1009,7 +1022,8 @@ export const servicePages: ServicePage[] = [
     intro: "We Provide Efficient Procurement And Logistics Management. Our Experience Can Help Successfully Optimize Operations, Ensure Timely Deliveries, And Enhance Performance.",
     support: {
       title: "DIFFERENT WAYS WE CAN SUPPORT YOU",
-      text: "Streamline your operations with a comprehensive procurement and logistics solution. With precision and efficiency, we handle sourcing, purchasing, and delivery. As we optimize your supply chain, reduce costs, and increase productivity, you can focus on growing your business."
+      text: "Streamline your operations with a comprehensive procurement and logistics solution. With precision and efficiency, we handle sourcing, purchasing, and delivery. As we optimize your supply chain, reduce costs, and increase productivity, you can focus on growing your business.",
+      italic: true
     },
     services: {
       items: [
@@ -1019,6 +1033,7 @@ export const servicePages: ServicePage[] = [
           title: "Services",
           excerpt: "Our inventory control solutions can help you optimize your business operations. With real-time tracking, accurate forecasting, and efficient management, we reduce costs, prevent stockouts, and maximize profitability.",
           bio: "Control your inventory with our comprehensive inventory control solutions. You’ll enjoy real-time tracking, precise forecasting, and efficient management with our advanced systems. By utilizing our tailored approach, we can reduce costs, prevent stockouts, and eliminate excess inventory. You can make informed decisions and improve overall operational efficiency by using our detailed analytics and reporting. Small or large, our inventory control services streamline processes, improve productivity, and boost profits.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/procurement-logistics/inquiry/"
@@ -1048,6 +1063,7 @@ export const servicePages: ServicePage[] = [
           title: "Purchasing Goods",
           excerpt: "Take advantage of our sourcing and purchasing expertise to streamline your supply chain. To reduce costs and improve efficiency, we identify quality suppliers, negotiate competitive prices, and ensure timely delivery.",
           bio: "We provide professional sourcing and purchasing services to help you optimize your supply chain. In addition to identifying high-quality suppliers and negotiating the best prices, we set up timely deliveries. As part of our process, our team conducts comprehensive market research and evaluates suppliers to ensure that you receive the most value for your investment. You can reduce procurement costs, enhance efficiency, and ensure consistent product quality with our expertise.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/procurement-logistics/inquiry/"
@@ -1077,6 +1093,7 @@ export const servicePages: ServicePage[] = [
           title: "Transportation",
           excerpt: "Timely delivery of goods is ensured by efficient transportation and shipping services.",
           bio: "Our shipping and transportation solutions are designed to optimize logistics, reduce transit times, and enhance supply chain efficiency, ensuring your.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/procurement-logistics/inquiry/"
@@ -1106,6 +1123,7 @@ export const servicePages: ServicePage[] = [
           title: "Optimization",
           excerpt: "Utilizing advanced analytics and strategic insights, we optimize supply chains, from procurement to distribution, ensuring efficiency, cost-effectiveness, and resilience.",
           bio: "Our expertise in supply chain optimization encompasses meticulous analysis, strategic planning, and innovative solutions, with the goal of enhancing efficiency, reducing costs, minimizing risks, and maximizing value across every stage of your supply chain, resulting in sustained growth and competitive advantage in dynamic markets.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/procurement-logistics/inquiry/"
@@ -1165,6 +1183,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "PROCUREMENT / LOGISTICS MANAGEMENT FAQ's",
       items: [
         {
@@ -1204,7 +1223,8 @@ export const servicePages: ServicePage[] = [
     intro: "We Invite You To Join Us For An Exciting Sports Tourism Experience. Sports Enthusiasts And Adventure Travelers Can Enjoy Our Exclusive Sporting Events And Unforgettable Travel Packages.",
     support: {
       title: "DIFFERENT WAYS WE CAN SUPPORT YOU",
-      text: "We offer customized sports tourism packages to make sure you get the most out of your trip! Fans can experience exclusive access to pro games, iconic stadiums, and even participate in friendly matches. By traveling to unique venues, attending exclusive events, and enjoying VIP treatment, you can elevate your love of sports. Make your sports dreams a reality!"
+      text: "We offer customized sports tourism packages to make sure you get the most out of your trip! Fans can experience exclusive access to pro games, iconic stadiums, and even participate in friendly matches. By traveling to unique venues, attending exclusive events, and enjoying VIP treatment, you can elevate your love of sports. Make your sports dreams a reality!",
+      italic: true
     },
     services: {
       items: [
@@ -1214,6 +1234,7 @@ export const servicePages: ServicePage[] = [
           title: "Dining",
           excerpt: "Experience the best in sports tourism with our expertly planned activities and dining. A sports fan's dream trip begins here, with exclusive access to games, stadium tours, and top-rated restaurants.",
           bio: "Discover the ultimate sports tourism experience with our meticulously planned dining and activities. You can attend major league games, receive behind-the-scenes stadium tours, and meet sports legends. A variety of top-rated local restaurants feature curated menus that exemplify the city’s sports culture, included in our packages. No matter where you’re sitting, whether you’re watching or eating, we ensure every experience is memorable.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/sports-tourism/inquiry/"
@@ -1243,6 +1264,7 @@ export const servicePages: ServicePage[] = [
           title: "Management",
           excerpt: "Ensure a stress-free and unforgettable experience for every sports enthusiast by staying in top-rated accommodations and traveling comfortably with our dedicated services.",
           bio: "Take advantage of our comprehensive hotel and transportation services to enhance your sports tourism adventure. During your stay with us, we will ensure your comfort and convenience by providing top-rated accommodations close to major sports venues. For your convenience, we offer private transfers, VIP shuttle services, and flexible travel arrangements. With seamless logistics and personalized service, you can focus on the excitement of the game from the moment you arrive. It doesn’t matter if you’re traveling alone or with a group, we’ll take care of all the details so you can have a stress-free and enjoyable trip.",
+          bioItalic: true,
           cta: {
             label: "Start a Project",
             href: "/sports-tourism/inquiry/"
@@ -1360,6 +1382,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
+      italic: true,
       title: "SPORTS TOURISM FAQ's",
       items: [
         {

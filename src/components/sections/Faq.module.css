@@ -212,8 +212,11 @@
 }
 
 @media (max-width: 999px) {
+  /* The original's 2 / 8 / 2 columns stack here; the empty first column and the FAQ column each keep a
+     25px bottom margin. */
   .inner {
     max-width: none;
+    padding: 25px 0;
   }
 
   .title {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { FaAngleDown, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import {
   FaArrowRight,
@@ -16,6 +17,7 @@ import {
 } from 'react-icons/fa6';
 import { SITE_URL } from '@/content/site';
 import type { GalleryImage } from '@/content/types';
+import { money, readCart, writeCart } from '@/components/cart/cartStore';
 import styles from './GalleryLightbox.module.css';
 
 type Props = {
@@ -27,20 +29,8 @@ type Props = {
 };
 
 const SLIDESHOW_MS = 5000;
-/** The original sells each photo as a digital download. */
-const DOWNLOAD = { label: 'HD', price: 1 };
-const CART_KEY = 'clp-photo-cart';
-
-const money = (n: number) => `$ ${n.toFixed(2)}`;
-
-function readCart(): string[] {
-  try {
-    const value = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-    return Array.isArray(value) ? value : [];
-  } catch {
-    return [];
-  }
-}
+/** The original sells some photos as an HD digital download (`image.download` is its price). */
+const DOWNLOAD_LABEL = 'HD';
 
 /**
  * Full-screen photo viewer (NextGEN Pro Lightbox, white variant): the photo fitted above a strip of gold
@@ -98,18 +88,17 @@ export default function GalleryLightbox({ galleryId, images, index, onIndex, onC
   const pageUrl = typeof window === 'undefined' ? SITE_URL : window.location.origin + window.location.pathname;
   const shareUrl = `${pageUrl}#gallery/${galleryId}/${image.id}`;
   const imageUrl = typeof window === 'undefined' ? image.full : window.location.origin + image.full;
-  const inCart = cart.filter((id) => id === image.id).length;
-  const pending = inCart + (selected ? 1 : 0);
+  const price = image.download;
+  const inCart = cart.includes(image.id) ? 1 : 0;
+  const pending = price ? Math.max(inCart, selected ? 1 : 0) : 0;
 
   const addToCart = () => {
-    if (!selected) return;
-    const next = [...cart, image.id];
+    if (!selected || !price) return;
+    const next = [...new Set([...cart, image.id])];
     setCart(next);
     setSelected(false);
     setUpdated(true);
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(next));
-    } catch {}
+    writeCart(next);
   };
 
   return createPortal(
@@ -212,40 +201,45 @@ export default function GalleryLightbox({ galleryId, images, index, onIndex, onC
           <h3 className={styles.cartTitle}>Add to cart</h3>
           <div className={styles.cartSummary}>
             <span>{pending} item(s)</span>
-            <span>{money(pending * DOWNLOAD.price)}</span>
+            <span>{money(pending * (price ?? 0))}</span>
           </div>
-          <div className={styles.cartTabs}>
-            <span className={styles.cartTab}>Digital downloads</span>
-          </div>
-          <h4 className={styles.cartHeading}>Digital Downloads</h4>
-          <table className={styles.cartTable}>
-            <thead>
-              <tr>
-                <th>Quantity</th>
-                <th>Description</th>
-                <th>Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <button type="button" className={`${styles.pill} ${selected || inCart ? styles.pillOn : ''}`} aria-pressed={selected} onClick={() => setSelected(!selected)}>
-                    Add
-                  </button>
-                </td>
-                <td>{DOWNLOAD.label}</td>
-                <td>{money(DOWNLOAD.price)}</td>
-              </tr>
-            </tbody>
-          </table>
+          {/* Photos without a price list have nothing for sale: only the header and the buttons show. */}
+          {price !== undefined && (
+            <>
+              <div className={styles.cartTabs}>
+                <span className={styles.cartTab}>Digital downloads</span>
+              </div>
+              <h4 className={styles.cartHeading}>Digital Downloads</h4>
+              <table className={styles.cartTable}>
+                <thead>
+                  <tr>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <button type="button" className={`${styles.pill} ${selected || inCart ? styles.pillOn : ''}`} aria-pressed={selected} onClick={() => setSelected(!selected)}>
+                        Add
+                      </button>
+                    </td>
+                    <td>{DOWNLOAD_LABEL}</td>
+                    <td>{money(price)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </>
+          )}
           {updated && <p className={styles.cartNotice}>Your cart has been updated</p>}
           <div className={styles.cartFooter}>
             <button type="button" className={styles.bigPill} onClick={addToCart}>
               Add to cart
             </button>
-            <a className={styles.bigPill} href={`${SITE_URL}/shopping-cart/`}>
+            <Link className={styles.bigPill} href="/shopping-cart/">
               View cart / checkout
-            </a>
+            </Link>
           </div>
         </aside>
       )}

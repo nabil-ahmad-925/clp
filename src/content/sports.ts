@@ -3418,7 +3418,7 @@ export const sportPages: SportPage[] = [
       ]
     },
     faq: {
-      title: "FÚTBOL (SOCCER) RESOURCES FAQ's",
+      title: "FÚTBOL (SOCCER)\nRESOURCES FAQ's",
       items: [
         {
           question: "What types of soccer experiences do you offer?",

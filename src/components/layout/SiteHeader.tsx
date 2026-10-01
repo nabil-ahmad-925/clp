@@ -9,7 +9,7 @@ import FullscreenMenu from './FullscreenMenu';
 import styles from './SiteHeader.module.css';
 
 // Pages without a hero get a solid black header instead of the transparent one.
-const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/']);
+const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/', '/shopping-cart/']);
 
 /** Finds the tone of the section currently behind the header (sections opt in with data-header-tone). */
 function toneBehindHeader(header: HTMLElement): HeaderTone {
@@ -27,7 +27,7 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [tone, setTone] = useState<HeaderTone>('light');
   const pathname = usePathname();
-  const variant = SOLID_HEADER_PATHS.has(pathname) || pathname.startsWith('/category/') ? 'solid' : 'transparent';
+  const variant = SOLID_HEADER_PATHS.has(pathname) || pathname.startsWith('/category/') || pathname.startsWith('/author/') || pathname.startsWith('/clp-partners/') ? 'solid' : 'transparent';
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 

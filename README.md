@@ -14,6 +14,19 @@ npm start
 
 Requires Node 20+.
 
+## Deploy (AWS S3 + CloudFront)
+
+```bash
+npm run deploy:aws                    # static export (out/) -> S3 -> CloudFront, AWS profile "abduk", us-east-2
+SKIP_BUILD=1 npm run deploy:aws       # re-upload the existing out/
+STAGE=staging npm run deploy:aws      # a separate stack
+```
+
+`scripts/deploy-aws.sh` builds with `STATIC_EXPORT=1` (Next's `output: 'export'`) and creates or updates, all named
+`competelikepros-web-<stage>`: a private S3 bucket (`…-<account id>`), an Origin Access Control, the CloudFront
+Function `…-router` (`scripts/aws/cloudfront-function.js`: the site's 301 redirects, trailing-slash redirects and
+`/path/` → `/path/index.html`) and the distribution, then invalidates the cache. Needs the AWS CLI and `jq`.
+
 ## Pages
 
 | URL | Source |
@@ -21,6 +34,9 @@ Requires Node 20+.
 | `/` | `src/app/page.tsx` + `src/content/home.ts` |
 | `/experiences/`, `/experiences/<sport>/` | `src/app/experiences/` + `src/content/experiences.ts`, `sports.ts` |
 | `/resources/`, `/resources/<sport>/` | `src/app/resources/` + `src/content/sports.ts` |
+| Resource sub-pages: directories (e.g. `/basketball-dieting-nutrition/`), `/product-reviews/`, `/strategy-insights/` | `src/app/[slug]/` + `src/content/data/directories.json` |
+| Blog posts (e.g. `/walking-in-basketball-shoes-smart-choice-or-rookie-mistake/`) | `src/app/[slug]/` + `src/content/data/posts.json` |
+| `/category/…/` and `/author/…/` archives | `src/app/category/`, `src/app/author/` + `src/content/data/archives.json` |
 | 7 service pages (e.g. `/brand-product-development/`) | `src/app/[slug]/` + `src/content/services.ts` |
 | 4 policy pages (e.g. `/terms-conditions/`) | `src/app/[slug]/` + `src/content/legal.ts` |
 | `/about-us/`, `/partnerships/`, `/our-expectations/`, `/updates/` | own folders in `src/app/` + matching file in `src/content/` |
@@ -66,6 +82,10 @@ there, and from `https://competelikepros.com/wp-content/uploads/…` otherwise.
 Content matches the live site as last archived (May 2026), including a few places where the live site itself still
 shows theme placeholder text (e.g. the "We Make Beautiful Things" heading and FAQ on `/experiences/`, and some service
 card bios). The live `/resources/` page has no body content, and this build mirrors that.
+The resource sub-pages, all blog posts and all category/author archives were refreshed from the live site in
+September 2026. `/product-reviews/?filter=<category id>` opens with that category chosen, as on the live site.
+The Pickleball resources page's "Photos" tile links to `/experiences/tennis-pickleball/tennis-pickleball-photos/`,
+which is a 404 on the live site as well.
 Replace the placeholder text in `src/content/*` when real copy is ready.
 
 ## Environment variables

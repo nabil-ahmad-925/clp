@@ -131,3 +131,11 @@
   font-size: 30px;
   line-height: 30px;
 }
+
+/* The plugin's excerpt: light grey, in the browser's sans-serif (the plugin's Roboto isn't loaded on the
+   original), with 28px below it. */
+.wps .meta p {
+  padding-bottom: 28px;
+  font-family: sans-serif;
+  color: #dcdfe4;
+}

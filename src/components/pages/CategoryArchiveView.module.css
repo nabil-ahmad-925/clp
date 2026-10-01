@@ -52,6 +52,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-rows: 40vh;
+  grid-auto-flow: dense;
   margin: 0 -5px;
   --grid-font: min(24px, max(18px, 1.3vw));
 }
@@ -61,8 +62,25 @@
   margin: 5px;
 }
 
-.featured {
-  grid-column: span 2;
+/* Vertical staggered: in each group of six, the 1st post is large on the left, the 2nd-3rd stack on the
+   right, the 4th-5th stack on the left and the 6th is large on the right. */
+.item:nth-child(6n + 1) {
+  grid-column: 1 / span 2;
+  grid-row: span 2;
+}
+
+.item:nth-child(6n + 2),
+.item:nth-child(6n + 3) {
+  grid-column: 3;
+}
+
+.item:nth-child(6n + 4),
+.item:nth-child(6n + 5) {
+  grid-column: 1;
+}
+
+.item:nth-child(6n) {
+  grid-column: 2 / span 2;
   grid-row: span 2;
 }
 
@@ -136,8 +154,13 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 50px 30% 50px 50px;
+  padding: 35px;
   color: #fff;
+}
+
+.item:nth-child(6n + 1) .content,
+.item:nth-child(6n) .content {
+  padding: 50px 30% 50px 50px;
 }
 
 .link {
@@ -169,8 +192,33 @@
   color: #fff;
 }
 
-.featured .heading span {
+.item:nth-child(6n + 1) .heading span,
+.item:nth-child(6n) .heading span {
   font-size: 2em;
+}
+
+/* Category buttons above the title (colours come from each category's settings). */
+.categories {
+  position: relative;
+  z-index: 2;
+  display: block;
+  line-height: 27px;
+  pointer-events: none;
+}
+
+.category {
+  display: inline-block;
+  margin: 0 10px 10px 0;
+  padding: 7.5px 15px;
+  border-radius: 200px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 15px;
+  color: #fff;
+  background-color: #dfbe75;
+  pointer-events: auto;
+  transition: color 0.3s;
 }
 
 /* Animated underline on hover. */
@@ -206,31 +254,73 @@
   background: currentColor;
 }
 
+/* WordPress page links (Salient): bold pills, the current page gold. */
+.pagination {
+  margin: 40px 0 10px;
+  font-size: 15px;
+  line-height: 27px;
+  text-align: center;
+}
+
+.pagination ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+/* The original's links are separated by the whitespace between them (one space of 15px Open Sans). */
+.pagination li + li {
+  margin-left: 0.26em;
+}
+
+.pagination a,
+.pagination .current {
+  display: inline-block;
+  padding: 11px 13px 10px;
+  border-radius: 200px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 11px;
+  text-transform: capitalize;
+  color: #000;
+  transition:
+    color 0.45s cubic-bezier(0.25, 1, 0.33, 1),
+    background-color 0.45s cubic-bezier(0.25, 1, 0.33, 1);
+}
+
+.pagination a:hover {
+  color: #dfbe75;
+}
+
+.pagination .current {
+  color: #fff;
+  background-color: #dfbe75;
+}
+
 @media (max-width: 1299px) {
-  .content {
-    padding: 35px 30% 35px 35px;
+  .item:nth-child(6n + 1) .content,
+  .item:nth-child(6n) .content {
+    padding: 3.5vw 30% 3.5vw 3.5vw;
   }
 }
 
+/* Two columns: only the first post of each six is large (full width, two rows); the rest fill in order. */
+/* Below 1000px the box still shrink-wraps the title, but its inner container is capped at 88% of the box
+   (as on the original), so a title that only just fits wraps onto a second line. */
 @media (max-width: 999px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 690px) {
-  .header {
-    width: calc(100% - 11px);
-  }
-
   .title {
-    margin: 0 22.7px;
+    max-width: 88%;
+    margin: 0 auto;
     padding: 0 0 36px;
   }
 
   .title h1 {
-    font-size: 30px;
-    line-height: 40px;
+    font-size: 70px;
+    line-height: 75px;
   }
 
   .container {
@@ -239,26 +329,58 @@
   }
 
   .grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin: 30px -5px;
     --grid-font: 20px;
   }
 
-  .featured {
+  .item:nth-child(n) {
     grid-column: auto;
     grid-row: auto;
   }
 
-  .item {
-    aspect-ratio: 343.2 / 264.9;
+  .item:nth-child(6n + 1) {
+    grid-column: 1 / span 2;
+    grid-row: span 2;
   }
 
-  .content {
+  .item:nth-child(6n) .content {
     padding: 35px;
   }
 
-  .featured .heading span {
+  .item:nth-child(6n + 1) .content {
+    padding: 35px 35px 39.6px;
+  }
+
+  .item:nth-child(n) .heading span {
     font-size: 1em;
+  }
+}
+
+/* One column: each card is 75% as tall as the grid is wide, with 30px between cards. */
+@media (max-width: 690px) {
+  .title h1 {
+    font-size: 30px;
+    line-height: 40px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+  }
+
+  .item:nth-child(n) {
+    grid-column: auto;
+    grid-row: auto;
+    height: calc((88vw + 10px) * 0.75);
+    margin-bottom: 25px;
+  }
+
+  .item:last-child {
+    margin-bottom: 5px;
+  }
+
+  .item:nth-child(n) .content {
+    padding: 35px;
   }
 }

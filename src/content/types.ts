@@ -23,12 +23,14 @@ export type FacilityCard = {
   subtitle: string;
   title: string;
   excerpt: string;
-  /** Shown in the full-screen bio overlay. */
+  /** Shown in the full-screen bio overlay; a blank line ("\n\n") separates paragraphs. */
   bio: string;
   /** Large photo on the overlay's right half. Without one the original shows an empty grey panel. */
   bioImage?: string;
   cta?: Cta;
   socials: { network?: string; href: string }[];
+  /** The original wraps `bio` in <i> (shown in the display font, see globals.css). */
+  bioItalic?: boolean;
   /** Rich-text bio (sanitized HTML); used instead of `bio` when present. */
   bioHtml?: string;
   /** Buttons under the bio (team-directory popups can have several, e.g. "Hire" and "contact"). */
@@ -166,7 +168,8 @@ export type GridImage = { src: string; full: string; alt: string; width: number;
 export type AlbumItem = { title: string; href: string; image: string; count: number };
 
 /** One photo of a gallery: `src` is the 400px-high mosaic version, `thumb` the lightbox strip thumbnail. */
-export type GalleryImage = { id: string; src: string; full: string; thumb: string; width: number; height: number; title: string; alt: string };
+/** `download`: price of the photo's HD digital download, when the original sells one. */
+export type GalleryImage = { id: string; src: string; full: string; thumb: string; width: number; height: number; title: string; alt: string; download?: number };
 
 export type BuilderRow = {
   id?: string;
@@ -192,14 +195,19 @@ export type BuilderPage = {
   /** Without a hero: extra space below the solid header before the first row (Salient's 40px top padding). */
   topSpacing?: number;
   rows: BuilderRow[];
+  /** Portfolio pages: the gold "Previous / Next Partnership" links under the content. */
+  portfolioNav?: PortfolioNavLink[];
 };
+
+export type PortfolioNavLink = { kind: 'previous' | 'next'; label: string; title: string[]; href: string };
 
 export type Tile = { title: string; image: string; width: number; height: number; href: string; newTab?: boolean };
 
 /** `answer` is plain text; `html` is sanitized rich text (paragraphs, lists, links) from the original site. */
 export type FaqItem = { question: string; answer?: string; html?: string };
 
-export type FaqData = { title?: string; items: FaqItem[]; viewAll?: Cta };
+/** `italic`: the original wraps each answer in <i> (shown in the display font, see globals.css). */
+export type FaqData = { title?: string; items: FaqItem[]; viewAll?: Cta; italic?: boolean };
 
 export type LegalPage = {
   slug: string;
@@ -241,7 +249,8 @@ export type ServicePage = {
   hero: PageHeroData;
   /** Large statement on the gold band under the hero. */
   intro: string;
-  support: { title: string; text: string };
+  /** `italic`: the original sets this paragraph in italics. */
+  support: { title: string; text: string; italic?: boolean };
   services: { items: FacilityCard[]; viewAll?: Cta };
   recent: { title: string; tiles: Tile[] };
   faq: FaqData;

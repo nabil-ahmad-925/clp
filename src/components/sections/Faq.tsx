@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { Fragment, useId, useState } from 'react';
 import Button from '@/components/ui/Button';
 import Reveal from '@/components/ui/Reveal';
 import RichText from '@/components/ui/RichText';
@@ -27,7 +27,7 @@ type Props = FaqData & {
  * Heading + accordion (one item open at a time) + optional "View all" button.
  * The first item starts open, as the original's accordion script does on load.
  */
-export default function Faq({ title, items, viewAll, variant = 'minimal', introHtml, wide, bare, compact, viewAllGap }: Props) {
+export default function Faq({ title, items, viewAll, italic, variant = 'minimal', introHtml, wide, bare, compact, viewAllGap }: Props) {
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null);
   const id = useId();
 
@@ -51,7 +51,7 @@ export default function Faq({ title, items, viewAll, variant = 'minimal', introH
             </h3>
             <div id={`${id}-a${i}`} role="region" aria-labelledby={`${id}-q${i}`} className={styles.answer}>
               <div className={styles.answerInner}>
-                {item.html ? <RichText html={item.html} className={styles.answerText} /> : item.answer ? <p className={styles.answerPlain}>{item.answer}</p> : null}
+                {item.html ? <RichText html={item.html} className={styles.answerText} /> : item.answer ? <p className={styles.answerPlain}>{italic ? <i>{item.answer}</i> : item.answer}</p> : null}
               </div>
             </div>
           </div>
@@ -67,7 +67,17 @@ export default function Faq({ title, items, viewAll, variant = 'minimal', introH
       <Container>
         {variant === 'minimal' ? (
           <Reveal className={wide ? undefined : styles.inner}>
-            {title && <h2 className={styles.title}>{title}</h2>}
+            {title && (
+              <h2 className={styles.title}>
+                {/* A "\n" in the title is a line break, as in the original heading. */}
+                {title.split('\n').map((line, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && <br />}
+                    {line}
+                  </Fragment>
+                ))}
+              </h2>
+            )}
             {list}
           </Reveal>
         ) : (

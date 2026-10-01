@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { FaCheck, FaComments, FaLink } from 'react-icons/fa';
 import type { FilterPost } from '@/content/types';
 import styles from './PostFilter.module.css';
@@ -10,13 +10,21 @@ type Props = { categories: { id: string; label: string; count: number }[]; posts
 /** Columns of the original's Bootstrap grid (col-lg-4 col-md-4 col-sm-6 col-xs-12). */
 const columnsFor = (width: number) => (width >= 992 ? 3 : width >= 768 ? 2 : 1);
 
+/** The page URL's `?filter=` value (the static HTML has none, so it renders "All" until hydrated). */
+const subscribeNever = () => () => {};
+const urlFilter = () => new URLSearchParams(window.location.search).get('filter');
+const noFilter = () => null;
+
 /**
  * Category-filtered post grid (Blog Filter plugin): gold category buttons (the chosen one black, with a check),
  * a search box, and post cards laid out in columns, each card placed below the previous one in its column.
- * Grids of a single category have no buttons or search box.
+ * Grids of a single category have no buttons or search box. A `?filter=<category id>` query picks the category.
  */
 export default function PostFilter({ categories, posts }: Props) {
-  const [category, setCategory] = useState('all');
+  // Links such as /product-reviews/?filter=195 open with that category chosen (unknown ids keep "All").
+  const linked = useSyncExternalStore(subscribeNever, urlFilter, noFilter);
+  const [chosen, setCategory] = useState<string | null>(null);
+  const category = chosen ?? (categories.some((c) => c.id === linked) ? linked! : 'all');
   const [query, setQuery] = useState('');
   const [columns, setColumns] = useState(3);
   const [heights, setHeights] = useState<Record<string, number>>({});

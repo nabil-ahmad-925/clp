@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
+import FooterGate from '@/components/layout/FooterGate';
 import BackToTop from '@/components/layout/BackToTop';
 import { SITE_URL, site } from '@/content/site';
 import { fontVariables } from './fonts';
@@ -41,7 +42,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         </a>
         <SiteHeader />
         <main id="main">{children}</main>
-        <SiteFooter />
+        <FooterGate>
+          <SiteFooter />
+        </FooterGate>
         <BackToTop />
       </body>
     </html>
