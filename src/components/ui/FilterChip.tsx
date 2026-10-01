@@ -16,8 +16,11 @@ type Props = {
   value: string[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** How many results the draft would show, for the "Show N results" button. */
-  resultsFor: (draft: string[]) => number;
+  /**
+   * How many results the draft would show, for the "Show N results" button. Without it the button reads "Show
+   * results" (results that come from a server are only fetched when it is pressed).
+   */
+  resultsFor?: (draft: string[]) => number;
   onApply: (values: string[]) => void;
 };
 
@@ -68,7 +71,7 @@ export default function FilterChip({ name, icon, all, options, value, open, onOp
   const first = value.find((v) => labels.has(v));
   const text = first == null ? name : value.length > 1 ? `${labels.get(first)} +${value.length - 1}` : labels.get(first);
   const toggle = (v: string) => setDraft((d) => (d.includes(v) ? d.filter((x) => x !== v) : [...d, v]));
-  const results = open ? resultsFor(draft) : 0;
+  const results = open && resultsFor ? resultsFor(draft) : null;
 
   return (
     <div ref={ref} className={`${styles.wrap} ${open ? styles.isOpen : ''}`}>
@@ -125,7 +128,7 @@ export default function FilterChip({ name, icon, all, options, value, open, onOp
                 onOpenChange(false);
               }}
             >
-              Show {results} {results === 1 ? 'result' : 'results'}
+              {results === null ? 'Show results' : `Show ${results} ${results === 1 ? 'result' : 'results'}`}
             </button>
           </div>
         </div>

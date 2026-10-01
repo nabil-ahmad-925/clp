@@ -31,7 +31,7 @@ export default function BuilderBlock({ block }: { block: Block }) {
     case 'team':
       return (
         <div className={styles.teamColumn}>
-          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} />
+          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} widgetId={block.widgetId} />
         </div>
       );
     case 'serviceNav':

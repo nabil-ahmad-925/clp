@@ -5,6 +5,9 @@ import type { NextConfig } from 'next';
 // (scripts/aws/cloudfront-function.js) instead.
 const staticExport = process.env.STATIC_EXPORT === '1';
 
+// Images of listings added from the admin (clp-api's S3 bucket, see .env.example).
+const listingsMedia = process.env.NEXT_PUBLIC_LISTINGS_MEDIA_URL ? new URL(process.env.NEXT_PUBLIC_LISTINGS_MEDIA_URL) : null;
+
 // The original site's 301 redirects for pages that moved (keep in sync with scripts/aws/cloudfront-function.js).
 export const siteRedirects = [
   ['/event-project-management/', '/services/event-project-management-services/'],
@@ -21,7 +24,10 @@ const nextConfig: NextConfig = {
     // Images are served directly from competelikepros.com. Its Cloudflare protection rejects
     // server-side fetches, so Next's image optimizer can't proxy them — the browser loads them as-is.
     unoptimized: true,
-    remotePatterns: [{ protocol: 'https', hostname: 'competelikepros.com', pathname: '/wp-content/uploads/**' }],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'competelikepros.com', pathname: '/wp-content/uploads/**' },
+      ...(listingsMedia ? [{ protocol: 'https' as const, hostname: listingsMedia.hostname, pathname: '/listings/**' }] : []),
+    ],
   },
   ...(staticExport
     ? {}
