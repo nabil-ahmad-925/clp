@@ -447,6 +447,22 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
     const others = matching(builtIn, withFilter(i, []), search);
     return (v) => others.filter((item) => item.tags.includes(v)).length;
   };
+  // Which filters and options the page offers is decided without the search: a search narrows the counts (shown in
+  // the panels) but never hides a filter or an option. API pages keep the facets of their latest answer without a
+  // search for this; built-in cards are counted here without it.
+  const loadedSearch = JSON.parse(view.resultKey) as ResultKey;
+  const unsearched = !loadedSearch.q && !loadedSearch.loc;
+  const [baseFacets, setBaseFacets] = useState<ListingsResult['facets'] | null>(null);
+  if (mode === 'api' && result && unsearched && result.facets !== baseFacets) setBaseFacets(result.facets);
+  const offered = (i: number): ((v: string) => boolean) => {
+    if (mode === 'api') {
+      const facet = (unsearched ? result?.facets : (baseFacets ?? result?.facets))?.[i];
+      return (v) => !facet || (facet.counts[v] ?? 0) > 0;
+    }
+    if (mode === 'loading') return () => true;
+    const others = matching(builtIn, withFilter(i, []), NO_SEARCH);
+    return (v) => others.some((item) => item.tags.includes(v));
+  };
   /** "Show N results" of a draft: counted here over the built-in cards, or by the API (exact, with the search). */
   const counts = useRef(new Map<string, Promise<number>>());
   const draftCount = (i: number) =>
@@ -465,13 +481,15 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
           },
         }
       : { resultsFor: (draft: string[]) => (mode === 'local' ? matching(builtIn, withFilter(i, draft), search).length : null) };
-  // Options with no results are left out (unless ticked), and so are chips left with none.
+  // Options the page doesn't offer are left out (unless ticked), and so are chips left with none; the search doesn't
+  // count here (see offered).
   const bar = shown
     .map((menu) => {
       const of = chipCounts(menu.i);
+      const has = offered(menu.i);
       const options = menu.options
-        .map((o) => ({ ...o, count: of(o.value) }))
-        .filter((o) => o.count !== 0 || chosen[menu.i].includes(o.value));
+        .filter((o) => has(o.value) || chosen[menu.i].includes(o.value))
+        .map((o) => ({ ...o, count: of(o.value) }));
       return { ...menu, of, options };
     })
     .filter(({ options }) => options.length > 0);
