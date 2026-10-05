@@ -96,6 +96,10 @@
 }
 
 .listItem {
+  min-width: 0;
+}
+
+.listItemIn {
   animation: rowIn 0.3s ease;
 }
 
@@ -199,6 +203,10 @@
   width: var(--dir-col-width);
   padding-top: var(--dir-row-gap);
   padding-left: var(--dir-col-gap);
+}
+
+/* A card new to the results (cards already shown don't replay it when they only move). */
+.colIn {
   animation: reveal 0.4s ease;
 }
 
@@ -215,10 +223,10 @@
   pointer-events: none;
 }
 
-/* A filter change waiting for the API: the current cards dim until the answer arrives. */
-.pending .row {
-  opacity: 0.45;
-  transition: opacity 0.15s;
+/* A change waiting for the API: the current cards stay as they are (no flash) until the answer arrives; the results
+   line says "Loading…" meanwhile. */
+.pending .row,
+.pending .list {
   pointer-events: none;
 }
 
@@ -285,8 +293,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .col,
-  .listItem {
+  .colIn,
+  .listItemIn {
     animation: none;
   }
 }

@@ -332,6 +332,12 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
   const pageItems = mode === 'api' ? sorted : sorted.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
   const totalFound = mode === 'api' ? (result?.total ?? 0) : filtered.length;
   const pageCount = Math.max(1, Math.ceil(totalFound / pageSize));
+  // Cards new to the results fade/scale in; those already shown before this change don't replay it when they only
+  // move (a new order). `before` is the set of cards the previous results showed.
+  const shownIds = pageItems.map((item) => item.id).join('|');
+  const [cardsShown, setCardsShown] = useState({ now: '', before: new Set<string>() });
+  if (cardsShown.now !== shownIds) setCardsShown({ now: shownIds, before: new Set(cardsShown.now.split('|')) });
+  const isNew = (id: string) => !cardsShown.before.has(id);
   const [open, setOpen] = useState<DirectoryItem | null>(null);
   const [openFilter, setOpenFilter] = useState<number | null>(null);
   // As on the original, "No Results Found" appears only when a filter change empties a grid that had cards
@@ -621,11 +627,12 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
               </div>
             ))}
           </div>
-        ) : /* Re-keying on the filter state replays the fade/scale-in, like the original's filtering animation. */
+        ) : /* Cards are keyed by id: those already shown stay (or move, for a new order) and only cards new to the results
+             play the fade/scale-in, once, when the new results are there. */
         display === 'list' ? (
-          <div key={`${shownKey}|${sort}|list`} className={styles.list}>
+          <div key="list" className={styles.list}>
             {pageItems.map((item) => (
-              <div key={item.id} className={styles.listItem}>
+              <div key={item.id} className={`${styles.listItem} ${isNew(item.id) ? styles.listItemIn : ''}`}>
                 <DirectoryRow
                   card={item}
                   facts={rowFacts(item, filters, prices)}
@@ -636,9 +643,9 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
             ))}
           </div>
         ) : (
-          <div key={`${shownKey}|${sort}`} className={styles.row}>
+          <div key="grid" className={styles.row}>
             {pageItems.map((item) => (
-              <div key={item.id} className={styles.col}>
+              <div key={item.id} className={`${styles.col} ${isNew(item.id) ? styles.colIn : ''}`}>
                 <TeamCard card={item} variant="wps" fallbackImage={(item as AddedItem).fallbackImage} onOpen={() => setOpen(item)} />
               </div>
             ))}
