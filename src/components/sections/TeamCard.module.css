@@ -8,7 +8,8 @@
   outline: none;
 }
 
-/* Black fade over the photo, turning gold on hover. */
+/* Black fade over the photo, turning gold on hover. The hover fade keeps a dark band where the lifted text sits, so
+   white text stays readable over light photos (a white logo background included). */
 .card::before {
   content: '';
   position: absolute;
@@ -23,7 +24,7 @@
 .card:hover::before,
 .card:focus-visible::before {
   z-index: 5;
-  background: linear-gradient(rgba(0, 0, 0, 0), var(--gold-strong) 100%);
+  background: linear-gradient(rgba(17, 17, 17, 0.25) 0%, rgba(17, 17, 17, 0.62) 45%, rgba(17, 17, 17, 0.55) 80%, var(--gold-strong) 100%);
 }
 
 .image {
@@ -58,6 +59,10 @@
   margin: auto;
   color: var(--white);
   text-align: center;
+  /* A soft shadow under the text: legible on any photo, light ones included. */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 2px 14px rgba(0, 0, 0, 0.35);
   transition:
     opacity 0.65s cubic-bezier(0.05, 0.2, 0.1, 1),
     transform 0.65s cubic-bezier(0.05, 0.2, 0.1, 1);
@@ -137,5 +142,5 @@
 .wps .meta p {
   padding-bottom: 28px;
   font-family: sans-serif;
-  color: #dcdfe4;
+  color: #eceef1;
 }

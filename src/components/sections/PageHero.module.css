@@ -203,6 +203,25 @@
   }
 }
 
+/* Directory pages (the inner "… Nearby" pages, with the search bar on the heading's edge): a smaller title. The
+   sport and section pages (Experiences, Resources) keep the full size above. */
+.compact .title {
+  font-size: 50px;
+  line-height: 1.1;
+}
+
+@media (max-width: 999px) {
+  .compact .title {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 690px) {
+  .compact .title {
+    font-size: 30px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rotateIn .word > span {
     opacity: 1;

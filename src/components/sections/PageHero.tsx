@@ -8,7 +8,21 @@ import styles from './PageHero.module.css';
 const PARALLAX_SPEED = 0.25;
 const WORD_STAGGER_MS = 370;
 
-export default function PageHero({ title, subtitle, height, backgroundColor, backgroundImage, video, textEffect, scrollArrow, meta, titleMaxWidth, overlay }: PageHeroData) {
+/** `compact`: the smaller title of the directory pages (BuilderPageView); every other page keeps the full size. */
+export default function PageHero({
+  title,
+  subtitle,
+  height,
+  backgroundColor,
+  backgroundImage,
+  video,
+  textEffect,
+  scrollArrow,
+  meta,
+  titleMaxWidth,
+  overlay,
+  compact,
+}: PageHeroData & { compact?: boolean }) {
   const heroRef = useRef<HTMLElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const [textIn, setTextIn] = useState(!textEffect);
@@ -72,9 +86,10 @@ export default function PageHero({ title, subtitle, height, backgroundColor, bac
   return (
     <section
       ref={heroRef}
-      className={`${styles.hero} ${height === 'fullscreen' ? styles.fullscreen : styles.fixed} ${typeof height === 'number' ? styles.exact : ''}`}
+      className={`${styles.hero} ${height === 'fullscreen' ? styles.fullscreen : styles.fixed} ${typeof height === 'number' ? styles.exact : ''} ${compact ? styles.compact : ''}`}
       style={{ backgroundColor, '--hero-height': typeof height === 'number' ? `${height}px` : undefined } as CSSProperties}
       data-header-tone="light"
+      data-page-hero
     >
       <div className={styles.mediaClip} aria-hidden>
         <div ref={mediaRef} className={styles.media}>

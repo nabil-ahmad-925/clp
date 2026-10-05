@@ -1,0 +1,278 @@
+/* List-view directory row, after tenpo.com's event row, in the site's black and gold. */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px;
+  border: 1px solid #ece9e2;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 1px 2px rgba(17, 17, 17, 0.05);
+  color: #111;
+  font-family: var(--font-host-grotesk), var(--font-body);
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.row:hover {
+  border-color: #d6d3cc;
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.08);
+  transform: translateY(-1px);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.media {
+  position: relative;
+  flex: none;
+  width: 180px;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f3efe6;
+}
+
+.backdrop {
+  object-fit: cover;
+  filter: blur(14px) saturate(1.4) brightness(1.05);
+  transform: scale(1.15);
+  opacity: 0.55;
+}
+
+.image {
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.photo .image {
+  object-fit: cover;
+}
+
+.photo .backdrop {
+  display: none;
+}
+
+.row:hover .image {
+  transform: scale(1.04);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.meta {
+  overflow: hidden;
+  color: #817b6a;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #111;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: normal;
+  text-transform: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.excerpt {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #6b6b6b;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 280px;
+  color: #111;
+  font-weight: 500;
+}
+
+.detailIcon {
+  display: inline-flex;
+  flex: none;
+  font-size: 14px;
+  color: #817b6a;
+}
+
+.detailText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Price and call to action, set off by a divider. */
+.aside {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  align-self: stretch;
+  width: 200px;
+  padding-left: 24px;
+  border-left: 1px solid #ece9e2;
+  text-align: center;
+}
+
+.price {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+.noPrice {
+  color: #6b6b6b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #111;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.row:hover .cta {
+  background: var(--gold);
+  color: #111;
+}
+
+.ctaArrow {
+  font-size: 13px;
+  transition: transform 0.15s ease;
+}
+
+.row:hover .ctaArrow {
+  transform: translateX(2px);
+}
+
+/* Phones: square thumbnail, two-line title, details trimmed; price and button stack on the right. */
+@media (max-width: 639px) {
+  .row {
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .media {
+    width: 84px;
+    aspect-ratio: 1;
+  }
+
+  .body {
+    gap: 4px;
+  }
+
+  .meta {
+    font-size: 12px;
+  }
+
+  .title {
+    font-size: 15px;
+    -webkit-line-clamp: 2;
+  }
+
+  .excerpt {
+    display: none;
+  }
+
+  .details {
+    font-size: 12px;
+    gap: 2px 12px;
+  }
+
+  .detail:not(:first-child) {
+    display: none;
+  }
+
+  .aside {
+    width: auto;
+    align-items: flex-end;
+    gap: 8px;
+    padding-left: 0;
+    border-left: none;
+    text-align: right;
+  }
+
+  .price {
+    font-size: 15px;
+  }
+
+  .noPrice {
+    display: none;
+  }
+
+  .cta {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .ctaArrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .image,
+  .ctaArrow {
+    transition: none;
+  }
+
+  .row:hover {
+    transform: none;
+  }
+}

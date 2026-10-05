@@ -1,66 +1,93 @@
-/* Pill filter with a checkbox panel, in the site's black and gold. */
+/* Filter pills, their popover panels, the price slider and the sort menu: tenpo.com's layout in the site's black
+   and gold. Every panel is 320px wide, whatever it holds. */
 
-.wrap {
+.wrap,
+.sortWrap {
+  --f-primary: #111;
+  --f-primary-ring: rgba(201, 162, 39, 0.35);
+  --f-fg: #111;
+  --f-muted: #f3efe6;
+  --f-muted-fg: #6b6b6b;
+  --f-border: #d6d3cc;
+  --f-input: #b9b5ad;
   position: relative;
   flex: none;
+  font-family: var(--font-host-grotesk), var(--font-body);
 }
 
 .isOpen {
   z-index: 999;
 }
 
-.chip {
+/* ---- Pill ---- */
+
+.wrap {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 44px;
-  max-width: 340px;
-  padding: 0 16px;
-  border: 1px solid #d6d3cc;
+  height: 32px;
+  border: 1px solid var(--f-border);
   border-radius: 999px;
   background: var(--white);
   color: #111;
-  font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background-color 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.chip:hover {
+.wrap:hover:not(:has(.panel:hover)),
+.wrap.isOpen {
   border-color: #111;
 }
 
-.chip:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.isOpen .chip {
-  border-color: #111;
+.wrap.isOpen {
   box-shadow: 0 0 0 1px #111;
 }
 
-/* A chip with values applied takes the gold accent. */
-.active {
+/* A chip with a value applied takes the gold accent, with a clear button in place of its chevron. */
+.active,
+.active:hover:not(:has(.panel:hover)),
+.active.isOpen {
   border-color: var(--gold-deep);
   background: #fbf4e4;
 }
 
-.active:hover,
-.isOpen .active {
-  border-color: var(--gold-deep);
+.active.isOpen,
+.active:hover:not(:has(.panel:hover)) {
   box-shadow: 0 0 0 1px var(--gold-deep);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  max-width: 280px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.active .chip {
+  padding-right: 6px;
+}
+
+.chip:focus-visible,
+.chipClear:focus-visible,
+.sort:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .icon {
   display: inline-flex;
-  font-size: 17px;
+  font-size: 15px;
   color: #444;
 }
 
@@ -75,63 +102,97 @@
 
 .chevron {
   flex: none;
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease;
 }
 
 .isOpen .chevron {
   transform: rotate(180deg);
 }
 
+.chipClear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.08);
+  color: #111;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.15s ease;
+}
+
+.chipClear:hover {
+  background: var(--gold);
+}
+
+/* ---- Panel: tenpo.com's popover (sizes and type) in the site's colours, always 320px wide ---- */
+
 .panel {
   position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
+  top: calc(100% + 8px);
+  left: -1px;
+  box-sizing: border-box;
   width: 320px;
   max-width: calc(100vw - 32px);
-  padding: 20px 20px 16px;
-  border: 1px solid #ece9e2;
+  padding: 16px;
   border-radius: 16px;
   background: var(--white);
-  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.14);
-  font-family: var(--font-body);
-  animation: drop 0.16s ease-out;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  color: var(--f-fg);
+  font-weight: 400;
+  line-height: 1.43;
+  cursor: default;
+  transform-origin: top left;
+  animation: pop 0.15s ease-out;
 }
 
 .right {
   left: auto;
-  right: 0;
+  right: -1px;
+  transform-origin: top right;
 }
 
-@keyframes drop {
+@keyframes pop {
   from {
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-8px) scale(0.95);
   }
 }
 
 .heading {
   margin-bottom: 10px;
-  color: #6b6b6b;
+  color: #817b6a;
   font-size: 12px;
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: 0.08em;
+  font-weight: 500;
+  line-height: 1.66;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-/* Lists taller than about six options scroll, with an always-visible gold scrollbar. */
+/* Long lists scroll; the gutter keeps the scrollbar clear of the counts. */
 .options {
-  max-height: 230px;
-  margin: 0 -8px;
-  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 220px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-/* Firefox only: in Chrome these standard properties override the ::-webkit-scrollbar styles below and bring back
-   macOS's auto-hiding scrollbar. */
+.options:has(> :nth-child(7)) {
+  padding-right: 10px;
+}
+
 @supports not selector(::-webkit-scrollbar) {
   .options {
     scrollbar-width: thin;
@@ -140,7 +201,7 @@
 }
 
 .options::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .options::-webkit-scrollbar-track {
@@ -153,25 +214,16 @@
   background: var(--gold);
 }
 
-.options::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-deep);
-}
-
 .option {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 9px 8px;
-  border-radius: 8px;
-  color: #111;
-  font-size: 15px;
-  line-height: 1.35;
+  gap: 10px;
+  padding: 6px 0;
+  color: var(--f-fg);
+  font-size: 14px;
+  line-height: 1.43;
   cursor: pointer;
   user-select: none;
-}
-
-.option:hover {
-  background: #f7f4ee;
 }
 
 .option input {
@@ -181,18 +233,18 @@
 }
 
 .box {
-  display: inline-flex;
+  display: grid;
   flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border: 1.5px solid #b9b5ad;
-  border-radius: 5px;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--f-input);
+  border-radius: 4px;
   background: var(--white);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   color: transparent;
-  font-size: 14px;
-  transition: all 0.12s ease;
+  font-size: 12px;
+  transition: box-shadow 0.15s ease;
 }
 
 .option:hover .box {
@@ -206,17 +258,20 @@
 }
 
 .option input:focus-visible + .box {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--f-primary-ring);
 }
 
 .label {
   flex: 1;
+  min-width: 0;
 }
 
 .count {
-  color: #6b6b6b;
-  font-size: 14px;
+  flex: none;
+  margin-left: auto;
+  color: #817b6a;
+  font-size: 12px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
@@ -224,47 +279,50 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
-  padding-top: 16px;
-  border-top: 1px solid #ece9e2;
+  gap: 8px;
+  margin: 14px 0 -4px;
+}
+
+.clear,
+.apply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .clear {
-  padding: 10px 8px;
-  border: none;
+  margin-left: -8px;
   background: none;
-  color: #555;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
+  color: #111;
 }
 
-.clear:hover:not(:disabled) {
-  color: #111;
-  text-decoration: underline;
+.clear:hover {
+  opacity: 0.8;
 }
 
 .clear:disabled {
-  color: #b5b2ab;
-  cursor: default;
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .apply {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 999px;
+  margin-right: -4px;
   background: #111;
   color: var(--white);
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
 }
 
 .apply:hover {
@@ -274,12 +332,196 @@
 
 .clear:focus-visible,
 .apply:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--f-primary-ring);
+}
+
+/* ---- Price slider: two range inputs over one track; only their thumbs take the pointer. ---- */
+
+.slider {
+  position: relative;
+  height: 16px;
+  margin: 8px 0;
+}
+
+.track {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  left: 8px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--f-muted);
+}
+
+.range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--from);
+  right: calc(100% - var(--to));
+  background: var(--gold);
+}
+
+.slider input {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 16px;
+  margin: 0;
+  background: none;
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.slider input::-webkit-slider-runnable-track {
+  height: 16px;
+  background: none;
+}
+
+.slider input::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gold-deep);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.slider input::-moz-range-track {
+  background: none;
+}
+
+.slider input::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gold-deep);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: box-shadow 0.15s ease;
+}
+
+.slider input:hover::-webkit-slider-thumb,
+.slider input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px var(--f-primary-ring);
+}
+
+.slider input:hover::-moz-range-thumb,
+.slider input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px var(--f-primary-ring);
+}
+
+.slider input:focus {
+  outline: none;
+}
+
+.priceText {
+  margin-top: 10px;
+  color: #817b6a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ---- Sort menu ---- */
+
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--f-border);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--f-fg);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.sort:hover,
+.sortWrap.isOpen .sort {
+  border-color: #111;
+}
+
+.sortIcon {
+  display: inline-flex;
+  font-size: 16px;
+  color: #444;
+}
+
+.sortChevron {
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+.sortList {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: max(128px, 100%);
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transform-origin: top right;
+  animation: pop 0.15s ease-out;
+}
+
+/* Opening upwards (a menu at the bottom of the page). */
+.sortListUp {
+  top: auto;
+  bottom: calc(100% + 4px);
+  transform-origin: bottom right;
+}
+
+.sortItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 6px 32px 6px 8px;
+  border-radius: 12px;
+  color: var(--f-fg);
+  font-size: 14px;
+  line-height: 1.43;
+  white-space: nowrap;
+  cursor: default;
+  outline: none;
+  user-select: none;
+}
+
+.sortItem:hover,
+.sortItem:focus {
+  background: #efeeea;
+}
+
+.sortCheck {
+  position: absolute;
+  right: 8px;
+  font-size: 16px;
+  color: #111;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel {
+  .panel,
+  .sortList {
     animation: none;
   }
 }

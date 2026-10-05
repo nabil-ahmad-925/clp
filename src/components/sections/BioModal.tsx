@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import Button from '@/components/ui/Button';
 import SocialIcon from '@/components/ui/SocialIcon';
 import type { FacilityCard } from '@/content/types';
@@ -21,12 +22,28 @@ type Props = {
   variant?: 'nectar' | 'wps';
 };
 
-/** Full-screen bio overlay (Salient "bio fullscreen alt"). Click anywhere (except links) or press Esc to close. */
+/** Swipes shorter than this (px) are taps. */
+const SWIPE_PX = 40;
+/** The carousel moves on by itself this often (ms), looping, while the overlay is open. */
+const AUTOPLAY_MS = 4000;
+
+/**
+ * Full-screen bio overlay (Salient "bio fullscreen alt"). Click anywhere (except links and the photo controls) or
+ * press Esc to close. Several photos (`bioImages`) show as a carousel: arrows, dots, ←/→ keys and swiping; it also
+ * moves on by itself every AUTOPLAY_MS, looping from the last photo to the first, only while the overlay is open.
+ */
 export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
   const [visible, setVisible] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const photos = card.bioImages?.length ? card.bioImages : card.bioImage ? [card.bioImage] : [];
+  const [slide, setSlide] = useState(0);
+  const [loaded, setLoaded] = useState<ReadonlySet<string>>(() => new Set());
   const closing = useRef(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const many = photos.length > 1;
+  const step = useCallback((by: number) => setSlide((s) => (s + by + photos.length) % photos.length), [photos.length]);
+  // A swipe over the photo changes it, and the click it ends with doesn't close the overlay.
+  const swipeFrom = useRef<number | null>(null);
+  const swiped = useRef(false);
 
   const close = useCallback(() => {
     if (closing.current) return;
@@ -39,25 +56,40 @@ export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
     const frame = requestAnimationFrame(() => setVisible(true));
     document.body.classList.add('menu-open');
     dialogRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+      else if (many && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) step(e.key === 'ArrowLeft' ? -1 : 1);
+    };
     window.addEventListener('keydown', onKey);
     return () => {
       cancelAnimationFrame(frame);
       document.body.classList.remove('menu-open');
       window.removeEventListener('keydown', onKey);
     };
-  }, [close]);
+  }, [close, many, step]);
 
-  // Fade the photo in once it has loaded, like the original.
+  // Autoplay: the next photo AUTOPLAY_MS after the current one showed (a manual change restarts the wait). Only while
+  // the overlay is open: closing (visible false) or unmounting stops it. Not for visitors who ask for reduced motion.
   useEffect(() => {
-    if (!card.bioImage) return;
-    const img = new Image();
-    img.onload = () => setImageLoaded(true);
-    img.src = card.bioImage;
-    return () => {
-      img.onload = null;
-    };
-  }, [card.bioImage]);
+    if (!many || !visible || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => step(1), AUTOPLAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [many, visible, slide, step]);
+
+  // Each photo fades in once it has loaded, like the original (all are loaded up front, so the carousel doesn't wait).
+  const photosKey = photos.join('|');
+  useEffect(() => {
+    const images = photosKey
+      .split('|')
+      .filter(Boolean)
+      .map((src) => {
+        const img = new Image();
+        img.onload = () => setLoaded((prev) => new Set(prev).add(src));
+        img.src = src;
+        return img;
+      });
+    return () => images.forEach((img) => (img.onload = null));
+  }, [photosKey]);
 
   return createPortal(
     <div
@@ -68,7 +100,11 @@ export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
       aria-label={`${card.subtitle} – ${card.title}`}
       tabIndex={-1}
       onClick={(e) => {
-        if (!(e.target as HTMLElement).closest('a')) close();
+        if (swiped.current) {
+          swiped.current = false;
+          return;
+        }
+        if (!(e.target as HTMLElement).closest('a, [data-carousel-control]')) close();
       }}
     >
       <div className={styles.innerWrap}>
@@ -129,15 +165,72 @@ export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
             </div>
           </div>
         </div>
-        <div className={styles.picture} aria-hidden>
-          <div className={styles.pictureCover} />
-          {card.bioImage && (
-            <div className={styles.pictureWrap}>
-              <div
-                className={`${styles.pictureImage} ${imageLoaded ? styles.pictureLoaded : ''}`}
-                style={{ backgroundImage: `url("${card.bioImage}")` }}
-              />
+        <div
+          className={`${styles.picture} ${many ? styles.pictureMany : ''}`}
+          {...(many
+            ? { role: 'group', 'aria-roledescription': 'carousel', 'aria-label': `Photos of ${card.title}` }
+            : { 'aria-hidden': true })}
+          onPointerDown={(e) => {
+            if (many) swipeFrom.current = e.clientX;
+          }}
+          onPointerUp={(e) => {
+            const from = swipeFrom.current;
+            swipeFrom.current = null;
+            if (from === null || Math.abs(e.clientX - from) < SWIPE_PX) return;
+            swiped.current = true;
+            step(e.clientX < from ? 1 : -1);
+          }}
+        >
+          <div className={styles.pictureCover} aria-hidden />
+          {photos.length > 0 && (
+            <div className={styles.pictureWrap} aria-hidden>
+              {photos.map((src, i) => (
+                <div
+                  key={src}
+                  className={[styles.pictureImage, loaded.has(src) && styles.pictureLoaded, i === slide && styles.pictureActive]
+                    .filter(Boolean)
+                    .join(' ')}
+                  style={{ backgroundImage: `url("${src}")` }}
+                />
+              ))}
             </div>
+          )}
+          {many && (
+            <>
+              <button
+                type="button"
+                className={`${styles.slideBtn} ${styles.slidePrev}`}
+                data-carousel-control
+                aria-label="Previous photo"
+                onClick={() => step(-1)}
+              >
+                <LuChevronLeft aria-hidden />
+              </button>
+              <button
+                type="button"
+                className={`${styles.slideBtn} ${styles.slideNext}`}
+                data-carousel-control
+                aria-label="Next photo"
+                onClick={() => step(1)}
+              >
+                <LuChevronRight aria-hidden />
+              </button>
+              <div className={styles.slideDots} data-carousel-control>
+                {photos.map((src, i) => (
+                  <button
+                    key={src}
+                    type="button"
+                    className={`${styles.slideDot} ${i === slide ? styles.slideDotOn : ''}`}
+                    aria-label={`Photo ${i + 1} of ${photos.length}`}
+                    aria-current={i === slide ? 'true' : undefined}
+                    onClick={() => setSlide(i)}
+                  />
+                ))}
+              </div>
+              <span className={styles.slideCount} aria-live="polite">
+                {slide + 1} / {photos.length}
+              </span>
+            </>
           )}
         </div>
       </div>

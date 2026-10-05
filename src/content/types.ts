@@ -27,6 +27,8 @@ export type FacilityCard = {
   bio: string;
   /** Large photo on the overlay's right half. Without one the original shows an empty grey panel. */
   bioImage?: string;
+  /** Several photos for the overlay (shown as a carousel, `bioImage` being the first); listings from the admin. */
+  bioImages?: string[];
   cta?: Cta;
   socials: { network?: string; href: string }[];
   /** The original wraps `bio` in <i> (shown in the display font, see globals.css). */

@@ -1,6 +1,7 @@
 /* Team plugin container/grid (per-widget variables) plus the site's custom overrides. */
 
 .directory {
+  scroll-margin-top: 110px;
   width: 100%;
   max-width: var(--dir-width);
   margin: 0 auto;
@@ -11,22 +12,113 @@
   margin: 40px 0 32px;
 }
 
-/* Pill filters in a row, wrapping on narrow screens. */
+/* The directory's own search bar, on pages where it isn't under the page heading (see DirectorySearchSlot). */
+.searchSlot {
+  margin-top: 40px;
+}
+
+.searchSlot + .bar {
+  margin-top: 28px;
+}
+
+/* tenpo.com's filter bar: pills wrapping on the left, the sort menu on the right. */
+.barRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
 .filters {
   display: flex;
+  flex: 1;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sortSlot {
+  display: flex;
+  flex: none;
   align-items: center;
   gap: 10px;
 }
 
+/* Grid / list switch (tenpo.com's "Results view" pill), black when on. */
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid #d6d3cc;
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.viewBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: #6b6b6b;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.viewBtn:hover {
+  color: #111;
+}
+
+.viewOn,
+.viewOn:hover {
+  background: #111;
+  color: var(--white);
+}
+
+.viewBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* List view: one row per card, full width, lined up with the filter bar. */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listItem {
+  animation: rowIn 0.3s ease;
+}
+
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.skeletonRow {
+  height: 138px;
+  border-radius: 16px;
+}
+
 .clearAll {
-  height: 44px;
-  padding: 0 8px;
+  height: 32px;
+  padding: 0 6px;
   border: none;
   background: none;
   color: #111;
-  font-family: var(--font-body);
-  font-size: 15px;
+  font-family: var(--font-host-grotesk), var(--font-body);
+  font-size: 14px;
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -45,9 +137,21 @@
 .found {
   margin-top: 16px;
   color: #6b6b6b;
-  font-family: var(--font-body);
+  font-family: var(--font-host-grotesk), var(--font-body);
   font-size: 14px;
   line-height: 1.4;
+}
+
+/* Phones: the sort menu goes above the pills. */
+@media (max-width: 639px) {
+  .barRow {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .sortSlot {
+    align-self: flex-end;
+  }
 }
 
 /* Without filters the plugin's empty filter bar still leaves its 40px margin. */
@@ -181,7 +285,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .col {
+  .col,
+  .listItem {
     animation: none;
   }
 }
@@ -192,53 +297,134 @@
     padding-left: 32px;
   }
 
-  .bar {
+  .bar,
+  .list,
+  .pager {
     padding-left: calc(32px - var(--dir-col-gap));
   }
 }
 
-/* "Load More" under paged widgets; hidden once every card is shown. */
-.loadMore {
-  display: flex;
-  flex-direction: column;
+/* Pager under the cards: "1–12 of 33 results", Previous / page numbers / Next, and the page size. */
+.pager {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
+  gap: 16px;
   width: 100%;
-  font-family: sans-serif;
+  margin-top: 40px;
+  font-family: var(--font-host-grotesk), var(--font-body);
 }
 
-.loadMoreBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding: 4px 14px;
-  border: 2px solid rgba(120, 123, 129, 0.32);
-  border-radius: 200px;
-  background: transparent;
-  color: #53565a;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 27px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.loadMoreBtn svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-}
-
-.loadMoreBtn:hover {
-  border-color: #e3bd66;
-  background: #e3bd66;
-}
-
-.loadStatus {
-  margin-top: 16px;
+.pagerInfo {
+  color: #817b6a;
   font-size: 14px;
   font-weight: 500;
-  line-height: 27px;
-  color: #444950;
+}
+
+.pagerPages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pagerStep,
+.pagerNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  border: 1px solid #d6d3cc;
+  border-radius: 999px;
+  background: var(--white);
+  color: #111;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.pagerStep {
+  padding: 0 14px;
+}
+
+.pagerNum {
+  min-width: 36px;
+  padding: 0 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pagerStep:hover:not(:disabled),
+.pagerNum:hover:not(:disabled) {
+  border-color: #111;
+}
+
+.pagerOn,
+.pagerOn:hover:not(:disabled) {
+  border-color: #111;
+  background: #111;
+  color: var(--white);
+}
+
+.pagerStep:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerNum:disabled:not(.pagerOn) {
+  cursor: default;
+}
+
+.pagerStep:focus-visible,
+.pagerNum:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pagerGap {
+  min-width: 20px;
+  color: #817b6a;
+  text-align: center;
+}
+
+.pagerSize {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: #817b6a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Narrow screens: page buttons first, range and page size on a row below. */
+@media (max-width: 899px) {
+  .pager {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .pagerPages {
+    grid-column: 1 / -1;
+    justify-content: center;
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagerStep {
+    padding: 0 10px;
+  }
+
+  .pagerStep svg + *,
+  .pagerStep {
+    font-size: 13px;
+  }
 }

@@ -1,4 +1,4 @@
-import { Lato, Montserrat, Open_Sans, Oswald, Playfair_Display, Poppins, Roboto } from 'next/font/google';
+import { Host_Grotesk, Lato, Montserrat, Open_Sans, Oswald, Playfair_Display, Poppins, Roboto } from 'next/font/google';
 
 export const openSans = Open_Sans({
   subsets: ['latin', 'latin-ext'],
@@ -55,4 +55,12 @@ export const poppins = Poppins({
   display: 'swap',
 });
 
-export const fontVariables = [openSans, montserrat, oswald, playfair, roboto, lato, poppins].map((f) => f.variable).join(' ');
+// The directory filters (pills, panels, sort menu) are set in Host Grotesk, as on tenpo.com.
+export const hostGrotesk = Host_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-host-grotesk',
+  display: 'swap',
+});
+
+export const fontVariables = [openSans, montserrat, oswald, playfair, roboto, lato, poppins, hostGrotesk].map((f) => f.variable).join(' ');

@@ -6,8 +6,35 @@ import type { Cta, DirectoryItem } from './types';
  */
 const API_URL = process.env.NEXT_PUBLIC_LISTINGS_API_URL?.replace(/\/$/, '');
 
-/** Widgets the admin can add cards to (the sports' "Learn More" directories; keep in sync with clp-api WIDGETS). */
-const LISTING_WIDGETS = new Set([45, 46, 47, 6, 37, 36, 41]);
+/** The site's two menus; every directory widget is under one (its listings' `listingType`). */
+export type ListingType = 'experiences' | 'resources';
+
+/**
+ * Widgets the admin can add cards to, by listing type: the directories behind the sport pages' "Learn More" tiles
+ * (keep in sync with clp-api WIDGET_TYPES and the admin's scripts/sync-widgets.mjs).
+ */
+const WIDGET_TYPES: Record<number, ListingType> = {
+  45: 'experiences', // Advancement & Workshops
+  46: 'experiences', // Branded Activations
+  47: 'experiences', // Camps/Tournaments
+  6: 'experiences', // Groups/Private Lessons
+  37: 'experiences', // Leagues/Social Clubs
+  36: 'experiences', // Leagues/Social Clubs (Golf)
+  41: 'experiences', // Trips/Retreats
+  40: 'resources', // Dieting & Nutrition
+  16: 'resources', // Injury Prevention & Recovery
+  39: 'resources', // Mental Health & Resilience
+  33: 'resources', // Strength & Conditioning
+  10: 'resources', // Facilities & Parks (Baseball & Softball)
+  9: 'resources', // Facilities & Parks (Basketball)
+  42: 'resources', // Facilities & Venues (Esports)
+  8: 'resources', // Facilities & Parks (Fútbol/Soccer)
+  43: 'resources', // Facilities & Clubs (Golfing)
+  44: 'resources', // Facilities & Parks (Pickleball)
+};
+
+/** The `type=` of a widget's requests: the API answers with listings of that type only. */
+const typeParam = (widgetId: number) => (WIDGET_TYPES[widgetId] ? `&type=${WIDGET_TYPES[widgetId]}` : '');
 
 type Listing = {
   id: string;
@@ -19,6 +46,8 @@ type Listing = {
   bio: string;
   image: string;
   bioImage: string;
+  /** The popup photos, in order (up to 3; older listings have only bioImage). */
+  bioImages?: string[];
   tags: string[];
   buttons: Cta[];
   socials: { network: string; href: string }[];
@@ -48,14 +77,15 @@ const toItem = (l: Listing): AddedItem => ({
   excerpt: l.excerpt,
   bio: l.bio,
   bioHtml: bioToHtml(l.bio),
-  bioImage: l.bioImage || l.image || undefined,
+  bioImage: l.bioImages?.[0] || l.bioImage || l.image || undefined,
+  bioImages: l.bioImages?.length ? l.bioImages : l.bioImage ? [l.bioImage] : undefined,
   buttons: l.buttons.map((b) => ({ ...b, newTab: /^https?:/.test(b.href) })),
   socials: l.socials,
 });
 
 /** Whether a directory widget loads its cards from the listings API (the page shows a loader until it answers). */
 export const listingsEnabled = (widgetId: number | undefined): widgetId is number =>
-  Boolean(API_URL) && widgetId != null && LISTING_WIDGETS.has(widgetId);
+  Boolean(API_URL) && widgetId != null && Object.hasOwn(WIDGET_TYPES, widgetId);
 
 /** After this long the page stops waiting and shows its built-in cards. */
 const TIMEOUT_MS = 4000;
@@ -71,8 +101,24 @@ function get<T>(path: string): Promise<T> {
 }
 
 const filtersParam = (groups: string[][]) => `filters=${encodeURIComponent(encodeGroups(groups))}`;
-const listPath = (widgetId: number, groups: string[][], facets: number[], limit: number, cursor?: string) =>
-  `/listings?widget=${widgetId}&${filtersParam(groups)}${facets.length ? `&facets=${facets.join(',')}` : ''}&limit=${limit}` +
+
+/** The API's orders: newest first (the directory's "Recommended"), by price-range tags, or by next month from now. */
+export type ListingsSort = 'recommended' | 'price-asc' | 'price-desc' | 'soonest';
+
+/**
+ * How a list is asked for besides its filter groups: `q` searches the title, subtitle and excerpt (every word must be
+ * found), `loc` a place among the tags (a city or destination starting with it), `sort` orders it. The API ignores
+ * case and accents.
+ */
+export type ListingsOptions = { q?: string; loc?: string; sort?: ListingsSort };
+
+const searchParam = ({ q, loc }: ListingsOptions = {}) =>
+  (q?.trim() ? `&q=${encodeURIComponent(q.trim())}` : '') + (loc?.trim() ? `&loc=${encodeURIComponent(loc.trim())}` : '');
+
+const listPath = (widgetId: number, groups: string[][], facets: number[], limit: number, cursor?: string, options: ListingsOptions = {}) =>
+  `/listings?widget=${widgetId}${typeParam(widgetId)}&${filtersParam(groups)}${facets.length ? `&facets=${facets.join(',')}` : ''}&limit=${limit}` +
+  searchParam(options) +
+  (options.sort && options.sort !== 'recommended' ? `&sort=${options.sort}` : '') +
   (cursor ? `&cursor=${encodeURIComponent(cursor)}` : '');
 
 /** The API's largest page; widgets without "Load More" read every page of this size. */
@@ -96,26 +142,51 @@ const toResult = (data: ListingsResponse): ListingsResult => ({
 });
 
 /** Every page after the first one (widgets that show all their cards at once). */
-async function rest(widgetId: number, groups: string[][], first: ListingsResult): Promise<ListingsResult> {
+async function rest(widgetId: number, groups: string[][], first: ListingsResult, options?: ListingsOptions): Promise<ListingsResult> {
   let result = first;
-  while (result.nextCursor) result = await moreListings(widgetId, groups, result);
+  while (result.nextCursor) result = await moreListings(widgetId, groups, result, undefined, options);
   return result;
 }
 
 /**
  * The first page of a widget's published listings matching the filter groups (any value of each non-empty group),
- * filtered by the API in DynamoDB, newest first; with the total and the counts of the `facets` groups. `limit`
- * omitted: every page is loaded. Rejects when the API fails or is slow.
+ * filtered (and searched, see ListingsOptions) by the API in DynamoDB, newest first; with the total and the counts of
+ * the `facets` groups. `limit` omitted: every page is loaded. Rejects when the API fails or is slow.
  */
-export const queryListings = (widgetId: number, groups: string[][], facets: number[] = [], limit?: number) =>
-  get<ListingsResponse>(listPath(widgetId, groups, facets, limit ?? MAX_PAGE))
+export const queryListings = (widgetId: number, groups: string[][], facets: number[] = [], limit?: number, options?: ListingsOptions) =>
+  get<ListingsResponse>(listPath(widgetId, groups, facets, limit ?? MAX_PAGE, undefined, options))
     .then(toResult)
-    .then((r) => (limit === undefined ? rest(widgetId, groups, r) : r));
+    .then((r) => (limit === undefined ? rest(widgetId, groups, r, options) : r));
 
-/** `loaded` with the next page appended (the same filters; `limit` items, by default the first page's size). */
-export async function moreListings(widgetId: number, groups: string[][], loaded: ListingsResult, limit = loaded.limit): Promise<ListingsResult> {
+/**
+ * How many published listings match the filter groups and search (the "Show N results" of a filter panel), counted by
+ * the API.
+ */
+export const countListings = (widgetId: number, groups: string[][], options?: ListingsOptions) =>
+  get<{ total: number }>(`/listings?widget=${widgetId}${typeParam(widgetId)}&${filtersParam(groups)}${searchParam(options)}&count=1`).then(
+    (r) => r.total,
+  );
+
+/**
+ * One page of listings after `cursor` (the `nextCursor` of the page before it), with the same filters, search and sort
+ * as the first page: `nextCursor` continues to the page after (null: it's the last one).
+ */
+export const listingsPage = (widgetId: number, groups: string[][], cursor: string, limit: number, options?: ListingsOptions) =>
+  get<ListingsResponse>(listPath(widgetId, groups, [], limit, cursor, options)).then((data) => {
+    const page = toResult(data);
+    return { items: page.items, nextCursor: page.nextCursor };
+  });
+
+/** `loaded` with the next page appended (the same filters, search and sort; `limit` items, by default the first page's size). */
+export async function moreListings(
+  widgetId: number,
+  groups: string[][],
+  loaded: ListingsResult,
+  limit = loaded.limit,
+  options?: ListingsOptions,
+): Promise<ListingsResult> {
   if (!loaded.nextCursor) return loaded;
-  const page = toResult(await get<ListingsResponse>(listPath(widgetId, groups, [], limit, loaded.nextCursor)));
+  const page = toResult(await get<ListingsResponse>(listPath(widgetId, groups, [], limit, loaded.nextCursor, options)));
   // A listing can't repeat across pages, but one added meanwhile must not show twice either.
   const seen = new Set(loaded.items.map((i) => i.id));
   return { ...loaded, items: [...loaded.items, ...page.items.filter((i) => !seen.has(i.id))], nextCursor: page.nextCursor };

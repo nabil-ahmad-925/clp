@@ -1,0 +1,274 @@
+/* tenpo.com's two-field search bar (rounded white card, uppercase field labels, round search button), in black and gold. */
+
+/* Under the page heading: centred on its bottom edge. The bar has a set height (per breakpoint), so half of it is
+   known up front and the page lays out right from its first paint. */
+.slot {
+  --search-h: 78px;
+  position: relative;
+  z-index: 5;
+  margin: calc(var(--search-h) / -2) auto 0;
+  padding: 0 16px;
+}
+
+.slot .search {
+  height: var(--search-h);
+}
+
+.search {
+  position: relative;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 8px;
+  border: 1px solid #ece9e2;
+  border-radius: 18px;
+  background: var(--white);
+  box-shadow:
+    0 18px 40px -18px rgba(17, 17, 17, 0.3),
+    0 3px 10px rgba(17, 17, 17, 0.06);
+  font-family: var(--font-host-grotesk), var(--font-body);
+}
+
+.seg {
+  position: relative;
+  display: flex;
+  flex: 1.5;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 22px;
+  border-radius: 10px;
+  cursor: text;
+  transition: background-color 0.2s ease;
+}
+
+.seg:hover,
+.seg:focus-within {
+  background: rgba(17, 17, 17, 0.04);
+}
+
+.locSeg {
+  flex: 1;
+  padding: 0;
+}
+
+.segLabel {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 22px;
+  cursor: text;
+}
+
+/* Divider between the two fields. */
+.locSeg::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 1px;
+  height: 30px;
+  background: #d6d3cc;
+  transform: translateY(-50%);
+  content: '';
+}
+
+.segIcon {
+  display: none;
+  flex: none;
+  font-size: 19px;
+  color: rgba(17, 17, 17, 0.4);
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.label {
+  color: rgba(17, 17, 17, 0.7);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  padding: 2px 0 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  outline: none;
+  appearance: none;
+}
+
+.input::placeholder {
+  color: rgba(17, 17, 17, 0.4);
+  font-weight: 500;
+}
+
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.submit {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  gap: 9px;
+  width: 44px;
+  height: 44px;
+  margin: 0 4px 0 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #111;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.submit:hover {
+  background: var(--gold);
+  color: #111;
+}
+
+.submit:active {
+  transform: scale(0.97);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.submitText {
+  display: none;
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+/* Location suggestions: the page's places that have results. */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  min-width: 260px;
+  max-height: 320px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #111;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.suggestion[aria-selected='true'] {
+  background: #efeeea;
+}
+
+.suggestionIcon {
+  flex: none;
+  font-size: 15px;
+  color: #817b6a;
+}
+
+.suggestionLabel {
+  flex: 1;
+}
+
+/* Phones: the fields stack, each with its icon; the button spans the width. */
+@media (max-width: 639px) {
+  .slot {
+    --search-h: 182px;
+  }
+
+  .search {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    border-radius: 22px;
+  }
+
+  .seg,
+  .segLabel {
+    padding: 7px 14px;
+  }
+
+  .locSeg {
+    padding: 0;
+  }
+
+  .suggestions {
+    top: calc(100% + 6px);
+    min-width: 0;
+  }
+
+  .locSeg::before {
+    top: 0;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    height: 1px;
+    transform: none;
+  }
+
+  .segIcon {
+    display: block;
+  }
+
+  .label {
+    font-size: 11px;
+  }
+
+  .submit {
+    align-self: stretch;
+    width: auto;
+    margin: 4px 0 0;
+    padding: 11px 26px;
+    height: auto;
+  }
+
+  .submitText {
+    display: inline;
+  }
+}
