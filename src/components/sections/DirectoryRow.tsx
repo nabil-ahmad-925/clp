@@ -15,16 +15,18 @@ type Props = {
   onOpen: () => void;
   /** Shown instead when the card's image is missing or fails to load (an API card's built-in image). */
   fallbackImage?: string;
+  /** Rows near the top load their image at once rather than when scrolled near. */
+  eager?: boolean;
 };
 
 /**
  * A directory card in the list view (tenpo.com's event row): image on the left, title and details in the middle,
  * price and "View details" on the right. The whole row opens the card's full-screen bio, as the grid card does.
  */
-export default function DirectoryRow({ card, facts, onOpen, fallbackImage }: Props) {
+export default function DirectoryRow({ card, facts, onOpen, fallbackImage, eager }: Props) {
   const [failed, setFailed] = useState(false);
-  // Landscape images (photos) fill the thumbnail; square and tall ones (logos, crests) fit whole.
-  const [photo, setPhoto] = useState(false);
+  // The image shows once fully loaded (a placeholder shimmers meanwhile), never half-painted.
+  const [loaded, setLoaded] = useState('');
   const src = (failed ? fallbackImage : card.image) || fallbackImage;
   const details = (
     [
@@ -49,21 +51,19 @@ export default function DirectoryRow({ card, facts, onOpen, fallbackImage }: Pro
         }
       }}
     >
-      {/* A logo fits whole over a blurred copy of itself; a photo fills the frame. */}
-      <div className={`${styles.media} ${photo ? styles.photo : ''}`}>
+      {/* The card image fills the thumbnail, centred, as on the grid cards (their logos sit mid-image). */}
+      <div className={`${styles.media} ${src && loaded === src ? styles.mediaLoaded : ''}`}>
         {src && (
-          <>
-            <Image className={styles.backdrop} src={src} alt="" fill sizes="180px" aria-hidden />
-            <Image
-              className={styles.image}
-              src={src}
-              alt=""
-              fill
-              sizes="(min-width: 640px) 180px, 84px"
-              onLoad={(e) => setPhoto(e.currentTarget.naturalWidth >= e.currentTarget.naturalHeight * 1.15)}
-              onError={() => fallbackImage && setFailed(true)}
-            />
-          </>
+          <Image
+            className={styles.image}
+            src={src}
+            alt=""
+            fill
+            sizes="(min-width: 640px) 180px, 84px"
+            loading={eager ? 'eager' : 'lazy'}
+            onLoad={() => setLoaded(src)}
+            onError={() => fallbackImage && setFailed(true)}
+          />
         )}
       </div>
 

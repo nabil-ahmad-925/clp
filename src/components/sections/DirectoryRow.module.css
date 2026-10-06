@@ -33,30 +33,40 @@
   position: relative;
   flex: none;
   width: 180px;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 12px;
-  background: #f3efe6;
+  /* Loading: a soft shimmer until the image has fully arrived. */
+  background: linear-gradient(100deg, #f1ede4 30%, #f8f6f1 50%, #f1ede4 70%) 0 0 / 300% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
-.backdrop {
-  object-fit: cover;
-  filter: blur(14px) saturate(1.4) brightness(1.05);
-  transform: scale(1.15);
-  opacity: 0.55;
+.mediaLoaded {
+  background: #f3efe6;
+  animation: none;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }
 
 .image {
-  object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.photo .image {
   object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition:
+    opacity 0.35s ease,
+    transform 0.3s ease;
 }
 
-.photo .backdrop {
-  display: none;
+/* Fades in once loaded (a large photo never shows half-painted). */
+.mediaLoaded .image {
+  opacity: 1;
 }
 
 .row:hover .image {
@@ -266,6 +276,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .media {
+    animation: none;
+  }
+
   .row,
   .image,
   .ctaArrow {

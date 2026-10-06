@@ -3,7 +3,7 @@
 /* Under the page heading: centred on its bottom edge. The bar has a set height (per breakpoint), so half of it is
    known up front and the page lays out right from its first paint. */
 .slot {
-  --search-h: 78px;
+  --search-h: 64px;
   position: relative;
   z-index: 5;
   margin: calc(var(--search-h) / -2) auto 0;
@@ -79,7 +79,7 @@
 }
 
 .segIcon {
-  display: none;
+  display: block;
   flex: none;
   font-size: 19px;
   color: rgba(17, 17, 17, 0.4);
@@ -91,6 +91,16 @@
   flex-direction: column;
   gap: 1px;
   min-width: 0;
+}
+
+/* Field names for screen readers only (the fields show their placeholders). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .label {
@@ -138,7 +148,8 @@
   margin: 0 4px 0 8px;
   padding: 0;
   border: none;
-  border-radius: 999px;
+  /* A rounded square (tenpo's is a circle). */
+  border-radius: 12px;
   background: #111;
   color: var(--white);
   font-family: inherit;
@@ -219,7 +230,7 @@
 /* Phones: the fields stack, each with its icon; the button spans the width. */
 @media (max-width: 639px) {
   .slot {
-    --search-h: 182px;
+    --search-h: 148px;
   }
 
   .search {

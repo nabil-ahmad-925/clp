@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { DirectorySearchProvider, DirectorySearchSlot } from '@/components/sections/DirectorySearch';
 import PageHero from '@/components/sections/PageHero';
+import { searchPlaceholder } from '@/content/listings';
 import { Container } from '@/components/ui/Section';
 import type { BuilderPage, BuilderRow } from '@/content/types';
 import BuilderBlock from './BuilderBlock';
@@ -13,7 +14,8 @@ import styles from './BuilderPageView.module.css';
  */
 export default function BuilderPageView({ page }: { page: BuilderPage }) {
   // A directory page (its directory in the first row, under a heading) gets the search bar on the heading's edge.
-  const search = Boolean(page.hero) && page.rows[0]?.columns.some((col) => col.blocks.some((b) => b.type === 'team'));
+  const directory = page.hero ? page.rows[0]?.columns.flatMap((col) => col.blocks).find((b) => b.type === 'team') : undefined;
+  const search = Boolean(directory);
   const body = (
     <>
       {page.hero && <PageHero {...page.hero} compact={search} />}
@@ -27,7 +29,9 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
       {page.portfolioNav && <PortfolioNav links={page.portfolioNav} />}
     </>
   );
-  return search ? <DirectorySearchProvider>{body}</DirectorySearchProvider> : body;
+  // The search field names the page's category ("Search Advancement & Workshops…").
+  const placeholder = searchPlaceholder(directory?.type === 'team' ? directory.widgetId : undefined, page.hero?.title.join(' '));
+  return search ? <DirectorySearchProvider placeholder={placeholder}>{body}</DirectorySearchProvider> : body;
 }
 
 function Row({ row }: { row: BuilderRow }) {

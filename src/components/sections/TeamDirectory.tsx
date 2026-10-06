@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   LuAccessibility,
+  LuBriefcase,
   LuCalendar,
   LuChartNoAxesColumn,
   LuChevronLeft,
@@ -24,7 +25,7 @@ import { AppliedPill } from '@/components/ui/FilterPopover';
 import PillSelect from '@/components/ui/PillSelect';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
 import SortSelect, { type Sort } from '@/components/ui/SortSelect';
-import { countListings, listingsEnabled, listingsPage, queryListings, type AddedItem, type ListingsResult } from '@/content/listings';
+import { countListings, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
@@ -67,6 +68,9 @@ function found(item: DirectoryItem, { q, loc }: Search) {
 const matching = (items: DirectoryItem[], chosen: string[][], search: Search = NO_SEARCH) =>
   items.filter((item) => chosen.every((values) => values.length === 0 || values.some((v) => item.tags.includes(v))) && found(item, search));
 
+/** Filters shown with all their options whether or not listings use them yet (the others hide without results). */
+const ALWAYS_SHOWN = ['alldates'];
+
 /** Filters whose options are places: the search bar's "Location" takes their place, so they get no pill. */
 const LOCATION_KEYS = ['language', 'city', 'destinations'];
 
@@ -89,6 +93,7 @@ const CHIPS: Record<string, Chip> = {
   'extra-two': { name: 'Accessibility', icon: <LuAccessibility />, plural: 'selected' },
   'extra-three': { name: 'Partner', icon: <LuHandshake />, plural: 'partners' },
   'extra-four': { name: 'Performance/Rehab', icon: <LuHeartPulse />, plural: 'services' },
+  service: { name: 'Service', icon: <LuBriefcase />, plural: 'services' },
 };
 
 const chipFor = (filter: DirectoryFilter): Chip => {
@@ -101,7 +106,7 @@ const chipFor = (filter: DirectoryFilter): Chip => {
 /** "Boston", "Boston +2": the first of a card's labels, with how many more it has. */
 const firstOf = (labels: string[]) =>
   labels.length === 0 ? undefined : labels.length === 1 ? labels[0] : `${labels[0]} +${labels.length - 1}`;
-const dollars = (n: number) => `$${n.toLocaleString('en-US')}`;
+const dollars = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
 
 /** A list row's details from the card's tags: its city, ages, months and price range (as the filters label them). */
 function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<string, PriceBucket>): RowFacts {
@@ -112,7 +117,11 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
   const months = MONTHS.map((m, i) => (item.tags.includes(m) ? MONTH_SHORT[i] : '')).filter(Boolean);
   const buckets = item.tags.flatMap((t) => (prices.has(t) ? [prices.get(t)!] : []));
   let price: string | undefined;
-  if (buckets.length) {
+  if (item.priceMin != null) {
+    // The listing's own price: "Free", "$25", "$25 – $50".
+    const max = item.priceMax ?? item.priceMin;
+    price = max === 0 ? 'Free' : item.priceMin === max ? dollars(max) : `${dollars(item.priceMin)} – ${dollars(max)}`;
+  } else if (buckets.length) {
     const min = Math.min(...buckets.map((b) => b.min));
     const max = Math.max(...buckets.map((b) => b.max));
     price =
@@ -493,8 +502,11 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
     .map((menu) => {
       const of = chipCounts(menu.i);
       const has = offered(menu.i);
+      // "When" always shows on the directories that have it (Advancement & Workshops, Branded Activations,
+      // Camps/Tournaments, Groups/Private Lessons, Trips/Retreats), with every month, even before listings have dates.
+      const always = ALWAYS_SHOWN.includes(menu.filter.key ?? '');
       const options = menu.options
-        .filter((o) => has(o.value) || chosen[menu.i].includes(o.value))
+        .filter((o) => always || has(o.value) || chosen[menu.i].includes(o.value))
         .map((o) => ({ ...o, count: of(o.value) }));
       return { ...menu, of, options };
     })
@@ -540,7 +552,7 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
     <div ref={topRef} className={styles.directory} style={vars}>
       {!shared && (
         <div className={styles.searchSlot}>
-          <DirectorySearch query={search.q} location={search.loc} places={places} onSearch={(q, loc) => runSearch({ q, loc })} />
+          <DirectorySearch query={search.q} location={search.loc} places={places} placeholder={searchPlaceholder(widgetId)} onSearch={(q, loc) => runSearch({ q, loc })} />
         </div>
       )}
       {bar.length === 0 && sorts.length < 2 && builtIn.length === 0 && apiItems.length === 0 ? (
@@ -631,10 +643,11 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
              play the fade/scale-in, once, when the new results are there. */
         display === 'list' ? (
           <div key="list" className={styles.list}>
-            {pageItems.map((item) => (
+            {pageItems.map((item, i) => (
               <div key={item.id} className={`${styles.listItem} ${isNew(item.id) ? styles.listItemIn : ''}`}>
                 <DirectoryRow
                   card={item}
+                  eager={i < 6}
                   facts={rowFacts(item, filters, prices)}
                   fallbackImage={(item as AddedItem).fallbackImage}
                   onOpen={() => setOpen(item)}

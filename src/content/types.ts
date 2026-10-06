@@ -40,7 +40,13 @@ export type FacilityCard = {
 };
 
 /** A card in a filterable team directory: filter terms it belongs to (e.g. "boston", "youth-5-12"). */
-export type DirectoryItem = FacilityCard & { id: string; tags: string[] };
+export type DirectoryItem = FacilityCard & {
+  id: string;
+  tags: string[];
+  /** Its price in dollars (listings from the admin): the same in both for a single price, 0 for free. */
+  priceMin?: number;
+  priceMax?: number;
+};
 
 /**
  * One drop-menu filter. `preset` is the option the original page selects on load (each sport page pre-selects its

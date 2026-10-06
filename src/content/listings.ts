@@ -6,8 +6,8 @@ import type { Cta, DirectoryItem } from './types';
  */
 const API_URL = process.env.NEXT_PUBLIC_LISTINGS_API_URL?.replace(/\/$/, '');
 
-/** The site's two menus; every directory widget is under one (its listings' `listingType`). */
-export type ListingType = 'experiences' | 'resources';
+/** The site's two menus and the facilities directories; every directory widget is one of them (its listings' `listingType`). */
+export type ListingType = 'experiences' | 'resources' | 'facilities' | 'services';
 
 /**
  * Widgets the admin can add cards to, by listing type: the directories behind the sport pages' "Learn More" tiles
@@ -25,12 +25,57 @@ const WIDGET_TYPES: Record<number, ListingType> = {
   16: 'resources', // Injury Prevention & Recovery
   39: 'resources', // Mental Health & Resilience
   33: 'resources', // Strength & Conditioning
-  10: 'resources', // Facilities & Parks (Baseball & Softball)
-  9: 'resources', // Facilities & Parks (Basketball)
-  42: 'resources', // Facilities & Venues (Esports)
-  8: 'resources', // Facilities & Parks (Fútbol/Soccer)
-  43: 'resources', // Facilities & Clubs (Golfing)
-  44: 'resources', // Facilities & Parks (Pickleball)
+  10: 'facilities', // Facilities & Parks (Baseball & Softball)
+  9: 'facilities', // Facilities & Parks (Basketball)
+  42: 'facilities', // Facilities & Venues (Esports)
+  8: 'facilities', // Facilities & Parks (Fútbol/Soccer)
+  43: 'facilities', // Facilities & Clubs (Golfing)
+  44: 'facilities', // Facilities & Parks (Pickleball)
+  // The home page's service areas (ids of their own, see data/serviceDirectories.json).
+  101: 'services', // Brand/Product Development
+  102: 'services', // Content Creation/Licensing
+  103: 'services', // Event/Project Management
+  104: 'services', // Fundraising/Retailing
+  105: 'services', // Nutrition/Performance Programming
+  106: 'services', // Procurement/Logistics
+  107: 'services', // Sports Tourism
+};
+
+/** Category names by widget, as the sport pages' tiles (and the admin) name them. */
+const WIDGET_NAMES: Record<number, string> = {
+  45: 'Advancement & Workshops',
+  46: 'Branded Activations',
+  47: 'Camps/Tournaments',
+  6: 'Groups/Private Lessons',
+  37: 'Leagues/Social Clubs',
+  36: 'Leagues/Social Clubs',
+  41: 'Trips/Retreats',
+  40: 'Dieting & Nutrition',
+  16: 'Injury Prevention & Recovery',
+  39: 'Mental Health & Resilience',
+  33: 'Strength & Conditioning',
+  10: 'Facilities & Parks',
+  9: 'Facilities & Parks',
+  42: 'Facilities & Venues',
+  8: 'Facilities & Parks',
+  43: 'Facilities & Clubs',
+  44: 'Facilities & Parks',
+  101: 'Brand/Product Development',
+  102: 'Content Creation/Licensing',
+  103: 'Event/Project Management',
+  104: 'Fundraising/Retailing',
+  105: 'Nutrition/Performance Programming',
+  106: 'Procurement/Logistics',
+  107: 'Sports Tourism',
+};
+
+/** A directory's category name ("Advancement & Workshops"), when it is one of the listing categories. */
+export const categoryName = (widgetId: number | undefined) => (widgetId != null ? WIDGET_NAMES[widgetId] : undefined);
+
+/** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
+export const searchPlaceholder = (widgetId: number | undefined, fallback?: string) => {
+  const name = categoryName(widgetId) ?? fallback?.replace(/\s+nearby$/i, '').trim();
+  return name ? `Search ${name}…` : 'Search camps, clinics, programs…';
 };
 
 /** The `type=` of a widget's requests: the API answers with listings of that type only. */
@@ -49,6 +94,8 @@ type Listing = {
   /** The popup photos, in order (up to 3; older listings have only bioImage). */
   bioImages?: string[];
   tags: string[];
+  priceMin?: number;
+  priceMax?: number;
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
@@ -71,6 +118,8 @@ const toItem = (l: Listing): AddedItem => ({
   id: l.id,
   sourceId: l.sourceId,
   tags: l.tags,
+  priceMin: l.priceMin,
+  priceMax: l.priceMax,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,

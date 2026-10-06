@@ -7,6 +7,7 @@ import TileCarousel from '@/components/sections/TileCarousel';
 import Faq from '@/components/sections/Faq';
 import Button from '@/components/ui/Button';
 import { Container } from '@/components/ui/Section';
+import { directorySource } from '@/content/builder';
 import type { SportPage } from '@/content/types';
 import styles from './SportPageView.module.css';
 
@@ -23,7 +24,8 @@ export default function SportPageView({ page }: { page: SportPage }) {
       ))}
 
       <SectionHeading title={facilities.title} spaced />
-      <FacilityCards items={facilities.items} />
+      {/* The facilities of this sport from the listings API (what "View all" lists), else the built-in cards. */}
+      <FacilityCards items={facilities.items} live={facilities.viewAll ? directorySource(facilities.viewAll.href) : undefined} />
       {facilities.viewAll && (
         <section className={styles.viewAll} data-header-tone="dark">
           <Container>

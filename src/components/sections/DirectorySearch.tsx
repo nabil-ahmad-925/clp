@@ -2,12 +2,15 @@
 
 import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { LuMapPin, LuSearch } from 'react-icons/lu';
+import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import styles from './DirectorySearch.module.css';
 
 /** A place to search for (a city or destination of the cards), with how many results it has. */
 export type Place = { value: string; label: string; count?: number };
 
 type Props = {
+  /** The search field's placeholder (the page's category: "Search Advancement & Workshops…"). */
+  placeholder?: string;
   /** The applied search and location. */
   query: string;
   location: string;
@@ -30,7 +33,7 @@ export const fold = (s: string) =>
  * (a city or destination of the cards, suggested as you type), applied by the search button, Enter or a suggestion.
  * Both are searched by the listings API.
  */
-export default function DirectorySearch({ query, location, places = [], onSearch }: Props) {
+export default function DirectorySearch({ query, location, places = [], onSearch, placeholder = 'Search camps, clinics, programs…' }: Props) {
   const [q, setQ] = useState(query);
   const [loc, setLoc] = useState(location);
   const [open, setOpen] = useState(false);
@@ -79,13 +82,13 @@ export default function DirectorySearch({ query, location, places = [], onSearch
       <label className={styles.seg} htmlFor={qId}>
         <LuSearch className={styles.segIcon} aria-hidden />
         <span className={styles.field}>
-          <span className={styles.label}>Sport or event</span>
+          <span className={styles.srOnly}>Sport or event</span>
           <input
             id={qId}
             className={styles.input}
             type="search"
             autoComplete="off"
-            placeholder="Search camps, clinics, programs…"
+            placeholder={placeholder}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -95,7 +98,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
         <label className={styles.segLabel} htmlFor={locId}>
           <LuMapPin className={styles.segIcon} aria-hidden />
           <span className={styles.field}>
-            <span className={styles.label}>Location</span>
+            <span className={styles.srOnly}>Location</span>
             <input
               id={locId}
               className={styles.input}
@@ -152,7 +155,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
         )}
       </div>
       <button type="submit" className={styles.submit} aria-label="Search">
-        <LuSearch aria-hidden />
+        <PiMagnifyingGlassBold aria-hidden />
         <span className={styles.submitText}>Search</span>
       </button>
     </form>
@@ -173,6 +176,8 @@ type SearchContext = {
   /** The places the location field suggests (set by the directory from the API's counts). */
   places: Place[];
   setPlaces: (places: Place[]) => void;
+  /** The search field's placeholder (see DirectorySearch). */
+  placeholder?: string;
 };
 const SearchContext = createContext<SearchContext | null>(null);
 
@@ -180,7 +185,7 @@ const SearchContext = createContext<SearchContext | null>(null);
  * Shares the search of a page whose bar is rendered under the page heading (DirectorySearchSlot) with its directory
  * (TeamDirectory), so the bar is in the page's HTML from the start rather than appearing once the directory loads.
  */
-export function DirectorySearchProvider({ children }: { children: ReactNode }) {
+export function DirectorySearchProvider({ children, placeholder }: { children: ReactNode; placeholder?: string }) {
   const [search, setSearch] = useState(NO_SEARCH);
   const [places, setPlaces] = useState<Place[]>([]);
   const runner = useRef<((search: Search) => void) | null>(null);
@@ -193,7 +198,7 @@ export function DirectorySearchProvider({ children }: { children: ReactNode }) {
       };
     },
   }));
-  return <SearchContext.Provider value={{ search, setSearch, places, setPlaces, ...actions }}>{children}</SearchContext.Provider>;
+  return <SearchContext.Provider value={{ search, setSearch, places, setPlaces, placeholder, ...actions }}>{children}</SearchContext.Provider>;
 }
 
 /** The page's search when its bar is in the slot under the heading (null: the directory shows its own bar). */
@@ -205,7 +210,8 @@ export function DirectorySearchSlot() {
   if (!ctx) return null;
   return (
     <div className={styles.slot}>
-      <DirectorySearch query={ctx.search.q} location={ctx.search.loc} places={ctx.places} onSearch={(q, loc) => ctx.run({ q, loc })} />
+      <DirectorySearch query={ctx.search.q} location={ctx.search.loc} places={ctx.places}
+        placeholder={ctx.placeholder} onSearch={(q, loc) => ctx.run({ q, loc })} />
     </div>
   );
 }

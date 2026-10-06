@@ -426,6 +426,13 @@
   outline: none;
 }
 
+/* The price panel's "Free" checkbox, above the slider. */
+.freeOption {
+  margin-bottom: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0eee9;
+}
+
 .priceText {
   margin-top: 10px;
   color: #817b6a;

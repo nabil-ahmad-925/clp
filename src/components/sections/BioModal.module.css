@@ -297,6 +297,7 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s;
+  mix-blend-mode: difference;
 }
 
 .closeVisible {

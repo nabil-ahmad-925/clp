@@ -1,0 +1,249 @@
+{
+ "areas": [
+  {
+   "widgetId": 101,
+   "name": "Brand/Product Development",
+   "slug": "brand-product-development",
+   "path": "/services/brand-product-development/",
+   "servicePage": "/brand-product-development/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "branding-services",
+       "label": "Branding Services"
+      },
+      {
+       "value": "marketing-sales-services",
+       "label": "Marketing + Sales Services"
+      },
+      {
+       "value": "product-development",
+       "label": "Product Development"
+      },
+      {
+       "value": "website-design-development",
+       "label": "Website Design + Development"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 102,
+   "name": "Content Creation/Licensing",
+   "slug": "content-creation-licensing-services",
+   "path": "/services/content-creation-licensing-services/",
+   "servicePage": "/content-creation-licensing/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "copywriting-services",
+       "label": "Copywriting Services"
+      },
+      {
+       "value": "graphic-design-services",
+       "label": "Graphic Design Services"
+      },
+      {
+       "value": "photography-services",
+       "label": "Photography Services"
+      },
+      {
+       "value": "video-photography-services",
+       "label": "Video Photography Services"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 103,
+   "name": "Event/Project Management",
+   "slug": "event-project-management-services",
+   "path": "/services/event-project-management-services/",
+   "servicePage": "/event-project-management/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "budget-planning-management",
+       "label": "Budget Planning / Management"
+      },
+      {
+       "value": "event-management",
+       "label": "Event Management"
+      },
+      {
+       "value": "housing-selection-management",
+       "label": "Housing Selection / Management"
+      },
+      {
+       "value": "sponsor-coordination",
+       "label": "Sponsor Coordination"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 104,
+   "name": "Fundraising/Retailing",
+   "slug": "fundraising-retailing-services",
+   "path": "/services/fundraising-retailing-services/",
+   "servicePage": "/fundraising-retailing/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "direct-mailing-campaigns",
+       "label": "Direct Mailing Campaigns"
+      },
+      {
+       "value": "earned-income-campaigns",
+       "label": "Earned Income Campaigns"
+      },
+      {
+       "value": "popup-shop-campaigns",
+       "label": "Popup Shop Campaigns"
+      },
+      {
+       "value": "social-media-campaigns",
+       "label": "Social Media Campaigns"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 105,
+   "name": "Nutrition/Performance Programming",
+   "slug": "recovery-performance-training-services",
+   "path": "/services/recovery-performance-training-services/",
+   "servicePage": "/recovery-performance-training/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "nutrition-counseling",
+       "label": "Nutrition Counseling"
+      },
+      {
+       "value": "performance-testing",
+       "label": "Performance Testing"
+      },
+      {
+       "value": "strength-conditioning",
+       "label": "Strength + Conditioning"
+      },
+      {
+       "value": "training-programs",
+       "label": "Training Programs"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 106,
+   "name": "Procurement/Logistics",
+   "slug": "procurement-logistics-management",
+   "path": "/services/procurement-logistics-management/",
+   "servicePage": "/procurement-logistics/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "inventory-control-services",
+       "label": "Inventory Control Services"
+      },
+      {
+       "value": "sourcing-purchasing-goods",
+       "label": "Sourcing + Purchasing Goods"
+      },
+      {
+       "value": "shipping-transportation",
+       "label": "Shipping + Transportation"
+      },
+      {
+       "value": "supply-chain-optimization",
+       "label": "Supply Chain Optimization"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "widgetId": 107,
+   "name": "Sports Tourism",
+   "slug": "sports-tourism-services",
+   "path": "/services/sports-tourism-services/",
+   "servicePage": "/sports-tourism/",
+   "filters": [
+    {
+     "key": "service",
+     "label": "All Services",
+     "options": [
+      {
+       "value": "",
+       "label": "All Services"
+      },
+      {
+       "value": "activities-planning-dining",
+       "label": "Activities Planning + Dining"
+      },
+      {
+       "value": "fundraising-management",
+       "label": "Fundraising Management"
+      },
+      {
+       "value": "hotels-logistics",
+       "label": "Hotels + Logistics"
+      },
+      {
+       "value": "venue-cultural-experiences",
+       "label": "Venue & Cultural Experiences"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

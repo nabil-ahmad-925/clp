@@ -26,7 +26,7 @@
   font-size: 22px;
   line-height: 18px;
   color: var(--black);
-  transition: transform 0.25s cubic-bezier(0.12, 0.75, 0.4, 1);
+  transition: all 0.25s cubic-bezier(0.12, 0.75, 0.4, 1);
 }
 
 .prev svg,
@@ -36,31 +36,9 @@
   height: 23px;
 }
 
-.prev::after,
-.next::after {
-  content: '';
-  position: absolute;
-  top: 11px;
-  left: 3px;
-  width: 24px;
-  height: 2px;
-  background-color: var(--black);
-  opacity: 0;
-  transition: all 0.25s cubic-bezier(0.12, 0.75, 0.4, 1);
-}
-
-.prev::after {
-  transform: translateX(20px);
-}
-
-.next::after {
-  transform: translateX(-20px);
-}
-
-.prev:hover::after,
-.next:hover::after {
-  opacity: 1;
-  transform: translateX(0);
+.prev:hover,
+.next:hover {
+  color: var(--white);
 }
 
 .viewport {
