@@ -11,18 +11,13 @@ type Props = {
   categories: FilterCategory[];
   posts: FilterPost[];
   /** The article category path the grid shows ("strategy-and-insights", "sports-updates/sports-tourism"): its live
-   *  articles are read from the API page by page (category, search and page included), and the buttons become its
+   *  articles are read from the API page by page (category and page), and the buttons become its
    *  subcategories. */
   source?: string;
 };
 
 /** Cards per page: three rows of the three-column grid. */
 const PAGE_SIZE = 9;
-/** How long typing must pause before the search runs. */
-const SEARCH_DELAY_MS = 350;
-/** The API's search limits. */
-const MAX_WORDS = 10;
-const MAX_QUERY = 100;
 
 /** A category grid's buttons from the API's counts: All, then each subcategory (not Featured) that has articles. */
 function liveButtons(source: string, counts: Record<string, number>): FilterCategory[] {
@@ -53,11 +48,11 @@ type Result = { key: string; posts: FilterPost[]; pages: number };
 
 /**
  * Category-filtered post grid (Blog Filter plugin): gold category buttons (the chosen one black, with a check),
- * a search box, and post cards laid out in columns, each card placed below the previous one in its column, newest
- * first and PAGE_SIZE a page (numbered pages under the grid; a new category or search starts at page 1).
- * With a `source`, the API does the work: each category, search and page is a request, and the buttons' counts are
+ * and post cards laid out in columns, each card placed below the previous one in its column, newest
+ * first and PAGE_SIZE a page (numbered pages under the grid; a new category starts at page 1).
+ * With a `source`, the API does the work: each category and page is a request, and the buttons' counts are
  * the API's. The built-in cards show until the first answer (and are filtered in the page if the API can't be reached).
- * Grids of a single category have no buttons or search box. A `?filter=<category id>` query picks the category (the
+ * Grids of a single category have no buttons. A `?filter=<category id>` query picks the category (the
  * original site's numeric ids still work: they pick the live button of the same name).
  */
 export default function PostFilter({ categories: builtInCategories, posts: builtInPosts, source }: Props) {
@@ -76,25 +71,12 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   const linked = useSyncExternalStore(subscribeNever, urlFilter, noFilter);
   const [chosen, setChosen] = useState<string | null>(null);
   const category = resolve(chosen) ?? resolve(linked) ?? 'all';
-  // A new category or search starts at page 1.
+  // A new category starts at page 1.
   const [page, setPage] = useState(1);
   const chooseCategory = (id: string) => {
     setChosen(id);
     setPage(1);
   };
-  // The search box keeps what is typed; the search (within the API's limits: 10 words, 100 characters) runs once
-  // typing pauses.
-  const [typed, setTyped] = useState('');
-  const [query, setQuery] = useState('');
-  useEffect(() => {
-    const next = typed.trim().split(/\s+/).filter(Boolean).slice(0, MAX_WORDS).join(' ').slice(0, MAX_QUERY).trim();
-    if (next === query) return;
-    const timer = setTimeout(() => {
-      setQuery(next);
-      setPage(1);
-    }, SEARCH_DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [typed, query]);
   const top = useRef<HTMLDivElement>(null);
   const goTo = (n: number) => {
     setPage(n);
@@ -104,13 +86,13 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   // Live: one page from the API. A built-in id not resolved yet (counts still loading) asks for the whole category.
   const path = category === 'all' || !category.includes('/') ? source : category;
   const [retry, setRetry] = useState(0);
-  const requestKey = `${path}|${query}|${page}|${retry}`;
+  const requestKey = `${path}|${page}|${retry}`;
   const [result, setResult] = useState<Result | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   useEffect(() => {
     if (!live || !path) return;
     let active = true;
-    fetchArticles({ category: path, q: query || undefined, page, limit: PAGE_SIZE, counts: counts ? undefined : 1 }).then(
+    fetchArticles({ category: path, page, limit: PAGE_SIZE, counts: counts ? undefined : 1 }).then(
       (r) => {
         if (!active) return;
         if (r.counts) setCounts(r.counts);
@@ -125,19 +107,18 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     };
     // `counts` only decides whether to ask for them (until they come).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [live, path, query, page, requestKey]);
+  }, [live, path, page, requestKey]);
   const failed = failedKey === requestKey;
 
   // Built-in cards (until the first answer, or when the API never answers): filtered and paged here.
   const builtIn = useMemo(() => {
-    const q = query.toLowerCase();
     const matching = builtInPosts.filter(
-      (post) => (category === 'all' || post.categories.includes(category)) && (!q || `${post.title} ${post.excerpt} ${post.comments}`.toLowerCase().includes(q)),
+      (post) => category === 'all' || post.categories.includes(category),
     );
     const pages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
     const at = Math.min(page, pages);
     return { posts: matching.slice((at - 1) * PAGE_SIZE, at * PAGE_SIZE), pages };
-  }, [builtInPosts, category, query, page]);
+  }, [builtInPosts, category, page]);
   // While another page loads (or after it failed), the last one shown stays.
   const shown = live && result ? result : builtIn;
   const loading = live && result !== null && result.key !== requestKey && !failed;
@@ -191,9 +172,6 @@ export default function PostFilter({ categories: builtInCategories, posts: built
               </li>
             ))}
           </ul>
-          <div className={styles.search}>
-            <input type="text" className={styles.searchTerm} name="blog_search" placeholder="Search" aria-label="Search" maxLength={MAX_QUERY} value={typed} onChange={(e) => setTyped(e.target.value)} />
-          </div>
         </>
       )}
       {/* Until the cards are measured they sit floated in rows (still hidden), so the grid keeps its height. */}

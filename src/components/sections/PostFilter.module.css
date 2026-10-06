@@ -116,32 +116,6 @@
   }
 }
 
-.search {
-  position: relative;
-  text-align: center;
-}
-
-.searchTerm {
-  display: inline-block;
-  width: 45%;
-  height: 34px;
-  margin-right: -9px;
-  padding: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  outline: none;
-  background: #fff;
-  color: #555;
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 24px;
-  transition: 0.2s;
-}
-
-.searchTerm:focus {
-  color: #00b4cc;
-}
-
 /* Cards are absolutely placed: column × card width across, the heights of the cards above it down. */
 .container {
   position: relative;
@@ -365,13 +339,7 @@
   font-weight: 600;
 }
 
-@media (max-width: 767px) {
-  .searchTerm {
-    width: 90%;
-  }
-}
-
-/* Another page or search loading: the current cards stay, dimmed. */
+/* Another page loading: the current cards stay, dimmed. */
 .loading {
   opacity: 0.45;
 }
