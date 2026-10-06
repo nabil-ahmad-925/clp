@@ -146,7 +146,9 @@
 .container {
   position: relative;
   width: 100%;
-  transition: height 0.8s;
+  transition:
+    height 0.8s,
+    opacity 0.2s;
 }
 
 .container::after {
@@ -315,8 +317,78 @@
   margin: 20px 0;
 }
 
+/* Numbered pages under the grid, in the filter buttons' gold (the current page black). */
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 30px 0 20px;
+  font-family: Raleway, Arial, sans-serif;
+}
+
+.pageLink {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e3bd66;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pageLink:hover:not(:disabled) {
+  background-color: #c9a44f;
+}
+
+.pageLink:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pageCurrent,
+.pageCurrent:hover:not(:disabled) {
+  background-color: #000;
+  cursor: default;
+}
+
+.pageGap {
+  padding: 0 4px;
+  color: #999;
+  font-weight: 600;
+}
+
 @media (max-width: 767px) {
   .searchTerm {
     width: 90%;
   }
+}
+
+/* Another page or search loading: the current cards stay, dimmed. */
+.loading {
+  opacity: 0.45;
+}
+
+.empty {
+  margin: 30px 0;
+  color: #777;
+  font-family: Raleway, Arial, sans-serif;
+  text-align: center;
+}
+
+.retry {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #c9a44f;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }

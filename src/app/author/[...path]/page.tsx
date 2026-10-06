@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import CategoryArchiveView from '@/components/pages/CategoryArchiveView';
+import LiveArchive from '@/components/pages/LiveArchive';
 import { archiveParams, getArchive } from '@/content/categories';
 
 // Author archives ("All Posts By ..."), e.g. /author/michael/ and its second page /author/michael/page/2/.
@@ -28,5 +30,10 @@ export default async function AuthorPage(props: PageProps<'/author/[...path]'>) 
   const { path } = await props.params;
   const archive = getArchive(pathOf(path));
   if (!archive) notFound();
-  return <CategoryArchiveView archive={archive} />;
+  // The page number (?page=) is only known in the browser: the static HTML has the built-in list.
+  return (
+    <Suspense fallback={<CategoryArchiveView archive={archive} />}>
+      <LiveArchive archive={archive} />
+    </Suspense>
+  );
 }

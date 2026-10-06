@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import ServicePageView from '@/components/pages/ServicePageView';
 import LegalPageView from '@/components/pages/LegalPageView';
 import BuilderPageView from '@/components/builder/BuilderPageView';
-import PostView from '@/components/pages/PostView';
+import LivePost from '@/components/pages/LivePost';
 import { getServicePage, servicePages } from '@/content/services';
 import { getLegalPage, legalPages } from '@/content/legal';
 import { builderPaths, getBuilderPage } from '@/content/builder';
@@ -59,6 +59,7 @@ export default async function TopLevelPage(props: PageProps<'/[slug]'>) {
     case 'builder':
       return <BuilderPageView page={found.page} />;
     case 'post':
-      return <PostView post={found.page} />;
+      // The built-in copy, replaced in the browser by the article as last saved in the admin.
+      return <LivePost slug={slug} post={found.page} />;
   }
 }

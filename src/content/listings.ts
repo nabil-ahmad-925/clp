@@ -90,9 +90,8 @@ type Listing = {
   excerpt: string;
   bio: string;
   image: string;
-  bioImage: string;
-  /** The popup photos, in order (up to 3; older listings have only bioImage). */
-  bioImages?: string[];
+  /** The popup photos, in order (up to 3). */
+  bioImages: string[];
   tags: string[];
   priceMin?: number;
   priceMax?: number;
@@ -126,8 +125,8 @@ const toItem = (l: Listing): AddedItem => ({
   excerpt: l.excerpt,
   bio: l.bio,
   bioHtml: bioToHtml(l.bio),
-  bioImage: l.bioImages?.[0] || l.bioImage || l.image || undefined,
-  bioImages: l.bioImages?.length ? l.bioImages : l.bioImage ? [l.bioImage] : undefined,
+  // Without popup photos of its own, the popup shows the card image.
+  bioImages: l.bioImages.length ? l.bioImages : l.image ? [l.image] : undefined,
   buttons: l.buttons.map((b) => ({ ...b, newTab: /^https?:/.test(b.href) })),
   socials: l.socials,
 });

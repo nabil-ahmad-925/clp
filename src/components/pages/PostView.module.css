@@ -102,3 +102,46 @@
     margin: 0 auto;
   }
 }
+
+/* An article loading (no built-in copy): shimmering text lines. */
+.loading {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 120px;
+}
+.loading span {
+  display: block;
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #f6f6f6 50%, #eee 75%) 0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.loading span:nth-child(2) {
+  width: 92%;
+}
+.loading span:nth-child(3) {
+  width: 64%;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (max-width: 1000px) {
+  .loading {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* "Try again" when an article couldn't be loaded (the site's dark button). */
+.retry {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 200px;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

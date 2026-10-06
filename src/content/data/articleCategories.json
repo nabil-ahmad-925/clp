@@ -1,0 +1,273 @@
+{
+  "_comment": "Blog article categories (from the original site's category archives): /category/<slug>/ and /category/<slug>/<sub>/. `page` is the site page that lists the category's articles (its post filter grid). Shared by the site, the admin (scripts/sync-widgets.mjs copies it) and clp-api (bundled from here).",
+  "categories": [
+    {
+      "slug": "activations-branded-experiences",
+      "name": "Activations & Branded Experiences",
+      "page": "/branded-activations-2/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball-articles",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-articles",
+          "name": "Basketball"
+        },
+        {
+          "slug": "esports-articles",
+          "name": "Esports"
+        },
+        {
+          "slug": "futbol-soccer-articles",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "golfing-articles",
+          "name": "Golfing"
+        },
+        {
+          "slug": "pickleball-articles",
+          "name": "Pickleball"
+        },
+        {
+          "slug": "featured-activations-branded-experiences",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "briefings-field-reports",
+      "name": "Briefings & Field Reports",
+      "page": "/briefs-field-reports/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-dieting-nutrition",
+          "name": "Basketball"
+        },
+        {
+          "slug": "esports",
+          "name": "Esports"
+        },
+        {
+          "slug": "futbol-soccer",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "golfing",
+          "name": "Golfing"
+        },
+        {
+          "slug": "pickleball",
+          "name": "Pickleball"
+        },
+        {
+          "slug": "featured-briefings-field-reports",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "diet-recovery-injury-prevention",
+      "name": "Diet, Recovery & Injury Prevention",
+      "page": "/diet-recovery-injury-prevention-recovery/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball-injury-prevention-recovery",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-injury-prevention-recovery",
+          "name": "Basketball"
+        },
+        {
+          "slug": "esports-injury-prevention-recovery",
+          "name": "Esports"
+        },
+        {
+          "slug": "futbol-soccer-injury-prevention-recovery",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "golfing-injury-prevention-recovery",
+          "name": "Golfing"
+        },
+        {
+          "slug": "pickleball-injury-prevention-recovery",
+          "name": "Pickleball"
+        },
+        {
+          "slug": "featured-diet-recovery-injury-prevention",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "product-development-reviews",
+      "name": "Product Development & Reviews",
+      "label": {
+        "color": "#000000",
+        "background": "#f9e4b4"
+      },
+      "page": "/product-reviews/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball-product-reviews",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-product-reviews",
+          "name": "Basketball"
+        },
+        {
+          "slug": "futbol-soccer-product-reviews",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "featured-product-development-reviews",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "resilience-performance-training",
+      "name": "Resilience, Performance & Training",
+      "page": "/resilience-performance-training/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball-resilience-performance-training",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-resilience-performance-training",
+          "name": "Basketball"
+        },
+        {
+          "slug": "esports-resilience-performance-training",
+          "name": "Esports"
+        },
+        {
+          "slug": "futbol-soccer-resilience-performance-training",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "golfing-resilience-performance-training",
+          "name": "Golfing"
+        },
+        {
+          "slug": "pickleball-resilience-performance-training",
+          "name": "Pickleball"
+        },
+        {
+          "slug": "featured-resilience-performance-training",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "strategy-and-insights",
+      "name": "Strategy and Insights",
+      "page": "/strategy-insights/",
+      "subcategories": [
+        {
+          "slug": "baseball-softball-strategy-insights",
+          "name": "Baseball & Softball"
+        },
+        {
+          "slug": "basketball-strategy-insights",
+          "name": "Basketball"
+        },
+        {
+          "slug": "esports-strategy-insights",
+          "name": "Esports"
+        },
+        {
+          "slug": "futbol-soccer-strategy-insights",
+          "name": "Fútbol (Soccer)"
+        },
+        {
+          "slug": "golfing-strategy-insights",
+          "name": "Golfing"
+        },
+        {
+          "slug": "pickleball-strategy-insights",
+          "name": "Pickleball"
+        },
+        {
+          "slug": "featured-strategy-and-insights",
+          "name": "Featured",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "slug": "sports-updates",
+      "name": "Sports Updates",
+      "subcategories": [
+        {
+          "slug": "brand-product-development",
+          "name": "Brand / Product Development",
+          "page": "/brand-product-development/articles/"
+        },
+        {
+          "slug": "content-creation-licensing",
+          "name": "Content Creation / Licensing",
+          "page": "/content-creation-licensing/articles/"
+        },
+        {
+          "slug": "event-project-management",
+          "name": "Event / Project Management"
+        },
+        {
+          "slug": "fundraising-retailing",
+          "name": "Fundraising / Retailing",
+          "page": "/fundraising-retailing/articles/"
+        },
+        {
+          "slug": "procurement-logistics",
+          "name": "Procurement / Logistics",
+          "page": "/procurement-logistics/articles/"
+        },
+        {
+          "slug": "recovery-performance-training",
+          "name": "Recovery / Performance Training",
+          "page": "/recovery-performance-training/articles/"
+        },
+        {
+          "slug": "sports-tourism",
+          "name": "Sports Tourism",
+          "page": "/sports-tourism/articles/"
+        }
+      ]
+    },
+    {
+      "slug": "event-project-management",
+      "name": "Event / Project Management",
+      "subcategories": []
+    },
+    {
+      "slug": "uncategorized",
+      "name": "Uncategorized",
+      "subcategories": []
+    }
+  ],
+  "authors": [
+    {
+      "slug": "michael",
+      "name": "Compete Like Pros"
+    },
+    {
+      "slug": "harpreetclp-com",
+      "name": "H C"
+    }
+  ]
+}

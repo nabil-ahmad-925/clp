@@ -60,10 +60,12 @@ export default function CategoryArchiveView({ archive }: { archive: CategoryArch
           {archive.pagination && (
             <nav className={styles.pagination} aria-label="Pagination Navigation">
               <ul>
-                {archive.pagination.map((p) => (
-                  <li key={p.kind + p.label}>
+                {archive.pagination.map((p, i) => (
+                  <li key={p.kind + p.label + i}>
                     {p.href ? (
                       <Link href={p.href}>{p.label}</Link>
+                    ) : p.kind === 'gap' ? (
+                      <span className={styles.gap}>{p.label}</span>
                     ) : (
                       <span className={styles.current} aria-current="page">
                         {p.label}

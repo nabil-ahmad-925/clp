@@ -14,8 +14,9 @@ export type CategoryArchive = {
   subheader: string;
   title: string;
   posts: ArchivePost[];
-  /** Page links under the grid (only archives with more than one page); the current page has no href. */
-  pagination?: { label: string; href?: string; kind: 'prev' | 'page' | 'next' }[];
+  /** Page links under the grid (only archives with more than one page); the current page has no href, a gap ("…")
+   *  stands for the pages left out of a long list. */
+  pagination?: { label: string; href?: string; kind: 'prev' | 'page' | 'gap' | 'next' }[];
 };
 
 /** Category label shown above a card's title (Salient's "meta-category" button); colours set per category. */

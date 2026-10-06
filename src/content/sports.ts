@@ -119,7 +119,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2024/04/Partner-Large-Photo.png'),
+          bioImages: [upload('/2024/04/Partner-Large-Photo.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -149,7 +149,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY - FENWAY (BOSTON)",
           excerpt: "Clemente Field sits in the heart of the Fens—Boston's original green space. Train where generations of ballplayers have sharpened their game.",
           bio: "Back Bay Fens baseball field offers a historic and well-maintained space where athletes and teams can train, compete, and enjoy the game in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -179,7 +179,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "Memorial Park is the heartbeat of East Boston baseball—a neighborhood diamond built for competition, connection, and community pride.",
           bio: "East Boston Memorial Park features well-maintained baseball fields, providing athletes and teams a premier space for games, training, and community play in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -209,7 +209,7 @@ export const sportPages: SportPage[] = [
           title: "NORTH END (BOSTON)",
           excerpt: "Play with the harbor at your back. Langone Park delivers one of Boston's most iconic settings—where the North End's legendary energy meets the field.",
           bio: "Langone Park features scenic waterfront baseball fields, offering athletes and teams a premier space for games, training, and community engagement in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -418,7 +418,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/07/Basketball-1.png'),
+          bioImages: [upload('/2025/07/Basketball-1.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -448,7 +448,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "LoPresti brings waterfront basketball to Eastie—scenic courts with competitive runs and community pride.",
           bio: "LoPresti Park provides top-tier waterfront basketball courts, creating an energetic environment for players to compete, practice, and connect while enjoying stunning Boston Harbor views.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -478,7 +478,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY - FENWAY (BOSTON)",
           excerpt: "Clemente Courts sit in the heart of Back Bay Fens—an outdoor hoops staple where players of all levels come to compete.",
           bio: "Back Bay Fens provides outdoor basketball courts, inviting athletes of all levels to play, practice, and engage in competitive games within a vibrant park atmosphere.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -508,7 +508,7 @@ export const sportPages: SportPage[] = [
           title: "ALLSTON (BOSTON)",
           excerpt: "Smith Playground is the neighborhood's go-to—quality courts, good runs, and a community that shows up ready to play.",
           bio: "Smith Playground offers top-tier basketball courts, welcoming players of all levels to train, compete, and connect in an energetic community-driven sports environment in Boston.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -709,7 +709,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -739,7 +739,7 @@ export const sportPages: SportPage[] = [
           title: "(BOSTON)",
           excerpt: "Balance Patch is where serious players compete—high-performance setups, tournament-ready environment, and a community that shows up to win.",
           bio: "Balance Patch is Boston’s premier esports lounge, offering top-tier gaming setups, tournaments, and a vibrant community for competitive and casual gamers alike.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -769,7 +769,7 @@ export const sportPages: SportPage[] = [
           title: "(MALDEN)",
           excerpt: "Mixer blends esports and social—top-tier rigs, regular tournaments, and a café vibe that makes it easy to stay and play.",
           bio: "Mixer eSports + Cafe blends gaming and community, offering high-end setups, tournaments, and a social hub for casual and competitive gamers in Boston.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -799,7 +799,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -1004,7 +1004,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Contact LEARN MORE",
             href: "#"
@@ -1034,7 +1034,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY -FENWAY (BOSTON)",
           excerpt: "Clemente Field sits at the heart of the Fens—open turf, an iconic setting, and space to train the way you play.",
           bio: "Clemente Field offers an open turf field, inviting athletes and teams to play, train, and enjoy the game in a scenic setting.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"
@@ -1064,7 +1064,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "LoPresti brings the harbor views and Eastie's competitive spirit together on one of Boston's best waterfront pitches.",
           bio: "LoPresti Park offers stunning waterfront soccer fields, creating an energetic environment for athletes, teams, and fans to train, compete, and enjoy the game in East Boston.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"
@@ -1094,7 +1094,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTH END (BOSTON)",
           excerpt: "Carter Playground is a neighborhood hub—quality turf, strong community, and the kind of energy that makes you want to compete.",
           bio: "Carter Playground features high-quality soccer fields, offering athletes, teams, and fans a premier space for training, competition, and community engagement in Boston.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"
@@ -1291,7 +1291,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2024/04/Partner-Large-Photo.png'),
+          bioImages: [upload('/2024/04/Partner-Large-Photo.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -1321,7 +1321,7 @@ export const sportPages: SportPage[] = [
           title: "(BROOKLINE)",
           excerpt: "Lynch Golf Course delivers a legit test for every level—rolling fairways, solid conditions, and Brookline's understated prestige.",
           bio: "Robert T. Lynch Municipal Golf Course offers a scenic and challenging course, welcoming golfers of all levels for an enjoyable and competitive experience near Boston.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/RF2U"
@@ -1351,7 +1351,7 @@ export const sportPages: SportPage[] = [
           title: "(LYNN, MA)",
           excerpt: "Gannon offers an honest round—scenic views, challenging layout, and the kind of course that rewards good shots.",
           bio: "Gannon Municipal Golf Course offers a scenic, challenging layout, providing golfers of all levels a top-tier playing experience in a picturesque setting near Boston.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: ""
@@ -1381,7 +1381,7 @@ export const sportPages: SportPage[] = [
           title: "(DEVENS, MA)",
           excerpt: "Red Tail is the real deal—pristine conditions, strategic design, and a setting that makes every tee shot feel like it matters.",
           bio: "Red Tail Golf Club offers a championship-caliber course with scenic fairways, challenging holes, and a premier golfing experience set in a beautiful natural landscape.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/RF2U"
@@ -1578,7 +1578,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -1608,7 +1608,7 @@ export const sportPages: SportPage[] = [
           title: "KENDALL SQUARE (CAMBRIDGE)",
           excerpt: "Play above it all. Kendall Square's rooftop courts deliver competition with city views you won't find anywhere else.",
           bio: "Kendall Square Roof Garden features rooftop pickleball courts, blending competitive play with breathtaking city views, creating a one-of-a-kind experience for players of all levels in Cambridge.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -1638,7 +1638,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTHIE (BOSTON)",
           excerpt: "Lawn on D brings the social energy—open courts, good vibes, and a scene that makes every game feel like an event.",
           bio: "Lawn on D offers a lively pickleball space, combining fun, competition, and social play in a vibrant outdoor setting with a dynamic atmosphere.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -1668,7 +1668,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTH END (BOSTON)",
           excerpt: "Tucked beneath the highways of the South End, Underground at Ink Block is pickleball with an edge—gritty, social, and always buzzing.",
           bio: "Underground at Ink Block offers urban pickleball courts, blending competition, fitness, and community vibes in a vibrant space beneath Boston’s elevated highways.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -1859,7 +1859,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -1889,7 +1889,7 @@ export const sportPages: SportPage[] = [
           title: "(BOSTON)",
           excerpt: "Balance Patch is where serious players compete—high-performance setups, a tournament-ready environment, and a community that shows up to win.",
           bio: "Balance Patch is Boston’s premier esports lounge, offering top-tier gaming setups, tournaments, and a vibrant community for competitive and casual gamers alike.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -1919,7 +1919,7 @@ export const sportPages: SportPage[] = [
           title: "(MALDEN)",
           excerpt: "Mixer blends esports and social—top-tier rigs, regular tournaments, and a café vibe that makes it easy to stay and play.",
           bio: "Mixer eSports + Cafe blends gaming and community, offering high-end setups, tournaments, and a social hub for casual and competitive gamers in Boston.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -1949,7 +1949,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Gamer-Large.png'),
+          bioImages: [upload('/2025/03/Gamer-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/R5kh"
@@ -2136,7 +2136,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2024/04/Partner-Large-Photo.png'),
+          bioImages: [upload('/2024/04/Partner-Large-Photo.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -2166,7 +2166,7 @@ export const sportPages: SportPage[] = [
           title: "(BROOKLINE)",
           excerpt: "Lynch Golf Course delivers a legit test for every level—rolling fairways, solid conditions, and Brookline's understated prestige.",
           bio: "Robert T. Lynch Municipal Golf Course offers a scenic and challenging course, welcoming golfers of all levels for an enjoyable and competitive experience near Boston.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/RF2U"
@@ -2196,7 +2196,7 @@ export const sportPages: SportPage[] = [
           title: "(LYNN, MA)",
           excerpt: "Gannon offers an honest round—scenic views, a challenging layout, and the kind of course that rewards good shots.",
           bio: "Gannon Municipal Golf Course offers a scenic, challenging layout, providing golfers of all levels a top-tier playing experience in a picturesque setting near Boston.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: ""
@@ -2226,7 +2226,7 @@ export const sportPages: SportPage[] = [
           title: "(DEVENS, MA)",
           excerpt: "Red Tail is the real deal—pristine conditions, strategic design, and a setting that makes every tee shot feel like it matters.",
           bio: "Red Tail Golf Club offers a championship-caliber course with scenic fairways, challenging holes, and a premier golfing experience set in a beautiful natural landscape.",
-          bioImage: upload('/2025/03/Golf-Putter.png'),
+          bioImages: [upload('/2025/03/Golf-Putter.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/RF2U"
@@ -2413,7 +2413,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -2443,7 +2443,7 @@ export const sportPages: SportPage[] = [
           title: "KENDALL SQUARE (CAMBRIDGE)",
           excerpt: "Play above it all. Kendall Square's rooftop courts deliver competition with city views you won't find anywhere else.",
           bio: "Kendall Square Roof Garden features rooftop pickleball courts, blending competitive play with breathtaking city views, creating a one-of-a-kind experience for players of all levels in Cambridge.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -2473,7 +2473,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTHIE (BOSTON)",
           excerpt: "Lawn on D brings the social energy—open courts, good vibes, and a scene that makes every game feel like an event.",
           bio: "Lawn on D offers a lively pickleball space, combining fun, competition, and social play in a vibrant outdoor setting with a dynamic atmosphere.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -2503,7 +2503,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTH END (BOSTON)",
           excerpt: "Tucked beneath the highways of the South End, Underground at Ink Block is pickleball with an edge—gritty, social, and always buzzing.",
           bio: "Underground at Ink Block offers urban pickleball courts, blending competition, fitness, and community vibes in a vibrant space beneath Boston’s elevated highways.",
-          bioImage: upload('/2025/03/Pickleball-Large.png'),
+          bioImages: [upload('/2025/03/Pickleball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/kosM"
@@ -2694,7 +2694,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2024/04/Partner-Large-Photo.png'),
+          bioImages: [upload('/2024/04/Partner-Large-Photo.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -2724,7 +2724,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY - FENWAY (BOSTON)",
           excerpt: "Clemente Field sits in the heart of the Fens—Boston's original green space. Train where generations of ballplayers have sharpened their game.",
           bio: "Back Bay Fens baseball field offers a historic and well-maintained space where athletes and teams can train, compete, and enjoy the game in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -2754,7 +2754,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "Memorial Park is the heartbeat of East Boston baseball—a neighborhood diamond built for competition, connection, and community pride.",
           bio: "East Boston Memorial Park features well-maintained baseball fields, providing athletes and teams a premier space for games, training, and community play in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -2784,7 +2784,7 @@ export const sportPages: SportPage[] = [
           title: "NORTH END (BOSTON)",
           excerpt: "Play with the harbor at your back. Langone Park delivers one of Boston's most iconic settings—where the North End's legendary energy meets the field.",
           bio: "Langone Park features scenic waterfront baseball fields, offering athletes and teams a premier space for games, training, and community engagement in Boston.",
-          bioImage: upload('/2025/03/Baseball-Large.png'),
+          bioImages: [upload('/2025/03/Baseball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/wLeN"
@@ -2983,7 +2983,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2024/04/Partner-Large-Photo.png'),
+          bioImages: [upload('/2024/04/Partner-Large-Photo.png')],
           cta: {
             label: "Book Now",
             href: ""
@@ -3013,7 +3013,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "LoPresti brings waterfront basketball to Eastie—scenic courts with competitive runs and community pride.",
           bio: "LoPresti Park provides top-tier waterfront basketball courts, creating an energetic environment for players to compete, practice, and connect while enjoying stunning Boston Harbor views.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -3043,7 +3043,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY - FENWAY (BOSTON)",
           excerpt: "Clemente Courts sits in the heart of Back Bay Fens—an outdoor hoops staple where players of all levels come to compete.",
           bio: "Back Bay Fens provides outdoor basketball courts, inviting athletes of all levels to play, practice, and engage in competitive games within a vibrant park atmosphere.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -3073,7 +3073,7 @@ export const sportPages: SportPage[] = [
           title: "ALLSTON (BOSTON)",
           excerpt: "Smith Playground is the neighborhood's go-to—quality courts, good runs, and a community that shows up ready to play.",
           bio: "Smith Playground offers top-tier basketball courts, welcoming players of all levels to train, compete, and connect in an energetic community-driven sports environment in Boston.",
-          bioImage: upload('/2025/03/Basketball-Large.png'),
+          bioImages: [upload('/2025/03/Basketball-Large.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/9t4N"
@@ -3268,7 +3268,7 @@ export const sportPages: SportPage[] = [
           title: "SHOULD BE HERE",
           excerpt: "With our support, clients learn new skills, build strong bonds, and take calculated risks to grow. Together, we are purposeful in our pursuit of excellence.",
           bio: "CLP provides sports, fitness, and entertainment expertise to athletes, brands, coaches, fans, influencers, parents, and teams globally.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Learn Now",
             href: "https://link.heylo.co/TH7A"
@@ -3298,7 +3298,7 @@ export const sportPages: SportPage[] = [
           title: "BACK BAY -FENWAY (BOSTON)",
           excerpt: "Clemente Field sits at the heart of the Fens—open turf, an iconic setting, and space to train the way you play.",
           bio: "Clemente Field offers an open turf field, inviting athletes and teams to play, train, and enjoy the game in a scenic setting.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"
@@ -3328,7 +3328,7 @@ export const sportPages: SportPage[] = [
           title: "EASTIE (BOSTON)",
           excerpt: "LoPresti brings the harbor views and Eastie's competitive spirit together on one of Boston's best waterfront pitches.",
           bio: "LoPresti Park offers stunning waterfront soccer fields, creating an energetic environment for athletes, teams, and fans to train, compete, and enjoy the game in East Boston.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"
@@ -3358,7 +3358,7 @@ export const sportPages: SportPage[] = [
           title: "SOUTH END (BOSTON)",
           excerpt: "Carter Playground is a neighborhood hub—quality turf, strong community, and the kind of energy that makes you want to compete.",
           bio: "Carter Playground features high-quality soccer fields, offering athletes, teams, and fans a premier space for training, competition, and community engagement in Boston.",
-          bioImage: upload('/2025/03/Soccer-Guy.png'),
+          bioImages: [upload('/2025/03/Soccer-Guy.png')],
           cta: {
             label: "Play Now",
             href: "https://link.heylo.co/TH7A"

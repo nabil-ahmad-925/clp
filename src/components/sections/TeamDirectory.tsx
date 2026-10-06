@@ -308,8 +308,7 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
           ? {
               ...a,
               image: a.image || local.image,
-              bioImage: a.bioImage || local.bioImage,
-              bioImages: a.bioImages ?? (local.bioImage ? [local.bioImage] : undefined),
+              bioImages: a.bioImages ?? local.bioImages,
               fallbackImage: local.image,
             }
           : a;

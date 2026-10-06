@@ -25,9 +25,8 @@ export type FacilityCard = {
   excerpt: string;
   /** Shown in the full-screen bio overlay; a blank line ("\n\n") separates paragraphs. */
   bio: string;
-  /** Large photo on the overlay's right half. Without one the original shows an empty grey panel. */
-  bioImage?: string;
-  /** Several photos for the overlay (shown as a carousel, `bioImage` being the first); listings from the admin. */
+  /** Large photos on the overlay's right half, in order (a carousel when there are several). Without any the original
+   *  shows an empty grey panel. */
   bioImages?: string[];
   cta?: Cta;
   socials: { network?: string; href: string }[];
@@ -94,6 +93,8 @@ export type Block =
       /** Category buttons (with the search box); none on grids showing a single category. */
       categories: { id: string; label: string; count: number }[];
       posts: FilterPost[];
+      /** The article category path of the grid (see content/articles.ts): its live articles replace `posts`. */
+      source?: string;
     }
   | { type: 'gallery'; id: string; name: string; breadcrumbs: { label: string; href?: string }[]; images: GalleryImage[] };
 

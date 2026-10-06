@@ -86,7 +86,7 @@ export default function BuilderBlock({ block }: { block: Block }) {
     case 'postFilter':
       return (
         <div>
-          <PostFilter categories={block.categories} posts={block.posts} />
+          <PostFilter categories={block.categories} posts={block.posts} source={block.source} />
         </div>
       );
     case 'gallery':

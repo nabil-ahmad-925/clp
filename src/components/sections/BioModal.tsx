@@ -34,7 +34,7 @@ const AUTOPLAY_MS = 4000;
  */
 export default function BioModal({ card, onClose, variant = 'nectar' }: Props) {
   const [visible, setVisible] = useState(false);
-  const photos = card.bioImages?.length ? card.bioImages : card.bioImage ? [card.bioImage] : [];
+  const photos = card.bioImages ?? [];
   const [slide, setSlide] = useState(0);
   const [loaded, setLoaded] = useState<ReadonlySet<string>>(() => new Set());
   const closing = useRef(false);
