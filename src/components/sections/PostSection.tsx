@@ -1,7 +1,7 @@
 'use client';
 
 import useEmblaCarousel from 'embla-carousel-react';
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Container } from '@/components/ui/Section';
 import type { Post, PostSectionData } from '@/content/types';
 import styles from './PostSection.module.css';
@@ -121,10 +121,14 @@ function PostCard({ post, variant }: { post: Post; variant: 'plain' | 'feature' 
       <div className={styles.content}>
         <h3 className={styles.postTitle}>
           <a href={post.href} aria-label={post.title}>
+            {/* The space goes between the word boxes (one inside a box would be dropped at its end). */}
             {post.title.split(/\s+/).map((word, i) => (
-              <span key={i} className={styles.word} aria-hidden>
-                <span className={styles.wordInner}>{word}</span>{' '}
-              </span>
+              <Fragment key={i}>
+                {i > 0 && ' '}
+                <span className={styles.word} aria-hidden>
+                  <span className={styles.wordInner}>{word}</span>
+                </span>
+              </Fragment>
             ))}
           </a>
         </h3>

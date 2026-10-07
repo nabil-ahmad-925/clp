@@ -307,8 +307,9 @@
   pointer-events: none;
 }
 
+/* As the original: twice the cards' size on desktop, 1.4 times below 1000px (see the media queries). */
 .feature .postTitle {
-  font-size: calc(min(15px, 1.4vw) * 1.4);
+  font-size: calc(min(15px, 1.4vw) * 2);
   line-height: 1.3em;
 }
 
