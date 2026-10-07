@@ -1,8 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { LuMapPin, LuSearch } from 'react-icons/lu';
-import { PiMagnifyingGlassBold } from 'react-icons/pi';
+import { LuChevronDown, LuMapPin, LuSearch } from 'react-icons/lu';
 import styles from './DirectorySearch.module.css';
 
 /** A place to search for (a city or destination of the cards), with how many results it has. */
@@ -84,7 +83,10 @@ export default function DirectorySearch({ query, location, places = [], onSearch
   return (
     <form role="search" className={`${styles.search} ${withLocation ? '' : styles.single}`} onSubmit={submit}>
       <label className={styles.seg} htmlFor={qId}>
-        <LuSearch className={styles.segIcon} aria-hidden />
+        {/* The search button: the magnifier at the start of the field (Enter in either field searches too). */}
+        <button type="submit" className={styles.searchBtn} aria-label="Search">
+          <LuSearch aria-hidden />
+        </button>
         <span className={styles.field}>
           <span className={styles.srOnly}>{label}</span>
           <input
@@ -139,6 +141,21 @@ export default function DirectorySearch({ query, location, places = [], onSearch
               />
             </span>
           </label>
+          {/* Opens (or closes) the list of places. */}
+          <button
+            type="button"
+            className={`${styles.locToggle} ${shown ? styles.locToggleOpen : ''}`}
+            aria-label={shown ? 'Hide locations' : 'Show locations'}
+            aria-expanded={shown}
+            aria-controls={listId}
+            disabled={places.length === 0}
+            onClick={() => {
+              setActive(-1);
+              setOpen(!shown);
+            }}
+          >
+            <LuChevronDown aria-hidden />
+          </button>
           {shown && (
             <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
               {suggestions.map((p, i) => (
@@ -160,10 +177,6 @@ export default function DirectorySearch({ query, location, places = [], onSearch
           )}
         </div>
       )}
-      <button type="submit" className={styles.submit} aria-label="Search">
-        <PiMagnifyingGlassBold aria-hidden />
-        <span className={styles.submitText}>Search</span>
-      </button>
     </form>
   );
 }

@@ -1,4 +1,5 @@
-/* tenpo.com's two-field search bar (rounded white card, uppercase field labels, round search button), in black and gold. */
+/* tenpo.com's two-field search bar (rounded white card): the magnifier at the start searches, the location field has an
+   arrow opening its places. */
 
 /* Under the page heading: centred on its bottom edge. The bar has a set height (per breakpoint), so half of it is
    known up front and the page lays out right from its first paint. */
@@ -141,49 +142,78 @@
   -webkit-appearance: none;
 }
 
-.submit {
-  display: inline-flex;
+/* The search button: the magnifier at the start of the first field. */
+.searchBtn {
+  display: grid;
   flex: none;
-  align-items: center;
-  align-self: center;
-  justify-content: center;
-  gap: 9px;
-  width: 44px;
-  height: 44px;
-  margin: 0 4px 0 8px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin: 0 -6px 0 -8px;
   padding: 0;
   border: none;
-  /* A rounded square (tenpo's is a circle). */
-  border-radius: 12px;
-  background: #111;
-  color: var(--white);
-  font-family: inherit;
+  border-radius: 10px;
+  background: none;
+  color: rgba(17, 17, 17, 0.55);
+  font-size: 19px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.searchBtn:hover {
+  background: rgba(17, 17, 17, 0.07);
+  color: #111;
+}
+
+.searchBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+/* The location list's arrow, at the end of the location field. */
+.locToggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 10px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: rgba(17, 17, 17, 0.55);
   font-size: 18px;
   cursor: pointer;
   transition:
     background-color 0.15s ease,
-    color 0.15s ease,
-    transform 0.1s ease;
+    color 0.15s ease;
 }
 
-.submit:hover {
-  background: var(--gold);
+.locToggle svg {
+  transition: transform 0.2s ease;
+}
+
+.locToggle:hover:not(:disabled) {
+  background: rgba(17, 17, 17, 0.07);
   color: #111;
 }
 
-.submit:active {
-  transform: scale(0.97);
+.locToggle:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
-.submit:focus-visible {
+.locToggleOpen svg {
+  transform: rotate(180deg);
+}
+
+.locToggle:focus-visible {
   outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.submitText {
-  display: none;
-  font-size: 15.5px;
-  font-weight: 600;
+  outline-offset: 1px;
 }
 
 /* Location suggestions: the page's places that have results. */
@@ -232,10 +262,15 @@
   flex: 1;
 }
 
-/* Phones: the fields stack, each with its icon; the button spans the width. */
+/* Phones: the fields stack, each with its icon. */
 @media (max-width: 639px) {
   .slot {
-    --search-h: 148px;
+    --search-h: 110px;
+  }
+
+  /* The search field alone stays one row. */
+  .slot:has(.single) {
+    --search-h: 64px;
   }
 
   .search {
@@ -276,15 +311,4 @@
     font-size: 11px;
   }
 
-  .submit {
-    align-self: stretch;
-    width: auto;
-    margin: 4px 0 0;
-    padding: 11px 26px;
-    height: auto;
-  }
-
-  .submitText {
-    display: inline;
-  }
 }

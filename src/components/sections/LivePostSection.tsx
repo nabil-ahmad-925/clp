@@ -7,13 +7,15 @@ import PostSection from './PostSection';
 
 /**
  * An "Updates & News" section listing its category's newest live articles (as published in the admin), as many as the
- * design's section shows (its built-in cards: 3 in a masonry row, 4–5 in a carousel); "View all" opens all of them.
+ * original page's grid shows (5 in a carousel, 3 in a masonry row); "View all" opens all of them.
  * The built-in cards show until they load (and stay if the API can't be reached); a category without articles has no
  * section.
  */
 export default function LivePostSection({ category, ...section }: PostSectionData & { category?: string }) {
   const [live, setLive] = useState<{ category: string; posts: Post[] } | null>(null);
-  const size = section.posts.length;
+  // As many as the original page's grids show: five in a carousel (four a row, the arrows bring the fifth), three in a
+  // masonry row.
+  const size = section.layout === 'carousel' ? 5 : 3;
 
   useEffect(() => {
     if (!category || !articlesEnabled || size < 1) return;

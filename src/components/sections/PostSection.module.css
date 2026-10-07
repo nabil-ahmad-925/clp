@@ -1,3 +1,6 @@
+/* Updates & News sections: Salient's post grid as on the original page (values from its element-post-grid.css,
+   flickity.css and the page's inline settings: 4 columns, 15px spacing, 10px corners, 50vh photos). */
+
 .section {
   background: var(--white);
   color: var(--black);
@@ -14,14 +17,17 @@
   color: var(--black);
 }
 
-/* ---- Carousel layout ---- */
+/* ---- Carousel: four posts a row, every photo the same size, arrows over the photos ---- */
 
 .carousel {
+  position: relative;
   margin: 0 -15px;
 }
 
+/* Room inside the clipped viewport for a hovered post's lift and shadow. */
 .viewport {
   overflow: hidden;
+  padding: 15px 0 50px;
 }
 
 .track {
@@ -32,34 +38,115 @@
 .slide {
   flex: 0 0 25%;
   min-width: 0;
-  padding: 15px;
+  padding: 0 15px;
 }
 
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+/* Arrows: a white disc (it grows on hover) with a black chevron and a line that stretches on hover. */
+.arrow {
+  position: absolute;
+  top: calc(15px + 25vh);
+  top: calc(15px + 25svh);
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
 }
 
-.dots button {
-  width: 8px;
-  height: 8px;
+.prev {
+  left: 50px;
+}
+
+.next {
+  right: 50px;
+}
+
+.arrow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.25);
-  transition: background-color 0.3s ease;
+  background: var(--white);
+  transition: transform 0.45s cubic-bezier(0.15, 0.2, 0.1, 1);
 }
 
-.dots button:hover,
-.dots .dotActive {
-  background: var(--black);
+.arrow:hover::before {
+  transform: scale(1.2);
 }
 
-/* ---- Masonry layout: three cards, the middle one spans two columns ---- */
+/* The line of the arrow. */
+.arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 15px;
+  height: 2px;
+  margin-top: -1px;
+  background: #000;
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.prev::after {
+  left: 13px;
+  transform: scaleX(1) translateX(1px);
+  transform-origin: left;
+}
+
+.next::after {
+  left: 12px;
+  transform: scaleX(1);
+  transform-origin: right;
+}
+
+.prev:hover::after {
+  transform: scaleX(1.3) translateX(-1px);
+}
+
+.next:hover::after {
+  transform: scaleX(1.3) translateX(1px);
+}
+
+.arrowHead {
+  position: absolute;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  fill: #000;
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.prev .arrowHead {
+  left: 10px;
+}
+
+.next .arrowHead {
+  right: 10px;
+  transform: rotate(180deg);
+}
+
+.prev:hover .arrowHead {
+  transform: translateX(-2px);
+}
+
+.next:hover .arrowHead {
+  transform: rotate(180deg) translateX(-2px);
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+/* ---- Masonry: three posts on four columns, the middle one two columns wide ---- */
 
 .masonry {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(50vh, auto);
   gap: 30px;
   padding-top: 15px;
 }
@@ -68,22 +155,46 @@
   grid-column: span 2;
 }
 
-/* ---- Post card ---- */
+/* ---- Post ---- */
 
 .post {
+  position: relative;
+  isolation: isolate;
   height: 100%;
-  text-align: center;
 }
 
-.card {
+/* Carousel posts: on hover a white card with a shadow shows behind the photo and title (to the row's bottom), and the
+   post lifts. */
+.slide .post {
+  transition: transform 0.32s ease;
+}
+
+.slide .post::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   border-radius: 10px;
   background: var(--white);
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
+.slide .post:hover {
+  transform: translateY(-4px);
+}
+
+.slide .post:hover::after {
+  opacity: 1;
+}
+
+/* The photo: 50vh tall, 10px corners; revealed by unclipping from 30px in. */
 .imageWrap {
   position: relative;
   display: block;
-  height: 450px;
+  height: 50vh;
+  height: 50svh;
   overflow: hidden;
   border-radius: 10px;
   transform: translateZ(0);
@@ -99,58 +210,111 @@
   opacity: 1;
 }
 
+/* Zoom on hover (the wrapper), separate from the photo's reveal (the image). */
+.zoom {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+}
+
+.post:hover .zoom {
+  transform: scale(1.1);
+}
+
 .imageWrap img {
   display: block;
   width: 100%;
   height: 100%;
   max-width: none;
   object-fit: cover;
-  transition: transform 0.45s cubic-bezier(0.15, 0.75, 0.5, 1);
+  transform: scale(1.3);
+  transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.post:hover .imageWrap img {
-  transform: scale(1.1);
+.shown .imageWrap img {
+  transform: scale(1);
 }
 
+/* The title, centred under the photo. */
 .content {
-  padding: 30px;
-}
-
-.plain .content {
-  padding: 25px 0;
+  padding: 35px;
+  text-align: center;
 }
 
 .postTitle {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 15px;
-  line-height: 21px;
+  font-size: min(15px, 1.4vw);
   font-weight: 700;
-}
-
-.plain .postTitle {
-  line-height: 19.5px;
+  line-height: 1.3em;
 }
 
 .postTitle a {
   color: var(--black);
 }
 
-.date {
-  display: block;
-  margin-top: 20px;
-  font-size: 12px;
-  line-height: 1.1;
-  opacity: 0;
-  transform: translateY(20px);
-  transition:
-    transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.7s,
-    opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.7s;
+/* The title's words slide up into view after the photo. */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
 }
 
-.shown .date {
-  opacity: 1;
+.wordInner {
+  display: inline-block;
+  transform: translateY(1.3em);
+  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s;
+}
+
+.shown .wordInner {
   transform: none;
+}
+
+/* Feature (the masonry's wide post): the photo fills the cell under a dark corner gradient, the title centred on it
+   in white. */
+.feature .imageWrap {
+  position: absolute;
+  inset: 0;
+  height: auto;
+}
+
+.feature::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 10px;
+  background: radial-gradient(circle at 0 0, rgba(0, 0, 0, 0.75) 0, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.feature.shown::before {
+  opacity: 1;
+}
+
+.feature .content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: 10vw min(max(35px, 3.5vw), 50px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.feature .postTitle {
+  font-size: calc(min(15px, 1.4vw) * 1.4);
+  line-height: 1.3em;
+}
+
+.feature .postTitle a {
+  color: var(--white);
+  pointer-events: auto;
 }
 
 /* ---- "View all" pill ---- */
@@ -188,37 +352,73 @@
   transform: translateX(3px);
 }
 
+/* Tablets: two columns; title sizes as the original's tablet setting. */
 @media (max-width: 999px) {
   .slide {
     flex-basis: 50%;
   }
 
   .masonry {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .postTitle {
+    font-size: min(15px, 2.4vw);
+  }
+
+  .feature .postTitle {
+    font-size: calc(min(15px, 2.4vw) * 1.4);
+  }
+
+  .arrow {
+    transform: translateY(-50%) scale(0.75);
   }
 }
 
+/* Phones: one column; smaller arrows closer to the edges. */
 @media (max-width: 690px) {
   .slide {
     flex-basis: 100%;
   }
 
   .masonry {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .wide {
     grid-column: auto;
   }
 
-  .post:hover .imageWrap img {
+  .postTitle {
+    font-size: min(15px, 3.4vw);
+  }
+
+  .feature .postTitle {
+    font-size: calc(min(15px, 3.4vw) * 1.4);
+  }
+
+  .prev {
+    left: 35px;
+  }
+
+  .next {
+    right: 35px;
+  }
+
+  .arrow {
+    transform: translateY(-50%) scale(0.65);
+  }
+
+  .post:hover .zoom {
     transform: none;
   }
 }
 
 @media (hover: none) and (pointer: coarse), (prefers-reduced-motion: reduce) {
   .imageWrap,
-  .date {
+  .imageWrap img,
+  .wordInner,
+  .feature::before {
     clip-path: inset(0 round 10px);
     opacity: 1;
     transform: none;

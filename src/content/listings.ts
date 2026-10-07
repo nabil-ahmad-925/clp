@@ -210,6 +210,12 @@ export const queryListings = (widgetId: number, groups: string[][], facets: numb
  * How many published listings match the filter groups and search (the "Show N results" of a filter panel), counted by
  * the API.
  */
+/** An option added in the admin to a directory's filter (e.g. a new Service), next to the page's own ones. */
+export type AddedOption = { key: string; value: string; label: string };
+
+/** The options added in the admin to a directory's filters. */
+export const addedOptions = (widgetId: number) => get<{ options: AddedOption[] }>(`/filter-options?widget=${widgetId}`).then((r) => r.options);
+
 export const countListings = (widgetId: number, groups: string[][], options?: ListingsOptions) =>
   get<{ total: number }>(`/listings?widget=${widgetId}${typeParam(widgetId)}&${filtersParam(groups)}${searchParam(options)}&count=1`).then(
     (r) => r.total,

@@ -22,7 +22,7 @@ import Pager from '@/components/ui/Pager';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
 import SortSelect, { type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { countListings, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type ListingsResult } from '@/content/listings';
+import { addedOptions, countListings, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
@@ -196,7 +196,31 @@ type View = {
  * When the API has no listings for the page, fails or is slow, the page falls back to its built-in cards, filtered
  * (and paged) in the browser.
  */
-export default function TeamDirectory({ layout, filters, items: builtIn, widgetId }: Props) {
+export default function TeamDirectory({ layout, filters: pageFilters, items: builtIn, widgetId }: Props) {
+  // Options added in the admin (e.g. a new Service) join their filter after the page's own options; filters themselves
+  // (and so the API's filter groups) stay as the page has them.
+  const [added, setAdded] = useState<AddedOption[]>([]);
+  useEffect(() => {
+    if (!listingsEnabled(widgetId)) return;
+    let active = true;
+    addedOptions(widgetId).then(
+      (options) => active && setAdded(options),
+      () => {},
+    );
+    return () => {
+      active = false;
+    };
+  }, [widgetId]);
+  const filters = useMemo(
+    () =>
+      added.length
+        ? pageFilters.map((f) => {
+            const extra = added.filter((o) => o.key === f.key && !f.options.some((own) => own.value === o.value));
+            return extra.length ? { ...f, options: [...f.options, ...extra.map(({ value, label }) => ({ value, label }))] } : f;
+          })
+        : pageFilters,
+    [pageFilters, added],
+  );
   const enabled = listingsEnabled(widgetId);
   const presets = filters.map((f) => (f.preset ? [f.preset] : []));
   // The empty-valued option is the plugin's "All …" choice; as on tenpo.com, the panel's "Clear" does that instead.

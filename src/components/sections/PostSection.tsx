@@ -6,7 +6,12 @@ import { Container } from '@/components/ui/Section';
 import type { Post, PostSectionData } from '@/content/types';
 import styles from './PostSection.module.css';
 
-/** One "Updates & News" category: heading, post cards (carousel or masonry) and a "View all" pill. */
+/**
+ * One "Updates & News" category: heading, posts and a "View all" pill, laid out as the original page's post grid
+ * (photo with the title centred under it, 10px corners, zoom on hover, zoom-out reveal): a carousel, four a row with
+ * arrows over the photos and a white card behind the hovered post, or a masonry row of three whose middle post is a
+ * wide photo with its title on it.
+ */
 export default function PostSection({ title, layout, spacing, posts, viewAll }: PostSectionData) {
   return (
     <section
@@ -28,66 +33,64 @@ export default function PostSection({ title, layout, spacing, posts, viewAll }: 
   );
 }
 
+/** Carousel (Flickity on the original: wraps around, arrows over the photos). */
 function PostCarousel({ posts }: { posts: Post[] }) {
-  const [emblaRef, embla] = useEmblaCarousel({ align: 'start', slidesToScroll: 'auto', containScroll: 'trimSnaps' });
-  const [snaps, setSnaps] = useState<number[]>([]);
-  const [selected, setSelected] = useState(0);
-
+  const [emblaRef, embla] = useEmblaCarousel({ align: 'start', slidesToScroll: 'auto', loop: true });
+  // Arrows only when there is more than one page of posts.
+  const [many, setMany] = useState(false);
   useEffect(() => {
     if (!embla) return;
-    const sync = () => {
-      setSnaps(embla.scrollSnapList());
-      setSelected(embla.selectedScrollSnap());
-    };
-    embla.on('init', sync).on('reInit', sync).on('select', sync);
+    // The carousel is already set up when its API arrives (its "init" has passed): read it now, then on each re-init.
+    const sync = () => setMany(embla.scrollSnapList().length > 1);
+    sync();
+    embla.on('reInit', sync);
     return () => {
-      embla.off('init', sync).off('reInit', sync).off('select', sync);
+      embla.off('reInit', sync);
     };
   }, [embla]);
-
   return (
     <div className={styles.carousel}>
       <div className={styles.viewport} ref={emblaRef}>
         <div className={styles.track}>
           {posts.map((post) => (
             <div key={post.href} className={styles.slide}>
-              <PostCard post={post} variant="card" />
+              <PostCard post={post} variant="plain" />
             </div>
           ))}
         </div>
       </div>
-      {snaps.length > 1 && (
-        <div className={styles.dots}>
-          {snaps.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              className={i === selected ? styles.dotActive : undefined}
-              aria-label={`Show page ${i + 1}`}
-              aria-current={i === selected || undefined}
-              onClick={() => embla?.scrollTo(i)}
-            />
-          ))}
-        </div>
+      {many && (
+        <>
+          <button type="button" className={`${styles.arrow} ${styles.prev}`} aria-label="Previous posts" onClick={() => embla?.scrollPrev()}>
+            <ArrowHead />
+          </button>
+          <button type="button" className={`${styles.arrow} ${styles.next}`} aria-label="Next posts" onClick={() => embla?.scrollNext()}>
+            <ArrowHead />
+          </button>
+        </>
       )}
     </div>
   );
 }
 
+/** Masonry row: the second post spans two columns, its photo filling the cell with the title over it. */
 function PostMasonry({ posts }: { posts: Post[] }) {
   return (
     <div className={styles.masonry}>
       {posts.map((post, i) => (
         <div key={post.href} className={i === 1 ? styles.wide : undefined}>
-          <PostCard post={post} variant="plain" />
+          <PostCard post={post} variant={i === 1 ? 'feature' : 'plain'} />
         </div>
       ))}
     </div>
   );
 }
 
-/** Post card: image (revealed with a clip animation on scroll, zooms on hover) + title (+ date). */
-function PostCard({ post, variant }: { post: Post; variant: 'card' | 'plain' }) {
+/**
+ * Post: photo (revealed on scroll: unclipped from 30px in while it settles from 1.3x; zooms on hover) and title (its
+ * words slide up into view). `plain`: title centred under the photo; `feature`: title centred on the photo.
+ */
+function PostCard({ post, variant }: { post: Post; variant: 'plain' | 'feature' }) {
   const ref = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
 
@@ -110,16 +113,32 @@ function PostCard({ post, variant }: { post: Post; variant: 'card' | 'plain' }) 
   return (
     <article ref={ref} className={`${styles.post} ${styles[variant]} ${shown ? styles.shown : ''}`}>
       <a href={post.href} className={styles.imageWrap} tabIndex={-1} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.image} alt="" loading="lazy" />
+        <span className={styles.zoom}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={post.image} alt="" loading="lazy" />
+        </span>
       </a>
       <div className={styles.content}>
         <h3 className={styles.postTitle}>
-          <a href={post.href}>{post.title}</a>
+          <a href={post.href} aria-label={post.title}>
+            {post.title.split(/\s+/).map((word, i) => (
+              <span key={i} className={styles.word} aria-hidden>
+                <span className={styles.wordInner}>{word}</span>{' '}
+              </span>
+            ))}
+          </a>
         </h3>
-        {variant === 'card' && post.date && <span className={styles.date}>{post.date}</span>}
       </div>
     </article>
+  );
+}
+
+/** The arrows' chevron (Flickity's), with the line drawn by CSS next to it. */
+function ArrowHead() {
+  return (
+    <svg className={styles.arrowHead} viewBox="0 0 100 100" aria-hidden focusable="false">
+      <path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" />
+    </svg>
   );
 }
 
