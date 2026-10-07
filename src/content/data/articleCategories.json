@@ -1,5 +1,5 @@
 {
-  "_comment": "Blog article categories (from the original site's category archives): /category/<slug>/ and /category/<slug>/<sub>/. `page` is the site page that lists the category's articles (its post filter grid). Shared by the site, the admin (scripts/sync-widgets.mjs copies it) and clp-api (bundled from here).",
+  "_comment": "Blog article categories (from the original site's category archives): /category/<slug>/ and /category/<slug>/<sub>/. `page` is the site page that lists the category's articles (its post filter grid). Shared by the site, the admin (scripts/sync-widgets.mjs copies it) and clp-api (bundled from here). A sport subcategory has `sport`: the sport filter value of the experience directories (baseball-softball, basketball, …).",
   "categories": [
     {
       "slug": "activations-branded-experiences",
@@ -8,27 +8,33 @@
       "subcategories": [
         {
           "slug": "baseball-softball-articles",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-articles",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "esports-articles",
-          "name": "Esports"
+          "name": "Esports",
+          "sport": "esports"
         },
         {
           "slug": "futbol-soccer-articles",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "golfing-articles",
-          "name": "Golfing"
+          "name": "Golfing",
+          "sport": "golfing"
         },
         {
           "slug": "pickleball-articles",
-          "name": "Pickleball"
+          "name": "Pickleball",
+          "sport": "pickleball"
         },
         {
           "slug": "featured-activations-branded-experiences",
@@ -44,27 +50,33 @@
       "subcategories": [
         {
           "slug": "baseball-softball",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-dieting-nutrition",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "esports",
-          "name": "Esports"
+          "name": "Esports",
+          "sport": "esports"
         },
         {
           "slug": "futbol-soccer",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "golfing",
-          "name": "Golfing"
+          "name": "Golfing",
+          "sport": "golfing"
         },
         {
           "slug": "pickleball",
-          "name": "Pickleball"
+          "name": "Pickleball",
+          "sport": "pickleball"
         },
         {
           "slug": "featured-briefings-field-reports",
@@ -80,27 +92,33 @@
       "subcategories": [
         {
           "slug": "baseball-softball-injury-prevention-recovery",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-injury-prevention-recovery",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "esports-injury-prevention-recovery",
-          "name": "Esports"
+          "name": "Esports",
+          "sport": "esports"
         },
         {
           "slug": "futbol-soccer-injury-prevention-recovery",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "golfing-injury-prevention-recovery",
-          "name": "Golfing"
+          "name": "Golfing",
+          "sport": "golfing"
         },
         {
           "slug": "pickleball-injury-prevention-recovery",
-          "name": "Pickleball"
+          "name": "Pickleball",
+          "sport": "pickleball"
         },
         {
           "slug": "featured-diet-recovery-injury-prevention",
@@ -120,15 +138,18 @@
       "subcategories": [
         {
           "slug": "baseball-softball-product-reviews",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-product-reviews",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "futbol-soccer-product-reviews",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "featured-product-development-reviews",
@@ -144,27 +165,33 @@
       "subcategories": [
         {
           "slug": "baseball-softball-resilience-performance-training",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-resilience-performance-training",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "esports-resilience-performance-training",
-          "name": "Esports"
+          "name": "Esports",
+          "sport": "esports"
         },
         {
           "slug": "futbol-soccer-resilience-performance-training",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "golfing-resilience-performance-training",
-          "name": "Golfing"
+          "name": "Golfing",
+          "sport": "golfing"
         },
         {
           "slug": "pickleball-resilience-performance-training",
-          "name": "Pickleball"
+          "name": "Pickleball",
+          "sport": "pickleball"
         },
         {
           "slug": "featured-resilience-performance-training",
@@ -180,27 +207,33 @@
       "subcategories": [
         {
           "slug": "baseball-softball-strategy-insights",
-          "name": "Baseball & Softball"
+          "name": "Baseball & Softball",
+          "sport": "baseball-softball"
         },
         {
           "slug": "basketball-strategy-insights",
-          "name": "Basketball"
+          "name": "Basketball",
+          "sport": "basketball"
         },
         {
           "slug": "esports-strategy-insights",
-          "name": "Esports"
+          "name": "Esports",
+          "sport": "esports"
         },
         {
           "slug": "futbol-soccer-strategy-insights",
-          "name": "Fútbol (Soccer)"
+          "name": "Fútbol (Soccer)",
+          "sport": "futbol-soccer"
         },
         {
           "slug": "golfing-strategy-insights",
-          "name": "Golfing"
+          "name": "Golfing",
+          "sport": "golfing"
         },
         {
           "slug": "pickleball-strategy-insights",
-          "name": "Pickleball"
+          "name": "Pickleball",
+          "sport": "pickleball"
         },
         {
           "slug": "featured-strategy-and-insights",

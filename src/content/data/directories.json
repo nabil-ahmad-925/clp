@@ -10189,6 +10189,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "alldates",
           "label": "Date",
           "options": [
@@ -10749,6 +10803,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -11860,6 +11968,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -13545,6 +13707,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "alldates",
           "label": "Date",
           "options": [
@@ -14101,6 +14317,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -15665,6 +15935,98 @@
           ]
          },
          {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -16134,6 +16496,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -44129,6 +44545,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -45716,6 +46186,98 @@
           ]
          },
          {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -46185,6 +46747,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -47106,6 +47722,60 @@
            {
             "value": "los-angeles",
             "label": "Los Angeles"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -48311,6 +48981,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -49414,6 +50138,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "alldates",
           "label": "Date",
           "options": [
@@ -49974,6 +50752,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -52153,6 +52985,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -53649,6 +54535,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "alldates",
           "label": "Date",
           "options": [
@@ -54221,6 +55161,98 @@
           ]
          },
          {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -54690,6 +55722,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -56379,6 +57465,98 @@
            {
             "value": "sports-medicine-specialists",
             "label": "Sports Medicine Specialists"
+           }
+          ]
+         },
+         {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -64966,6 +66144,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -66483,6 +67715,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "alldates",
           "label": "Date",
           "options": [
@@ -67063,6 +68349,98 @@
           ]
          },
          {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -67532,6 +68910,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -69225,6 +70657,98 @@
           ]
          },
          {
+          "key": "experiences",
+          "label": "Experiences",
+          "options": [
+           {
+            "value": "",
+            "label": "All Training Experiences"
+           },
+           {
+            "value": "academies-clubs",
+            "label": "Academies/Clubs"
+           },
+           {
+            "value": "amateur-semi-pro",
+            "label": "Amateur/Semi-Pro"
+           },
+           {
+            "value": "colleges-universities",
+            "label": "Colleges/Universities"
+           },
+           {
+            "value": "groups-individuals",
+            "label": "Groups/Individuals"
+           },
+           {
+            "value": "high-school",
+            "label": "High School"
+           },
+           {
+            "value": "pro-athletes-teams",
+            "label": "Pro Athletes/Teams"
+           },
+           {
+            "value": "youths",
+            "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -69694,6 +71218,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -70943,6 +72521,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -72188,6 +73820,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -73429,6 +75115,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -75466,6 +77206,60 @@
           ]
          },
          {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
           "key": "extra-one",
           "label": "Sport",
           "options": [
@@ -76707,6 +78501,60 @@
            {
             "value": "youths",
             "label": "Youths"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },
@@ -79724,6 +81572,60 @@
            {
             "value": "washington-d-c",
             "label": "Washington D.C."
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
            }
           ]
          },

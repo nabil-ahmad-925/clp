@@ -17,6 +17,10 @@ type Props = {
   /** The page's places with results, suggested under the location field (just their names). */
   places?: Place[];
   onSearch: (query: string, location: string) => void;
+  /** The location field (false: the search field alone, e.g. articles). */
+  withLocation?: boolean;
+  /** The search field's hidden label. */
+  label?: string;
 };
 
 /** Accents, case and extra spaces don't matter when matching what's typed ("barca" finds "Barça"), as in the API. */
@@ -33,7 +37,7 @@ export const fold = (s: string) =>
  * (a city or destination of the cards, suggested as you type), applied by the search button, Enter or a suggestion.
  * Both are searched by the listings API.
  */
-export default function DirectorySearch({ query, location, places = [], onSearch, placeholder = 'Search camps, clinics, programs…' }: Props) {
+export default function DirectorySearch({ query, location, places = [], onSearch, placeholder = 'Search camps, clinics, programs…', withLocation = true, label = 'Sport or event' }: Props) {
   const [q, setQ] = useState(query);
   const [loc, setLoc] = useState(location);
   const [open, setOpen] = useState(false);
@@ -78,11 +82,11 @@ export default function DirectorySearch({ query, location, places = [], onSearch
   };
 
   return (
-    <form role="search" className={styles.search} onSubmit={submit}>
+    <form role="search" className={`${styles.search} ${withLocation ? '' : styles.single}`} onSubmit={submit}>
       <label className={styles.seg} htmlFor={qId}>
         <LuSearch className={styles.segIcon} aria-hidden />
         <span className={styles.field}>
-          <span className={styles.srOnly}>Sport or event</span>
+          <span className={styles.srOnly}>{label}</span>
           <input
             id={qId}
             className={styles.input}
@@ -94,66 +98,68 @@ export default function DirectorySearch({ query, location, places = [], onSearch
           />
         </span>
       </label>
-      <div ref={locRef} className={`${styles.seg} ${styles.locSeg}`}>
-        <label className={styles.segLabel} htmlFor={locId}>
-          <LuMapPin className={styles.segIcon} aria-hidden />
-          <span className={styles.field}>
-            <span className={styles.srOnly}>Location</span>
-            <input
-              id={locId}
-              className={styles.input}
-              type="search"
-              role="combobox"
-              aria-autocomplete="list"
-              aria-expanded={shown}
-              aria-controls={listId}
-              aria-activedescendant={shown && active >= 0 ? `${listId}-${active}` : undefined}
-              autoComplete="off"
-              placeholder="City or destination"
-              value={loc}
-              onFocus={() => setOpen(true)}
-              onClick={() => setOpen(true)}
-              onChange={(e) => {
-                setLoc(e.target.value);
-                setActive(-1);
-                setOpen(true);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                  e.preventDefault();
+      {withLocation && (
+        <div ref={locRef} className={`${styles.seg} ${styles.locSeg}`}>
+          <label className={styles.segLabel} htmlFor={locId}>
+            <LuMapPin className={styles.segIcon} aria-hidden />
+            <span className={styles.field}>
+              <span className={styles.srOnly}>Location</span>
+              <input
+                id={locId}
+                className={styles.input}
+                type="search"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={shown}
+                aria-controls={listId}
+                aria-activedescendant={shown && active >= 0 ? `${listId}-${active}` : undefined}
+                autoComplete="off"
+                placeholder="City or destination"
+                value={loc}
+                onFocus={() => setOpen(true)}
+                onClick={() => setOpen(true)}
+                onChange={(e) => {
+                  setLoc(e.target.value);
+                  setActive(-1);
                   setOpen(true);
-                  const n = suggestions.length;
-                  if (n) setActive((a) => (e.key === 'ArrowDown' ? (a + 1) % n : (a - 1 + n) % n));
-                } else if (e.key === 'Enter' && shown && active >= 0 && suggestions[active]) {
-                  e.preventDefault();
-                  pick(suggestions[active]);
-                } else if (e.key === 'Escape') {
-                  setOpen(false);
-                }
-              }}
-            />
-          </span>
-        </label>
-        {shown && (
-          <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
-            {suggestions.map((p, i) => (
-              <li
-                key={p.value}
-                id={`${listId}-${i}`}
-                role="option"
-                aria-selected={i === active}
-                className={styles.suggestion}
-                onMouseDown={(e) => e.preventDefault()}
-                onMouseEnter={() => setActive(i)}
-                onClick={() => pick(p)}
-              >
-                <LuMapPin className={styles.suggestionIcon} aria-hidden />
-                <span className={styles.suggestionLabel}>{p.label}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setOpen(true);
+                    const n = suggestions.length;
+                    if (n) setActive((a) => (e.key === 'ArrowDown' ? (a + 1) % n : (a - 1 + n) % n));
+                  } else if (e.key === 'Enter' && shown && active >= 0 && suggestions[active]) {
+                    e.preventDefault();
+                    pick(suggestions[active]);
+                  } else if (e.key === 'Escape') {
+                    setOpen(false);
+                  }
+                }}
+              />
+            </span>
+          </label>
+          {shown && (
+            <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
+              {suggestions.map((p, i) => (
+                <li
+                  key={p.value}
+                  id={`${listId}-${i}`}
+                  role="option"
+                  aria-selected={i === active}
+                  className={styles.suggestion}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onMouseEnter={() => setActive(i)}
+                  onClick={() => pick(p)}
+                >
+                  <LuMapPin className={styles.suggestionIcon} aria-hidden />
+                  <span className={styles.suggestionLabel}>{p.label}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       <button type="submit" className={styles.submit} aria-label="Search">
         <PiMagnifyingGlassBold aria-hidden />
         <span className={styles.submitText}>Search</span>
@@ -176,16 +182,28 @@ type SearchContext = {
   /** The places the location field suggests (set by the directory from the API's counts). */
   places: Place[];
   setPlaces: (places: Place[]) => void;
-  /** The search field's placeholder (see DirectorySearch). */
+  /** The search field's placeholder and hidden label, and whether the bar has the location field (see DirectorySearch). */
   placeholder?: string;
+  label?: string;
+  withLocation: boolean;
 };
 const SearchContext = createContext<SearchContext | null>(null);
 
 /**
  * Shares the search of a page whose bar is rendered under the page heading (DirectorySearchSlot) with its directory
- * (TeamDirectory), so the bar is in the page's HTML from the start rather than appearing once the directory loads.
+ * (TeamDirectory) or article list (PostFilter), so the bar is in the page's HTML from the start rather than appearing once the directory loads.
  */
-export function DirectorySearchProvider({ children, placeholder }: { children: ReactNode; placeholder?: string }) {
+export function DirectorySearchProvider({
+  children,
+  placeholder,
+  label,
+  withLocation = true,
+}: {
+  children: ReactNode;
+  placeholder?: string;
+  label?: string;
+  withLocation?: boolean;
+}) {
   const [search, setSearch] = useState(NO_SEARCH);
   const [places, setPlaces] = useState<Place[]>([]);
   const runner = useRef<((search: Search) => void) | null>(null);
@@ -198,7 +216,7 @@ export function DirectorySearchProvider({ children, placeholder }: { children: R
       };
     },
   }));
-  return <SearchContext.Provider value={{ search, setSearch, places, setPlaces, placeholder, ...actions }}>{children}</SearchContext.Provider>;
+  return <SearchContext.Provider value={{ search, setSearch, places, setPlaces, placeholder, label, withLocation, ...actions }}>{children}</SearchContext.Provider>;
 }
 
 /** The page's search when its bar is in the slot under the heading (null: the directory shows its own bar). */
@@ -210,8 +228,15 @@ export function DirectorySearchSlot() {
   if (!ctx) return null;
   return (
     <div className={styles.slot}>
-      <DirectorySearch query={ctx.search.q} location={ctx.search.loc} places={ctx.places}
-        placeholder={ctx.placeholder} onSearch={(q, loc) => ctx.run({ q, loc })} />
+      <DirectorySearch
+        query={ctx.search.q}
+        location={ctx.search.loc}
+        places={ctx.places}
+        placeholder={ctx.placeholder}
+        label={ctx.label}
+        withLocation={ctx.withLocation}
+        onSearch={(q, loc) => ctx.run({ q, loc })}
+      />
     </div>
   );
 }

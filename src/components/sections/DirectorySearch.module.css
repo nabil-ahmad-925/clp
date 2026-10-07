@@ -14,6 +14,11 @@
   height: var(--search-h);
 }
 
+/* The search field alone (no location), e.g. the article lists. */
+.single {
+  max-width: 680px;
+}
+
 .search {
   position: relative;
   z-index: 5;

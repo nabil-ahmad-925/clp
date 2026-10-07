@@ -6,13 +6,9 @@ import {
   LuBriefcase,
   LuCalendar,
   LuChartNoAxesColumn,
-  LuChevronLeft,
-  LuChevronRight,
   LuDollarSign,
   LuHandshake,
   LuHeartPulse,
-  LuLayoutGrid,
-  LuList,
   LuMapPin,
   LuPlane,
   LuSearch,
@@ -22,9 +18,10 @@ import {
 } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
-import PillSelect from '@/components/ui/PillSelect';
+import Pager from '@/components/ui/Pager';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
 import SortSelect, { type Sort } from '@/components/ui/SortSelect';
+import ViewToggle from '@/components/ui/ViewToggle';
 import { countListings, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
@@ -166,21 +163,6 @@ const VIEW_KEY = 'clp-directory-view';
 const PAGE_SIZE = 12;
 const PAGE_SIZES = [12, 24, 48];
 
-/**
- * The page numbers to show (0-based) around the current one, with null for a gap: first, last, and the current with
- * its neighbours ("1 … 4 5 6 … 12"); a gap of a single page shows that page instead.
- */
-function pageNumbers(current: number, total: number): (number | null)[] {
-  const near = [...new Set([0, total - 1, current - 1, current, current + 1])].filter((n) => n >= 0 && n < total).sort((a, b) => a - b);
-  const out: (number | null)[] = [];
-  near.forEach((n, i) => {
-    const prev = i ? near[i - 1] : -1;
-    if (n - prev === 2) out.push(prev + 1);
-    else if (n - prev > 2) out.push(null);
-    out.push(n);
-  });
-  return out;
-}
 /** The API's order for a sort ("Recommended" is its default, newest first). */
 const apiSort = (sort: Sort) => (sort === 'featured' ? undefined : sort);
 
@@ -598,29 +580,14 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
             </div>
             <div className={`${styles.sortSlot} ${loading ? styles.busy : ''}`} inert={loading}>
               {sorts.length > 1 && <SortSelect value={sort} onChange={chooseSort} options={sorts} />}
-              <div className={styles.viewToggle} role="group" aria-label="Results view">
-                {(['grid', 'list'] as const).map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    className={`${styles.viewBtn} ${display === v ? styles.viewOn : ''}`}
-                    aria-pressed={display === v}
-                    aria-label={v === 'grid' ? 'Grid view' : 'List view'}
-                    onClick={() => chooseView(v)}
-                  >
-                    {v === 'grid' ? <LuLayoutGrid aria-hidden /> : <LuList aria-hidden />}
-                  </button>
-                ))}
-              </div>
+              <ViewToggle value={display} onChange={chooseView} />
             </div>
           </div>
-          <div className={styles.found} role="status">
-            {loading || view.pending
-              ? 'Loading…'
-              : view.error
-                ? 'Could not update the results. Please try again.'
-                : `${totalFound} ${totalFound === 1 ? 'result' : 'results'} found`}
-          </div>
+          {view.error && !loading && !view.pending && (
+            <div className={styles.found} role="status">
+              Could not update the results. Please try again.
+            </div>
+          )}
         </div>
       )}
       <div className={`${styles.inner} ${view.pending ? styles.pending : ''}`} aria-busy={loading || view.pending}>
@@ -666,58 +633,19 @@ export default function TeamDirectory({ layout, filters, items: builtIn, widgetI
         {/* Pager (as the admin's): range, Previous / page numbers / Next, and the page size. Shown once the results
             are more than the smallest page. */}
         {!loading && totalFound > PAGE_SIZES[0] && (
-          <nav className={styles.pager} aria-label="Pages">
-            <span className={styles.pagerInfo} role="status">
-              {view.more ? 'Loading…' : `${pageIndex * pageSize + 1}–${pageIndex * pageSize + pageItems.length} of ${totalFound} results`}
-            </span>
-            <div className={styles.pagerPages}>
-              <button
-                type="button"
-                className={styles.pagerStep}
-                onClick={() => goTo(pageIndex - 1)}
-                disabled={pageIndex === 0 || view.more || view.pending}
-              >
-                <LuChevronLeft aria-hidden /> Previous
-              </button>
-              {pageNumbers(pageIndex, pageCount).map((n, i) =>
-                n === null ? (
-                  <span key={`gap${i}`} className={styles.pagerGap} aria-hidden>
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={n}
-                    type="button"
-                    className={`${styles.pagerNum} ${n === pageIndex ? styles.pagerOn : ''}`}
-                    aria-label={`Page ${n + 1}`}
-                    aria-current={n === pageIndex ? 'page' : undefined}
-                    onClick={() => goTo(n)}
-                    disabled={view.more || view.pending}
-                  >
-                    {n + 1}
-                  </button>
-                ),
-              )}
-              <button
-                type="button"
-                className={styles.pagerStep}
-                onClick={() => goTo(pageIndex + 1)}
-                disabled={pageIndex >= pageCount - 1 || view.more || view.pending}
-              >
-                Next <LuChevronRight aria-hidden />
-              </button>
-            </div>
-            <div className={styles.pagerSize}>
-              <span>Per page</span>
-              <PillSelect
-                value={pageSize}
-                options={PAGE_SIZES.map((n) => ({ value: n, label: String(n) }))}
-                onChange={choosePageSize}
-                label="Results per page"
-                placement="up"
-              />
-            </div>
-          </nav>
+          <Pager
+            className={styles.pager}
+            page={pageIndex}
+            pageCount={pageCount}
+            total={totalFound}
+            shown={pageItems.length}
+            pageSize={pageSize}
+            sizes={PAGE_SIZES}
+            loading={view.more}
+            disabled={view.pending}
+            onPage={goTo}
+            onPageSize={choosePageSize}
+          />
         )}
         {!loading && !view.pending && filtered.length === 0 && emptyShown && (
           <div className={styles.emptyWrap} role="status">

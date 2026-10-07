@@ -1,269 +1,326 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
-import { FaCheck, FaComments, FaLink } from 'react-icons/fa';
-import { ARTICLE_CATEGORIES, articlesEnabled, fetchArticles, toFilterPost } from '@/content/articles';
+import { FaComments } from 'react-icons/fa';
+import { LuSearch, LuVolleyball } from 'react-icons/lu';
+import FilterChip from '@/components/ui/FilterChip';
+import { AppliedPill } from '@/components/ui/FilterPopover';
+import Pager from '@/components/ui/Pager';
+import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
+import { ARTICLE_CATEGORIES, articleSearchPlaceholder, articlesEnabled, countArticles, fetchArticles, toFilterPost } from '@/content/articles';
 import type { FilterPost } from '@/content/types';
+import DirectorySearch, { useSharedSearch } from './DirectorySearch';
+import dir from './TeamDirectory.module.css';
 import styles from './PostFilter.module.css';
 
 type FilterCategory = { id: string; label: string; count: number };
 type Props = {
+  /** The original grid's category buttons (WordPress ids): only their names are used, to read old ?filter= links. */
   categories: FilterCategory[];
+  /** The original grid's cards: shown when the API can't be reached. */
   posts: FilterPost[];
-  /** The article category path the grid shows ("strategy-and-insights", "sports-updates/sports-tourism"): its live
-   *  articles are read from the API page by page (category and page), and the buttons become its
-   *  subcategories. */
+  /** The article category path the list shows ("strategy-and-insights", "sports-updates/sports-tourism"). */
   source?: string;
 };
 
-/** Cards per page: three rows of the three-column grid. */
-const PAGE_SIZE = 9;
+/** Cards per page (rows of three; 12 as on the experience directories), and the "Per page" choices. */
+const PAGE_SIZES = [12, 24, 48] as const;
+const VIEW_KEY = 'clp-articles-view';
 
-/** A category grid's buttons from the API's counts: All, then each subcategory (not Featured) that has articles. */
-function liveButtons(source: string, counts: Record<string, number>): FilterCategory[] {
-  const category = ARTICLE_CATEGORIES.find((c) => c.slug === source.split('/')[0]);
-  if (!category) return [];
-  const subs = category.subcategories
-    .filter((s) => !s.featured)
-    .map((s) => ({ id: `${category.slug}/${s.slug}`, label: s.name, count: counts[`${category.slug}/${s.slug}`] ?? 0 }))
-    .filter((s) => s.count > 0);
-  return [{ id: 'all', label: 'All', count: counts[category.slug] ?? 0 }, ...subs];
-}
-
-/** Page numbers to show: the first and last, the current one and its neighbours; null marks a gap ("…"). */
-const pageNumbers = (page: number, pages: number) => {
-  const shown = [...new Set([1, page - 1, page, page + 1, pages])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
-  return shown.flatMap((n, i) => (i > 0 && n - shown[i - 1] > 1 ? [null, n] : [n]));
-};
-
-/** Columns of the original's Bootstrap grid (col-lg-4 col-md-4 col-sm-6 col-xs-12). */
-const columnsFor = (width: number) => (width >= 992 ? 3 : width >= 768 ? 2 : 1);
-
-/** The page URL's `?filter=` value (the static HTML has none, so it renders "All" until hydrated). */
+/** The page URL's `?filter=` value (old links such as /product-reviews/?filter=195 pick that sport). */
 const subscribeNever = () => () => {};
 const urlFilter = () => new URLSearchParams(window.location.search).get('filter');
 const noFilter = () => null;
 
-type Result = { key: string; posts: FilterPost[]; pages: number };
+type Result = { key: string; posts: FilterPost[]; total: number; counts: Record<string, number> };
 
 /**
- * Category-filtered post grid (Blog Filter plugin): gold category buttons (the chosen one black, with a check),
- * and post cards laid out in columns, each card placed below the previous one in its column, newest
- * first and PAGE_SIZE a page (numbered pages under the grid; a new category starts at page 1).
- * With a `source`, the API does the work: each category and page is a request, and the buttons' counts are
- * the API's. The built-in cards show until the first answer (and are filtered in the page if the API can't be reached).
- * Grids of a single category have no buttons. A `?filter=<category id>` query picks the category (the
- * original site's numeric ids still work: they pick the live button of the same name).
+ * A category's articles, as the experience directories list their listings: a search bar (on the page heading's edge
+ * when the page puts it there, see BuilderPageView), a Sport filter (one sport at a time, when the category has sport
+ * subcategories), grid or list view, and the same pager. The API searches, filters, counts and
+ * pages them (newest first); a skeleton shows while the first page loads. If the API can't be reached, the
+ * original grid's cards show instead (searched and paged here) with an offer to try again.
  */
 export default function PostFilter({ categories: builtInCategories, posts: builtInPosts, source }: Props) {
   const live = Boolean(source && articlesEnabled);
-  const [counts, setCounts] = useState<Record<string, number> | null>(null);
-  // Grids of a single category stay without buttons.
-  const categories = live && counts && builtInCategories.length > 0 ? liveButtons(source!, counts) : builtInCategories;
-  /** A category id as this grid knows it (a built-in id becomes the live button of the same name), or null. */
-  const resolve = (id: string | null) => {
-    if (!id || categories.some((c) => c.id === id)) return id;
-    const label = builtInCategories.find((c) => c.id === id)?.label;
-    return categories.find((c) => c.label === label)?.id ?? null;
-  };
+  const topRef = useRef<HTMLDivElement>(null);
 
-  // Links such as /product-reviews/?filter=195 open with that category chosen (unknown ids keep "All").
+  // The Sport filter: the sports of the category's subcategories (a whole category only, not a subcategory's list).
+  const category = ARTICLE_CATEGORIES.find((c) => c.slug === source?.split('/')[0]);
+  const sportChoices = useMemo(
+    () => (source && !source.includes('/') ? (category?.subcategories.filter((s) => s.sport) ?? []).map((s) => ({ value: s.sport!, label: s.name })) : []),
+    [source, category],
+  );
+
+  // Old links (?filter=<WordPress id>) pick the sport of the button of that name.
   const linked = useSyncExternalStore(subscribeNever, urlFilter, noFilter);
-  const [chosen, setChosen] = useState<string | null>(null);
-  const category = resolve(chosen) ?? resolve(linked) ?? 'all';
-  // A new category starts at page 1.
-  const [page, setPage] = useState(1);
-  const chooseCategory = (id: string) => {
-    setChosen(id);
-    setPage(1);
+  const linkedLabel = builtInCategories.find((c) => c.id === linked)?.label;
+  const linkedSport = sportChoices.find((s) => s.label === linkedLabel)?.value;
+  const [chosenSports, setChosenSports] = useState<string[] | null>(null);
+  const sports = chosenSports ?? (linkedSport ? [linkedSport] : []);
+  // The search: the page's bar on the heading's edge when there is one, else this list's own.
+  const shared = useSharedSearch();
+  const [ownQ, setOwnQ] = useState('');
+  const q = shared ? shared.search.q : ownQ;
+  const setQ = (query: string) => (shared ? shared.setSearch({ q: query, loc: '' }) : setOwnQ(query));
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
+  const [openFilter, setOpenFilter] = useState(false);
+  // A new search or sport starts at page 1.
+  const applySports = (values: string[]) => {
+    setChosenSports(values);
+    setPage(0);
   };
-  const top = useRef<HTMLDivElement>(null);
+  const applySearch = (query: string) => {
+    setQ(query.trim().replace(/\s+/g, ' '));
+    setPage(0);
+  };
+  // The page's bar runs its searches here (back to page 1).
+  const searchLatest = useRef(applySearch);
+  useEffect(() => {
+    searchLatest.current = applySearch;
+  });
+  const register = shared?.register;
+  useEffect(() => register?.((next) => searchLatest.current(next.q)), [register]);
   const goTo = (n: number) => {
     setPage(n);
-    top.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const choosePageSize = (size: number) => {
+    setPageSize(size);
+    setPage(0);
   };
 
-  // Live: one page from the API. A built-in id not resolved yet (counts still loading) asks for the whole category.
-  const path = category === 'all' || !category.includes('/') ? source : category;
+  // Grid or list; the choice is remembered in this browser.
+  const [display, setDisplay] = useState<ResultsView>('grid');
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- read once after hydration (the export has no storage)
+      if (localStorage.getItem(VIEW_KEY) === 'list') setDisplay('list');
+    } catch {}
+  }, []);
+  const chooseView = (view: ResultsView) => {
+    setDisplay(view);
+    try {
+      localStorage.setItem(VIEW_KEY, view);
+    } catch {}
+  };
+
+  // The API's page for the current search, sports, page and page size.
   const [retry, setRetry] = useState(0);
-  const requestKey = `${path}|${page}|${retry}`;
+  const requestKey = JSON.stringify([source, sports, q, page, pageSize, retry]);
   const [result, setResult] = useState<Result | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   useEffect(() => {
-    if (!live || !path) return;
+    if (!live) return;
     let active = true;
-    fetchArticles({ category: path, page, limit: PAGE_SIZE, counts: counts ? undefined : 1 }).then(
+    fetchArticles({ category: source, sports, q: q || undefined, page: page + 1, limit: pageSize, counts: 1 }).then(
       (r) => {
         if (!active) return;
-        if (r.counts) setCounts(r.counts);
-        // Past the last page (articles removed meanwhile): the last page instead.
-        if (r.page > r.pages && r.total > 0) return setPage(r.pages);
-        setResult({ key: requestKey, posts: r.items.map(toFilterPost), pages: r.pages });
+        // Past the last page (articles removed meanwhile): the last page.
+        if (r.page > r.pages && r.total > 0) return setPage(r.pages - 1);
+        setResult({ key: requestKey, posts: r.items.map(toFilterPost), total: r.total, counts: r.counts ?? {} });
       },
       () => active && setFailedKey(requestKey),
     );
     return () => {
       active = false;
     };
-    // `counts` only decides whether to ask for them (until they come).
+    // requestKey stands for source, sports, q, page, pageSize and retry.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [live, path, page, requestKey]);
+  }, [live, requestKey]);
   const failed = failedKey === requestKey;
 
-  // Built-in cards (until the first answer, or when the API never answers): filtered and paged here.
-  const builtIn = useMemo(() => {
-    const matching = builtInPosts.filter(
-      (post) => category === 'all' || post.categories.includes(category),
+  // Without the API (or before it ever answered, when it failed): the original cards, searched and paged here.
+  const local = !live || (failed && !result);
+  /** The original cards matching the search and some sports (their buttons of the same names). */
+  const matchLocal = (chosen: string[]) => {
+    const words = q.toLowerCase().split(' ').filter(Boolean);
+    const ids = new Set(builtInCategories.filter((c) => sportChoices.some((s) => chosen.includes(s.value) && s.label === c.label)).map((c) => c.id));
+    return builtInPosts.filter(
+      (post) => (!chosen.length || post.categories.some((c) => ids.has(c))) && words.every((w) => `${post.title} ${post.excerpt}`.toLowerCase().includes(w)),
     );
-    const pages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
-    const at = Math.min(page, pages);
-    return { posts: matching.slice((at - 1) * PAGE_SIZE, at * PAGE_SIZE), pages };
-  }, [builtInPosts, category, page]);
-  // While another page loads (or after it failed), the last one shown stays.
-  const shown = live && result ? result : builtIn;
-  const loading = live && result !== null && result.key !== requestKey && !failed;
-  const posts = shown.posts;
-  const pages = shown.pages;
+  };
+  const localMatches = local ? matchLocal(sports) : [];
 
-  const [columns, setColumns] = useState(3);
-  const [heights, setHeights] = useState<Record<string, number>>({});
-  const cardRefs = useRef(new Map<string, HTMLDivElement>());
+  const loading = live && !result && !failed;
+  const pending = live && result !== null && result.key !== requestKey && !failed;
+  const total = local ? localMatches.length : (result?.total ?? 0);
+  const posts = local ? localMatches.slice(page * pageSize, (page + 1) * pageSize) : (result?.posts ?? []);
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const sportOptions = sportChoices
+    .map((s) => ({ ...s, count: local ? undefined : (result?.counts[s.value] ?? 0) }))
+    // Sports without articles are left out (unless chosen), as on the experience directories.
+    .filter((s) => s.count === undefined || s.count > 0 || sports.includes(s.value));
 
-  useEffect(() => {
-    const update = () => setColumns(columnsFor(window.innerWidth));
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  // Heights drive the column layout, so re-measure whenever cards resize (images loading, width changes).
-  useEffect(() => {
-    const observer = new ResizeObserver(() => {
-      const next: Record<string, number> = {};
-      cardRefs.current.forEach((el, id) => (next[id] = el.offsetHeight));
-      setHeights(next);
-    });
-    cardRefs.current.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [posts]);
-
-  const measured = posts.length > 0 && posts.every((p) => heights[p.id] !== undefined);
-  const positions = new Map<string, { x: number; y: number }>();
-  const columnHeights = Array(columns).fill(0);
-  posts.forEach((post, i) => {
-    const column = i % columns;
-    positions.set(post.id, { x: column, y: columnHeights[column] });
-    columnHeights[column] += heights[post.id] ?? 0;
-  });
+  // The cards have no column padding: --dir-col-gap 32px cancels the filter bar's indent (TeamDirectory lines it up
+  // with its cards' 32px padding), so the Sport pill starts at the cards' left edge.
+  const layout = { '--dir-width': '1200px', '--dir-col-gap': '32px' } as CSSProperties;
 
   return (
-    <div className={styles.main} ref={top}>
-      {categories.length > 0 && (
-        <>
-          <ul className={styles.filters}>
-            {categories.map((c) => (
-              <li key={c.id}>
-                <button type="button" className={`${styles.button} ${category === c.id ? styles.active : ''}`} aria-pressed={category === c.id} onClick={() => chooseCategory(c.id)}>
-                  <span>
-                    {c.label} ({c.count})
-                  </span>
-                  <FaCheck aria-hidden />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
+    <div ref={topRef} className={`${dir.directory} ${styles.directory}`} style={layout}>
+      {!shared && (
+        <div className={dir.searchSlot}>
+          <DirectorySearch
+            query={q}
+            location=""
+            withLocation={false}
+            label="Search articles"
+            placeholder={articleSearchPlaceholder(source)}
+            onSearch={(query) => applySearch(query)}
+          />
+        </div>
       )}
-      {/* Until the cards are measured they sit floated in rows (still hidden), so the grid keeps its height. */}
-      <div
-        className={`${styles.container} ${measured ? styles.measured : ''} ${loading ? styles.loading : ''}`}
-        style={{ height: measured ? Math.max(0, ...columnHeights) : undefined, '--bf-columns': columns } as CSSProperties}
-        aria-busy={loading}
-      >
-        {posts.map((post) => {
-          const position = positions.get(post.id);
-          return (
-            <div
-              key={post.id}
-              ref={(el) => {
-                if (el) cardRefs.current.set(post.id, el);
-                else cardRefs.current.delete(post.id);
-              }}
-              className={`${styles.item} ${measured && position ? styles.shown : ''}`}
-              style={measured && position ? { transform: `translate3d(calc(100% * ${position.x}), ${position.y}px, 0)` } : undefined}
-            >
-              <article className={styles.card}>
-                <div className={styles.thumbnail}>
-                  <div className={styles.date}>
-                    <div className={styles.day}>{post.day}</div>
-                    <div className={styles.month}>{post.month}</div>
-                  </div>
-                  <figure>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- the original 300px thumbnail, stretched as on the site */}
-                    <img src={post.image} alt={post.imageAlt} width={post.imageWidth} height={post.imageHeight} />
-                  </figure>
-                </div>
-                <div className={styles.content}>
-                  <a href={post.href}>
-                    <h2 className={styles.title}>{post.title}</h2>
-                  </a>
-                  <p className={styles.excerpt}>{post.excerpt}</p>
-                  <div className={styles.meta}>
-                    <FaComments aria-hidden /> {post.comments}
-                  </div>
-                  <div className={styles.readMore}>
-                    <a className={styles.button} href={post.href}>
-                      <span>Read More</span>
-                      <FaLink aria-hidden />
-                    </a>
-                  </div>
-                </div>
-              </article>
-            </div>
-          );
-        })}
-      </div>
-      {failed ? (
-        <p className={styles.empty} role="alert">
-          The articles couldn&apos;t be loaded.{' '}
-          <button type="button" className={styles.retry} onClick={() => setRetry((n) => n + 1)}>
-            Try again
-          </button>
-        </p>
-      ) : (
-        posts.length === 0 && !loading && <p className={styles.empty}>No articles found.</p>
-      )}
-      {pages > 1 ? (
-        <nav className={styles.pager} aria-label="Pages">
-          <button type="button" className={styles.pageLink} disabled={page === 1 || loading} onClick={() => goTo(page - 1)}>
-            Previous
-          </button>
-          {pageNumbers(page, pages).map((n, i) =>
-            n === null ? (
-              <span key={`gap${i}`} className={styles.pageGap}>
-                …
-              </span>
-            ) : (
+      <div className={dir.bar}>
+        <div className={dir.barRow}>
+          <div className={`${dir.filters} ${loading ? dir.busy : ''}`} inert={loading}>
+            {sportOptions.length > 0 && (
+              <FilterChip
+                name="Sport"
+                icon={<LuVolleyball />}
+                plural="sports"
+                single
+                options={sportOptions}
+                value={sports}
+                open={openFilter}
+                onOpenChange={setOpenFilter}
+                {...(local
+                  ? { resultsFor: (draft: string[]) => matchLocal(draft).length }
+                  : { countFor: (draft: string[]) => countArticles({ category: source, sports: draft, q: q || undefined }) })}
+                onApply={applySports}
+              />
+            )}
+            {q && <AppliedPill icon={<LuSearch />} label={`“${q}”`} onClear={() => applySearch('')} />}
+            {(q || sports.length > 0) && (
               <button
-                key={n}
                 type="button"
-                className={`${styles.pageLink} ${n === page ? styles.pageCurrent : ''}`}
-                aria-current={n === page ? 'page' : undefined}
-                disabled={loading && n !== page}
-                onClick={() => n !== page && goTo(n)}
+                className={dir.clearAll}
+                onClick={() => {
+                  setQ('');
+                  applySports([]);
+                }}
               >
-                {n}
+                Clear all
               </button>
-            ),
-          )}
-          <button type="button" className={styles.pageLink} disabled={page === pages || loading} onClick={() => goTo(page + 1)}>
-            Next
-          </button>
-        </nav>
-      ) : (
-        // The plugin's (empty) pagination bar keeps its 20px margins and 1px height below the grid.
-        <div className={styles.pagination} aria-hidden />
-      )}
+            )}
+          </div>
+          <div className={dir.sortSlot}>
+            <ViewToggle value={display} onChange={chooseView} />
+          </div>
+        </div>
+        {failed && (
+          <div className={dir.found} role="status">
+            The articles couldn&apos;t be loaded.{' '}
+            <button type="button" className={styles.retry} onClick={() => setRetry((n) => n + 1)}>
+              Try again
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className={`${styles.results} ${pending ? styles.pending : ''}`} aria-busy={loading || pending}>
+        {loading ? (
+          <div className={display === 'list' ? styles.list : styles.grid} aria-hidden>
+            {Array.from({ length: display === 'list' ? 3 : 6 }, (_, i) => (
+              <div key={i} className={`${styles.skeleton} ${display === 'list' ? styles.skeletonRow : styles.skeletonCard}`} />
+            ))}
+          </div>
+        ) : display === 'list' ? (
+          <div className={styles.list}>
+            {posts.map((post, i) => (
+              <ArticleRow key={post.id} post={post} eager={i < 3} />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {posts.map((post, i) => (
+              <ArticleCard key={post.id} post={post} eager={i < 3} />
+            ))}
+          </div>
+        )}
+        {!loading && !pending && posts.length === 0 && (
+          <div className={styles.emptyWrap} role="status">
+            <div className={styles.empty}>No Results Found</div>
+          </div>
+        )}
+        {!loading && total > PAGE_SIZES[0] && (
+          <Pager
+            page={page}
+            pageCount={pageCount}
+            total={total}
+            shown={posts.length}
+            pageSize={pageSize}
+            sizes={PAGE_SIZES}
+            loading={pending}
+            onPage={goTo}
+            onPageSize={choosePageSize}
+          />
+        )}
+      </div>
     </div>
+  );
+}
+
+/** The date badge on a card's photo ("07 / OCT"). */
+function DateBadge({ post }: { post: FilterPost }) {
+  return (
+    <span className={styles.date}>
+      <span className={styles.day}>{post.day}</span>
+      <span className={styles.month}>{post.month}</span>
+    </span>
+  );
+}
+
+/** Grid card: photo with the date, title, excerpt, comments and Read More. */
+function ArticleCard({ post, eager }: { post: FilterPost; eager: boolean }) {
+  return (
+    <article className={styles.card}>
+      <a href={post.href} className={styles.thumb} tabIndex={-1} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
+        {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}
+        <DateBadge post={post} />
+      </a>
+      <div className={styles.body}>
+        <h3 className={styles.title}>
+          <a href={post.href}>{post.title}</a>
+        </h3>
+        {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
+        <div className={styles.foot}>
+          <span className={styles.meta}>
+            <FaComments aria-hidden /> {post.comments}
+          </span>
+          <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
+            Read More
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** List row: photo on the left, then the same content. */
+function ArticleRow({ post, eager }: { post: FilterPost; eager: boolean }) {
+  return (
+    <article className={styles.row}>
+      <a href={post.href} className={styles.rowThumb} tabIndex={-1} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
+        {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}
+        <DateBadge post={post} />
+      </a>
+      <div className={styles.rowBody}>
+        <h3 className={styles.title}>
+          <a href={post.href}>{post.title}</a>
+        </h3>
+        {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
+        <div className={styles.foot}>
+          <span className={styles.meta}>
+            <FaComments aria-hidden /> {post.comments}
+          </span>
+          <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
+            Read More
+          </a>
+        </div>
+      </div>
+    </article>
   );
 }

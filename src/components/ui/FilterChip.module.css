@@ -247,6 +247,11 @@
   transition: box-shadow 0.15s ease;
 }
 
+/* One at a time: round buttons. */
+.single .box {
+  border-radius: 50%;
+}
+
 .option:hover .box {
   border-color: #111;
 }

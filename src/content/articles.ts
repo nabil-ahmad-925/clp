@@ -15,7 +15,8 @@ const API_URL = process.env.NEXT_PUBLIC_LISTINGS_API_URL?.replace(/\/$/, '');
 /** After this long a request gives up (the page keeps what it shows, or offers to try again). */
 const TIMEOUT_MS = 10_000;
 
-export type ArticleSubcategory = { slug: string; name: string; featured?: boolean; page?: string };
+/** `sport`: a sport subcategory's sport (the experience directories' sport filter value). */
+export type ArticleSubcategory = { slug: string; name: string; sport?: string; featured?: boolean; page?: string };
 /** `label`: the colours of the category's label on archive cards (the site's gold when none). */
 export type ArticleCategory = { slug: string; name: string; label?: { color: string; background: string }; page?: string; subcategories: ArticleSubcategory[] };
 
@@ -40,19 +41,37 @@ export type ArticlePageData = { item: Article; previous: ArticleSummary | null; 
 export const articlesEnabled = Boolean(API_URL);
 
 /**
- * One numbered page of a list (items newest first). `counts` (asked with counts: 1): the published articles of the
- * category's top category and of each of its subcategories, by path.
+ * One numbered page of a list (items newest first). `counts` (asked with counts: 1): the matches per sport with every
+ * other filter applied (the Sport filter's option counts).
  */
 export type ArticleList = { items: ArticleSummary[]; page: number; limit: number; total: number; pages: number; counts?: Record<string, number> };
 
 /** A page of published articles, newest first: of a category path, an author, matching search words, or all of them. */
-export async function fetchArticles(options: { category?: string; author?: string; q?: string; limit?: number; page?: number; counts?: 1 } = {}) {
-  if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
+export type ArticleQuery = { category?: string; author?: string; sports?: string[]; q?: string };
+
+/** The query string of a list request (sports comma-separated; empty values left out). */
+const listQuery = ({ sports, ...rest }: ArticleQuery & { limit?: number; page?: number; counts?: 1; count?: 1 }) => {
   const qs = new URLSearchParams();
-  for (const [k, v] of Object.entries(options)) if (v !== undefined && v !== '') qs.set(k, String(v));
+  for (const [k, v] of Object.entries(rest)) if (v !== undefined && v !== '') qs.set(k, String(v));
+  if (sports?.length) qs.set('sport', sports.join(','));
+  return qs;
+};
+
+export async function fetchArticles(options: ArticleQuery & { limit?: number; page?: number; counts?: 1 } = {}) {
+  if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
+  const qs = listQuery(options);
   const res = await fetch(`${API_URL}/articles?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`Articles: ${res.status}`);
   return (await res.json()) as ArticleList;
+}
+
+/** How many published articles match (the filter panel's "Show N results"). */
+export async function countArticles(query: ArticleQuery) {
+  if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
+  const qs = listQuery({ ...query, count: 1 as const });
+  const res = await fetch(`${API_URL}/articles?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`Articles: ${res.status}`);
+  return ((await res.json()) as { total: number }).total;
 }
 
 /** One published article with its page's links; null when there is none of that slug (deleted or unpublished). */
@@ -96,6 +115,14 @@ export const categoryLinks = (paths: string[]) =>
     .map(categoryLink)
     .filter((l): l is Link => l !== null);
 
+/** The search field's placeholder of an article list: "Search Strategy and Insights articles…". */
+export function articleSearchPlaceholder(source: string | undefined) {
+  const [top, sub] = source?.split('/') ?? [];
+  const category = ARTICLE_CATEGORIES.find((c) => c.slug === top);
+  const name = sub ? category?.subcategories.find((s) => s.slug === sub)?.name : category?.name;
+  return name ? `Search ${name} articles…` : 'Search articles…';
+}
+
 /** The category path of an archive address ("/category/a/b/" -> "a/b"), or null for other pages. */
 export const categoryOfArchive = (archivePath: string) => {
   const m = archivePath.match(/^\/category\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?\/$/);
@@ -132,8 +159,8 @@ export function toFilterPost(a: ArticleSummary): FilterPost {
     imageHeight: 169,
     title: a.title,
     href: a.path,
-    // The grid shows the start of the excerpt, as the original plugin did.
-    excerpt: a.excerpt.length > 95 ? `${a.excerpt.slice(0, 95).trimEnd()}...` : a.excerpt,
+    // The cards clip it to three lines.
+    excerpt: a.excerpt,
     comments: '0 Comments',
   };
 }

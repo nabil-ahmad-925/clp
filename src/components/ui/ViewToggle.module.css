@@ -1,0 +1,43 @@
+/* Grid / list switch (tenpo.com's "Results view" pill), black when on. */
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid #d6d3cc;
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.viewBtn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: #6b6b6b;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.viewBtn:hover {
+  color: #111;
+}
+
+.viewOn,
+.viewOn:hover {
+  background: #111;
+  color: var(--white);
+}
+
+.viewBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

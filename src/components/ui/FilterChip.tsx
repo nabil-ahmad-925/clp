@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { LuCheck } from 'react-icons/lu';
 import FilterPopover, { showLabel, useDraftCount, type DraftCount } from './FilterPopover';
 import styles from './FilterChip.module.css';
@@ -21,11 +21,13 @@ type Props = DraftCount & {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onApply: (values: string[]) => void;
+  /** One option at a time (round buttons): choosing another replaces it. */
+  single?: boolean;
 };
 
 /**
- * Filter pill with a checkbox panel (tenpo.com's Sport / When / Age chips): options are multi-select, each with
- * its result count; "Clear" empties the draft and "Show N results" applies it.
+ * Filter pill with a checkbox panel (tenpo.com's Sport / When / Age chips): options are multi-select (or one at a time
+ * with `single`), each with its result count; "Clear" empties the draft and "Show N results" applies it.
  */
 export default function FilterChip({
   name,
@@ -39,8 +41,10 @@ export default function FilterChip({
   resultsFor,
   countFor,
   onApply,
+  single = false,
 }: Props) {
   const [draft, setDraft] = useState(value);
+  const group = useId();
 
   // Each opening starts from the applied values.
   const [wasOpen, setWasOpen] = useState(open);
@@ -54,7 +58,7 @@ export default function FilterChip({
   const labels = new Map(options.map((o) => [o.value, o.label]));
   const applied = value.filter((v) => labels.has(v));
   const label = applied.length === 0 ? name : applied.length === 1 ? labels.get(applied[0])! : `${applied.length} ${plural ?? 'selected'}`;
-  const toggle = (v: string) => setDraft((d) => (d.includes(v) ? d.filter((x) => x !== v) : [...d, v]));
+  const toggle = (v: string) => setDraft((d) => (single ? [v] : d.includes(v) ? d.filter((x) => x !== v) : [...d, v]));
 
   return (
     <FilterPopover
@@ -73,8 +77,8 @@ export default function FilterChip({
     >
       <div className={styles.options}>
         {options.map((o) => (
-          <label key={o.value} className={styles.option}>
-            <input type="checkbox" checked={draft.includes(o.value)} onChange={() => toggle(o.value)} />
+          <label key={o.value} className={`${styles.option} ${single ? styles.single : ''}`}>
+            <input type={single ? 'radio' : 'checkbox'} name={single ? group : undefined} checked={draft.includes(o.value)} onChange={() => toggle(o.value)} />
             <span className={styles.box} aria-hidden>
               <LuCheck />
             </span>

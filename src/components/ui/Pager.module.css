@@ -1,0 +1,124 @@
+/* Pager under a list of cards (the experience directories and the article lists): "1–12 of 33 results", Previous / page numbers / Next, and the page size. */
+.pager {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin-top: 40px;
+  font-family: var(--font-host-grotesk), var(--font-body);
+}
+
+.pagerInfo {
+  color: #817b6a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pagerPages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pagerStep,
+.pagerNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  border: 1px solid #d6d3cc;
+  border-radius: 999px;
+  background: var(--white);
+  color: #111;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.pagerStep {
+  padding: 0 14px;
+}
+
+.pagerNum {
+  min-width: 36px;
+  padding: 0 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pagerStep:hover:not(:disabled),
+.pagerNum:hover:not(:disabled) {
+  border-color: #111;
+}
+
+.pagerOn,
+.pagerOn:hover:not(:disabled) {
+  border-color: #111;
+  background: #111;
+  color: var(--white);
+}
+
+.pagerStep:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagerNum:disabled:not(.pagerOn) {
+  cursor: default;
+}
+
+.pagerStep:focus-visible,
+.pagerNum:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pagerGap {
+  min-width: 20px;
+  color: #817b6a;
+  text-align: center;
+}
+
+.pagerSize {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: #817b6a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Narrow screens: page buttons first, range and page size on a row below. */
+@media (max-width: 899px) {
+  .pager {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .pagerPages {
+    grid-column: 1 / -1;
+    justify-content: center;
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagerStep {
+    padding: 0 10px;
+  }
+
+  .pagerStep svg + *,
+  .pagerStep {
+    font-size: 13px;
+  }
+}
