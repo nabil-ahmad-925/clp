@@ -236,6 +236,16 @@
   padding: 24px 28px;
 }
 
+.row .foot {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.row .foot .readMore {
+  align-self: auto;
+}
+
 @media (max-width: 767px) {
   .row {
     flex-direction: column;
