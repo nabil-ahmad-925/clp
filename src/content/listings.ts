@@ -95,9 +95,37 @@ type Listing = {
   tags: string[];
   priceMin?: number;
   priceMax?: number;
+  startDate?: string;
+  endDate?: string;
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
+
+/**
+ * The When filter's months. A dated listing is in a month when its days overlap it (the month's next one: from today in
+ * the current month, next year's when already past); a month-only listing (no dates) by its month tag. As the listings
+ * API works it out (days are US Eastern).
+ */
+const MONTH_TAGS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+/** The days of a month's next occurrence, or null when the value is no month. */
+function monthRange(value: string) {
+  const m = MONTH_TAGS.indexOf(value);
+  if (m < 0) return null;
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
+  const year = Number(today.slice(0, 4));
+  const current = Number(today.slice(5, 7)) - 1;
+  const y = m < current ? year + 1 : year;
+  return { from: m === current ? today : iso(new Date(Date.UTC(y, m, 1))), to: iso(new Date(Date.UTC(y, m + 1, 0))) };
+}
+
+/** Whether a card has a filter value: one of its tags, or (a month) one its dates fall in. */
+export function hasValue(item: { tags: string[]; startDate?: string; endDate?: string }, value: string) {
+  const month = item.startDate ? monthRange(value) : null;
+  if (!month) return item.tags.includes(value);
+  return item.startDate! <= month.to && (item.endDate ?? item.startDate!) >= month.from;
+}
 
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -119,6 +147,8 @@ const toItem = (l: Listing): AddedItem => ({
   tags: l.tags,
   priceMin: l.priceMin,
   priceMax: l.priceMax,
+  startDate: l.startDate,
+  endDate: l.endDate,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,

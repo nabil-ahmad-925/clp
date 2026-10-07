@@ -45,6 +45,10 @@ export type DirectoryItem = FacilityCard & {
   /** Its price in dollars (listings from the admin): the same in both for a single price, 0 for free. */
   priceMin?: number;
   priceMax?: number;
+  /** Its dates ("YYYY-MM-DD"; the same for one day; listings from the admin): the When filter's Today / This week / This
+   *  month find it, and its row shows them. */
+  startDate?: string;
+  endDate?: string;
 };
 
 /**

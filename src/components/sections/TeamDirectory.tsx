@@ -22,7 +22,7 @@ import Pager from '@/components/ui/Pager';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
 import SortSelect, { type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { addedOptions, countListings, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
+import { addedOptions, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
@@ -63,7 +63,7 @@ function found(item: DirectoryItem, { q, loc }: Search) {
 
 /** Cards matching every filter (within one filter any ticked value will do; an empty filter matches all) and the search. */
 const matching = (items: DirectoryItem[], chosen: string[][], search: Search = NO_SEARCH) =>
-  items.filter((item) => chosen.every((values) => values.length === 0 || values.some((v) => item.tags.includes(v))) && found(item, search));
+  items.filter((item) => chosen.every((values) => values.length === 0 || values.some((v) => hasValue(item, v))) && found(item, search));
 
 /** Filters shown with all their options whether or not listings use them yet (the others hide without results). */
 const ALWAYS_SHOWN = ['alldates'];
@@ -127,10 +127,21 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
   return {
     city: firstOf([...new Set(labelsOf((k) => LOCATION_KEYS.includes(k)))]),
     ages: firstOf(labelsOf((k) => k === 'age' || k === 'age-group')),
-    months: months.length > 3 ? `${months.slice(0, 3).join(', ')} +${months.length - 3}` : months.join(', ') || undefined,
+    // A dated listing shows its dates ("Oct 30 – Nov 2"), others their months.
+    months: item.startDate
+      ? dayRange(item.startDate, item.endDate ?? item.startDate)
+      : months.length > 3
+        ? `${months.slice(0, 3).join(', ')} +${months.length - 3}`
+        : months.join(', ') || undefined,
     price,
   };
 }
+
+/** "Oct 30", or "Oct 30 – Nov 2" for several days. */
+const dayRange = (start: string, end: string) => {
+  const short = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  return end === start ? short(start) : `${short(start)} – ${short(end)}`;
+};
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
@@ -213,12 +224,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   }, [widgetId]);
   const filters = useMemo(
     () =>
-      added.length
-        ? pageFilters.map((f) => {
-            const extra = added.filter((o) => o.key === f.key && !f.options.some((own) => own.value === o.value));
-            return extra.length ? { ...f, options: [...f.options, ...extra.map(({ value, label }) => ({ value, label }))] } : f;
-          })
-        : pageFilters,
+      pageFilters.map((f) => {
+        const extra = added.filter((o) => o.key === f.key && !f.options.some((own) => own.value === o.value)).map(({ value, label }) => ({ value, label }));
+        return extra.length ? { ...f, options: [...f.options, ...extra] } : f;
+      }),
     [pageFilters, added],
   );
   const enabled = listingsEnabled(widgetId);
@@ -465,7 +474,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     }
     if (mode === 'loading') return () => undefined;
     const others = matching(builtIn, withFilter(i, []), search);
-    return (v) => others.filter((item) => item.tags.includes(v)).length;
+    return (v) => others.filter((item) => hasValue(item, v)).length;
   };
   // Which filters and options the page offers is decided without the search: a search narrows the counts (shown in
   // the panels) but never hides a filter or an option. API pages keep the facets of their latest answer without a
@@ -481,7 +490,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     }
     if (mode === 'loading') return () => true;
     const others = matching(builtIn, withFilter(i, []), NO_SEARCH);
-    return (v) => others.some((item) => item.tags.includes(v));
+    return (v) => others.some((item) => hasValue(item, v));
   };
   /** "Show N results" of a draft: counted here over the built-in cards, or by the API (exact, with the search). */
   const counts = useRef(new Map<string, Promise<number>>());
