@@ -148,7 +148,8 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-rows: minmax(50vh, auto);
   gap: 30px;
-  padding-top: 15px;
+  /* The original's 15px item margins above and below the posts. */
+  padding: 15px 0;
 }
 
 .wide {
@@ -325,17 +326,25 @@
   text-align: center;
 }
 
+/* Under a carousel, the viewport's 50px room for the hover shadow is the original's 15px item margin and most of the
+   28px: the posts end 43px above the button either way. */
+.carousel + .viewAll {
+  margin-top: -7px;
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
-  padding: 10px 28px;
+  /* The original's link and its text both take the "category-link-btn" span padding (10px 28px): twice the room
+     before the label, 28px plus the 0.5em icon gap after it, 24px lines (44px tall). */
+  gap: calc(28px + 0.5em);
+  padding: 10px 28px 10px 56px;
   border-radius: 200px;
   background: var(--gold-strong);
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 20px;
-  line-height: 16px;
+  line-height: 24px;
   color: var(--white);
   transition: background-color 0.45s var(--ease-out);
 }

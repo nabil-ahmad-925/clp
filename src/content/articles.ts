@@ -46,6 +46,15 @@ export const articlesEnabled = Boolean(API_URL);
  */
 export type ArticleList = { items: ArticleSummary[]; page: number; limit: number; total: number; pages: number; counts?: Record<string, number> };
 
+/** The list orders: "Recommended" is newest first (the API's default, sent as no sort). */
+export const ARTICLE_SORTS = [
+  { value: 'recommended', label: 'Recommended' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'title-asc', label: 'Title: A to Z' },
+  { value: 'title-desc', label: 'Title: Z to A' },
+] as const;
+export type ArticleSort = (typeof ARTICLE_SORTS)[number]['value'];
+
 /** A page of published articles, newest first: of a category path, an author, matching search words, or all of them. */
 export type ArticleQuery = { category?: string; author?: string; sports?: string[]; q?: string };
 
@@ -57,9 +66,10 @@ const listQuery = ({ sports, ...rest }: ArticleQuery & { limit?: number; page?: 
   return qs;
 };
 
-export async function fetchArticles(options: ArticleQuery & { limit?: number; page?: number; counts?: 1 } = {}) {
+export async function fetchArticles({ sort, ...options }: ArticleQuery & { limit?: number; page?: number; counts?: 1; sort?: ArticleSort } = {}) {
   if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
   const qs = listQuery(options);
+  if (sort && sort !== 'recommended') qs.set('sort', sort);
   const res = await fetch(`${API_URL}/articles?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`Articles: ${res.status}`);
   return (await res.json()) as ArticleList;

@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { FaComments } from 'react-icons/fa';
-import { LuSearch, LuVolleyball } from 'react-icons/lu';
+import { LuArrowUpDown, LuSearch, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import Pager from '@/components/ui/Pager';
+import PillSelect from '@/components/ui/PillSelect';
 import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
-import { ARTICLE_CATEGORIES, articleSearchPlaceholder, articlesEnabled, countArticles, fetchArticles, toFilterPost } from '@/content/articles';
+import { ARTICLE_CATEGORIES, ARTICLE_SORTS, articleSearchPlaceholder, articlesEnabled, countArticles, fetchArticles, toFilterPost, type ArticleSort } from '@/content/articles';
 import type { FilterPost } from '@/content/types';
 import DirectorySearch, { useSharedSearch } from './DirectorySearch';
 import dir from './TeamDirectory.module.css';
@@ -66,7 +67,12 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
   const [openFilter, setOpenFilter] = useState(false);
-  // A new search or sport starts at page 1.
+  const [sort, setSort] = useState<ArticleSort>('recommended');
+  // A new search, sport or sort starts at page 1.
+  const chooseSort = (next: ArticleSort) => {
+    setSort(next);
+    setPage(0);
+  };
   const applySports = (values: string[]) => {
     setChosenSports(values);
     setPage(0);
@@ -108,13 +114,13 @@ export default function PostFilter({ categories: builtInCategories, posts: built
 
   // The API's page for the current search, sports, page and page size.
   const [retry, setRetry] = useState(0);
-  const requestKey = JSON.stringify([source, sports, q, page, pageSize, retry]);
+  const requestKey = JSON.stringify([source, sports, q, sort, page, pageSize, retry]);
   const [result, setResult] = useState<Result | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   useEffect(() => {
     if (!live) return;
     let active = true;
-    fetchArticles({ category: source, sports, q: q || undefined, page: page + 1, limit: pageSize, counts: 1 }).then(
+    fetchArticles({ category: source, sports, q: q || undefined, sort, page: page + 1, limit: pageSize, counts: 1 }).then(
       (r) => {
         if (!active) return;
         // Past the last page (articles removed meanwhile): the last page.
@@ -126,7 +132,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     return () => {
       active = false;
     };
-    // requestKey stands for source, sports, q, page, pageSize and retry.
+    // requestKey stands for source, sports, q, sort, page, pageSize and retry.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, requestKey]);
   const failed = failedKey === requestKey;
@@ -141,7 +147,14 @@ export default function PostFilter({ categories: builtInCategories, posts: built
       (post) => (!chosen.length || post.categories.some((c) => ids.has(c))) && words.every((w) => `${post.title} ${post.excerpt}`.toLowerCase().includes(w)),
     );
   };
-  const localMatches = local ? matchLocal(sports) : [];
+  /** The original cards (newest first) in the chosen order. */
+  const sortLocal = (list: FilterPost[]) => {
+    if (sort === 'oldest') return [...list].reverse();
+    if (sort === 'recommended') return list;
+    const byTitle = [...list].sort((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base', numeric: true }));
+    return sort === 'title-desc' ? byTitle.reverse() : byTitle;
+  };
+  const localMatches = local ? sortLocal(matchLocal(sports)) : [];
 
   const loading = live && !result && !failed;
   const pending = live && result !== null && result.key !== requestKey && !failed;
@@ -204,7 +217,8 @@ export default function PostFilter({ categories: builtInCategories, posts: built
               </button>
             )}
           </div>
-          <div className={dir.sortSlot}>
+          <div className={`${dir.sortSlot} ${loading ? dir.busy : ''}`} inert={loading}>
+            <PillSelect value={sort} options={ARTICLE_SORTS} onChange={chooseSort} label="Sort articles" icon={<LuArrowUpDown />} />
             <ViewToggle value={display} onChange={chooseView} />
           </div>
         </div>
