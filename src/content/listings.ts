@@ -161,6 +161,12 @@ const toItem = (l: Listing): AddedItem => ({
   socials: l.socials,
 });
 
+/** The directories' Sport filter (each sport page presets it to its sport). */
+export const SPORT_FILTER = 'extra-one';
+
+/** A directory widget's listing type (the site menu it is under), or undefined for widgets without listings. */
+export const listingTypeOf = (widgetId: number): ListingType | undefined => WIDGET_TYPES[widgetId];
+
 /** Whether a directory widget loads its cards from the listings API (the page shows a loader until it answers). */
 export const listingsEnabled = (widgetId: number | undefined): widgetId is number =>
   Boolean(API_URL) && widgetId != null && Object.hasOwn(WIDGET_TYPES, widgetId);

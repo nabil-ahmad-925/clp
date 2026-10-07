@@ -57,6 +57,9 @@ export type DirectoryItem = FacilityCard & {
  */
 export type DirectoryFilter = { key?: string; label: string; options: { value: string; label: string }[]; preset?: string; hidden?: boolean };
 
+/** A directory's page for one sport (its Sport filter's `value`). */
+export type DirectorySportPage = { value: string; path: string };
+
 /** Grid settings of a directory widget (the plugin's per-widget CSS variables). */
 export type DirectoryLayout = {
   width?: string;
