@@ -200,9 +200,32 @@
     padding-bottom: 15px;
   }
 
+  /* As the original below 1000px, a set height gives way to the content, padded by 10% of the width (the directory
+     pages keep theirs: the search bar sits on their edge). */
+  .fixed:not(.compact) {
+    min-height: 0;
+    padding: 10% 0;
+  }
+
+  /* The original's last line's bottom margin merges into the column's margin below it. */
+  .fixed:not(.compact) .inner > :last-child {
+    margin-bottom: 0;
+  }
+
   .title {
     font-size: 70px;
     line-height: 75px;
+  }
+}
+
+/* Tablets: the title's column has 25px below it. */
+@media (min-width: 691px) and (max-width: 999px) {
+  .fixed:not(.compact) .inner {
+    padding-bottom: 25px;
+  }
+
+  .subtitleSmall {
+    line-height: 40px;
   }
 }
 
@@ -235,6 +258,10 @@
   .subtitle {
     line-height: 48px;
   }
+
+  .subtitleSmall {
+    line-height: 28.8px;
+  }
 }
 
 /* Directory pages (the inner "… Nearby" pages, with the search bar on the heading's edge): a smaller title. The
@@ -253,6 +280,7 @@
 @media (max-width: 690px) {
   .compact .title {
     font-size: 30px;
+    line-height: 40px;
   }
 }
 
