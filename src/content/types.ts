@@ -45,10 +45,13 @@ export type DirectoryItem = FacilityCard & {
   /** Its price in dollars (listings from the admin): the same in both for a single price, 0 for free. */
   priceMin?: number;
   priceMax?: number;
-  /** Its dates ("YYYY-MM-DD"; the same for one day; listings from the admin): the When filter's Today / This week / This
-   *  month find it, and its row shows them. */
+  /** Its dates ("YYYY-MM-DD"; the same for one day; listings from the admin): the Date filter's months find it, and its
+   *  row shows them. */
   startDate?: string;
   endDate?: string;
+  /** Its times ("HH:MM", 24-hour; with its dates): the Available time filter finds it by the start, and its row shows them. */
+  startTime?: string;
+  endTime?: string;
 };
 
 /**
@@ -56,9 +59,6 @@ export type DirectoryItem = FacilityCard & {
  * sport); `hidden` filters still apply but are not shown (the page hides that menu after selecting it).
  */
 export type DirectoryFilter = { key?: string; label: string; options: { value: string; label: string }[]; preset?: string; hidden?: boolean };
-
-/** A directory's page for one sport (its Sport filter's `value`). */
-export type DirectorySportPage = { value: string; path: string };
 
 /** Grid settings of a directory widget (the plugin's per-widget CSS variables). */
 export type DirectoryLayout = {
@@ -119,6 +119,10 @@ export type FilterPost = {
   href: string;
   excerpt: string;
   comments: string;
+  /** "5 min read" (live articles). */
+  readingTime?: string;
+  /** The cities it is about, as shown ("Boston, Miami"; live articles). */
+  location?: string;
 };
 
 /** A field of an inquiry form (Contact Form 7); every field is required. */
@@ -257,6 +261,8 @@ export type PostSectionData = {
   spacing: { top: number; bottom: number };
   posts: Post[];
   viewAll: Cta;
+  /** Masonry: the side posts' photos smaller, centred on the wide one's height. */
+  smallSides?: boolean;
 };
 
 export type ServicePage = {
@@ -321,8 +327,11 @@ export type BlogPost = {
     title: string;
     image?: string;
     categories: Link[];
-    author: { name: string; href: string };
+    /** `href`: the author's archive (none for a partner). */
+    author: { name: string; href?: string };
     date: string;
+    /** The cities it is about, as shown ("Boston, Miami"; live articles). */
+    location?: string;
     comments: { label: string; href: string };
     readingTime: string;
   };

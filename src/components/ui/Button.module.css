@@ -9,6 +9,8 @@
   font-family: var(--font-heading);
   font-weight: 700;
   line-height: 20px;
+  /* As the original's buttons (Salient: uppercase, 1px apart). */
+  letter-spacing: 1px;
   text-transform: uppercase;
   text-align: center;
   transition:

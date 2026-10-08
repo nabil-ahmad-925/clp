@@ -7,6 +7,8 @@
 .testimonialsHeading h2 {
   max-width: 610px;
   margin: 0 auto;
+  /* As the original's headings (Salient: letter-spacing -1px). */
+  letter-spacing: -1px;
   padding-bottom: 5%;
   font-size: 50px;
   line-height: 60px;
@@ -15,6 +17,15 @@
 
 .testimonials {
   background: var(--white);
+}
+
+/* The service rows: their titles 1px tighter, as the original's headings. */
+.services {
+  display: contents;
+}
+
+.services h2 {
+  letter-spacing: -1px;
 }
 
 @media (min-width: 1000px) and (max-width: 1299px) {

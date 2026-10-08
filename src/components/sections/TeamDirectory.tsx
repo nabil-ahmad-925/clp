@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   LuAccessibility,
   LuBriefcase,
   LuCalendar,
   LuChartNoAxesColumn,
+  LuCalendarClock,
+  LuClock,
   LuDollarSign,
   LuHandshake,
   LuHeartPulse,
@@ -23,8 +24,9 @@ import Pager from '@/components/ui/Pager';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
 import SortSelect, { type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { SPORT_FILTER, addedOptions, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
-import type { DirectoryFilter, DirectoryItem, DirectoryLayout, DirectorySportPage } from '@/content/types';
+import { SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
+import { mainNav } from '@/content/site';
+import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
@@ -39,8 +41,6 @@ type Props = {
   paging?: { first: number; more: number };
   /** The directory widget; served by the listings API, its cards and filtering come from there (see below). */
   widgetId?: number;
-  /** A Resources directory's page per sport: its Sport chip (one sport) goes to the chosen sport's page. */
-  sportPages?: DirectorySportPage[];
 };
 
 /** A card's tags as the API's location search reads them (see clp-api placeTextOf): "new-york" -> "newyork", "new york". */
@@ -68,11 +68,16 @@ function found(item: DirectoryItem, { q, loc }: Search) {
 const matching = (items: DirectoryItem[], chosen: string[][], search: Search = NO_SEARCH) =>
   items.filter((item) => chosen.every((values) => values.length === 0 || values.some((v) => hasValue(item, v))) && found(item, search));
 
-/** Filters shown with all their options whether or not listings use them yet (the others hide without results). */
-const ALWAYS_SHOWN = ['alldates'];
+/** The Resources menu's sports ("For Basketball" -> "Basketball"): the ones a Resources page's Sport filter offers. */
+const RESOURCE_SPORTS = new Set((mainNav.find((n) => n.href === '/resources/')?.children ?? []).map((c) => c.label.replace(/^For /, '')));
 
-/** Filters whose options are places: the search bar's "Location" takes their place, so they get no pill. */
+/** Filters shown with all their options whether or not listings use them yet (the others hide without results). */
+const ALWAYS_SHOWN = ['alldates', START_TIME_FILTER.key, 'availability'];
+
+/** Filters whose options are places: the search bar's "Location" suggests them. */
 const LOCATION_KEYS = ['language', 'city', 'destinations'];
+/** Place filters with no pill of their own (the Location field is theirs); Destination keeps its pill too. */
+const NO_PILL_KEYS = ['language', 'city'];
 
 /**
  * Chip names and icons by filter key (the plugin's own labels are inconsistent: "ALL AGE", "cost", "Date"…), with
@@ -81,7 +86,8 @@ const LOCATION_KEYS = ['language', 'city', 'destinations'];
 type Chip = { name: string; icon: ReactNode; heading?: string; plural?: string };
 const CHIPS: Record<string, Chip> = {
   'extra-one': { name: 'Sport', icon: <LuVolleyball />, plural: 'sports' },
-  alldates: { name: 'When', icon: <LuCalendar />, plural: 'months' },
+  alldates: { name: 'Date', icon: <LuCalendar />, plural: 'months' },
+  starttime: { name: 'Available time', icon: <LuClock />, plural: 'times' },
   age: { name: 'Age', icon: <LuUsers />, heading: 'Age group', plural: 'groups' },
   'age-group': { name: 'Age', icon: <LuUsers />, heading: 'Age group', plural: 'groups' },
   'extra-five': { name: 'Price', icon: <LuDollarSign /> },
@@ -92,13 +98,17 @@ const CHIPS: Record<string, Chip> = {
   specialty: { name: 'Skill Level', icon: <LuChartNoAxesColumn />, plural: 'levels' },
   'extra-two': { name: 'Accessibility', icon: <LuAccessibility />, plural: 'selected' },
   'extra-three': { name: 'Partner', icon: <LuHandshake />, plural: 'partners' },
-  'extra-four': { name: 'Performance/Rehab', icon: <LuHeartPulse />, plural: 'services' },
+  'extra-four': { name: 'Resource Type', icon: <LuHeartPulse />, plural: 'types' },
+  // The Resources directories' level filter (its options: Academies/Clubs, High School, Pro Athletes/Teams…).
+  experiences: { name: 'Skill Level', icon: <LuChartNoAxesColumn />, plural: 'levels' },
+  availability: { name: 'Availability', icon: <LuCalendarClock />, plural: 'options' },
   service: { name: 'Service', icon: <LuBriefcase />, plural: 'services' },
 };
 
 const chipFor = (filter: DirectoryFilter): Chip => {
+  if (filter.key === START_TIME_FILTER.key) return { ...CHIPS.starttime, name: filter.label };
   if (filter.key && CHIPS[filter.key]) return CHIPS[filter.key];
-  if (filter.key?.startsWith('experience')) return { name: 'Experience', icon: <LuSparkles />, plural: 'experiences' };
+  if (filter.key?.startsWith('experience')) return { name: 'Experience Type', icon: <LuSparkles />, plural: 'experience types' };
   const name = filter.label.replace(/^all\s+/i, '').toLowerCase();
   return { name: name.replace(/\b\w/g, (c) => c.toUpperCase()), icon: <LuSparkles /> };
 };
@@ -130,9 +140,9 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
   return {
     city: firstOf([...new Set(labelsOf((k) => LOCATION_KEYS.includes(k)))]),
     ages: firstOf(labelsOf((k) => k === 'age' || k === 'age-group')),
-    // A dated listing shows its dates ("Oct 30 – Nov 2"), others their months.
+    // A dated listing shows its dates ("Oct 30 – Nov 2", with its times: "Oct 30, 9:30 AM – 11 AM"), others their months.
     months: item.startDate
-      ? dayRange(item.startDate, item.endDate ?? item.startDate)
+      ? [dayRange(item.startDate, item.endDate ?? item.startDate), timeRange(item.startTime, item.endTime)].filter(Boolean).join(', ')
       : months.length > 3
         ? `${months.slice(0, 3).join(', ')} +${months.length - 3}`
         : months.join(', ') || undefined,
@@ -144,6 +154,16 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
 const dayRange = (start: string, end: string) => {
   const short = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
   return end === start ? short(start) : `${short(start)} – ${short(end)}`;
+};
+
+/** "9:30 AM", "9:30 AM – 11 AM", or undefined (no start time). */
+const timeRange = (start?: string, end?: string) => {
+  if (!start) return undefined;
+  const clock = (t: string) => {
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'AM' : 'PM'}`;
+  };
+  return end ? `${clock(start)} – ${clock(end)}` : clock(start);
 };
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -202,7 +222,7 @@ type View = {
  * Filterable directory of partners (the team plugin's "filter" display): pill filters with checkbox panels above
  * a four-column card grid; a card shows only when it matches every filter. Cards open the full-screen bio.
  * Filters start on their `preset` option (the sport of the page); `hidden` ones apply without being shown. On Resources
- * directories (`sportPages`) the Sport chip shows the page's sport and goes to another sport's page.
+ * directories the Sport chip is a filter of the page whose default (nothing picked) is the route's sport.
  *
  * Widgets served by the listings API load their cards from it (a skeleton shows meanwhile); a filter is sent to the
  * API only when its "Show results" is pressed, and the answer brings the first page of results, their total and the
@@ -211,8 +231,7 @@ type View = {
  * When the API has no listings for the page, fails or is slow, the page falls back to its built-in cards, filtered
  * (and paged) in the browser.
  */
-export default function TeamDirectory({ layout, filters: pageFilters, items: builtIn, widgetId, sportPages }: Props) {
-  const router = useRouter();
+export default function TeamDirectory({ layout, filters: pageFilters, items: builtIn, widgetId }: Props) {
   // Options added in the admin (e.g. a new Service) join their filter after the page's own options; filters themselves
   // (and so the API's filter groups) stay as the page has them.
   const [added, setAdded] = useState<AddedOption[]>([]);
@@ -227,17 +246,23 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       active = false;
     };
   }, [widgetId]);
+  // A directory with a Date filter also has the Available time filter (last, so the page's own filters keep their places in
+  // the API's filter groups).
   const filters = useMemo(
-    () =>
-      pageFilters.map((f) => {
+    () => [
+      ...pageFilters.map((f) => {
         const extra = added.filter((o) => o.key === f.key && !f.options.some((own) => own.value === o.value)).map(({ value, label }) => ({ value, label }));
         return extra.length ? { ...f, options: [...f.options, ...extra] } : f;
       }),
-    [pageFilters, added],
+      ...(pageFilters.some((f) => f.key === 'alldates') ? [startTimeFilterFor(widgetId)] : []),
+    ],
+    [pageFilters, added, widgetId],
   );
   const enabled = listingsEnabled(widgetId);
   const presets = filters.map((f) => (f.preset ? [f.preset] : []));
   // The empty-valued option is the plugin's "All …" choice; as on tenpo.com, the panel's "Clear" does that instead.
+  // The Sport chip of a Resources directory: a filter of the page (see sportPicked below), its preset the route's sport.
+  const routeSport = (f: DirectoryFilter) => widgetId != null && listingTypeOf(widgetId) === 'resources' && f.key === SPORT_FILTER && Boolean(f.preset);
   const menus = filters
     .map((filter, i) => ({
       filter,
@@ -251,11 +276,9 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     () => new Map(filters.flatMap((f) => priceBuckets(f.options.filter((o) => o.value)) ?? []).map((b) => [b.value, b] as const)),
     [filters],
   );
-  // The Sport chip of a Resources directory: the page's sport, switched by going to that sport's page.
-  const switchesPage = (f: DirectoryFilter) => Boolean(sportPages?.length && f.key === SPORT_FILTER && f.preset);
   // API data covers the page's own preset (its sport) only, so there that menu stays on it: applied, not shown. A Sport
   // chip that switches pages has the API's counts of every sport (each the listings of that sport's page).
-  const facetGroups = menus.filter(({ filter }) => !filter.preset || switchesPage(filter)).map(({ i }) => i);
+  const facetGroups = menus.filter(({ filter }) => !filter.preset || routeSport(filter)).map(({ i }) => i);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [sort, setSort] = useState<Sort>('featured');
 
@@ -403,6 +426,85 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       () => request === latest.current && setView((v) => ({ ...v, pending: false, error: true })),
     );
   };
+  // Resources' Sport. Which sports have listings in the API for this category (whatever the filters; loaded once): such
+  // a sport shows those, any other its built-in cards (every sport's are on the page). Counts follow the same rule.
+  const sportIndex = filters.findIndex(routeSport);
+  const [apiSports, setApiSports] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    if (sportIndex < 0 || !enabled || widgetId == null) return;
+    let live = true;
+    queryListings(widgetId, [], [sportIndex], 1).then(
+      (r) => live && setApiSports(r.facets[sportIndex]?.counts ?? {}),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [sportIndex, enabled, widgetId]);
+  // The API's count of each sport with the other filters and the search (a page showing built-in cards asks for them;
+  // one showing API listings has them in its facets).
+  const sportsKey = JSON.stringify({ g: chosen.map((v, j) => (j === sportIndex ? [] : v)), q: search.q, loc: search.loc });
+  const [apiSportsNow, setApiSportsNow] = useState<{ key: string; counts: Record<string, number> } | null>(null);
+  useEffect(() => {
+    if (sportIndex < 0 || !enabled || widgetId == null || mode !== 'local') return;
+    let live = true;
+    const { g, q, loc } = JSON.parse(sportsKey) as { g: string[][]; q: string; loc: string };
+    queryListings(widgetId, g, [sportIndex], 1, { q, loc }).then(
+      (r) => live && setApiSportsNow({ key: sportsKey, counts: r.facets[sportIndex]?.counts ?? {} }),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [sportIndex, enabled, widgetId, mode, sportsKey]);
+  const inApi = (sport: string) => (apiSports?.[sport] ?? 0) > 0;
+  /** What a sport would show (its API listings, or its built-in cards), with the other filters and the search. */
+  const sportCount = (sport: string): number | undefined => {
+    if (inApi(sport)) {
+      const counts = mode === 'api' ? result?.facets[sportIndex]?.counts : apiSportsNow?.key === sportsKey ? apiSportsNow.counts : undefined;
+      return counts ? (counts[sport] ?? 0) : undefined;
+    }
+    if (enabled && !apiSports) return undefined;
+    return matching(builtIn, withFilter(sportIndex, [sport]), search).length;
+  };
+
+  /**
+   * Resources' Sport (picked or cleared): that sport's listings as on a first load: the API's when the category has some
+   * of that sport (with the other filters and the search applied), else that sport's built-in cards (every sport's are
+   * on the page).
+   */
+  const applySport = (next: string[][], nextSearch = search) => {
+    setChosen(next);
+    if (widgetId == null || !enabled) {
+      showCount(matching(builtIn, next, nextSearch).length);
+      return;
+    }
+    const si = filters.findIndex(routeSport);
+    const request = ++latest.current;
+    setView((v) => ({ ...v, pending: true, error: false }));
+    (apiSports ? Promise.resolve(next[si].some(inApi) ? 1 : 0) : countListings(widgetId, next.map((v, j) => (j === si ? v : []))))
+      .then(async (available) => {
+        if (available === 0) return null;
+        return queryListings(widgetId, next, facetGroups, pageSize, { ...nextSearch, sort: apiSort(sort) });
+      })
+      .then(
+        (r) => {
+          if (request !== latest.current) return;
+          showCount(r ? r.total : matching(builtIn, next, nextSearch).length);
+          setView((v) => ({
+            ...v,
+            mode: r ? 'api' : 'local',
+            result: r,
+            resultKey: JSON.stringify({ g: next, ...nextSearch, sort, size: pageSize } satisfies ResultKey),
+            pending: false,
+            more: false,
+            pages: r ? [r.items] : [],
+            cursors: r ? [null, r.nextCursor] : [],
+          }));
+        },
+        () => request === latest.current && setView((v) => ({ ...v, pending: false, error: true })),
+      );
+  };
   // Page changes bring the top of the directory (its filter bar) back into view.
   const topRef = useRef<HTMLDivElement>(null);
   const toTop = () => topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -465,12 +567,14 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   const register = shared?.register;
   useEffect(() => register?.((next) => runLatest.current(next)), [register]);
   // Preset menus (the sport) show only on the built-in cards; with API data (or while loading) they stay locked.
-  const locked = (f: DirectoryFilter) => Boolean(f.hidden || (mode !== 'local' && f.preset && !switchesPage(f)));
-  // Places are searched from the bar's "Location", so their filters get no pill.
-  const shown = menus.filter(({ filter }) => !locked(filter) && !LOCATION_KEYS.includes(filter.key ?? ''));
-  // The page's own sport (a Sport chip that switches pages) is no choice to clear.
-  const kept = (f: DirectoryFilter) => locked(f) || switchesPage(f);
-  const anyChosen = shown.some(({ filter, i }) => !kept(filter) && chosen[i].length > 0) || Boolean(search.q || search.loc);
+  const locked = (f: DirectoryFilter) => Boolean(f.hidden || (mode !== 'local' && f.preset && !routeSport(f)));
+  // Cities are searched from the bar's "Location", so they get no pill (Destination has both).
+  const shown = menus.filter(({ filter }) => !locked(filter) && !NO_PILL_KEYS.includes(filter.key ?? ''));
+  // Resources: until a sport is picked in the Sport chip the results are the route's sport (its preset, applied) and the
+  // chip shows none; a picked sport filters this page like any filter, and clearing it goes back to the route's sport.
+  const [sportPicked, setSportPicked] = useState(false);
+  const kept = (f: DirectoryFilter) => locked(f) || routeSport(f);
+  const anyChosen = shown.some(({ filter, i }) => !kept(filter) && chosen[i].length > 0) || sportPicked || Boolean(search.q || search.loc);
   const loading = mode === 'loading';
 
   /**
@@ -526,25 +630,20 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     .map((menu) => {
       const of = chipCounts(menu.i);
       const has = offered(menu.i);
-      // "When" always shows on the directories that have it (Advancement & Workshops, Branded Activations,
-      // Camps/Tournaments, Groups/Private Lessons, Trips/Retreats), with every month, even before listings have dates.
-      const always = ALWAYS_SHOWN.includes(menu.filter.key ?? '');
-      // A Sport chip that switches pages offers every sport with a page; its counts are the API's (the built-in cards
-      // are this sport's only, so they count no other).
-      if (switchesPage(menu.filter)) {
-        const options = menu.options
-          .filter((o) => sportPages!.some((p) => p.value === o.value))
-          .map((o) => ({ ...o, count: mode === 'api' ? of(o.value) : undefined }));
-        return { ...menu, of, options };
-      }
+      // Date and Available time always show on the directories that have them (Advancement & Workshops, Branded
+      // Activations, Camps & Tournaments, Groups & Private Lessons, Leagues & Social Clubs, Trips & Retreats, the
+      // facilities), and Availability on the Resources ones, with every option, even before listings have them.
+      // Resources' Sport offers every sport of the Resources menu, each counted as it would show (see sportCount).
+      const always = ALWAYS_SHOWN.includes(menu.filter.key ?? '') || routeSport(menu.filter);
       const options = menu.options
+        .filter((o) => !routeSport(menu.filter) || RESOURCE_SPORTS.has(o.label))
         .filter((o) => always || has(o.value) || chosen[menu.i].includes(o.value))
-        .map((o) => ({ ...o, count: of(o.value) }));
+        .map((o) => ({ ...o, count: routeSport(menu.filter) ? sportCount(o.value) : of(o.value) }));
       return { ...menu, of, options };
     })
     .filter(({ options }) => options.length > 0)
-    // The Sport chip that switches pages comes first.
-    .sort((a, b) => Number(switchesPage(b.filter)) - Number(switchesPage(a.filter)));
+    // The chips A to Z by name.
+    .sort((a, b) => chipFor(a.filter).name.localeCompare(chipFor(b.filter).name));
   // The location field's suggestions: the places of the page's city/destination filters that have results, with their
   // counts (the API's facets, else the built-in cards). Not while an API page loads (no counts yet). The list is the
   // one without a location applied, so a chosen place still offers the others.
@@ -607,13 +706,33 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                   ...draftCount(i),
                   onApply: (values: string[]) => apply(withFilter(i, values)),
                 };
-                // Another sport: that sport's page of this directory (cleared: the page's sport stays).
-                if (switchesPage(filter)) {
-                  const goToSport = (values: string[]) => {
-                    const target = sportPages!.find((p) => p.value === values[0] && p.value !== filter.preset);
-                    if (target) router.push(target.path);
-                  };
-                  return <FilterChip key={key} {...common} {...(mode === 'api' ? {} : { resultsFor: () => null })} heading={heading} options={options} single onApply={goToSport} />;
+                // Resources' Sport: a picked sport shows that sport's listings of this category (no page change);
+                // none (cleared) is the route's sport again.
+                if (routeSport(filter)) {
+                  const asApplied = (values: string[]) => (values.length ? values : [filter.preset!]);
+                  return (
+                    <FilterChip
+                      key={key}
+                      {...common}
+                      {...(enabled && widgetId != null
+                        ? {
+                            countFor: (draft: string[]) => {
+                              const groups = withFilter(i, asApplied(draft));
+                              return asApplied(draft).some(inApi) ? countListings(widgetId, groups, search) : Promise.resolve(matching(builtIn, groups, search).length);
+                            },
+                          }
+                        : { resultsFor: (draft: string[]) => matching(builtIn, withFilter(i, asApplied(draft)), search).length })}
+                      value={sportPicked ? chosen[i] : []}
+                      single
+                      heading={heading}
+                      plural={plural}
+                      options={options}
+                      onApply={(values) => {
+                        setSportPicked(values.length > 0);
+                        applySport(withFilter(i, asApplied(values)));
+                      }}
+                    />
+                  );
                 }
                 return buckets ? (
                   <PriceChip key={key} {...common} heading={heading} buckets={buckets} counts={of} />
@@ -629,10 +748,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                   className={styles.clearAll}
                   onClick={() => {
                     setSearch(NO_SEARCH);
-                    apply(
-                      chosen.map((v, j) => (kept(filters[j]) ? v : [])),
-                      NO_SEARCH,
-                    );
+                    const cleared = chosen.map((v, j) => (routeSport(filters[j]) ? [filters[j].preset!] : kept(filters[j]) ? v : []));
+                    if (sportPicked) applySport(cleared, NO_SEARCH);
+                    else apply(cleared, NO_SEARCH);
+                    setSportPicked(false);
                   }}
                 >
                   Clear all

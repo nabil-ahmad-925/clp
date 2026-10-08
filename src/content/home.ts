@@ -36,37 +36,37 @@ export const trustedBy = {
 
 export const homeServices: FeatureRowData[] = [
   {
-    title: 'BRAND/PRODUCT DEVELOPMENT',
+    title: 'BRAND & PRODUCT DEVELOPMENT',
     text: 'Build a brand that stands out. From identity design to co-branded merchandise, we help athletes, creators, and organizations craft solutions that connect.',
     image: upload('/2024/03/CLP-Photos-Brand-Product-Development.png'),
     cta: { label: 'Learn More', href: '/brand-product-development/' },
   },
   {
-    title: 'CONTENT CREATION/LICENSING',
+    title: 'CONTENT CREATION & LICENSING',
     text: 'Tell your story. We create and license content that captures attention, builds connection, and elevates your presence.',
     image: upload('/2024/03/CLP-Photos-Content-Creation.png'),
     cta: { label: 'Learn More', href: '/content-creation-licensing/' },
   },
   {
-    title: 'EVENT/PROJECT MANAGEMENT',
+    title: 'EVENT & PROJECT MANAGEMENT',
     text: 'Flawless execution. From concept to completion, we plan and manage events and projects that deliver results and leave an impression.',
     image: upload('/2024/03/CLP-Photos-Event-Management.png'),
     cta: { label: 'Learn More', href: '/event-project-management/' },
   },
   {
-    title: 'FUNDRAISING/RETAILING',
+    title: 'FUNDRAISING & RETAILING',
     text: 'Mobilize support. Our fundraising and retail solutions help organizations raise resources and drive revenue—efficiently and at scale.',
     image: upload('/2024/03/CLP-Photos-Fundrasing-Campaigns.png'),
     cta: { label: 'Learn More', href: '/fundraising-retailing/' },
   },
   {
-    title: 'NUTRITION/PERFORMANCE PROGRAMMING',
+    title: 'NUTRITION & PERFORMANCE PROGRAMMING',
     text: 'Fuel performance. Personalized nutrition and programming designed to maximize potential, minimize injury, and keep athletes performing at their peak.\nTailored plans hydrate and boost energy, strength, and endurance for athletes.',
     image: upload('/2024/03/CLP-Photos-Recovery.png'),
     cta: { label: 'Learn More', href: '/recovery-performance-training/' },
   },
   {
-    title: 'PROCUREMENT/LOGISTICS',
+    title: 'PROCUREMENT & LOGISTICS',
     text: 'Streamlined sourcing. We optimize procurement and logistics so you get what you need—on time, on budget, and on point.',
     image: upload('/2024/03/CLP-Photos-Procurement.png'),
     cta: { label: 'Learn More', href: '/procurement-logistics/' },

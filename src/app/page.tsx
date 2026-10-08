@@ -22,9 +22,11 @@ export default function HomePage() {
       <HashtagBand text={homeHashtag} />
       <TrustedBy {...trustedBy} />
 
-      {homeServices.map((service) => (
-        <FeatureRow key={service.title} {...service} />
-      ))}
+      <div className={styles.services}>
+        {homeServices.map((service) => (
+          <FeatureRow key={service.title} {...service} />
+        ))}
+      </div>
 
       <Section className={styles.testimonialsHeading}>
         <h2>{testimonials.title}</h2>

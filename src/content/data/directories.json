@@ -1,12 +1,12 @@
 {
  "/advancement-workshops-baseball-softball/": {
   "meta": {
-   "title": "Baseball/Softball Advancement & Workshops - Compete Like Pros™",
+   "title": "Baseball & Softball Advancement & Workshops - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Baseball/Softball Advancement &",
+    "Baseball & Softball Advancement &",
     "Workshops Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -10051,13 +10051,13 @@
  },
  "/baseball-softball-coaches-nearby/": {
   "meta": {
-   "title": "Baseball/Softball Groups & Private Lessons Nearby - Compete Like Pros™",
+   "title": "Baseball & Softball Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Baseball & Softball",
-    "Groups/Private Lessons Nearby"
+    "Baseball & Softball Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -10553,12 +10553,12 @@
  },
  "/baseball-softball-dieting-nutrition/": {
   "meta": {
-   "title": "Baseball/Softball Dieting & Nutrition - Compete Like Pros™",
+   "title": "Baseball & Softball Dieting & Nutrition - Compete Like Pros™",
    "description": "Call us on 123-456-7890 or simply book an appointment"
   },
   "hero": {
    "title": [
-    "Baseball/Softball Dieting",
+    "Baseball & Softball Dieting",
     "& Nutrition Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -10898,6 +10898,58 @@
            }
           ],
           "preset": "baseball-softball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -11718,12 +11770,12 @@
  },
  "/baseball-softball-mental-health-resilience/": {
   "meta": {
-   "title": "Baseball/Softball Mental Health & Resilience - Compete Like Pros™",
+   "title": "Baseball & Softball Mental Health & Resilience - Compete Like Pros™",
    "description": "Call us on 123-456-7890 or simply book an appointment"
   },
   "hero": {
    "title": [
-    "Baseball/Softball Mental",
+    "Baseball & Softball Mental",
     "Health & Resilience Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -12063,6 +12115,58 @@
            }
           ],
           "preset": "baseball-softball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -12849,7 +12953,7 @@
  },
  "/baseball-softball-trips-retreats/": {
   "meta": {
-   "title": "Baseball/Softball Trips & Retreats - Compete Like Pros™",
+   "title": "Baseball & Softball Trips & Retreats - Compete Like Pros™",
    "description": "Call us on 123-456-7890 or simply book an appointment"
   },
   "hero": {
@@ -13461,13 +13565,13 @@
  },
  "/basketball-coaches-nearby/": {
   "meta": {
-   "title": "Basketball Groups/Private Lessons Nearby - Compete Like Pros™",
+   "title": "Basketball Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Basketball Groups/Private",
-    "Lessons Nearby"
+    "Basketball Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -14412,6 +14516,58 @@
            }
           ],
           "preset": "basketball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -15304,8 +15460,32 @@
             "label": "All Cities"
            },
            {
-            "value": "new-york",
-            "label": "New York City"
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
            },
            {
             "value": "austin",
@@ -15316,12 +15496,136 @@
             "label": "Boston"
            },
            {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
             "value": "chicago",
             "label": "Chicago"
            },
            {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
             "value": "los-angeles",
             "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "tampa",
+            "label": "Tampa"
+           },
+           {
+            "value": "washington-d-c",
+            "label": "Washington D.C."
            }
           ]
          },
@@ -15673,13 +15977,13 @@
  },
  "/basketball-injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Basketball Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Basketball Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
     "Basketball Injury",
-    "Prevention/Rehab Nearby"
+    "Prevention & Rehab Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -16064,6 +16368,28 @@
            }
           ],
           "preset": "basketball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -16591,6 +16917,58 @@
            }
           ],
           "preset": "basketball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -17981,12 +18359,12 @@
  },
  "/branded-activations-baseball-softball/": {
   "meta": {
-   "title": "Baseball/Softball Branded Activations - Compete Like Pros™",
+   "title": "Baseball & Softball Branded Activations - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Baseball/Softball Branded",
+    "Baseball & Softball Branded",
     "Activations Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -23143,12 +23521,12 @@
  },
  "/camps-tournaments-baseball-softball/": {
   "meta": {
-   "title": "Baseball/Softball Camps & Tournaments - Compete Like Pros™",
+   "title": "Baseball & Softball Camps & Tournaments - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Baseball/Softball Camps",
+    "Baseball & Softball Camps",
     "& Tournaments Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -44636,6 +45014,58 @@
            }
           ],
           "preset": "esports"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -45527,8 +45957,32 @@
             "label": "All Cities"
            },
            {
-            "value": "new-york",
-            "label": "New York City"
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
            },
            {
             "value": "austin",
@@ -45539,12 +45993,136 @@
             "label": "Boston"
            },
            {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
             "value": "chicago",
             "label": "Chicago"
            },
            {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
             "value": "los-angeles",
             "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "tampa",
+            "label": "Tampa"
+           },
+           {
+            "value": "washington-d-c",
+            "label": "Washington D.C."
            }
           ]
          },
@@ -45924,13 +46502,13 @@
  },
  "/esports-injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Esports Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Esports Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
     "Esports Injury",
-    "Prevention/Rehab Nearby"
+    "Prevention & Rehab Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -46315,6 +46893,28 @@
            }
           ],
           "preset": "esports"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -46842,6 +47442,58 @@
            }
           ],
           "preset": "esports"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -47628,13 +48280,13 @@
  },
  "/esports-private-coaches-nearby/": {
   "meta": {
-   "title": "Esports Groups/Private Lessons Nearby - Compete Like Pros™",
+   "title": "Esports Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Esports Groups/Private",
-    "Lessons Nearby"
+    "Esports Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -49072,6 +49724,58 @@
            }
           ],
           "preset": "futbol-soccer"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -49892,13 +50596,13 @@
  },
  "/futbol-groups-private-coaches-nearby/": {
   "meta": {
-   "title": "Fútbol (Soccer) Groups/Private Lessons Nearby - Compete Like Pros™",
+   "title": "Fútbol (Soccer) Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Fútbol (Soccer) Groups/Private",
-    "Lessons Nearby"
+    "Fútbol (Soccer) Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -50847,6 +51551,58 @@
            }
           ],
           "preset": "futbol-soccer"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -52309,8 +53065,32 @@
             "label": "All Cities"
            },
            {
-            "value": "new-york",
-            "label": "New York City"
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
            },
            {
             "value": "austin",
@@ -52329,8 +53109,40 @@
             "label": "Chicago"
            },
            {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
             "value": "denver",
             "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
            },
            {
             "value": "los-angeles",
@@ -52341,8 +53153,56 @@
             "label": "Miami"
            },
            {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
             "value": "philadelphia",
             "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
            },
            {
             "value": "san-diego",
@@ -52353,20 +53213,24 @@
             "label": "San Francisco"
            },
            {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
             "value": "seattle",
             "label": "Seattle"
            },
            {
-            "value": "las-vegas",
-            "label": "Las Vegas"
+            "value": "tampa",
+            "label": "Tampa"
            },
            {
-            "value": "florida",
-            "label": "Florida"
-           },
-           {
-            "value": "fort-myers",
-            "label": "Fort Myers"
+            "value": "washington-d-c",
+            "label": "Washington D.C."
            }
           ]
          },
@@ -53076,6 +53940,58 @@
            }
           ],
           "preset": "golfing"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -53968,8 +54884,32 @@
             "label": "All Cities"
            },
            {
-            "value": "new-york",
-            "label": "New York City"
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
            },
            {
             "value": "austin",
@@ -53988,8 +54928,40 @@
             "label": "Chicago"
            },
            {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
             "value": "denver",
             "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
            },
            {
             "value": "los-angeles",
@@ -54000,8 +54972,56 @@
             "label": "Miami"
            },
            {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
             "value": "philadelphia",
             "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
            },
            {
             "value": "san-diego",
@@ -54012,20 +55032,24 @@
             "label": "San Francisco"
            },
            {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
             "value": "seattle",
             "label": "Seattle"
            },
            {
-            "value": "las-vegas",
-            "label": "Las Vegas"
+            "value": "tampa",
+            "label": "Tampa"
            },
            {
-            "value": "florida",
-            "label": "Florida"
-           },
-           {
-            "value": "fort-myers",
-            "label": "Fort Myers"
+            "value": "washington-d-c",
+            "label": "Washington D.C."
            }
           ]
          },
@@ -54397,13 +55421,13 @@
  },
  "/golfing-groups-private-coaches-nearby/": {
   "meta": {
-   "title": "Golf Groups/Private Lessons Nearby - Compete Like Pros™",
+   "title": "Golf Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Golf Groups/Private",
-    "Lessons Nearby"
+    "Golf Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -54899,13 +55923,13 @@
  },
  "/golfing-injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Golf Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Golf Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": "Access nearby golf injury prevention and rehab resources to stay strong and healthy on the course."
   },
   "hero": {
    "title": [
     "Golf Injury",
-    "Prevention/Rehab Nearby"
+    "Prevention & Rehab Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -55290,6 +56314,28 @@
            }
           ],
           "preset": "golfing"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -55817,6 +56863,58 @@
            }
           ],
           "preset": "golfing"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -57207,7 +58305,7 @@
  },
  "/injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Baseball and Softball Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Baseball and Softball Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": ""
   },
   "hero": {
@@ -57598,6 +58696,28 @@
            }
           ],
           "preset": "baseball-softball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -57780,13 +58900,13 @@
  },
  "/leagues-social-clubs-baseball-softball/": {
   "meta": {
-   "title": "Baseball/Softball Leagues & Social Clubs - Compete Like Pros™",
+   "title": "Baseball & Softball Leagues & Social Clubs - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Baseball/Softball",
-    "Leagues & Social Clubs Nearby"
+    "Baseball & Softball Leagues",
+    "& Social Clubs Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -58001,6 +59121,64 @@
            }
           ],
           "preset": "baseball-softball"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
@@ -59506,6 +60684,64 @@
            }
           ],
           "preset": "basketball"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
@@ -61123,6 +62359,64 @@
            }
           ],
           "preset": "esports"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
@@ -62407,13 +63701,13 @@
  },
  "/leagues-social-clubs-futbol-soccer/": {
   "meta": {
-   "title": "Fútbol (Soccer) Leagues/Social Clubs - Compete Like Pros™",
+   "title": "Fútbol (Soccer) Leagues & Social Clubs - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Fútbol (Soccer)",
-    "Leagues/Social Clubs Nearby"
+    "Fútbol (Soccer) Leagues",
+    "& Social Clubs Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -62740,6 +64034,64 @@
            }
           ],
           "preset": "futbol-soccer"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
@@ -64049,7 +65401,7 @@
        },
        {
         "type": "team",
-        "widgetId": 36,
+        "widgetId": 37,
         "layout": {
          "width": "1200px",
          "colGap": 10,
@@ -64057,6 +65409,36 @@
          "filterColumns": 4
         },
         "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           }
+          ]
+         },
          {
           "key": "language",
           "label": "City",
@@ -64136,30 +65518,6 @@
             "label": "All Cost"
            },
            {
-            "value": "free",
-            "label": "Free"
-           },
-           {
-            "value": "1-to-24",
-            "label": "$1 to $24"
-           },
-           {
-            "value": "25-to-49",
-            "label": "$25 to $49"
-           },
-           {
-            "value": "50-to-99",
-            "label": "$50 to $99"
-           },
-           {
-            "value": "100-to-249",
-            "label": "$100 to $249"
-           },
-           {
-            "value": "250-to-499",
-            "label": "$250 to $499"
-           },
-           {
             "value": "500-to-999",
             "label": "$500 to $999"
            },
@@ -64178,6 +65536,26 @@
            {
             "value": "10k",
             "label": "$10k+"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "free",
+            "label": "Free"
            }
           ]
          },
@@ -64219,155 +65597,1331 @@
            }
           ],
           "preset": "golfing"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
          {
-          "id": "wps-team-36--popup-12895",
+          "id": "wps-team-37--popup-13111",
           "tags": [
-           "groups-private-lessons",
+           "leagues-social-clubs",
+           "adults-18",
            "teens-13-17",
            "youth-5-12",
            "boston",
-           "100-to-249",
+           "25-to-49",
            "250-to-499",
-           "august",
+           "50-to-99",
            "july",
-           "groups-private-lessons-nearby"
+           "june",
+           "march",
+           "esports"
           ],
-          "image": "upload:/2026/02/Untitled-design-20.png",
+          "image": "upload:/2026/03/Untitled-design-79.png",
           "subtitle": "",
-          "title": "ProPath Soccer (Newton Youth Soccer)",
-          "excerpt": "Professional coaching staff. Age-appropriate training. Individual and small group options.",
+          "title": "Colleges of the Fenway Leagues",
+          "excerpt": "Seasonal leagues, one-day tournaments, open play. Discord community.",
           "bio": "",
-          "bioHtml": "<p>ProPath Soccer through Newton Youth Soccer delivers professional coaching with age-appropriate training. Individual and small group options serve different needs and budgets.</p>",
+          "bioHtml": "<p>Colleges of the Fenway Leagues offer seasonal competition, one-day tournaments, open play. Discord community.</p>",
           "bioImages": [
-           "upload:/2026/02/Untitled-design-20.png"
+           "upload:/2026/03/Untitled-design-79.png"
           ],
           "buttons": [
            {
             "label": "Learn More",
-            "href": "https://www.newtonsoccer.org/"
+            "href": "https://www.colleges-fenway.org/esports/"
            }
           ],
           "socials": [
            {
             "network": "facebook",
-            "href": "https://www.facebook.com/newtonyouthsoccer"
+            "href": "https://www.facebook.com/colleges.fenway"
            },
            {
             "network": "instagram",
-            "href": "https://www.instagram.com/newtonyouthsoccer/"
-           },
-           {
-            "network": "youtube",
-            "href": "https://www.youtube.com/channel/UCBs91QtX9KOtgBrdzN0sm_Q/playlists"
+            "href": "https://www.instagram.com/collegesofthefenway/"
            }
           ]
          },
          {
-          "id": "wps-team-36--popup-12894",
+          "id": "wps-team-37--popup-13112",
           "tags": [
-           "groups-private-lessons",
-           "teens-13-17",
+           "leagues-social-clubs",
            "youth-5-12",
            "boston",
-           "100-to-249",
+           "25-to-49",
            "250-to-499",
-           "futbol-soccer",
-           "groups-private-lessons-nearby"
+           "50-to-99",
+           "july",
+           "june",
+           "march",
+           "esports"
           ],
-          "image": "upload:/2026/02/Untitled-design-14.png",
+          "image": "",
           "subtitle": "",
-          "title": "Revolution Academy Team Training",
-          "excerpt": "Team camps/clinics – train ‘Revs Way’ with senior Academy coaches. Custom team sessions.",
+          "title": "Uptime Esports Tournaments",
+          "excerpt": "Youth-focused competitive events. Broadcast on Twitch/YouTube. Stage with audience.",
           "bio": "",
-          "bioHtml": "<p>Revolution Academy Team Training brings 'Revs Way' methodology to your team through custom camps and clinics with senior Academy coaches. Professional methodology, tailored delivery.</p>",
-          "bioImages": [
-           "upload:/2026/02/Untitled-design-14.png"
-          ],
+          "bioHtml": "<p>Uptime Esports Tournaments provide youth-focused events broadcast on Twitch/YouTube. Stage with audience seating.</p>",
           "buttons": [
            {
             "label": "Learn More",
-            "href": "https://www.revolutionsoccer.net/academy/camps-and-clinics"
+            "href": "https://uptimeinstitute.com/"
            }
           ],
           "socials": []
          },
          {
-          "id": "wps-team-36--popup-12893",
+          "id": "wps-team-37--popup-13113",
           "tags": [
-           "groups-private-lessons",
+           "leagues-social-clubs",
            "teens-13-17",
            "youth-5-12",
-           "100-to-249",
+           "boston",
+           "25-to-49",
            "250-to-499",
-           "futbol-soccer",
-           "groups-private-lessons-nearby"
+           "50-to-99",
+           "july",
+           "june",
+           "march",
+           "esports"
           ],
-          "image": "upload:/2026/02/Untitled-design-47.png",
+          "image": "upload:/2026/03/Untitled-design-78.png",
           "subtitle": "",
-          "title": "CityGolf Boston (Soccer training partners)",
-          "excerpt": "PGA-style individual instruction model applicable to soccer training.",
+          "title": "Balance Patch Weekly Events",
+          "excerpt": "Weekly tournaments. Larger weekend events. Community game nights.",
           "bio": "",
-          "bioHtml": "<p>CityGolf Boston demonstrates PGA-style individual instruction—unlimited lessons with membership. Model applicable to soccer: personalized attention accelerates development.</p>",
+          "bioHtml": "<p>Balance Patch Weekly Events deliver tournaments throughout week with larger weekend events. Community game nights.</p>",
           "bioImages": [
-           "upload:/2026/02/Untitled-design-47.png"
+           "upload:/2026/03/Untitled-design-78.png"
           ],
           "buttons": [
            {
             "label": "Learn More",
-            "href": "https://citygolfboston.com/"
+            "href": "https://www.balancepatch.com/"
            }
           ],
           "socials": [
            {
             "network": "facebook",
-            "href": "https://www.facebook.com/citygolf.boston/"
+            "href": "https://www.facebook.com/balancepatch"
            },
            {
             "network": "instagram",
-            "href": "https://www.instagram.com/citygolfboston/"
+            "href": "https://www.instagram.com/balancepatch"
            }
           ]
          },
          {
-          "id": "wps-team-36--popup-12892",
+          "id": "wps-team-37--popup-13114",
           "tags": [
-           "groups-private-lessons",
-           "teens-13-17",
+           "leagues-social-clubs",
            "youth-5-12",
            "boston",
+           "25-to-49",
            "250-to-499",
-           "50-to-99",
-           "clinics",
-           "groups-individuals",
-           "futbol-soccer",
-           "groups-private-lessons-nearby"
+           "july",
+           "june",
+           "march",
+           "esports"
           ],
-          "image": "upload:/2026/02/Untitled-design-45.png",
+          "image": "upload:/2026/03/Untitled-design-77.png",
           "subtitle": "",
-          "title": "Valeo FC Individual Skill Clinics",
-          "excerpt": "Weekday evening clinics during Fall, Winter, Spring. Master trainers. Skills improvement visible at next game.",
+          "title": "PAX East Tournaments",
+          "excerpt": "Annual convention with amateur tournaments and PAX Arena professional events.",
           "bio": "",
-          "bioHtml": "<p>Valeo FC Individual Skill Clinics run weekday evenings with master trainers. Promise: visible improvement at your next game. Technical development in small group settings.</p>",
+          "bioHtml": "<p>PAX East Tournaments at Boston Convention Center provide amateur esports during annual convention. PAX Arena hosts pro events.</p>",
           "bioImages": [
-           "upload:/2026/02/Untitled-design-45.png"
+           "upload:/2026/03/Untitled-design-77.png"
           ],
           "buttons": [
            {
             "label": "Learn More",
-            "href": "https://valeofc.com/"
+            "href": "https://east.paxsite.com/en-us/features/tournaments.html"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-13109",
+          "tags": [
+           "leagues-social-clubs",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "25-to-49",
+           "250-to-499",
+           "july",
+           "june",
+           "march",
+           "esports"
+          ],
+          "image": "upload:/2026/03/Untitled-design-76.png",
+          "subtitle": "",
+          "title": "GGLeagues Massachusetts",
+          "excerpt": "Statewide esports leagues. Youth, teen, adult divisions. 8-week seasons with prizes.",
+          "bio": "",
+          "bioHtml": "<p>GGLeagues Massachusetts delivers statewide leagues with youth, teen, adult divisions. 8-week seasons with rewards and prizes.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-76.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.ggleagues.com/massachusetts"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-13081",
+          "tags": [
+           "leagues-social-clubs",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "250-to-499",
+           "500-to-999",
+           "august",
+           "july",
+           "june",
+           "may",
+           "golfing"
+          ],
+          "image": "upload:/2026/03/Untitled-design-67.png",
+          "subtitle": "",
+          "title": "PGA Junior League",
+          "excerpt": "Team-based youth golf. Scramble format, numbered jerseys. Ages under 13.",
+          "bio": "",
+          "bioHtml": "<p>PGA Junior League delivers team-based youth golf through local PGA pros. Scramble format, numbered jerseys. Under 13.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-67.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.massgolf.org/play/junior-golf-programs/"
            }
           ],
           "socials": [
            {
             "network": "facebook",
-            "href": "https://www.facebook.com/valeofutbol/"
+            "href": "https://www.facebook.com/playmassgolf"
            },
            {
             "network": "instagram",
-            "href": "https://www.instagram.com/valeofutbol/https://www.instagram.com/valeofutbol/"
+            "href": "https://www.instagram.com/playmassgolf/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/MassGolf1903"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13080",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "500-to-999",
+           "august",
+           "june",
+           "may",
+           "golfing"
+          ],
+          "image": "upload:/2026/03/Untitled-design-68.png",
+          "subtitle": "",
+          "title": "Nextgen golf",
+          "excerpt": "Boston-based. Team golf for young adults, college, high school. 200+ tournaments nationwide.",
+          "bio": "",
+          "bioHtml": "<p>Nextgengolf from Boston delivers team golf for young adults, college, high school. NHSGA, NCCGA, City Tour. 200+ tournaments nationwide.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-68.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://mapga.com/nextgengolf/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/MAPGA"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/mapga_/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/channel/UCDexiZ82Penoykh4ntW6gkQ"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13079",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-21",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "250-to-499",
+           "500-to-999",
+           "august",
+           "july",
+           "june",
+           "may",
+           "golfing"
+          ],
+          "image": "upload:/2026/03/Untitled-design-67.png",
+          "subtitle": "",
+          "title": "New England PGA Junior Tour",
+          "excerpt": "Boys and girls ages 9-21. Regular and Elite Tour (36-hole for 12-18).",
+          "bio": "",
+          "bioHtml": "<p>New England PGA Junior Tour provides competitive golf ages 9-21. Regular Tour plus Elite Tour with 36-hole events for 12-18.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-67.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.massgolf.org/play/junior-golf-programs/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playmassgolf"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/playmassgolf/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/MassGolf1903"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13077",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "teens-13-17",
+           "boston",
+           "250-to-499",
+           "500-to-999",
+           "august",
+           "june",
+           "may",
+           "golfing"
+          ],
+          "image": "upload:/2026/03/Untitled-design-67.png",
+          "subtitle": "",
+          "title": "Mass Golf",
+          "excerpt": "State golf association. Championships, handicap services, junior programs.",
+          "bio": "",
+          "bioHtml": "<p>Mass Golf is state golf association with championships, handicap services, member clubs. Junior programs develop next generation.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-67.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.massgolf.org/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playmassgolf"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/playmassgolf/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/MassGolf1903"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13048",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "100-to-249",
+           "50-to-99",
+           "april",
+           "august",
+           "june",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-60.png",
+          "subtitle": "",
+          "title": "UTR Sports Boston Flex Leagues",
+          "excerpt": "Flex league format with UTR Pickleball Rating system.",
+          "bio": "",
+          "bioHtml": "<p>UTR Sports Boston Flex Leagues provide flexible competition using UTR Pickleball Rating (UTR-P) system.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-60.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://app.utrsports.net/clubs/918155"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/UTRSports"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/utr_sports/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/c/myutr"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13045",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "250-to-499",
+           "april",
+           "august",
+           "june",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-59.png",
+          "subtitle": "",
+          "title": "Life Time Pickleball Leagues",
+          "excerpt": "Singles, doubles, mixed, flex, box leagues. Session or drop-in formats.",
+          "bio": "",
+          "bioHtml": "<p>Life Time Pickleball Leagues offer comprehensive formats: singles, doubles, mixed, flex, box. Session or drop-in.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-59.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.lifetime.life/locations/ma/metrowest-boston/sports/pickleball.html"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/LifeTime.Life"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/lifetime.life"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/mylifetimefitness"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13046",
+          "tags": [
+           "leagues-social-clubs",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "april",
+           "july",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/02/Untitled-design-5.png",
+          "subtitle": "",
+          "title": "Volo Sports Pickleball",
+          "excerpt": "Social pickleball leagues. Day parties at Assembly Row. Oktoberfest events.",
+          "bio": "",
+          "bioHtml": "<p>Volo Sports Pickleball delivers social leagues with day parties at Assembly Row and themed events like Oktoberfest.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-5.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.volosports.com/Boston/Pickleball"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playvolo/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/volosports/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13047",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "250-to-499",
+           "april",
+           "august",
+           "june",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-58.png",
+          "subtitle": "",
+          "title": "PKL Boston Ladder League",
+          "excerpt": "Intermediate+ players (3.7+) move up/down ladder based on results.",
+          "bio": "",
+          "bioHtml": "<p>PKL Boston Ladder League serves 3.7+ players with ladder format. Move up/down based on results.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-58.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://playpkl.com/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/PKLBoston/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13049",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "100-to-249",
+           "25-to-49",
+           "250-to-499",
+           "july",
+           "june",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/02/Untitled-design-12.png",
+          "subtitle": "",
+          "title": "HUB Sports Pickleball Leagues",
+          "excerpt": "Recreational (2.0-3.5) and competitive (3.5+) divisions. Corporate leagues available.",
+          "bio": "",
+          "bioHtml": "<p>HUB Sports Pickleball Leagues offer rec (2.0-3.5) and competitive (3.5+) at Harpoon. Corporate leagues available.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-12.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://hubsportsboston.com/pickleball-social-club"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/hubsportsboston/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/hubsportsboston/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/thehubsoftball"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13039",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "youth-5-12",
+           "boston",
+           "250-to-499",
+           "april",
+           "august",
+           "june",
+           "march",
+           "pickleball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-57.png",
+          "subtitle": "",
+          "title": "Boston Pickle Club Leagues",
+          "excerpt": "Multiple league formats. DUPR-rated play.",
+          "bio": "",
+          "bioHtml": "<p>Boston Pickle Club Leagues provide multiple formats with DUPR-rated play. Hyde Park and Norwell.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-57.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.bostonpickleclub.com/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/bostonpickleclub"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/bostonpickleclub/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/@BostonPickleClub"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13012",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "boston",
+           "25-to-49",
+           "august",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "upload:/2026/03/Untitled-design-51.png",
+          "subtitle": "",
+          "title": "Central New England Baseball Association",
+          "excerpt": "Adult baseball serving Central Massachusetts.",
+          "bio": "",
+          "bioHtml": "<p>Central New England Baseball Association provides adult baseball for Central MA players west of Boston.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-51.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.adultbaseballcentral.com/"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-13017",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "100-to-249",
+           "june",
+           "march",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "upload:/2026/02/Untitled-design-5.png",
+          "subtitle": "",
+          "title": "Volo Sports Softball",
+          "excerpt": "Social adult softball leagues. Team or free agent registration.",
+          "bio": "",
+          "bioHtml": "<p>Volo Sports Softball delivers social adult softball. Team or free agent registration. Post-game gatherings build community.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-5.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.volosports.com/Boston"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playvolo/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/volosports/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13016",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "boston",
+           "100-to-249",
+           "august",
+           "march",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "upload:/2026/02/Untitled-design-10.png",
+          "subtitle": "",
+          "title": "BSSC Softball",
+          "excerpt": "Adult recreational softball. Coed and single-gender divisions. Greater Boston locations.",
+          "bio": "",
+          "bioHtml": "<p>BSSC Softball provides adult recreational softball through Greater Boston's largest sports org. Coed and single-gender divisions.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-10.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://bssc.com/sports/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/BostonSkiandSportsClub/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/bssc/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/BostonSkiandSports"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-13015",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "boston",
+           "250-to-499",
+           "june",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "",
+          "subtitle": "",
+          "title": "Boston Amateur Baseball League",
+          "excerpt": "Adult amateur baseball serving the Boston area.",
+          "bio": "",
+          "bioHtml": "<p>Boston Amateur Baseball League delivers adult amateur baseball in Boston area. Organized competition for structured league play.</p>",
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.leaguelineup.com/welcome.asp?url=babl03"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-13014",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "boston",
+           "250-to-499",
+           "june",
+           "may",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "upload:/2026/03/Untitled-design-50.png",
+          "subtitle": "",
+          "title": "Boston Park League",
+          "excerpt": "Oldest continuing amateur baseball league in the United States. Highly competitive.",
+          "bio": "",
+          "bioHtml": "<p>Boston Park League is oldest continuing amateur baseball league in US. Highly competitive play with historic tradition.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-50.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://bostonparkleague.org/"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-13013",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "teens-13-17",
+           "boston",
+           "250-to-499",
+           "april",
+           "baseball-softball",
+           "camps-tournaments-nearby"
+          ],
+          "image": "upload:/2026/03/Untitled-design-49.png",
+          "subtitle": "",
+          "title": "Boston Metro Baseball League",
+          "excerpt": "Largest adult baseball in MA/New England. 18+, 28+, 38+ divisions. Wood bats. 18-24 game seasons.",
+          "bio": "",
+          "bioHtml": "<p>Boston Metro Baseball League is largest in MA/New England. Divisions: 18+, 28+ (Boston/MetroWest), 38+ Masters. Wood bats only. 18-24 game seasons with playoffs.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-49.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.bostonmabl.com/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/BostonMetroBaseballLeague"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/bostonmetrobaseballleague"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/channel/UCHO3jX7RyC61xpcQRUNSDCw"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12986",
+          "tags": [
+           "leagues-social-clubs",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "basketball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-31.png",
+          "subtitle": "",
+          "title": "Metropolis of Boston Basketball",
+          "excerpt": "Adult basketball leagues via LeagueApps.",
+          "bio": "",
+          "bioHtml": "<p>Metropolis of Boston Basketball provides adult leagues through LeagueApps. Boston-based competition with online registration.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-31.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://myblboston.leagueapps.com/leagues"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-12985",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "basketball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-29.png",
+          "subtitle": "",
+          "title": "Starland Sportsplex",
+          "excerpt": "Men’s league (Wed recreational, Thu competitive). Coed league. 8-game seasons + playoffs. IAABO certified refs.",
+          "bio": "",
+          "bioHtml": "<p>Starland Sportsplex offers men's (Wed rec, Thu competitive) and coed leagues. 8-game seasons plus playoffs. IAABO certified refs. Hanover.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-29.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://starlandsports.com/sportsplex/basketball"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/starlandsports"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/starlandsportsplexandfun"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/channel/UCTHl5cKDJG8o3rWCCC95IdQ"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12984",
+          "tags": [
+           "leagues-social-clubs",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "march",
+           "november",
+           "basketball"
+          ],
+          "image": "upload:/2026/03/Untitled-design-28.png",
+          "subtitle": "",
+          "title": "Viking Sports Adult Basketball",
+          "excerpt": "Men’s and Women’s leagues at Brookline High School. 12-game regular season + playoffs.",
+          "bio": "",
+          "bioHtml": "<p>Viking Sports serves Brookline with Men's and Women's leagues at Brookline High School. 12-game regular season plus playoffs.</p>",
+          "bioImages": [
+           "upload:/2026/03/Untitled-design-28.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.vikingcamps.com/viking-programs/sports-league-adult/adult-basketball/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/vikingsportsma/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/vikingsportsMA/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12983",
+          "tags": [
+           "leagues-social-clubs",
+           "boston",
+           "100-to-249",
+           "250-to-499"
+          ],
+          "image": "",
+          "subtitle": "",
+          "title": "Boston Sports Leagues",
+          "excerpt": "Year-round competitive and recreational basketball. Former college players, corporate teams, recreational players.",
+          "bio": "",
+          "bioHtml": "<p>Boston Sports Leagues delivers year-round basketball serving former college players through recreational enthusiasts. Competitive and recreational divisions.</p>",
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https:https://www.bostonsportsleagues.com/boston-basketball.html//www.bostonsportsleagues.com/boston-basketball.html"
+           }
+          ],
+          "socials": []
+         },
+         {
+          "id": "wps-team-37--popup-12982",
+          "tags": [
+           "leagues-social-clubs",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "april",
+           "march",
+           "basketball"
+          ],
+          "image": "upload:/2026/02/Untitled-design-5.png",
+          "subtitle": "",
+          "title": "Volo Sports Basketball",
+          "excerpt": "Social and competitive adult leagues. 5-8 week seasons. Solo, small group, or team registration.",
+          "bio": "",
+          "bioHtml": "<p>Volo Sports Basketball combines competition with community. 5-8 week seasons with solo, small group, or team registration. Post-game socializing builds friendships.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-5.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.volosports.com/Boston/Basketball"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playvolo/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/volosports/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12981",
+          "tags": [
+           "leagues-social-clubs",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "march",
+           "basketball"
+          ],
+          "image": "upload:/2026/02/Untitled-design-12.png",
+          "subtitle": "",
+          "title": "HUB Sports Boston Basketball",
+          "excerpt": "Adult leagues across Boston. Recreational and competitive divisions. Team and individual registration.",
+          "bio": "",
+          "bioHtml": "<p>HUB Sports Basketball delivers adult leagues across Greater Boston including Starland Sportsplex. Recreational and competitive divisions. Team and individual registration.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-12.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://hubsportsboston.com/leagues/basketball"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/hubsportsboston/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/hubsportsboston/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12980",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "youth-5-12",
+           "boston",
+           "100-to-249",
+           "250-to-499",
+           "august",
+           "basketball"
+          ],
+          "image": "upload:/2026/02/Untitled-design-10.png",
+          "subtitle": "",
+          "title": "BSSC Basketball",
+          "excerpt": "#1 adult basketball league in Boston. Year-round indoor leagues. Coed, men’s, women’s. Multiple skill divisions. Professional refs, scoreb...",
+          "bio": "",
+          "bioHtml": "<p>BSSC Basketball is Boston's premier adult league with year-round indoor play. Cambridge, South Boston, Medford, Brighton, Waltham locations. Professional refs, scoreboards. Multiple skill divisions.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-10.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://bssc.com/sports/basketball/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/BostonSkiandSportsClub/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/bssc/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/BostonSkiandSports"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12836",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "100-to-249",
+           "50-to-99",
+           "futbol-soccer"
+          ],
+          "image": "upload:/2026/02/Untitled-design-13.png",
+          "subtitle": "",
+          "title": "Mass Soccer Adult Leagues",
+          "excerpt": "State organization with 15+ leagues, ~500 teams, 15,000+ players. Casa Select affiliated with USASA/USSF.",
+          "bio": "",
+          "bioHtml": "<p>Mass Soccer coordinates adult soccer statewide with 15+ leagues, ~500 teams, and 15,000+ players. USASA/USSF affiliation connects to national amateur structure.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-13.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.mass-soccer.org/leagueinfo"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/baystatesoccer/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/baystatesoccerleag"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12835",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "100-to-249",
+           "50-to-99",
+           "futbol-soccer"
+          ],
+          "image": "upload:/2026/02/Untitled-design-12.png",
+          "subtitle": "",
+          "title": "HUB Sports",
+          "excerpt": "Adult soccer leagues across Boston. Recreational and competitive divisions. Team and individual registration.",
+          "bio": "",
+          "bioHtml": "<p>Adult soccer leagues with recreational and competitive divisions. Team and individual registration.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-12.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://hubsportsboston.com/leagues"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/hubsportsboston/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/hubsportsboston/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/user/thehubsoftball"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12834",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "100-to-249",
+           "50-to-99",
+           "futbol-soccer"
+          ],
+          "image": "upload:/2026/02/Untitled-design-10.png",
+          "subtitle": "",
+          "title": "BSSC (Boston Ski & Sports Club)",
+          "excerpt": "Largest adult soccer program in Greater Boston – 10,000+ players, 1,300+ teams, 5,000+ games/year. 7v7, 11v11, indoor, futsal. Coed, men’s...",
+          "bio": "",
+          "bioHtml": "<p>BSSC operates Greater Boston's largest adult soccer program—10,000+ players, 1,300+ teams, 5,000+ games annually. 7v7, 11v11, indoor, and futsal with coed, men's, and women's divisions. Fenway, Cambridge, Medford locations.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-10.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://bssc.com/sports/soccer/"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/BostonSkiandSportsClub/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/bssc/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12831",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "100-to-249",
+           "25-to-49",
+           "50-to-99",
+           "futbol-soccer"
+          ],
+          "image": "upload:/2026/02/Untitled-design-5.png",
+          "subtitle": "",
+          "title": "Volo Sports",
+          "excerpt": "Boston’s most popular adult social sports. Soccer leagues, pickup games, 5-8 week seasons. Join as team, small group, or solo. Also offers fitne...",
+          "bio": "",
+          "bioHtml": "<p>Volo Sports delivers Boston's most popular adult social sports. 5-8 week seasons with team, small group, or solo registration. Post-game socializing builds community. Fitness subscription adds gym access.</p>",
+          "bioImages": [
+           "upload:/2026/02/Untitled-design-5.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.volosports.com/Boston/Soccer"
+           }
+          ],
+          "socials": [
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/playvolo/"
+           },
+           {
+            "network": "linkedin",
+            "href": "https://www.linkedin.com/company/volosports/"
+           },
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/volosports/"
+           }
+          ]
+         },
+         {
+          "id": "wps-team-37--popup-12825",
+          "tags": [
+           "leagues-social-clubs",
+           "adults-18",
+           "adults-21",
+           "boston",
+           "philadelphia",
+           "100-to-249",
+           "25-to-49",
+           "50-to-99",
+           "futbol-soccer"
+          ],
+          "image": "upload:/2026/02/list-image.png",
+          "subtitle": "",
+          "title": "Casa Soccer League",
+          "excerpt": "One of the largest adult amateur leagues for 11v11 play in Boston. Promotion/relegation system, 7v7, futsal, tournaments. 16,000+ members, 500+ teams....",
+          "bio": "",
+          "bioHtml": "<p>Casa Soccer League Boston stands as one of the largest adult amateur leagues with 16,000+ members across 500+ teams. Promotion/relegation system creates competitive balance. 11v11, 7v7, futsal, and tournament formats. Revolution partnership adds credibility.</p>",
+          "bioImages": [
+           "upload:/2026/02/casa-1.png"
+          ],
+          "buttons": [
+           {
+            "label": "Learn More",
+            "href": "https://www.casasoccerleagues.com/boston"
+           },
+           {
+            "label": "contact",
+            "href": "/clp-leagues-social-clubs-enquiry/?partner_id=12825",
+            "newTab": true
+           }
+          ],
+          "socials": [
+           {
+            "network": "instagram",
+            "href": "https://www.instagram.com/casasoccerboston/?hl=en"
+           },
+           {
+            "network": "facebook",
+            "href": "https://www.facebook.com/casasoccerleagues/"
+           },
+           {
+            "network": "youtube",
+            "href": "https://www.youtube.com/channel/UC19eGxVJCFlL5OV-LJeInVg"
            }
           ]
          }
@@ -64606,6 +67160,64 @@
            }
           ],
           "preset": "pickleball"
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
          }
         ],
         "items": [
@@ -66235,6 +68847,58 @@
            }
           ],
           "preset": "pickleball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sports-dietitians",
+            "label": "Sports Dietitians / Nutritionists"
+           },
+           {
+            "value": "nutrition-coaching",
+            "label": "Nutrition Coaching"
+           },
+           {
+            "value": "meal-prep-delivery",
+            "label": "Meal Prep & Delivery"
+           },
+           {
+            "value": "supplements-hydration",
+            "label": "Supplements & Hydration"
+           },
+           {
+            "value": "weight-management-programs",
+            "label": "Weight Management Programs"
+           }
+          ]
          }
         ],
         "items": [
@@ -67127,8 +69791,32 @@
             "label": "All Cities"
            },
            {
-            "value": "new-york",
-            "label": "New York City"
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
            },
            {
             "value": "austin",
@@ -67147,8 +69835,40 @@
             "label": "Chicago"
            },
            {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
             "value": "denver",
             "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
            },
            {
             "value": "los-angeles",
@@ -67159,8 +69879,56 @@
             "label": "Miami"
            },
            {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
             "value": "philadelphia",
             "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
            },
            {
             "value": "san-diego",
@@ -67171,20 +69939,24 @@
             "label": "San Francisco"
            },
            {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
             "value": "seattle",
             "label": "Seattle"
            },
            {
-            "value": "las-vegas",
-            "label": "Las Vegas"
+            "value": "tampa",
+            "label": "Tampa"
            },
            {
-            "value": "florida",
-            "label": "Florida"
-           },
-           {
-            "value": "fort-myers",
-            "label": "Fort Myers"
+            "value": "washington-d-c",
+            "label": "Washington D.C."
            }
           ]
          },
@@ -67577,13 +70349,13 @@
  },
  "/pickleball-groups-private-coaches-nearby/": {
   "meta": {
-   "title": "Pickleball Groups/Private Lessons Nearby - Compete Like Pros™",
+   "title": "Pickleball Groups & Private Lessons Nearby - Compete Like Pros™",
    "description": "Quisque id odio. Praesent blandit laoreet nibh.Praesent ac sem eget est egestas volutpat.Praesent ac sem eget est."
   },
   "hero": {
    "title": [
-    "Pickleball Groups/Private",
-    "Lessons Nearby"
+    "Pickleball Groups &",
+    "Private Lessons Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -68087,13 +70859,13 @@
  },
  "/pickleball-injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Pickleball Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Pickleball Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": "Explore injury prevention and rehab centers for pickleball players to recover and perform better."
   },
   "hero": {
    "title": [
     "Pickleball Injury",
-    "Prevention/Rehab Nearby"
+    "Prevention & Rehab Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -68478,6 +71250,28 @@
            }
           ],
           "preset": "pickleball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -69005,6 +71799,58 @@
            }
           ],
           "preset": "pickleball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "sport-psychologists",
+            "label": "Sport Psychologists"
+           },
+           {
+            "value": "mental-performance-coaching",
+            "label": "Mental Performance Coaching"
+           },
+           {
+            "value": "counseling-therapy",
+            "label": "Counseling & Therapy"
+           },
+           {
+            "value": "mindfulness-meditation",
+            "label": "Mindfulness & Meditation"
+           },
+           {
+            "value": "support-groups-workshops",
+            "label": "Support Groups & Workshops"
+           }
+          ]
          }
         ],
         "items": [
@@ -70395,13 +73241,13 @@
  },
  "/soccer-injury-prevention-rehab-nearby/": {
   "meta": {
-   "title": "Fútbol(Soccer) Injury Prevention/Rehab Nearby - Compete Like Pros™",
+   "title": "Fútbol(Soccer) Injury Prevention & Rehab Nearby - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
     "Fútbol(Soccer) Injury",
-    "Prevention/Rehab Nearby"
+    "Prevention & Rehab Nearby"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -70786,6 +73632,28 @@
            }
           ],
           "preset": "futbol-soccer"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
          }
         ],
         "items": [
@@ -70968,12 +73836,12 @@
  },
  "/strength-conditioning-baseball-softball-2/": {
   "meta": {
-   "title": "Baseball/Softball Strength & Conditioning - Compete Like Pros™",
+   "title": "Baseball & Softball Strength & Conditioning - Compete Like Pros™",
    "description": "Call us on 123-456-7890 or simply book an appointment"
   },
   "hero": {
    "title": [
-    "Baseball/Softball",
+    "Baseball & Softball",
     "Strength & Conditioning Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -71313,6 +74181,58 @@
            }
           ],
           "preset": "baseball-softball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -72612,6 +75532,58 @@
            }
           ],
           "preset": "basketball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -73911,6 +76883,58 @@
            }
           ],
           "preset": "esports"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -75210,6 +78234,58 @@
            }
           ],
           "preset": "futbol-soccer"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -76363,7 +79439,7 @@
   },
   "hero": {
    "title": [
-    "Baseball/Softball",
+    "Baseball & Softball",
     "Facilities & Parks Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -77297,6 +80373,58 @@
            }
           ],
           "preset": "pickleball"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -78596,6 +81724,58 @@
            }
           ],
           "preset": "golfing"
+         },
+         {
+          "key": "availability",
+          "label": "Availability",
+          "options": [
+           {
+            "value": "",
+            "label": "All Availability"
+           },
+           {
+            "value": "daily",
+            "label": "Daily"
+           },
+           {
+            "value": "weekly",
+            "label": "Weekly"
+           },
+           {
+            "value": "monthly",
+            "label": "Monthly"
+           }
+          ]
+         },
+         {
+          "key": "extra-four",
+          "label": "Resource Type",
+          "options": [
+           {
+            "value": "",
+            "label": "All Resource Types"
+           },
+           {
+            "value": "personal-training",
+            "label": "Personal Training"
+           },
+           {
+            "value": "group-training-bootcamps",
+            "label": "Group Training & Bootcamps"
+           },
+           {
+            "value": "speed-agility-training",
+            "label": "Speed & Agility Training"
+           },
+           {
+            "value": "strength-performance-gyms",
+            "label": "Strength & Performance Gyms"
+           },
+           {
+            "value": "mobility-flexibility",
+            "label": "Mobility & Flexibility"
+           }
+          ]
          }
         ],
         "items": [
@@ -79555,7 +82735,7 @@
   },
   "hero": {
    "title": [
-    "Baseball/Softball",
+    "Baseball & Softball",
     "Facilities & Parks Nearby"
    ],
    "backgroundColor": "#0a0a0a",
@@ -81331,12 +84511,12 @@
  },
  "/book-a-session/groups-private-lessons-2/": {
   "meta": {
-   "title": "Groups / Private Lessons - Compete Like Pros™",
+   "title": "Groups & Private Lessons - Compete Like Pros™",
    "description": "Call us on 123-456-7890 or simply book an appointment"
   },
   "hero": {
    "title": [
-    "Basketball Groups / Private Lessons"
+    "Basketball Groups & Private Lessons"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -83655,7 +86835,7 @@
           "options": [
            {
             "value": "brand/product launch",
-            "label": "Brand/Product Launch"
+            "label": "Brand & Product Launch"
            },
            {
             "value": "community engagement",
@@ -83735,7 +86915,7 @@
           "extra": {
            "age-group": "Teenagers (13 - 17)",
            "all-cost": "50 - 99",
-           "experience-type": "Community Engagement,Experiental Campaigns,Game Day Experience,Giveaway,In-Stadium/On-Site,Sampling,Watch Party,Brand/Product Launch"
+           "experience-type": "Community Engagement,Experiental Campaigns,Game Day Experience,Giveaway,In-Stadium/On-Site,Sampling,Watch Party,Brand & Product Launch"
           }
          }
         ]
@@ -91835,7 +95015,7 @@
   },
   "hero": {
    "title": [
-    "Brand / Product &",
+    "Brand & Product &",
     "Development Inquiry"
    ],
    "backgroundColor": "#0a0a0a",
@@ -91976,7 +95156,7 @@
   },
   "hero": {
    "title": [
-    "Brand/Product",
+    "Brand & Product",
     "Development"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92053,7 +95233,7 @@
   },
   "hero": {
    "title": [
-    "Content Creation / Licensing",
+    "Content Creation & Licensing",
     "Services Inquiry"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92135,7 +95315,7 @@
   },
   "hero": {
    "title": [
-    "Content Creation / Licensing"
+    "Content Creation & Licensing"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -92228,7 +95408,7 @@
   },
   "hero": {
    "title": [
-    "Content Creation /",
+    "Content Creation &",
     "Licensing"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92364,7 +95544,7 @@
   },
   "hero": {
    "title": [
-    "Fundraising / Retailing",
+    "Fundraising & Retailing",
     "Inquiry"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92446,7 +95626,7 @@
   },
   "hero": {
    "title": [
-    "Fundraising / Retailing"
+    "Fundraising & Retailing"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -92504,7 +95684,7 @@
   },
   "hero": {
    "title": [
-    "Fundraising / Retailing",
+    "Fundraising & Retailing",
     "Campaigns"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92612,7 +95792,7 @@
   },
   "hero": {
    "title": [
-    "Recovery / Performance",
+    "Recovery & Performance",
     "Training Inquiry"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92753,7 +95933,7 @@
   },
   "hero": {
    "title": [
-    "Recovery / Performance",
+    "Recovery & Performance",
     "Training"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92861,7 +96041,7 @@
   },
   "hero": {
    "title": [
-    "Procurement / Logistics",
+    "Procurement & Logistics",
     "Inquiry"
    ],
    "backgroundColor": "#0a0a0a",
@@ -92943,7 +96123,7 @@
   },
   "hero": {
    "title": [
-    "Procurement / Logistics"
+    "Procurement & Logistics"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350

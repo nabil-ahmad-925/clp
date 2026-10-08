@@ -21,6 +21,7 @@ export default function PostView({ post }: { post: BlogPost }) {
         meta={[
           { prefix: 'By', label: hero.author.name, href: hero.author.href },
           { label: hero.date },
+          { label: hero.location ?? '' },
           { label: hero.comments.label, href: hero.comments.href },
           { label: hero.readingTime },
         ].filter((m) => m.label)}

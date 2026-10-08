@@ -1,4 +1,4 @@
-import type { Cta, DirectoryItem } from './types';
+import type { Cta, DirectoryFilter, DirectoryItem } from './types';
 
 /**
  * Directory cards added from the admin (clp-admin), stored in DynamoDB and served by the listings read API
@@ -16,11 +16,10 @@ export type ListingType = 'experiences' | 'resources' | 'facilities' | 'services
 const WIDGET_TYPES: Record<number, ListingType> = {
   45: 'experiences', // Advancement & Workshops
   46: 'experiences', // Branded Activations
-  47: 'experiences', // Camps/Tournaments
-  6: 'experiences', // Groups/Private Lessons
-  37: 'experiences', // Leagues/Social Clubs
-  36: 'experiences', // Leagues/Social Clubs (Golf)
-  41: 'experiences', // Trips/Retreats
+  47: 'experiences', // Camps & Tournaments
+  6: 'experiences', // Groups & Private Lessons
+  37: 'experiences', // Leagues & Social Clubs
+  41: 'experiences', // Trips & Retreats
   40: 'resources', // Dieting & Nutrition
   16: 'resources', // Injury Prevention & Recovery
   39: 'resources', // Mental Health & Resilience
@@ -28,16 +27,16 @@ const WIDGET_TYPES: Record<number, ListingType> = {
   10: 'facilities', // Facilities & Parks (Baseball & Softball)
   9: 'facilities', // Facilities & Parks (Basketball)
   42: 'facilities', // Facilities & Venues (Esports)
-  8: 'facilities', // Facilities & Parks (Fútbol/Soccer)
+  8: 'facilities', // Facilities & Parks (Fútbol (Soccer))
   43: 'facilities', // Facilities & Clubs (Golfing)
   44: 'facilities', // Facilities & Parks (Pickleball)
   // The home page's service areas (ids of their own, see data/serviceDirectories.json).
-  101: 'services', // Brand/Product Development
-  102: 'services', // Content Creation/Licensing
-  103: 'services', // Event/Project Management
-  104: 'services', // Fundraising/Retailing
-  105: 'services', // Nutrition/Performance Programming
-  106: 'services', // Procurement/Logistics
+  101: 'services', // Brand & Product Development
+  102: 'services', // Content Creation & Licensing
+  103: 'services', // Event & Project Management
+  104: 'services', // Fundraising & Retailing
+  105: 'services', // Nutrition & Performance Programming
+  106: 'services', // Procurement & Logistics
   107: 'services', // Sports Tourism
 };
 
@@ -45,11 +44,10 @@ const WIDGET_TYPES: Record<number, ListingType> = {
 const WIDGET_NAMES: Record<number, string> = {
   45: 'Advancement & Workshops',
   46: 'Branded Activations',
-  47: 'Camps/Tournaments',
-  6: 'Groups/Private Lessons',
-  37: 'Leagues/Social Clubs',
-  36: 'Leagues/Social Clubs',
-  41: 'Trips/Retreats',
+  47: 'Camps & Tournaments',
+  6: 'Groups & Private Lessons',
+  37: 'Leagues & Social Clubs',
+  41: 'Trips & Retreats',
   40: 'Dieting & Nutrition',
   16: 'Injury Prevention & Recovery',
   39: 'Mental Health & Resilience',
@@ -60,12 +58,12 @@ const WIDGET_NAMES: Record<number, string> = {
   8: 'Facilities & Parks',
   43: 'Facilities & Clubs',
   44: 'Facilities & Parks',
-  101: 'Brand/Product Development',
-  102: 'Content Creation/Licensing',
-  103: 'Event/Project Management',
-  104: 'Fundraising/Retailing',
-  105: 'Nutrition/Performance Programming',
-  106: 'Procurement/Logistics',
+  101: 'Brand & Product Development',
+  102: 'Content Creation & Licensing',
+  103: 'Event & Project Management',
+  104: 'Fundraising & Retailing',
+  105: 'Nutrition & Performance Programming',
+  106: 'Procurement & Logistics',
   107: 'Sports Tourism',
 };
 
@@ -97,6 +95,8 @@ type Listing = {
   priceMax?: number;
   startDate?: string;
   endDate?: string;
+  startTime?: string;
+  endTime?: string;
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
@@ -120,8 +120,44 @@ function monthRange(value: string) {
   return { from: m === current ? today : iso(new Date(Date.UTC(y, m, 1))), to: iso(new Date(Date.UTC(y, m + 1, 0))) };
 }
 
-/** Whether a card has a filter value: one of its tags, or (a month) one its dates fall in. */
-export function hasValue(item: { tags: string[]; startDate?: string; endDate?: string }, value: string) {
+/**
+ * The Available time filter, with a directory's Date filter: parts of the day, matched by a listing's start time (as the
+ * listings API does: clp-api shared/listings.mjs TIME_SLOTS).
+ */
+const TIME_SLOTS: Record<string, [string, string][]> = {
+  'time-morning': [['05:00', '12:00']],
+  'time-afternoon': [['12:00', '17:00']],
+  'time-evening': [['17:00', '21:00']],
+  // Over midnight.
+  'time-night': [
+    ['21:00', '24:00'],
+    ['00:00', '05:00'],
+  ],
+};
+export const START_TIME_FILTER: DirectoryFilter = {
+  key: 'starttime',
+  label: 'Start time',
+  options: [
+    { value: 'time-morning', label: 'Morning (5 AM – 12 PM)' },
+    { value: 'time-afternoon', label: 'Afternoon (12 PM – 5 PM)' },
+    { value: 'time-evening', label: 'Evening (5 PM – 9 PM)' },
+    { value: 'time-night', label: 'Night (9 PM – 5 AM)' },
+  ],
+};
+
+/** Groups & Private Lessons and Leagues & Social Clubs (the other experiences say "Start time"); facilities all say "Available time". */
+const AVAILABLE_TIME_WIDGETS = [6, 37];
+
+/** The time filter of a directory: titled "Available time" for those, "Start time" for the rest. */
+export function startTimeFilterFor(widgetId: number | undefined): DirectoryFilter {
+  const available = widgetId != null && (AVAILABLE_TIME_WIDGETS.includes(widgetId) || WIDGET_TYPES[widgetId] === 'facilities');
+  return available ? { ...START_TIME_FILTER, label: 'Available time' } : START_TIME_FILTER;
+}
+
+/** Whether a card has a filter value: one of its tags, a part of the day it starts in (Available time), or (a month) one its dates fall in. */
+export function hasValue(item: { tags: string[]; startDate?: string; endDate?: string; startTime?: string }, value: string) {
+  const slot = TIME_SLOTS[value];
+  if (slot) return Boolean(item.startTime) && slot.some(([from, to]) => item.startTime! >= from && item.startTime! < to);
   const month = item.startDate ? monthRange(value) : null;
   if (!month) return item.tags.includes(value);
   return item.startDate! <= month.to && (item.endDate ?? item.startDate!) >= month.from;
@@ -149,6 +185,8 @@ const toItem = (l: Listing): AddedItem => ({
   priceMax: l.priceMax,
   startDate: l.startDate,
   endDate: l.endDate,
+  startTime: l.startTime,
+  endTime: l.endTime,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,

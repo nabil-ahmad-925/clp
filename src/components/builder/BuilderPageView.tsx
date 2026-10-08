@@ -15,7 +15,7 @@ import styles from './BuilderPageView.module.css';
  */
 export default function BuilderPageView({ page }: { page: BuilderPage }) {
   // A directory or article list page (the list in the first row, under a heading) gets the search bar on the heading's
-  // edge; an article list's has no location field.
+  // edge (words and location for both).
   const directory = page.hero ? page.rows[0]?.columns.flatMap((col) => col.blocks).find((b) => b.type === 'team' || b.type === 'postFilter') : undefined;
   const search = Boolean(directory);
   const articles = directory?.type === 'postFilter';
@@ -36,7 +36,7 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
   const placeholder =
     directory?.type === 'postFilter' ? articleSearchPlaceholder(directory.source) : searchPlaceholder(directory?.type === 'team' ? directory.widgetId : undefined, page.hero?.title.join(' '));
   return search ? (
-    <DirectorySearchProvider placeholder={placeholder} label={articles ? 'Search articles' : undefined} withLocation={!articles}>
+    <DirectorySearchProvider placeholder={placeholder} label={articles ? 'Search articles' : undefined}>
       {body}
     </DirectorySearchProvider>
   ) : (

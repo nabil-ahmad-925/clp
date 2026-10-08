@@ -22,6 +22,18 @@ export type ArticleCategory = { slug: string; name: string; label?: { color: str
 
 export const ARTICLE_CATEGORIES = taxonomy.categories as ArticleCategory[];
 const AUTHORS = taxonomy.authors;
+/** The Writer filter's choices: the company's articles, those of partners, or of sponsors (the API's `writer`). */
+export const ARTICLE_WRITERS = [
+  { value: 'clp', label: 'Compete Like Pros' },
+  { value: 'partners', label: 'CLP Partners' },
+  { value: 'sponsor', label: 'Sponsor' },
+];
+/** The cities an article can be about (slugs as the experience directories' City filter values). */
+export const ARTICLE_LOCATIONS: { slug: string; name: string }[] = taxonomy.locations;
+/** A city's name ("New York City" for "new-york"). */
+export const locationName = (slug: string) => ARTICLE_LOCATIONS.find((l) => l.slug === slug)?.name ?? slug;
+/** An article's cities as shown ("Boston, Miami"; undefined when none). */
+const locationsShown = (slugs: string[] = []) => slugs.map(locationName).join(', ') || undefined;
 
 /** An article in a list (no body). `path` is its page: "/<slug>/" for the original posts, "/article/?slug=<slug>" for new ones. */
 export type ArticleSummary = {
@@ -31,9 +43,14 @@ export type ArticleSummary = {
   excerpt: string;
   image: string;
   categories: string[];
+  /** An author slug (/author/<slug>/), or a partner's id for a partner's article. */
   author: string;
+  /** Who wrote it, as shown: Compete Like Pros, or the partner's name. */
+  authorName?: string;
   publishedAt: string;
   readingTime: number;
+  /** The cities it is about (ARTICLE_LOCATIONS slugs). */
+  locations?: string[];
 };
 export type Article = ArticleSummary & { html: string };
 export type ArticlePageData = { item: Article; previous: ArticleSummary | null; next: ArticleSummary | null; related: ArticleSummary[] };
@@ -41,10 +58,21 @@ export type ArticlePageData = { item: Article; previous: ArticleSummary | null; 
 export const articlesEnabled = Boolean(API_URL);
 
 /**
- * One numbered page of a list (items newest first). `counts` (asked with counts: 1): the matches per sport with every
- * other filter applied (the Sport filter's option counts).
+ * One numbered page of a list (items newest first). Asked with counts: 1, the filters' option counts, each with every
+ * other filter applied: `counts` per sport, `lengths` per reading length and `places` per city slug (the search bar's
+ * suggestions).
  */
-export type ArticleList = { items: ArticleSummary[]; page: number; limit: number; total: number; pages: number; counts?: Record<string, number> };
+export type ArticleList = {
+  items: ArticleSummary[];
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+  counts?: Record<string, number>;
+  lengths?: Record<string, number>;
+  places?: Record<string, number>;
+  authors?: Record<string, number>;
+};
 
 /** The list orders: "Recommended" is newest first (the API's default, sent as no sort). */
 export const ARTICLE_SORTS = [
@@ -55,14 +83,27 @@ export const ARTICLE_SORTS = [
 ] as const;
 export type ArticleSort = (typeof ARTICLE_SORTS)[number]['value'];
 
-/** A page of published articles, newest first: of a category path, an author, matching search words, or all of them. */
-export type ArticleQuery = { category?: string; author?: string; sports?: string[]; q?: string };
+/** The Length filter's choices: reading time in minutes ("10" = 6 to 10; the API's LENGTHS). */
+export const ARTICLE_LENGTHS = [
+  { value: '5', label: 'Up to 5 min read' },
+  { value: '10', label: '6–10 min read' },
+  { value: '15', label: '11–15 min read' },
+  { value: '20', label: '16–20 min read' },
+  { value: 'more', label: 'Over 20 min read' },
+];
 
-/** The query string of a list request (sports comma-separated; empty values left out). */
-const listQuery = ({ sports, ...rest }: ArticleQuery & { limit?: number; page?: number; counts?: 1; count?: 1 }) => {
+/**
+ * A page of published articles, newest first: of a category path, an author, some sports or reading lengths, a
+ * location, matching search words, or all of them.
+ */
+export type ArticleQuery = { category?: string; author?: string; writer?: string; sports?: string[]; lengths?: string[]; loc?: string; q?: string };
+
+/** The query string of a list request (sports and lengths comma-separated; empty values left out). */
+const listQuery = ({ sports, lengths, ...rest }: ArticleQuery & { limit?: number; page?: number; counts?: 1; count?: 1 }) => {
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(rest)) if (v !== undefined && v !== '') qs.set(k, String(v));
   if (sports?.length) qs.set('sport', sports.join(','));
+  if (lengths?.length) qs.set('length', lengths.join(','));
   return qs;
 };
 
@@ -103,9 +144,10 @@ export async function fetchArticle(slug: string): Promise<ArticlePageData | null
 export const articleDate = (day: string) =>
   new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
-export const authorOf = (slug: string) => {
-  const author = AUTHORS.find((a) => a.slug === slug);
-  return { name: author?.name ?? slug, href: `/author/${slug}/` };
+/** Who wrote an article: an author of the taxonomy (with their archive), or a partner (by name, no archive). */
+export const authorOf = (a: Pick<ArticleSummary, 'author' | 'authorName'>) => {
+  const author = AUTHORS.find((x) => x.slug === a.author);
+  return author ? { name: author.name, href: `/author/${author.slug}/` } : { name: a.authorName || 'Compete Like Pros' };
 };
 
 /** A category path's name and archive ("Basketball", /category/strategy-and-insights/basketball-strategy-insights/). */
@@ -139,7 +181,7 @@ export const categoryOfArchive = (archivePath: string) => {
   return m ? (m[2] ? `${m[1]}/${m[2]}` : m[1]) : null;
 };
 
-export const toPostCard = (a: ArticleSummary): PostCard => ({ title: a.title, href: a.path, image: a.image, author: authorOf(a.author).name, date: articleDate(a.publishedAt) });
+export const toPostCard = (a: ArticleSummary): PostCard => ({ title: a.title, href: a.path, image: a.image, author: authorOf(a).name, date: articleDate(a.publishedAt) });
 
 /** An archive card: as toPostCard, with the labels of the article's categories (top level) over it. */
 export const toArchivePost = (a: ArticleSummary): ArchivePost => ({
@@ -172,6 +214,8 @@ export function toFilterPost(a: ArticleSummary): FilterPost {
     // The cards clip it to three lines.
     excerpt: a.excerpt,
     comments: '0 Comments',
+    readingTime: `${a.readingTime} min read`,
+    location: locationsShown(a.locations),
   };
 }
 
@@ -184,8 +228,9 @@ export function toBlogPost({ item, previous, next, related }: ArticlePageData): 
       title: item.title,
       image: item.image,
       categories: categoryLinks(item.categories),
-      author: authorOf(item.author),
+      author: authorOf(item),
       date: articleDate(item.publishedAt),
+      location: locationsShown(item.locations),
       comments: { label: 'No Comments', href: '#respond' },
       readingTime: `${item.readingTime} min read`,
     },

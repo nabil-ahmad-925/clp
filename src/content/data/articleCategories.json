@@ -1,5 +1,5 @@
 {
-  "_comment": "Blog article categories (from the original site's category archives): /category/<slug>/ and /category/<slug>/<sub>/. `page` is the site page that lists the category's articles (its post filter grid). Shared by the site, the admin (scripts/sync-widgets.mjs copies it) and clp-api (bundled from here). A sport subcategory has `sport`: the sport filter value of the experience directories (baseball-softball, basketball, …).",
+  "_comment": "Blog article categories (from the original site's category archives): /category/<slug>/ and /category/<slug>/<sub>/. `page` is the site page that lists the category's articles (its post filter grid). Shared by the site, the admin (scripts/sync-widgets.mjs copies it) and clp-api (bundled from here). A sport subcategory has `sport`: the sport filter value of the experience directories (baseball-softball, basketball, …). `locations`: the cities an article can be about (the admin's Location checklist, the site's location search); the slugs are the experience directories' City filter values.",
   "categories": [
     {
       "slug": "activations-branded-experiences",
@@ -248,31 +248,31 @@
       "subcategories": [
         {
           "slug": "brand-product-development",
-          "name": "Brand / Product Development",
+          "name": "Brand & Product Development",
           "page": "/brand-product-development/articles/"
         },
         {
           "slug": "content-creation-licensing",
-          "name": "Content Creation / Licensing",
+          "name": "Content Creation & Licensing",
           "page": "/content-creation-licensing/articles/"
         },
         {
           "slug": "event-project-management",
-          "name": "Event / Project Management"
+          "name": "Event & Project Management"
         },
         {
           "slug": "fundraising-retailing",
-          "name": "Fundraising / Retailing",
+          "name": "Fundraising & Retailing",
           "page": "/fundraising-retailing/articles/"
         },
         {
           "slug": "procurement-logistics",
-          "name": "Procurement / Logistics",
+          "name": "Procurement & Logistics",
           "page": "/procurement-logistics/articles/"
         },
         {
           "slug": "recovery-performance-training",
-          "name": "Recovery / Performance Training",
+          "name": "Recovery & Performance Training",
           "page": "/recovery-performance-training/articles/"
         },
         {
@@ -284,7 +284,7 @@
     },
     {
       "slug": "event-project-management",
-      "name": "Event / Project Management",
+      "name": "Event & Project Management",
       "subcategories": []
     },
     {
@@ -301,6 +301,180 @@
     {
       "slug": "harpreetclp-com",
       "name": "H C"
+    },
+    {
+      "slug": "sponsor",
+      "name": "Sponsor"
+    }
+  ],
+  "locations": [
+    {
+      "slug": "anchorage",
+      "name": "Anchorage"
+    },
+    {
+      "slug": "arizona",
+      "name": "Arizona"
+    },
+    {
+      "slug": "atlanta",
+      "name": "Atlanta"
+    },
+    {
+      "slug": "austin",
+      "name": "Austin"
+    },
+    {
+      "slug": "boston",
+      "name": "Boston"
+    },
+    {
+      "slug": "charlotte",
+      "name": "Charlotte"
+    },
+    {
+      "slug": "chicago",
+      "name": "Chicago"
+    },
+    {
+      "slug": "dallas",
+      "name": "Dallas"
+    },
+    {
+      "slug": "denver",
+      "name": "Denver"
+    },
+    {
+      "slug": "detriot",
+      "name": "Detroit"
+    },
+    {
+      "slug": "florida",
+      "name": "Florida"
+    },
+    {
+      "slug": "fort-myers",
+      "name": "Fort Myers"
+    },
+    {
+      "slug": "honolulu",
+      "name": "Honolulu"
+    },
+    {
+      "slug": "houston",
+      "name": "Houston"
+    },
+    {
+      "slug": "indianapolis",
+      "name": "Indianapolis"
+    },
+    {
+      "slug": "jacksonville",
+      "name": "Jacksonville"
+    },
+    {
+      "slug": "kansas-city",
+      "name": "Kansas City"
+    },
+    {
+      "slug": "lancaster",
+      "name": "Lancaster"
+    },
+    {
+      "slug": "las-vegas",
+      "name": "Las Vegas"
+    },
+    {
+      "slug": "los-angeles",
+      "name": "Los Angeles"
+    },
+    {
+      "slug": "memphis",
+      "name": "Memphis"
+    },
+    {
+      "slug": "miami",
+      "name": "Miami"
+    },
+    {
+      "slug": "minneapolis",
+      "name": "Minneapolis"
+    },
+    {
+      "slug": "nashville",
+      "name": "Nashville"
+    },
+    {
+      "slug": "new-orleans",
+      "name": "New Orleans"
+    },
+    {
+      "slug": "new-york",
+      "name": "New York City"
+    },
+    {
+      "slug": "newark",
+      "name": "Newark"
+    },
+    {
+      "slug": "oklahoma-city",
+      "name": "Oklahoma City"
+    },
+    {
+      "slug": "orlando",
+      "name": "Orlando"
+    },
+    {
+      "slug": "philadelphia",
+      "name": "Philadelphia"
+    },
+    {
+      "slug": "phoenix",
+      "name": "Phoenix"
+    },
+    {
+      "slug": "portland",
+      "name": "Portland"
+    },
+    {
+      "slug": "raleigh",
+      "name": "Raleigh"
+    },
+    {
+      "slug": "salt-lake-city",
+      "name": "Salt Lake City"
+    },
+    {
+      "slug": "san-antonio",
+      "name": "San Antonio"
+    },
+    {
+      "slug": "san-diego",
+      "name": "San Diego"
+    },
+    {
+      "slug": "san-francisco",
+      "name": "San Francisco"
+    },
+    {
+      "slug": "san-jose",
+      "name": "San Jose"
+    },
+    {
+      "slug": "san-juan",
+      "name": "San Juan"
+    },
+    {
+      "slug": "seattle",
+      "name": "Seattle"
+    },
+    {
+      "slug": "tampa",
+      "name": "Tampa"
+    },
+    {
+      "slug": "washington-d-c",
+      "name": "Washington D.C."
     }
   ]
 }

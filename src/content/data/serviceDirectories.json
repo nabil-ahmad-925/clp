@@ -2,7 +2,7 @@
  "areas": [
   {
    "widgetId": 101,
-   "name": "Brand/Product Development",
+   "name": "Brand & Product Development",
    "slug": "brand-product-development",
    "path": "/services/brand-product-development/",
    "servicePage": "/brand-product-development/",
@@ -37,7 +37,7 @@
   },
   {
    "widgetId": 102,
-   "name": "Content Creation/Licensing",
+   "name": "Content Creation & Licensing",
    "slug": "content-creation-licensing-services",
    "path": "/services/content-creation-licensing-services/",
    "servicePage": "/content-creation-licensing/",
@@ -72,7 +72,7 @@
   },
   {
    "widgetId": 103,
-   "name": "Event/Project Management",
+   "name": "Event & Project Management",
    "slug": "event-project-management-services",
    "path": "/services/event-project-management-services/",
    "servicePage": "/event-project-management/",
@@ -107,7 +107,7 @@
   },
   {
    "widgetId": 104,
-   "name": "Fundraising/Retailing",
+   "name": "Fundraising & Retailing",
    "slug": "fundraising-retailing-services",
    "path": "/services/fundraising-retailing-services/",
    "servicePage": "/fundraising-retailing/",
@@ -142,7 +142,7 @@
   },
   {
    "widgetId": 105,
-   "name": "Nutrition/Performance Programming",
+   "name": "Nutrition & Performance Programming",
    "slug": "recovery-performance-training-services",
    "path": "/services/recovery-performance-training-services/",
    "servicePage": "/recovery-performance-training/",
@@ -177,7 +177,7 @@
   },
   {
    "widgetId": 106,
-   "name": "Procurement/Logistics",
+   "name": "Procurement & Logistics",
    "slug": "procurement-logistics-management",
    "path": "/services/procurement-logistics-management/",
    "servicePage": "/procurement-logistics/",

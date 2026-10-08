@@ -54,13 +54,14 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/branded-activations-2/"
     }
   },
   {
     title: "Briefings & Field Reports",
     layout: "masonry",
+    smallSides: true,
     spacing: {
       top: 5,
       bottom: 10
@@ -86,7 +87,7 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/briefs-field-reports/"
     }
   },
@@ -128,13 +129,14 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/diet-recovery-injury-prevention-recovery/"
     }
   },
   {
     title: "PRODUCT DEVELOPMENT & REVIEWS",
     layout: "masonry",
+    smallSides: true,
     spacing: {
       top: 5,
       bottom: 10
@@ -160,7 +162,7 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/product-reviews/"
     }
   },
@@ -202,13 +204,14 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/resilience-performance-training/"
     }
   },
   {
     title: "Strategy and Insights",
     layout: "masonry",
+    smallSides: true,
     spacing: {
       top: 4,
       bottom: 4
@@ -234,7 +237,7 @@ export const updatesSections: PostSectionData[] = [
       }
     ],
     viewAll: {
-      label: "View all",
+      label: "View All",
       href: "/strategy-insights/"
     }
   }

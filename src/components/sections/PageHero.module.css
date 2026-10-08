@@ -88,6 +88,21 @@
   color: var(--white);
 }
 
+/* As the original's page heading on desktops: 85px up to 1299px wide, 90px to 1500px, then its custom 60px. */
+@media (min-width: 1000px) and (max-width: 1299px) {
+  .title {
+    font-size: 85px;
+    line-height: 94px;
+  }
+}
+
+@media (min-width: 1501px) {
+  .title {
+    font-size: 60px;
+    line-height: 70px;
+  }
+}
+
 .subtitle {
   display: block;
   margin-bottom: 15px;

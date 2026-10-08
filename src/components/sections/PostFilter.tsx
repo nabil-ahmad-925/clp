@@ -2,15 +2,27 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { FaComments } from 'react-icons/fa';
-import { LuArrowUpDown, LuSearch, LuVolleyball } from 'react-icons/lu';
+import { LuArrowUpDown, LuClock, LuMapPin, LuPenLine, LuSearch, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import Pager from '@/components/ui/Pager';
 import PillSelect from '@/components/ui/PillSelect';
 import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
-import { ARTICLE_CATEGORIES, ARTICLE_SORTS, articleSearchPlaceholder, articlesEnabled, countArticles, fetchArticles, toFilterPost, type ArticleSort } from '@/content/articles';
+import {
+  ARTICLE_WRITERS,
+  ARTICLE_CATEGORIES,
+  ARTICLE_LENGTHS,
+  ARTICLE_SORTS,
+  articleSearchPlaceholder,
+  articlesEnabled,
+  countArticles,
+  fetchArticles,
+  locationName,
+  toFilterPost,
+  type ArticleSort,
+} from '@/content/articles';
 import type { FilterPost } from '@/content/types';
-import DirectorySearch, { useSharedSearch } from './DirectorySearch';
+import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
 import dir from './TeamDirectory.module.css';
 import styles from './PostFilter.module.css';
 
@@ -33,12 +45,17 @@ const subscribeNever = () => () => {};
 const urlFilter = () => new URLSearchParams(window.location.search).get('filter');
 const noFilter = () => null;
 
-type Result = { key: string; posts: FilterPost[]; total: number; counts: Record<string, number> };
+type Result = { key: string; posts: FilterPost[]; total: number; counts: Record<string, number>; lengths: Record<string, number>; authors: Record<string, number>; places: Place[] };
+
+/** Search words and spaces as applied ("  a   b " -> "a b"). */
+const tidy = (text: string) => text.trim().replace(/\s+/g, ' ');
 
 /**
- * A category's articles, as the experience directories list their listings: a search bar (on the page heading's edge
- * when the page puts it there, see BuilderPageView), a Sport filter (one sport at a time, when the category has sport
- * subcategories), grid or list view, and the same pager. The API searches, filters, counts and
+ * A category's articles, as the experience directories list their listings: a search bar of words and location (on
+ * the page heading's edge when the page puts it there, see BuilderPageView; the location field suggests the articles'
+ * places), a Sport filter (one sport at a time, when the category has sport subcategories), a Writer filter (Compete
+ * Like Pros, CLP Partners or Sponsor) and a Length filter (reading time), one choice each, grid or list view, and the
+ * same pager. The API searches, filters, counts and
  * pages them (newest first); a skeleton shows while the first page loads. If the API can't be reached, the
  * original grid's cards show instead (searched and paged here) with an offer to try again.
  */
@@ -59,14 +76,19 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   const linkedSport = sportChoices.find((s) => s.label === linkedLabel)?.value;
   const [chosenSports, setChosenSports] = useState<string[] | null>(null);
   const sports = chosenSports ?? (linkedSport ? [linkedSport] : []);
-  // The search: the page's bar on the heading's edge when there is one, else this list's own.
+  const [lengths, setLengths] = useState<string[]>([]);
+  // The Writer filter: Compete Like Pros or CLP Partners (the API's `writer`), one at a time.
+  const [writers, setWriters] = useState<string[]>([]);
+  const writer = writers[0] ?? '';
+  // The search (words and location): the page's bar on the heading's edge when there is one, else this list's own.
   const shared = useSharedSearch();
-  const [ownQ, setOwnQ] = useState('');
-  const q = shared ? shared.search.q : ownQ;
-  const setQ = (query: string) => (shared ? shared.setSearch({ q: query, loc: '' }) : setOwnQ(query));
+  const [ownSearch, setOwnSearch] = useState<Search>(NO_SEARCH);
+  const { q, loc } = shared ? shared.search : ownSearch;
+  const setSearch = shared ? shared.setSearch : setOwnSearch;
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(PAGE_SIZES[0]);
-  const [openFilter, setOpenFilter] = useState(false);
+  const [openFilter, setOpenFilter] = useState<'sport' | 'writer' | 'length' | null>(null);
+  const chipOpen = (chip: 'sport' | 'writer' | 'length') => ({ open: openFilter === chip, onOpenChange: (open: boolean) => setOpenFilter(open ? chip : null) });
   const [sort, setSort] = useState<ArticleSort>('recommended');
   // A new search, sport or sort starts at page 1.
   const chooseSort = (next: ArticleSort) => {
@@ -77,8 +99,16 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     setChosenSports(values);
     setPage(0);
   };
-  const applySearch = (query: string) => {
-    setQ(query.trim().replace(/\s+/g, ' '));
+  const applyWriters = (values: string[]) => {
+    setWriters(values);
+    setPage(0);
+  };
+  const applyLengths = (values: string[]) => {
+    setLengths(values);
+    setPage(0);
+  };
+  const applySearch = (next: Search) => {
+    setSearch({ q: tidy(next.q), loc: tidy(next.loc) });
     setPage(0);
   };
   // The page's bar runs its searches here (back to page 1).
@@ -87,7 +117,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     searchLatest.current = applySearch;
   });
   const register = shared?.register;
-  useEffect(() => register?.((next) => searchLatest.current(next.q)), [register]);
+  useEffect(() => register?.((next) => searchLatest.current(next)), [register]);
   const goTo = (n: number) => {
     setPage(n);
     topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -112,39 +142,53 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     } catch {}
   };
 
-  // The API's page for the current search, sports, page and page size.
+  // The API's page for the current search, location, sports, lengths, page and page size.
   const [retry, setRetry] = useState(0);
-  const requestKey = JSON.stringify([source, sports, q, sort, page, pageSize, retry]);
+  const requestKey = JSON.stringify([source, sports, writer, lengths, q, loc, sort, page, pageSize, retry]);
   const [result, setResult] = useState<Result | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   useEffect(() => {
     if (!live) return;
     let active = true;
-    fetchArticles({ category: source, sports, q: q || undefined, sort, page: page + 1, limit: pageSize, counts: 1 }).then(
+    fetchArticles({ category: source, writer, sports, lengths, q: q || undefined, loc: loc || undefined, sort, page: page + 1, limit: pageSize, counts: 1 }).then(
       (r) => {
         if (!active) return;
         // Past the last page (articles removed meanwhile): the last page.
         if (r.page > r.pages && r.total > 0) return setPage(r.pages - 1);
-        setResult({ key: requestKey, posts: r.items.map(toFilterPost), total: r.total, counts: r.counts ?? {} });
+        // The location field's suggestions: the articles' cities (with every other filter applied), most articles first.
+        const places = Object.entries(r.places ?? {})
+          .map(([slug, count]) => ({ value: slug, label: locationName(slug), count }))
+          .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+        setResult({ key: requestKey, posts: r.items.map(toFilterPost), total: r.total, counts: r.counts ?? {}, lengths: r.lengths ?? {}, authors: r.authors ?? {}, places });
       },
       () => active && setFailedKey(requestKey),
     );
     return () => {
       active = false;
     };
-    // requestKey stands for source, sports, q, sort, page, pageSize and retry.
+    // requestKey stands for source, sports, writer, lengths, q, loc, sort, page, pageSize and retry.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, requestKey]);
   const failed = failedKey === requestKey;
 
+  // The places the location field suggests (the page's bar gets them too).
+  const places = result?.places;
+  const sharePlaces = shared?.setPlaces;
+  useEffect(() => {
+    if (places) sharePlaces?.(places);
+  }, [sharePlaces, places]);
+
   // Without the API (or before it ever answered, when it failed): the original cards, searched and paged here.
   const local = !live || (failed && !result);
-  /** The original cards matching the search and some sports (their buttons of the same names). */
+  /** The original cards matching the search and some sports (their buttons of the same names); they have no location. */
   const matchLocal = (chosen: string[]) => {
-    const words = q.toLowerCase().split(' ').filter(Boolean);
+    const words = fold(q).split(' ').filter(Boolean);
     const ids = new Set(builtInCategories.filter((c) => sportChoices.some((s) => chosen.includes(s.value) && s.label === c.label)).map((c) => c.id));
     return builtInPosts.filter(
-      (post) => (!chosen.length || post.categories.some((c) => ids.has(c))) && words.every((w) => `${post.title} ${post.excerpt}`.toLowerCase().includes(w)),
+      (post) =>
+        (!chosen.length || post.categories.some((c) => ids.has(c))) &&
+        (!loc || fold(post.location ?? '').includes(fold(loc))) &&
+        words.every((w) => fold(`${post.title} ${post.excerpt}`).includes(w)),
     );
   };
   /** The original cards (newest first) in the chosen order. */
@@ -161,10 +205,18 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   const total = local ? localMatches.length : (result?.total ?? 0);
   const posts = local ? localMatches.slice(page * pageSize, (page + 1) * pageSize) : (result?.posts ?? []);
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
-  const sportOptions = sportChoices
-    .map((s) => ({ ...s, count: local ? undefined : (result?.counts[s.value] ?? 0) }))
-    // Sports without articles are left out (unless chosen), as on the experience directories.
-    .filter((s) => s.count === undefined || s.count > 0 || sports.includes(s.value));
+  // Every sport of the category is offered, even one without articles (its count says 0).
+  const sportOptions = sportChoices.map((s) => ({ ...s, count: local ? undefined : (result?.counts[s.value] ?? 0) }));
+  // Every writer choice is offered, with its article count (0 included; none shown until the API answers); the built-in
+  // cards have no writer.
+  const writerOptions = local ? [] : ARTICLE_WRITERS.map((w) => ({ ...w, count: result ? (result.authors[w.value] ?? 0) : undefined }));
+  // Reading lengths with articles (or chosen); the built-in cards have no reading time.
+  const lengthOptions = local
+    ? []
+    : ARTICLE_LENGTHS.map((l) => ({ ...l, count: result?.lengths[l.value] ?? 0 })).filter((l) => l.count > 0 || lengths.includes(l.value));
+  /** The API's count of a draft of one filter, with the others applied. */
+  const countWith = (draft: { sports?: string[]; writer?: string; lengths?: string[] }) =>
+    countArticles({ category: source, writer, sports, lengths, q: q || undefined, loc: loc || undefined, ...draft });
 
   // The cards have no column padding: --dir-col-gap 32px cancels the filter bar's indent (TeamDirectory lines it up
   // with its cards' 32px padding), so the Sport pill starts at the cards' left edge.
@@ -176,11 +228,11 @@ export default function PostFilter({ categories: builtInCategories, posts: built
         <div className={dir.searchSlot}>
           <DirectorySearch
             query={q}
-            location=""
-            withLocation={false}
+            location={loc}
+            places={places}
             label="Search articles"
             placeholder={articleSearchPlaceholder(source)}
-            onSearch={(query) => applySearch(query)}
+            onSearch={(query, location) => applySearch({ q: query, loc: location })}
           />
         </div>
       )}
@@ -195,22 +247,49 @@ export default function PostFilter({ categories: builtInCategories, posts: built
                 single
                 options={sportOptions}
                 value={sports}
-                open={openFilter}
-                onOpenChange={setOpenFilter}
-                {...(local
-                  ? { resultsFor: (draft: string[]) => matchLocal(draft).length }
-                  : { countFor: (draft: string[]) => countArticles({ category: source, sports: draft, q: q || undefined }) })}
+                {...chipOpen('sport')}
+                {...(local ? { resultsFor: (draft: string[]) => matchLocal(draft).length } : { countFor: (draft: string[]) => countWith({ sports: draft }) })}
                 onApply={applySports}
               />
             )}
-            {q && <AppliedPill icon={<LuSearch />} label={`“${q}”`} onClear={() => applySearch('')} />}
-            {(q || sports.length > 0) && (
+            {writerOptions.length > 0 && (
+              <FilterChip
+                name="Writer"
+                icon={<LuPenLine />}
+                plural="writers"
+                single
+                options={writerOptions}
+                value={writers}
+                {...chipOpen('writer')}
+                countFor={(draft: string[]) => countWith({ writer: draft[0] ?? '' })}
+                onApply={applyWriters}
+              />
+            )}
+            {lengthOptions.length > 0 && (
+              <FilterChip
+                name="Length"
+                heading="Reading time"
+                icon={<LuClock />}
+                plural="lengths"
+                single
+                options={lengthOptions}
+                value={lengths}
+                {...chipOpen('length')}
+                countFor={(draft: string[]) => countWith({ lengths: draft })}
+                onApply={applyLengths}
+              />
+            )}
+            {loc && <AppliedPill icon={<LuMapPin />} label={loc} onClear={() => applySearch({ q, loc: '' })} />}
+            {q && <AppliedPill icon={<LuSearch />} label={`“${q}”`} onClear={() => applySearch({ q: '', loc })} />}
+            {(q || loc || sports.length > 0 || writers.length > 0 || lengths.length > 0) && (
               <button
                 type="button"
                 className={dir.clearAll}
                 onClick={() => {
-                  setQ('');
-                  applySports([]);
+                  setSearch(NO_SEARCH);
+                  setChosenSports([]);
+                  applyWriters([]);
+                  applyLengths([]);
                 }}
               >
                 Clear all
@@ -285,7 +364,33 @@ function DateBadge({ post }: { post: FilterPost }) {
   );
 }
 
-/** Grid card: photo with the date, title, excerpt, comments and Read More. */
+/** A card's foot: comments | reading time, then Read More. */
+function Foot({ post }: { post: FilterPost }) {
+  return (
+    <div className={styles.foot}>
+      <span className={styles.meta}>
+        <span className={styles.metaItem}>
+          <FaComments aria-hidden /> {post.comments}
+        </span>
+        {post.readingTime && (
+          <>
+            <span className={styles.metaSep} aria-hidden>
+              |
+            </span>
+            <span className={styles.metaItem}>
+              <LuClock aria-hidden /> {post.readingTime}
+            </span>
+          </>
+        )}
+      </span>
+      <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
+        Read More
+      </a>
+    </div>
+  );
+}
+
+/** Grid card: photo with the date, title, excerpt, comments | reading time and Read More. */
 function ArticleCard({ post, eager }: { post: FilterPost; eager: boolean }) {
   return (
     <article className={styles.card}>
@@ -299,14 +404,7 @@ function ArticleCard({ post, eager }: { post: FilterPost; eager: boolean }) {
           <a href={post.href}>{post.title}</a>
         </h3>
         {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
-        <div className={styles.foot}>
-          <span className={styles.meta}>
-            <FaComments aria-hidden /> {post.comments}
-          </span>
-          <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
-            Read More
-          </a>
-        </div>
+        <Foot post={post} />
       </div>
     </article>
   );
@@ -326,14 +424,7 @@ function ArticleRow({ post, eager }: { post: FilterPost; eager: boolean }) {
           <a href={post.href}>{post.title}</a>
         </h3>
         {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
-        <div className={styles.foot}>
-          <span className={styles.meta}>
-            <FaComments aria-hidden /> {post.comments}
-          </span>
-          <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
-            Read More
-          </a>
-        </div>
+        <Foot post={post} />
       </div>
     </article>
   );

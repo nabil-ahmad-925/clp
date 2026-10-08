@@ -211,7 +211,7 @@ export const servicePages: ServicePage[] = [
     },
     hero: {
       title: [
-        "Content Creation /",
+        "Content Creation &",
         "Licensing Services"
       ],
       backgroundColor: "#0a0a0a",
@@ -379,7 +379,7 @@ export const servicePages: ServicePage[] = [
     },
     faq: {
       italic: true,
-      title: "CONTENT CREATION / LICENSING FAQ's",
+      title: "CONTENT CREATION & LICENSING FAQ's",
       items: [
         {
           question: "What content creation services do you offer?",
@@ -407,12 +407,12 @@ export const servicePages: ServicePage[] = [
   {
     slug: "event-project-management",
     meta: {
-      title: "Event / Project Management - Compete Like Pros™",
+      title: "Event & Project Management - Compete Like Pros™",
       description: "With our event and project management services, you can optimize the success of your event or project. From idea to execution, we will coordinate your event"
     },
     hero: {
       title: [
-        "Event / Project",
+        "Event & Project",
         "Management Services"
       ],
       backgroundColor: "#0a0a0a",
@@ -578,7 +578,7 @@ export const servicePages: ServicePage[] = [
       ]
     },
     faq: {
-      title: "EVENT / PROJECT MANAGEMENT FAQ's",
+      title: "EVENT & PROJECT MANAGEMENT FAQ's",
       items: [
         {
           question: "What event management services do you offer?",
@@ -611,7 +611,7 @@ export const servicePages: ServicePage[] = [
     },
     hero: {
       title: [
-        "Fundraising/Retailing",
+        "Fundraising & Retailing",
         "Services"
       ],
       backgroundColor: "#0a0a0a",
@@ -778,7 +778,7 @@ export const servicePages: ServicePage[] = [
     },
     faq: {
       italic: true,
-      title: "FUNDRAISING/RETAILING FAQ's",
+      title: "FUNDRAISING & RETAILING FAQ's",
       items: [
         {
           question: "What fundraising services do you offer?",
@@ -811,7 +811,7 @@ export const servicePages: ServicePage[] = [
     },
     hero: {
       title: [
-        "Nutrition/Performance",
+        "Nutrition & Performance",
         "Programming Services"
       ],
       backgroundColor: "#0a0a0a",
@@ -1012,7 +1012,7 @@ export const servicePages: ServicePage[] = [
     },
     hero: {
       title: [
-        "Procurement / Logistics",
+        "Procurement & Logistics",
         "Management Services"
       ],
       backgroundColor: "#0a0a0a",
@@ -1184,7 +1184,7 @@ export const servicePages: ServicePage[] = [
     },
     faq: {
       italic: true,
-      title: "PROCUREMENT / LOGISTICS MANAGEMENT FAQ's",
+      title: "PROCUREMENT & LOGISTICS MANAGEMENT FAQ's",
       items: [
         {
           question: "What procurement and logistics services do you offer?",

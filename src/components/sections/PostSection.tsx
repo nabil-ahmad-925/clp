@@ -12,7 +12,7 @@ import styles from './PostSection.module.css';
  * arrows over the photos and a white card behind the hovered post, or a masonry row of three whose middle post is a
  * wide photo with its title on it.
  */
-export default function PostSection({ title, layout, spacing, posts, viewAll }: PostSectionData) {
+export default function PostSection({ title, layout, spacing, posts, viewAll, smallSides }: PostSectionData) {
   return (
     <section
       className={styles.section}
@@ -21,7 +21,7 @@ export default function PostSection({ title, layout, spacing, posts, viewAll }: 
     >
       <Container>
         <h2 className={styles.title}>{title}</h2>
-        {layout === 'carousel' ? <PostCarousel posts={posts} /> : <PostMasonry posts={posts} />}
+        {layout === 'carousel' ? <PostCarousel posts={posts} /> : <PostMasonry posts={posts} smallSides={smallSides} />}
         <div className={styles.viewAll}>
           <a href={viewAll.href} className={styles.pill}>
             <span>{viewAll.label}</span>
@@ -73,10 +73,13 @@ function PostCarousel({ posts }: { posts: Post[] }) {
   );
 }
 
-/** Masonry row: the second post spans two columns, its photo filling the cell with the title over it. */
-function PostMasonry({ posts }: { posts: Post[] }) {
+/**
+ * Masonry row: the second post spans two columns, its photo filling the cell with the title over it. `smallSides`:
+ * the other posts' photos are smaller, centred on the row's height.
+ */
+function PostMasonry({ posts, smallSides }: { posts: Post[]; smallSides?: boolean }) {
   return (
-    <div className={styles.masonry}>
+    <div className={`${styles.masonry} ${smallSides ? styles.smallSides : ''}`}>
       {posts.map((post, i) => (
         <div key={post.href} className={i === 1 ? styles.wide : undefined}>
           <PostCard post={post} variant={i === 1 ? 'feature' : 'plain'} />

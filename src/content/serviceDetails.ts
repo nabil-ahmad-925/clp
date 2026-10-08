@@ -98,13 +98,13 @@ export const serviceDetailPages: ServiceDetailPage[] = [
         socials: [],
       },
     ],
-    previous: { label: "Previous Service", title: ["Brand /", "Product Development"], href: "/services/brand-product-development/" },
-    next: { label: "Next Service", title: ["Event /", "Project Management"], href: "/services/event-project-management-services/" },
+    previous: { label: "Previous Service", title: ["Brand &", "Product Development"], href: "/services/brand-product-development/" },
+    next: { label: "Next Service", title: ["Event &", "Project Management"], href: "/services/event-project-management-services/" },
   },
   {
     slug: "event-project-management-services",
     meta: { title: "event-project-management-services - Compete Like Pros™", description: "" },
-    title: ["Event / Project", "Management Services"],
+    title: ["Event & Project", "Management Services"],
     cards: [
       {
         image: upload("/2024/05/Budget.png"),
@@ -147,13 +147,13 @@ export const serviceDetailPages: ServiceDetailPage[] = [
         socials: [],
       },
     ],
-    previous: { label: "Previous Service", title: ["Content Creation /", "Licensing"], href: "/services/content-creation-licensing-services/" },
-    next: { label: "Next Service", title: ["Fundraising /", "Retailing"], href: "/services/fundraising-retailing-services/" },
+    previous: { label: "Previous Service", title: ["Content Creation &", "Licensing"], href: "/services/content-creation-licensing-services/" },
+    next: { label: "Next Service", title: ["Fundraising &", "Retailing"], href: "/services/fundraising-retailing-services/" },
   },
   {
     slug: "fundraising-retailing-services",
     meta: { title: "fundraising-retailing-services – Compete Like Pros™", description: "" },
-    title: ["Fundraising / Retailing", "Services"],
+    title: ["Fundraising & Retailing", "Services"],
     cards: [
       {
         image: upload("/2024/05/Direct-Mail.png"),
@@ -196,13 +196,13 @@ export const serviceDetailPages: ServiceDetailPage[] = [
         socials: [],
       },
     ],
-    previous: { label: "Previous Service", title: ["Event /", "Project Management"], href: "/services/event-project-management-services/" },
-    next: { label: "Next Service", title: ["Procurement /", "Logistics"], href: "/services/procurement-logistics-management/" },
+    previous: { label: "Previous Service", title: ["Event &", "Project Management"], href: "/services/event-project-management-services/" },
+    next: { label: "Next Service", title: ["Procurement &", "Logistics"], href: "/services/procurement-logistics-management/" },
   },
   {
     slug: "procurement-logistics-management",
-    meta: { title: "Procurement / Logistics Management Services – Compete Like Pros™", description: "" },
-    title: ["Procurement / Logistics", "Management Services"],
+    meta: { title: "Procurement & Logistics Management Services – Compete Like Pros™", description: "" },
+    title: ["Procurement & Logistics", "Management Services"],
     cards: [
       {
         image: upload("/2024/05/Boxes.png"),
@@ -245,16 +245,16 @@ export const serviceDetailPages: ServiceDetailPage[] = [
         socials: [],
       },
     ],
-    previous: { label: "Previous Service", title: ["Fundraising /", "Retailing"], href: "/services/fundraising-retailing-services/" },
-    next: { label: "Next Service", title: ["Recovery /", "Performance Training"], href: "/services/recovery-performance-training-services/" },
+    previous: { label: "Previous Service", title: ["Fundraising &", "Retailing"], href: "/services/fundraising-retailing-services/" },
+    next: { label: "Next Service", title: ["Recovery &", "Performance Training"], href: "/services/recovery-performance-training-services/" },
   },
   {
     slug: "recovery-performance-training-services",
-    meta: { title: "Recovery / Performance Training Services – Compete Like Pros™", description: "" },
-    title: ["Recovery / Performance", "Training Services"],
+    meta: { title: "Recovery & Performance Training Services – Compete Like Pros™", description: "" },
+    title: ["Recovery & Performance", "Training Services"],
     // The team widget on the original has no members left, so it shows "No Results Found".
     cards: [],
-    previous: { label: "Previous Service", title: ["Procurement /", "Logistics"], href: "/services/procurement-logistics-management/" },
+    previous: { label: "Previous Service", title: ["Procurement &", "Logistics"], href: "/services/procurement-logistics-management/" },
     next: { label: "Next Service", title: ["Sports", "Tourism"], href: "/services/sports-tourism-services/" },
   },
   {
@@ -303,7 +303,7 @@ export const serviceDetailPages: ServiceDetailPage[] = [
         socials: [],
       },
     ],
-    previous: { label: "Previous Service", title: ["Recovery /", "Performance Training"], href: "/services/recovery-performance-training-services/" },
+    previous: { label: "Previous Service", title: ["Recovery &", "Performance Training"], href: "/services/recovery-performance-training-services/" },
     next: undefined,
   },
 ];

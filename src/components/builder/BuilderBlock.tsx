@@ -13,7 +13,6 @@ import PostFilter from '@/components/sections/PostFilter';
 import ServiceNav from '@/components/sections/ServiceNav';
 import TeamDirectory from '@/components/sections/TeamDirectory';
 import RichText from '@/components/ui/RichText';
-import { sportPagesOf } from '@/content/builder';
 import type { Block } from '@/content/types';
 import BookingForm from './BookingForm';
 import styles from './BuilderBlock.module.css';
@@ -32,7 +31,7 @@ export default function BuilderBlock({ block }: { block: Block }) {
     case 'team':
       return (
         <div className={styles.teamColumn}>
-          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} widgetId={block.widgetId} sportPages={sportPagesOf(block.widgetId)} />
+          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} widgetId={block.widgetId} />
         </div>
       );
     case 'serviceNav':

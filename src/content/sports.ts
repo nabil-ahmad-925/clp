@@ -64,7 +64,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Step up to the plate. Our camps and tournaments are built for every level—from first-timers to travel-ball veterans.",
         image: upload('/2024/03/CLP-Photos-Baseball-Camps.png'),
         cta: {
@@ -73,7 +73,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way—group sessions for team chemistry or private coaching to dial in your swing, arm slot, or defensive reads.",
         image: upload('/2024/03/CLP-Photos-Baseball-Group-Lessons.png'),
         cta: {
@@ -82,7 +82,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your league. Whether you're chasing wins or just chasing fly balls with friends, we've got a diamond for you.",
         image: upload('/2024/04/CLP-baseball-league.png'),
         cta: {
@@ -91,7 +91,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Train, travel, and connect. From spring training destinations to iconic ballparks, our trips combine elite development with unforgettable experiences.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -100,7 +100,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Get in the game. Open play and volunteer opportunities put community at the heart of every inning.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -363,7 +363,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Compete, grow, and connect through camps and tournaments built for every skill level—where development meets real competition.",
         image: upload('/2024/04/CLP-basketball-camps.png'),
         cta: {
@@ -372,7 +372,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way. Whether group sessions or one-on-one coaching, every program is built around your goals.",
         image: upload('/2024/04/CLP-Photos-Basketball-Group-Lessons.png'),
         cta: {
@@ -381,7 +381,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your level. From competitive leagues to laid-back social clubs, there's a court for everyone.",
         image: upload('/2024/04/Basketball-league.png'),
         cta: {
@@ -390,7 +390,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Elite training meets cultural immersion. Compete, recover, and connect in destinations that inspire growth.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -399,7 +399,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Show up. Give back. Our open play sessions and volunteer opportunities put community at the center of the game.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -654,7 +654,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Queue up. Our camps and tournaments are built for every skill tier—from casual grinders to competitive climbers.",
         image: upload('/2024/04/CLP-Photos-Esports-Camps.png'),
         cta: {
@@ -663,7 +663,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way—squad sessions for team synergy or private coaching to refine your mechanics, positioning, and decision-making.",
         image: upload('/2024/04/CLP-Photos-Esports-Group-Lessons.png'),
         cta: {
@@ -672,7 +672,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your lobby. Competitive leagues for ranked players. Social clubs for those who just want to run games with good people.",
         image: upload('/2024/04/Esports-League.png'),
         cta: {
@@ -681,7 +681,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Boot camps and LAN events in destinations built for focus, competition, and connection. Train hard. Play harder.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -690,7 +690,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Drop in. Get on the sticks. Our open play and volunteer programs put community at the center of gaming culture.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -949,7 +949,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Compete at your level. Our camps and tournaments build skills, sharpen instincts, and bring players together from first touch to final whistle.",
         image: upload('/2024/04/CLP-Photos-Futbol-Camps.png'),
         cta: {
@@ -958,7 +958,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way—group sessions to build chemistry or private coaching to refine your touch, positioning, and decision-making.",
         image: upload('/2024/04/CLP-Photos-Futbol-Group-Lessons.png'),
         cta: {
@@ -967,7 +967,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your pitch. From competitive leagues to social pickup, there's a place for every player ready to get on the ball.",
         image: upload('/2024/04/Futbol-League.png'),
         cta: {
@@ -976,7 +976,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Train where the game lives. From iconic pitches to international destinations, our trips blend elite development with cultural immersion.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -985,7 +985,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Show up. Get involved. Our open play and volunteer programs put community at the center of the game.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -1236,7 +1236,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Tee it up. Our camps and tournaments are designed for every handicap—building fundamentals for beginners and sharpening skills for competitors.",
         image: upload('/2024/04/CLP-Photos-Golf-Camps.png'),
         cta: {
@@ -1245,7 +1245,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way—group clinics for camaraderie or private instruction to dial in your swing, short game, and course management.",
         image: upload('/2024/04/CLP-Photos-Golf-Group-Lessons.png'),
         cta: {
@@ -1254,7 +1254,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your foursome. Competitive leagues for players chasing low rounds. Social clubs for those chasing good company.",
         image: upload('/2024/04/Golfing-league.png'),
         cta: {
@@ -1263,7 +1263,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Play where it matters. Our golf retreats combine world-class courses, expert coaching, and destinations that inspire your best game.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -1272,7 +1272,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Get involved. Our volunteer and open play programs bring golfers together to give back and grow the game.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -1523,7 +1523,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "CAMPS/TOURNAMENTS",
+        title: "CAMPS & TOURNAMENTS",
         text: "Compete, connect, and improve. Our camps and tournaments are built for every skill level—from newcomers to tournament-tested players.",
         image: upload('/2024/04/CLP-Photos-Pickleball-Camps.png'),
         cta: {
@@ -1532,7 +1532,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "GROUPS/PRIVATE LESSONS",
+        title: "GROUPS & PRIVATE LESSONS",
         text: "Train your way—group sessions for social play or private coaching to tighten your dinks, drives, and court positioning.",
         image: upload('/2024/04/CLP-Photos-Pickleball-Group-Lessons.png'),
         cta: {
@@ -1541,7 +1541,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "LEAGUES/SOCIAL CLUBS",
+        title: "LEAGUES & SOCIAL CLUBS",
         text: "Find your court. Competitive leagues for those chasing wins. Social clubs for those chasing a good time. Both are welcome here.",
         image: upload('/2024/05/Leagues.png'),
         cta: {
@@ -1550,7 +1550,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "TRIPS/RETREATS",
+        title: "TRIPS & RETREATS",
         text: "Play Destination Pickleball. Our retreats combine elite instruction, recovery, and unforgettable experiences in inspiring locations.",
         image: upload('/2025/07/Trips-and-retreats.png'),
         cta: {
@@ -1559,7 +1559,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "VOLUNTEERING/OPEN PLAY",
+        title: "VOLUNTEERING & OPEN PLAY",
         text: "Drop in. Get on the court. Our open play sessions and volunteer programs make community the heart of the game.",
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
@@ -1805,7 +1805,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
@@ -2082,7 +2082,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
@@ -2123,7 +2123,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2025/07/CLP-Photos-Strength-and-Conditioning-800x800-1.png'),
         cta: {
           label: "Learn More",
-          href: "/product-reviews/?filter=198"
+          href: "/strength-conditioning-golf/"
         }
       }
     ],
@@ -2359,7 +2359,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
@@ -2640,7 +2640,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
@@ -2929,7 +2929,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
@@ -2970,7 +2970,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2025/07/CLP-Photos-Strength-and-Conditioning-800x800-1.png'),
         cta: {
           label: "Learn More",
-          href: "/strength-conditioning-basketball"
+          href: "/strength-conditioning-basketball/"
         }
       }
     ],
@@ -3214,7 +3214,7 @@ export const sportPages: SportPage[] = [
         }
       },
       {
-        title: "JOBS/INTERNSHIPS",
+        title: "JOBS & INTERNSHIPS",
         text: "Build your career in sports. Explore jobs and internships with organizations that value talent and ambition.",
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
