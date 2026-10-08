@@ -53,13 +53,6 @@
   color: var(--white);
 }
 
-@media (min-width: 1000px) and (max-width: 1299px) {
-  .title {
-    font-size: 42.5px;
-    line-height: 42.5px;
-  }
-}
-
 @media (min-width: 768px) and (max-width: 999px) {
   .title {
     font-size: 40px;

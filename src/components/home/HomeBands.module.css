@@ -15,8 +15,6 @@
 .supporting {
   margin: -15px 0 30px;
   font-weight: 400;
-  /* The original's headings are 1px tighter (Salient: h2/h3 letter-spacing -1px). */
-  letter-spacing: -1px;
   color: var(--white);
 }
 
@@ -61,7 +59,6 @@
   font-weight: 400;
   font-size: 60px;
   line-height: 60px;
-  letter-spacing: -1px;
   color: var(--white);
 }
 
@@ -78,7 +75,6 @@
   font-weight: 400;
   font-size: 30px;
   line-height: 40px;
-  letter-spacing: -1px;
   color: var(--grey-muted);
 }
 
@@ -109,26 +105,29 @@
   .supporting,
   .hashtagText,
   .trustedTitle {
-    font-size: 30.4px;
-    line-height: 33.6px;
+    font-size: 31px;
+    line-height: 34px;
   }
 
+  /* Stacked, the original's logos keep space below their last row (measured: 15px more than the grid's). */
   .logos {
     grid-template-columns: repeat(3, 1fr);
     column-gap: 13px;
+    padding-bottom: 15px;
   }
 }
 
 @media (max-width: 767px) {
   .hashtagText {
     font-size: 20px;
-    line-height: 28px;
+    line-height: 34px;
   }
 }
 
 @media (max-width: 690px) {
   .statement,
   .supporting,
+  .hashtagText,
   .trustedTitle {
     font-size: 20px;
     line-height: 28px;

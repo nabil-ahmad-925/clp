@@ -10,6 +10,7 @@ export const homeHero: PageHeroData = {
   backgroundColor: '#2b2b2b',
   video: upload('/2024/03/clp-video.mp4'),
   textEffect: 'rotate-in',
+  scrollArrow: true,
 };
 
 export const homeIntro = {

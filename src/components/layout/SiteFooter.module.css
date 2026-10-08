@@ -95,6 +95,15 @@
   }
 }
 
+/* The original stacks the footer's columns below 1000px: the icons' column keeps its 25px bottom margin (phones
+   size it below). */
+@media (min-width: 691px) and (max-width: 999px) {
+  /* Padding, not margin: a margin would merge with the links' 30px top margin. */
+  .social {
+    padding-bottom: 25px;
+  }
+}
+
 @media (max-width: 767px) {
   .trademark {
     margin-top: 2px;
@@ -127,7 +136,7 @@
   .links li {
     display: block;
     margin: 5px 0;
-    line-height: 28px;
+    line-height: 27px;
   }
 
   .links a {

@@ -3,12 +3,12 @@
   text-align: center;
 }
 
-/* 5% of the content width below the heading (the padding of the original's inner row). */
+/* 5% of the content width below the heading (the padding of the original's inner row). The original's heading is
+   half the width (its column) and splits into one inline block per word, so its lines are taller than its
+   line-height says: these are the lines as shown. */
 .testimonialsHeading h2 {
-  max-width: 610px;
+  max-width: 50%;
   margin: 0 auto;
-  /* As the original's headings (Salient: letter-spacing -1px). */
-  letter-spacing: -1px;
   padding-bottom: 5%;
   font-size: 50px;
   line-height: 60px;
@@ -19,19 +19,24 @@
   background: var(--white);
 }
 
-/* The service rows: their titles 1px tighter, as the original's headings. */
+/* The service rows. */
 .services {
   display: contents;
 }
 
-.services h2 {
-  letter-spacing: -1px;
+@media (min-width: 1000px) and (max-width: 1300px) {
+  .testimonialsHeading h2 {
+    font-size: 43px;
+    line-height: 51.5px;
+  }
 }
 
-@media (min-width: 1000px) and (max-width: 1299px) {
+/* Below 1000px the original stacks its row's columns: the heading full width, then two empty columns of 25px
+   bottom margin each. */
+@media (max-width: 999px) {
   .testimonialsHeading h2 {
-    font-size: 42.5px;
-    line-height: 51px;
+    max-width: none;
+    margin-bottom: 50px;
   }
 }
 
@@ -43,13 +48,8 @@
 }
 
 @media (max-width: 690px) {
-  .testimonialsHeading {
-    padding-bottom: 43px;
-  }
-
   .testimonialsHeading h2 {
-    padding-bottom: 0;
     font-size: 22px;
-    line-height: 26.4px;
+    line-height: 28px;
   }
 }

@@ -202,7 +202,22 @@
 
   .title {
     font-size: 70px;
-    line-height: 74.2px;
+    line-height: 75px;
+  }
+}
+
+/* As the original: 40px titles from 691px to 767px (the home's rotating title already its phone size, below). */
+@media (min-width: 691px) and (max-width: 767px) {
+  .title {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .title.rotateIn {
+    margin-bottom: 4px;
+    font-size: 30px;
+    line-height: 48px;
   }
 }
 
@@ -211,6 +226,10 @@
     margin-bottom: 4px;
     font-size: 30px;
     line-height: 40px;
+  }
+
+  .title.rotateIn {
+    line-height: 48px;
   }
 
   .subtitle {
