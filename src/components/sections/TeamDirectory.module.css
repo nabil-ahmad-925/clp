@@ -102,15 +102,26 @@
   line-height: 1.4;
 }
 
-/* Phones: the sort menu goes above the pills. */
+/* Phones: the Filters button (with the sort in its sheet) on the left, the view toggle on the right. */
+.mobileFilters {
+  display: none;
+}
+
 @media (max-width: 639px) {
   .barRow {
-    flex-direction: column-reverse;
-    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  .sortSlot {
-    align-self: flex-end;
+  .filters,
+  .sortDesktop {
+    display: none;
+  }
+
+  .mobileFilters {
+    display: flex;
+    flex: 1;
+    min-width: 0;
   }
 }
 

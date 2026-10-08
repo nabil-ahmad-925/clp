@@ -340,7 +340,9 @@
     align-items: stretch;
   }
 
+  /* Its full height above the picture (a column item may otherwise shrink to nothing), so the overlay scrolls. */
   .details {
+    flex: none;
     padding: 0;
   }
 

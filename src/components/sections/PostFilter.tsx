@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSPro
 import { FaComments } from 'react-icons/fa';
 import { LuArrowUpDown, LuClock, LuMapPin, LuPenLine, LuSearch, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
+import MobileFilters from '@/components/ui/MobileFilters';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import Pager from '@/components/ui/Pager';
 import PillSelect from '@/components/ui/PillSelect';
@@ -296,8 +297,33 @@ export default function PostFilter({ categories: builtInCategories, posts: built
               </button>
             )}
           </div>
+          {/* Phones: one Filters button (tenpo's sheet) in place of the pills and the sort menu. */}
+          <div className={`${dir.mobileFilters} ${loading ? dir.busy : ''}`} inert={loading}>
+            <MobileFilters
+              sections={[
+                ...(sportOptions.length > 0 ? [{ id: 'sport', heading: 'Sport', options: sportOptions, value: sports, single: true }] : []),
+                ...(writerOptions.length > 0 ? [{ id: 'writer', heading: 'Writer', options: writerOptions, value: writers, single: true }] : []),
+                ...(lengthOptions.length > 0 ? [{ id: 'length', heading: 'Reading time', options: lengthOptions, value: lengths, single: true }] : []),
+              ]}
+              sort={{ value: sort, options: ARTICLE_SORTS }}
+              applied={(sports.length > 0 ? 1 : 0) + (writers.length > 0 ? 1 : 0) + (lengths.length > 0 ? 1 : 0)}
+              countFor={(draft) =>
+                local
+                  ? matchLocal(draft.sport ?? sports).length
+                  : countWith({ sports: draft.sport ?? sports, writer: (draft.writer ?? writers)[0] ?? '', lengths: draft.length ?? lengths })
+              }
+              onApply={(draft, nextSort) => {
+                applySports(draft.sport ?? sports);
+                applyWriters(draft.writer ?? writers);
+                applyLengths(draft.length ?? lengths);
+                if (nextSort) chooseSort(nextSort as ArticleSort);
+              }}
+            />
+          </div>
           <div className={`${dir.sortSlot} ${loading ? dir.busy : ''}`} inert={loading}>
-            <PillSelect value={sort} options={ARTICLE_SORTS} onChange={chooseSort} label="Sort articles" icon={<LuArrowUpDown />} />
+            <span className={dir.sortDesktop}>
+              <PillSelect value={sort} options={ARTICLE_SORTS} onChange={chooseSort} label="Sort articles" icon={<LuArrowUpDown />} />
+            </span>
             <ViewToggle value={display} onChange={chooseView} />
           </div>
         </div>

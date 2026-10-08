@@ -22,7 +22,8 @@ import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import Pager from '@/components/ui/Pager';
 import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/PriceChip';
-import SortSelect, { type Sort } from '@/components/ui/SortSelect';
+import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
+import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
 import { SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
@@ -473,7 +474,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
    * of that sport (with the other filters and the search applied), else that sport's built-in cards (every sport's are
    * on the page).
    */
-  const applySport = (next: string[][], nextSearch = search) => {
+  const applySport = (next: string[][], nextSearch = search, nextSort = sort) => {
     setChosen(next);
     if (widgetId == null || !enabled) {
       showCount(matching(builtIn, next, nextSearch).length);
@@ -485,7 +486,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     (apiSports ? Promise.resolve(next[si].some(inApi) ? 1 : 0) : countListings(widgetId, next.map((v, j) => (j === si ? v : []))))
       .then(async (available) => {
         if (available === 0) return null;
-        return queryListings(widgetId, next, facetGroups, pageSize, { ...nextSearch, sort: apiSort(sort) });
+        return queryListings(widgetId, next, facetGroups, pageSize, { ...nextSearch, sort: apiSort(nextSort) });
       })
       .then(
         (r) => {
@@ -495,7 +496,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
             ...v,
             mode: r ? 'api' : 'local',
             result: r,
-            resultKey: JSON.stringify({ g: next, ...nextSearch, sort, size: pageSize } satisfies ResultKey),
+            resultKey: JSON.stringify({ g: next, ...nextSearch, sort: nextSort, size: pageSize } satisfies ResultKey),
             pending: false,
             more: false,
             pages: r ? [r.items] : [],
@@ -505,6 +506,13 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         () => request === latest.current && setView((v) => ({ ...v, pending: false, error: true })),
       );
   };
+  /** The filter groups of a sheet draft (phones): its sections' values; none for Resources' Sport is the route's. */
+  const sheetGroups = (draft: SheetDraft) =>
+    chosen.map((v, j) => {
+      const d = draft[String(j)];
+      if (d === undefined) return v;
+      return routeSport(filters[j]) && d.length === 0 ? [filters[j].preset!] : d;
+    });
   // Page changes bring the top of the directory (its filter bar) back into view.
   const topRef = useRef<HTMLDivElement>(null);
   const toTop = () => topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -758,8 +766,45 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                 </button>
               )}
             </div>
+            {/* Phones: one Filters button (tenpo's sheet) in place of the pills and the sort menu. */}
+            <div className={`${styles.mobileFilters} ${loading ? styles.busy : ''}`} inert={loading}>
+              {(bar.length > 0 || sorts.length > 1) && (
+                <MobileFilters
+                  sections={bar.map(({ filter, i, options }) => ({
+                    id: String(i),
+                    heading: chipFor(filter).heading ?? chipFor(filter).name,
+                    options,
+                    // Resources' Sport: the route's sport is no choice made (see sportPicked).
+                    value: routeSport(filter) ? (sportPicked ? chosen[i] : []) : chosen[i],
+                    single: routeSport(filter),
+                  }))}
+                  sort={sorts.length > 1 ? { value: sort, options: SORTS.filter((o) => sorts.includes(o.value)) } : undefined}
+                  applied={shown.filter(({ filter, i }) => !kept(filter) && chosen[i].length > 0).length + (sportPicked ? 1 : 0)}
+                  countFor={(draft) => {
+                    const next = sheetGroups(draft);
+                    if (!enabled || widgetId == null) return matching(builtIn, next, search).length;
+                    const fromApi = sportIndex >= 0 ? next[sportIndex].some(inApi) : mode === 'api';
+                    return fromApi ? countListings(widgetId, next, search) : matching(builtIn, next, search).length;
+                  }}
+                  onApply={(draft, nextSort) => {
+                    const next = sheetGroups(draft);
+                    const s = (nextSort as Sort | undefined) ?? sort;
+                    setSort(s);
+                    if (sportIndex >= 0) {
+                      setSportPicked((draft[String(sportIndex)] ?? []).length > 0);
+                      if (JSON.stringify(next[sportIndex]) !== JSON.stringify(chosen[sportIndex])) return applySport(next, search, s);
+                    }
+                    apply(next, search, s);
+                  }}
+                />
+              )}
+            </div>
             <div className={`${styles.sortSlot} ${loading ? styles.busy : ''}`} inert={loading}>
-              {sorts.length > 1 && <SortSelect value={sort} onChange={chooseSort} options={sorts} />}
+              {sorts.length > 1 && (
+                <span className={styles.sortDesktop}>
+                  <SortSelect value={sort} onChange={chooseSort} options={sorts} />
+                </span>
+              )}
               <ViewToggle value={display} onChange={chooseView} />
             </div>
           </div>

@@ -448,6 +448,24 @@
   }
 }
 
+/* The plugin keeps three cards a row at every width (the live site's cards are 130px wide on phones): two on tablets,
+   one on phones. */
+@media (max-width: 999px) {
+  .item {
+    width: 50%;
+  }
+}
+
+@media (max-width: 639px) {
+  .archive {
+    padding: 24px 16px 80px;
+  }
+
+  .item {
+    width: 100%;
+  }
+}
+
 @media (max-width: 575px) and (orientation: portrait) {
   .photo,
   .photo img {
