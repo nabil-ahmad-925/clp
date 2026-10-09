@@ -1,0 +1,18 @@
+/* An on/off pill (FilterChip.module.css's pill): no clear button, so the same padding on or off. */
+button.toggle.toggle {
+  padding: 0 12px;
+}
+
+.check {
+  flex: none;
+  font-size: 15px;
+  color: var(--gold-deep);
+}
+
+.count {
+  flex: none;
+  color: #817b6a;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}

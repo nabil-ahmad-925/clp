@@ -1,19 +1,21 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import { FaComments } from 'react-icons/fa';
-import { LuArrowUpDown, LuClock, LuMapPin, LuPenLine, LuSearch, LuVolleyball } from 'react-icons/lu';
+import { LuArrowUpDown, LuClock, LuMapPin, LuPenLine, LuSearch, LuTrendingUp, LuUsers, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
-import MobileFilters from '@/components/ui/MobileFilters';
+import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import Pager from '@/components/ui/Pager';
 import PillSelect from '@/components/ui/PillSelect';
+import ToggleChip from '@/components/ui/ToggleChip';
 import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
 import {
   ARTICLE_WRITERS,
   ARTICLE_CATEGORIES,
   ARTICLE_LENGTHS,
   ARTICLE_SORTS,
+  ARTICLE_TAGS,
   articleSearchPlaceholder,
   articlesEnabled,
   countArticles,
@@ -46,7 +48,19 @@ const subscribeNever = () => () => {};
 const urlFilter = () => new URLSearchParams(window.location.search).get('filter');
 const noFilter = () => null;
 
-type Result = { key: string; posts: FilterPost[]; total: number; counts: Record<string, number>; lengths: Record<string, number>; authors: Record<string, number>; places: Place[] };
+type Result = {
+  key: string;
+  posts: FilterPost[];
+  total: number;
+  counts: Record<string, number>;
+  lengths: Record<string, number>;
+  authors: Record<string, number>;
+  tags: Record<string, number>;
+  places: Place[];
+};
+
+/** The tag filters' icons (Client Stories, Trending). */
+const TAG_ICONS: Record<string, ReactNode> = { 'client-stories': <LuUsers />, trending: <LuTrendingUp /> };
 
 /** Search words and spaces as applied ("  a   b " -> "a b"). */
 const tidy = (text: string) => text.trim().replace(/\s+/g, ' ');
@@ -55,8 +69,8 @@ const tidy = (text: string) => text.trim().replace(/\s+/g, ' ');
  * A category's articles, as the experience directories list their listings: a search bar of words and location (on
  * the page heading's edge when the page puts it there, see BuilderPageView; the location field suggests the articles'
  * places), a Sport filter (one sport at a time, when the category has sport subcategories), a Writer filter (Compete
- * Like Pros, CLP Partners or Sponsor) and a Length filter (reading time), one choice each, grid or list view, and the
- * same pager. The API searches, filters, counts and
+ * Like Pros, CLP Partners or Sponsor) and a Length filter (reading time), one choice each, a filter of each tag (Client
+ * Stories, Trending: on or off, each on its own), grid or list view, and the same pager. The API searches, filters, counts and
  * pages them (newest first); a skeleton shows while the first page loads. If the API can't be reached, the
  * original grid's cards show instead (searched and paged here) with an offer to try again.
  */
@@ -81,6 +95,8 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   // The Writer filter: Compete Like Pros or CLP Partners (the API's `writer`), one at a time.
   const [writers, setWriters] = useState<string[]>([]);
   const writer = writers[0] ?? '';
+  // The tag filters (Client Stories, Trending): each on or off; the articles have every tag that is on.
+  const [tags, setTags] = useState<string[]>([]);
   // The search (words and location): the page's bar on the heading's edge when there is one, else this list's own.
   const shared = useSharedSearch();
   const [ownSearch, setOwnSearch] = useState<Search>(NO_SEARCH);
@@ -108,6 +124,11 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     setLengths(values);
     setPage(0);
   };
+  const applyTags = (values: string[]) => {
+    setTags(ARTICLE_TAGS.map((t) => t.value).filter((v) => values.includes(v)));
+    setPage(0);
+  };
+  const toggleTag = (tag: string, on: boolean) => applyTags(on ? [...tags, tag] : tags.filter((t) => t !== tag));
   const applySearch = (next: Search) => {
     setSearch({ q: tidy(next.q), loc: tidy(next.loc) });
     setPage(0);
@@ -145,13 +166,13 @@ export default function PostFilter({ categories: builtInCategories, posts: built
 
   // The API's page for the current search, location, sports, lengths, page and page size.
   const [retry, setRetry] = useState(0);
-  const requestKey = JSON.stringify([source, sports, writer, lengths, q, loc, sort, page, pageSize, retry]);
+  const requestKey = JSON.stringify([source, sports, writer, lengths, tags, q, loc, sort, page, pageSize, retry]);
   const [result, setResult] = useState<Result | null>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   useEffect(() => {
     if (!live) return;
     let active = true;
-    fetchArticles({ category: source, writer, sports, lengths, q: q || undefined, loc: loc || undefined, sort, page: page + 1, limit: pageSize, counts: 1 }).then(
+    fetchArticles({ category: source, writer, sports, lengths, tags, q: q || undefined, loc: loc || undefined, sort, page: page + 1, limit: pageSize, counts: 1 }).then(
       (r) => {
         if (!active) return;
         // Past the last page (articles removed meanwhile): the last page.
@@ -160,14 +181,14 @@ export default function PostFilter({ categories: builtInCategories, posts: built
         const places = Object.entries(r.places ?? {})
           .map(([slug, count]) => ({ value: slug, label: locationName(slug), count }))
           .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-        setResult({ key: requestKey, posts: r.items.map(toFilterPost), total: r.total, counts: r.counts ?? {}, lengths: r.lengths ?? {}, authors: r.authors ?? {}, places });
+        setResult({ key: requestKey, posts: r.items.map(toFilterPost), total: r.total, counts: r.counts ?? {}, lengths: r.lengths ?? {}, authors: r.authors ?? {}, tags: r.tags ?? {}, places });
       },
       () => active && setFailedKey(requestKey),
     );
     return () => {
       active = false;
     };
-    // requestKey stands for source, sports, writer, lengths, q, loc, sort, page, pageSize and retry.
+    // requestKey stands for source, sports, writer, lengths, tags, q, loc, sort, page, pageSize and retry.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, requestKey]);
   const failed = failedKey === requestKey;
@@ -216,8 +237,10 @@ export default function PostFilter({ categories: builtInCategories, posts: built
     ? []
     : ARTICLE_LENGTHS.map((l) => ({ ...l, count: result?.lengths[l.value] ?? 0 })).filter((l) => l.count > 0 || lengths.includes(l.value));
   /** The API's count of a draft of one filter, with the others applied. */
-  const countWith = (draft: { sports?: string[]; writer?: string; lengths?: string[] }) =>
-    countArticles({ category: source, writer, sports, lengths, q: q || undefined, loc: loc || undefined, ...draft });
+  /** The tags a draft of the phones' sheet has on (its "tag:<value>" cards). */
+  const sheetTags = (draft: SheetDraft) => ARTICLE_TAGS.map((t) => t.value).filter((v) => (draft[`tag:${v}`] ?? (tags.includes(v) ? [v] : [])).includes(v));
+  const countWith = (draft: { sports?: string[]; writer?: string; lengths?: string[]; tags?: string[] }) =>
+    countArticles({ category: source, writer, sports, lengths, tags, q: q || undefined, loc: loc || undefined, ...draft });
 
   // The cards have no column padding: --dir-col-gap 32px cancels the filter bar's indent (TeamDirectory lines it up
   // with its cards' 32px padding), so the Sport pill starts at the cards' left edge.
@@ -280,9 +303,20 @@ export default function PostFilter({ categories: builtInCategories, posts: built
                 onApply={applyLengths}
               />
             )}
+            {!local &&
+              ARTICLE_TAGS.map((t) => (
+                <ToggleChip
+                  key={t.value}
+                  label={t.label}
+                  icon={TAG_ICONS[t.value]}
+                  on={tags.includes(t.value)}
+                  count={result?.tags[t.value]}
+                  onChange={(on) => toggleTag(t.value, on)}
+                />
+              ))}
             {loc && <AppliedPill icon={<LuMapPin />} label={loc} onClear={() => applySearch({ q, loc: '' })} />}
             {q && <AppliedPill icon={<LuSearch />} label={`“${q}”`} onClear={() => applySearch({ q: '', loc })} />}
-            {(q || loc || sports.length > 0 || writers.length > 0 || lengths.length > 0) && (
+            {(q || loc || sports.length > 0 || writers.length > 0 || lengths.length > 0 || tags.length > 0) && (
               <button
                 type="button"
                 className={dir.clearAll}
@@ -291,6 +325,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
                   setChosenSports([]);
                   applyWriters([]);
                   applyLengths([]);
+                  applyTags([]);
                 }}
               >
                 Clear all
@@ -304,18 +339,33 @@ export default function PostFilter({ categories: builtInCategories, posts: built
                 ...(sportOptions.length > 0 ? [{ id: 'sport', heading: 'Sport', options: sportOptions, value: sports, single: true }] : []),
                 ...(writerOptions.length > 0 ? [{ id: 'writer', heading: 'Writer', options: writerOptions, value: writers, single: true }] : []),
                 ...(lengthOptions.length > 0 ? [{ id: 'length', heading: 'Reading time', options: lengthOptions, value: lengths, single: true }] : []),
+                // Each tag its own filter: a card with its one checkbox.
+                ...(local
+                  ? []
+                  : ARTICLE_TAGS.map((t) => ({
+                      id: `tag:${t.value}`,
+                      heading: t.label,
+                      options: [{ value: t.value, label: `${t.label} only`, count: result?.tags[t.value] }],
+                      value: tags.includes(t.value) ? [t.value] : [],
+                    }))),
               ]}
               sort={{ value: sort, options: ARTICLE_SORTS }}
-              applied={(sports.length > 0 ? 1 : 0) + (writers.length > 0 ? 1 : 0) + (lengths.length > 0 ? 1 : 0)}
+              applied={(sports.length > 0 ? 1 : 0) + (writers.length > 0 ? 1 : 0) + (lengths.length > 0 ? 1 : 0) + tags.length}
               countFor={(draft) =>
                 local
                   ? matchLocal(draft.sport ?? sports).length
-                  : countWith({ sports: draft.sport ?? sports, writer: (draft.writer ?? writers)[0] ?? '', lengths: draft.length ?? lengths })
+                  : countWith({
+                      sports: draft.sport ?? sports,
+                      writer: (draft.writer ?? writers)[0] ?? '',
+                      lengths: draft.length ?? lengths,
+                      tags: sheetTags(draft),
+                    })
               }
               onApply={(draft, nextSort) => {
                 applySports(draft.sport ?? sports);
                 applyWriters(draft.writer ?? writers);
                 applyLengths(draft.length ?? lengths);
+                if (!local) applyTags(sheetTags(draft));
                 if (nextSort) chooseSort(nextSort as ArticleSort);
               }}
             />

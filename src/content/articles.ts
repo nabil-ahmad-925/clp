@@ -28,6 +28,8 @@ export const ARTICLE_WRITERS = [
   { value: 'partners', label: 'CLP Partners' },
   { value: 'sponsor', label: 'Sponsor' },
 ];
+/** The tags an article can have: each one its own on/off filter of the lists (Client Stories, Trending; the API's `tag`). */
+export const ARTICLE_TAGS = taxonomy.tags.map((t) => ({ value: t.slug, label: t.name }));
 /** The cities an article can be about (slugs as the experience directories' City filter values). */
 export const ARTICLE_LOCATIONS: { slug: string; name: string }[] = taxonomy.locations;
 /** A city's name ("New York City" for "new-york"). */
@@ -51,6 +53,8 @@ export type ArticleSummary = {
   readingTime: number;
   /** The cities it is about (ARTICLE_LOCATIONS slugs). */
   locations?: string[];
+  /** Its tags (ARTICLE_TAGS values). */
+  tags?: string[];
 };
 export type Article = ArticleSummary & { html: string };
 export type ArticlePageData = { item: Article; previous: ArticleSummary | null; next: ArticleSummary | null; related: ArticleSummary[] };
@@ -59,8 +63,8 @@ export const articlesEnabled = Boolean(API_URL);
 
 /**
  * One numbered page of a list (items newest first). Asked with counts: 1, the filters' option counts, each with every
- * other filter applied: `counts` per sport, `lengths` per reading length and `places` per city slug (the search bar's
- * suggestions).
+ * other filter applied: `counts` per sport, `lengths` per reading length, `authors` per writer, `tags` per tag (the
+ * results with that tag's filter on too) and `places` per city slug (the search bar's suggestions).
  */
 export type ArticleList = {
   items: ArticleSummary[];
@@ -72,6 +76,7 @@ export type ArticleList = {
   lengths?: Record<string, number>;
   places?: Record<string, number>;
   authors?: Record<string, number>;
+  tags?: Record<string, number>;
 };
 
 /** The list orders: "Recommended" is newest first (the API's default, sent as no sort). */
@@ -96,14 +101,15 @@ export const ARTICLE_LENGTHS = [
  * A page of published articles, newest first: of a category path, an author, some sports or reading lengths, a
  * location, matching search words, or all of them.
  */
-export type ArticleQuery = { category?: string; author?: string; writer?: string; sports?: string[]; lengths?: string[]; loc?: string; q?: string };
+export type ArticleQuery = { category?: string; author?: string; writer?: string; sports?: string[]; lengths?: string[]; tags?: string[]; loc?: string; q?: string };
 
-/** The query string of a list request (sports and lengths comma-separated; empty values left out). */
-const listQuery = ({ sports, lengths, ...rest }: ArticleQuery & { limit?: number; page?: number; counts?: 1; count?: 1 }) => {
+/** The query string of a list request (sports, lengths and tags comma-separated; empty values left out). */
+const listQuery = ({ sports, lengths, tags, ...rest }: ArticleQuery & { limit?: number; page?: number; counts?: 1; count?: 1 }) => {
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(rest)) if (v !== undefined && v !== '') qs.set(k, String(v));
   if (sports?.length) qs.set('sport', sports.join(','));
   if (lengths?.length) qs.set('length', lengths.join(','));
+  if (tags?.length) qs.set('tag', tags.join(','));
   return qs;
 };
 
