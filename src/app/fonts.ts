@@ -9,9 +9,10 @@ export const openSans = Open_Sans({
 });
 
 // The original site loads Montserrat 700 and Playfair 400/700/900 only; matching that keeps weights identical.
+// 800 is the new design's listing cards and partner names.
 export const montserrat = Montserrat({
   subsets: ['latin'],
-  weight: ['700'],
+  weight: ['700', '800'],
   variable: '--font-montserrat',
   display: 'swap',
 });

@@ -41,3 +41,25 @@
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
+
+/* Listing pages (new design): a 44px pill. */
+[data-listing] .viewToggle {
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 3px;
+  border-color: #ddddda;
+  border-radius: 22px;
+}
+
+[data-listing] .viewBtn {
+  width: 44px;
+  height: 36px;
+  border-radius: 18px;
+  color: #555;
+  font-size: 20px;
+}
+
+[data-listing] .viewOn,
+[data-listing] .viewOn:hover {
+  color: var(--white);
+}

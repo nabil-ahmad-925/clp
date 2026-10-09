@@ -67,3 +67,9 @@
     margin-left: 0;
   }
 }
+
+/* Listing pages (new design): the warm off-white page. */
+.listing {
+  background-color: #f7f6f3;
+  color: #111;
+}

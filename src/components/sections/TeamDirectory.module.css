@@ -278,3 +278,153 @@
     padding-left: calc(32px - var(--dir-col-gap));
   }
 }
+
+/* ---- Listing pages (Experiences and Resources categories, the new design) ---- */
+
+/* As wide as the design's content (1344px, 48px from the window's edges), centred on the page whatever its column. */
+.directory.listing {
+  --listing-w: min(1344px, calc(100vw - 96px));
+  width: var(--listing-w);
+  max-width: none;
+  margin-left: calc(50% - var(--listing-w) / 2);
+  font-family: var(--font-body);
+}
+
+.listing .bar {
+  margin: 40px 0 0;
+  padding-left: 0;
+}
+
+.listing .barRow {
+  align-items: center;
+  gap: 16px;
+}
+
+.listing .filters {
+  gap: 10px;
+}
+
+.listing .sortSlot {
+  gap: 12px;
+}
+
+.listing .clearAll {
+  height: 44px;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+/* "18 results in Camps & Tournaments". */
+.results {
+  padding-top: 20px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.results strong {
+  color: #111;
+}
+
+.listing .inner {
+  min-height: 0;
+  padding-top: 32px;
+}
+
+.listingGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.listingList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listingItem {
+  min-width: 0;
+}
+
+/* The cards after the partner spotlight. */
+.listingRest {
+  padding-top: 72px;
+}
+
+.pending .listingGrid,
+.pending .listingList {
+  pointer-events: none;
+}
+
+.listingSkeleton {
+  height: auto;
+  aspect-ratio: 3 / 4;
+}
+
+.listingSkeletonRow {
+  height: 200px;
+}
+
+.listingEmpty {
+  padding: 40px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  color: #666;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.listingClear {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.listingClear:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.listing .pager {
+  padding-left: 0;
+}
+
+@media (max-width: 1100px) {
+  .listingGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .listingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .directory.listing {
+    --listing-w: calc(100vw - 32px);
+  }
+
+  .listing .bar {
+    margin-top: 28px;
+  }
+
+  .listingRest {
+    padding-top: 56px;
+  }
+}
+
+@media (max-width: 540px) {
+  .listingGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

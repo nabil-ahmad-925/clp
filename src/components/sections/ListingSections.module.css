@@ -1,0 +1,375 @@
+/* The listing page's own sections (new design): crisis line, partner spotlight and "Run a program?". */
+
+/* ---- Crisis line (Mental Health & Resilience) ---- */
+.crisis {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 18px 22px;
+  border: 1px solid #ddddda;
+  border-radius: 10px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+}
+
+.crisisText {
+  flex: 1 1 400px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ---- Partner spotlight: a black band the full width of the window ---- */
+.spotlight {
+  width: 100vw;
+  margin: 72px 0 0 calc(50% - 50vw);
+  background: #0a0a0a;
+  color: var(--white);
+  font-family: var(--font-body);
+}
+
+.spotlightInner {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 80px 48px;
+}
+
+.spotlightHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.headText {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eyebrow,
+.eyebrowDark {
+  color: #dcbd7d;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 3px;
+}
+
+.eyebrowDark {
+  color: #8a6f33;
+}
+
+.spotlightTitle,
+.plansTitle {
+  margin: 0;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.spotlightSub {
+  max-width: 560px;
+  margin: 0;
+  padding: 0;
+  color: #aaa;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.allPartners {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid #dcbd7d;
+  border-radius: 6px;
+  color: #dcbd7d;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.allPartners:hover {
+  background: #dcbd7d;
+  color: #000;
+}
+
+.partners {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.partner {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #262626;
+  border-radius: 10px;
+  background: #161616;
+  color: var(--white);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+
+.partner:hover {
+  border-color: #dcbd7d;
+}
+
+.partnerMedia {
+  position: relative;
+  height: 180px;
+  background: #222;
+}
+
+.partnerImage {
+  object-fit: cover;
+}
+
+.partnerLogo {
+  position: absolute;
+  bottom: -28px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 3px solid #161616;
+  border-radius: 12px;
+  background: #333;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.partnerLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.partnerBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 40px 18px 20px;
+}
+
+.partnerName {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.partnerMeta {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.partnerLink {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 10px;
+  color: #dcbd7d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---- Run a program? ---- */
+.plans {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 112px 48px 120px;
+  color: #111;
+  font-family: var(--font-body);
+}
+
+.plansHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.planGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.plan {
+  --plan-bg: var(--white);
+  --plan-fg: #111;
+  --plan-border: #e5e5e2;
+  --plan-tag-bg: #f2f1ee;
+  --plan-tag-fg: #111;
+  --plan-check: #111;
+  --plan-cta-bg: var(--white);
+  --plan-cta-fg: #111;
+  --plan-cta-border: #111;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 36px;
+  border: 1px solid var(--plan-border);
+  border-radius: 12px;
+  background: var(--plan-bg);
+  color: var(--plan-fg);
+}
+
+.dark {
+  --plan-bg: #111;
+  --plan-fg: var(--white);
+  --plan-border: #111;
+  --plan-tag-bg: var(--white);
+  --plan-check: var(--white);
+  --plan-cta-border: var(--white);
+}
+
+.gold {
+  --plan-bg: #fbf6ea;
+  --plan-border: #dcbd7d;
+  --plan-tag-bg: #dcbd7d;
+  --plan-tag-fg: #000;
+  --plan-check: #8a6f33;
+  --plan-cta-bg: #111;
+  --plan-cta-fg: var(--white);
+}
+
+.planTag {
+  align-self: flex-start;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: var(--plan-tag-bg);
+  color: var(--plan-tag-fg);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 1.5px;
+}
+
+.planTitle {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.planDesc {
+  font-size: 15px;
+  line-height: 1.55;
+  opacity: 0.8;
+}
+
+.planPoints {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.planPoint {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.planCheck {
+  flex: none;
+  color: var(--plan-check);
+}
+
+.planCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  margin-top: auto;
+  border: 1px solid var(--plan-cta-border);
+  border-radius: 6px;
+  background: var(--plan-cta-bg);
+  color: var(--plan-cta-fg);
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.planCta:hover {
+  opacity: 0.85;
+}
+
+.allPartners:focus-visible,
+.partner:focus-visible,
+.planCta:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+  .partners {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planGrid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 560px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .spotlightInner {
+    padding: 56px 16px;
+  }
+
+  .spotlightTitle,
+  .plansTitle {
+    font-size: 34px;
+  }
+
+  .plans {
+    padding: 72px 16px 80px;
+    gap: 32px;
+  }
+
+  .plan {
+    padding: 28px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .partners {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

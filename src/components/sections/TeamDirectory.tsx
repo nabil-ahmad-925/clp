@@ -25,12 +25,14 @@ import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/Price
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingsResult } from '@/content/listings';
+import { MENTAL_HEALTH_WIDGET, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
 import BioModal from './BioModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
+import ListingCard from './ListingCard';
+import { CrisisNotice, PartnerSpotlight } from './ListingSections';
 import TeamCard from './TeamCard';
 import styles from './TeamDirectory.module.css';
 
@@ -42,7 +44,15 @@ type Props = {
   paging?: { first: number; more: number };
   /** The directory widget; served by the listings API, its cards and filtering come from there (see below). */
   widgetId?: number;
+  /**
+   * An Experiences or Resources listing page (the new design): its cards, a results line, the partner spotlight after
+   * the first SPOTLIGHT_AFTER cards and an empty state. The filters, search, sort and pages work the same.
+   */
+  listing?: ListingSetup;
 };
+
+/** On a listing page, the partner spotlight comes after this many cards. */
+const SPOTLIGHT_AFTER = 8;
 
 /** A card's tags as the API's location search reads them (see clp-api placeTextOf): "new-york" -> "newyork", "new york". */
 const placeText = (tags: string[]) => ` ${tags.flatMap((t) => [t.replace(/[^a-z0-9]/g, ''), t.replace(/-+/g, ' ')]).join(' ')} `;
@@ -232,7 +242,7 @@ type View = {
  * When the API has no listings for the page, fails or is slow, the page falls back to its built-in cards, filtered
  * (and paged) in the browser.
  */
-export default function TeamDirectory({ layout, filters: pageFilters, items: builtIn, widgetId }: Props) {
+export default function TeamDirectory({ layout, filters: pageFilters, items: builtIn, widgetId, listing }: Props) {
   // Options added in the admin (e.g. a new Service) join their filter after the page's own options; filters themselves
   // (and so the API's filter groups) stay as the page has them.
   const [added, setAdded] = useState<AddedOption[]>([]);
@@ -689,8 +699,95 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     '--dir-row-gap': layout.rowGap != null ? `${layout.rowGap}px` : '0px',
   } as CSSProperties;
 
+  /** "Clear all": no filters (the kept ones and Resources' route sport as they were) and no search. */
+  const clearAll = () => {
+    setSearch(NO_SEARCH);
+    const cleared = chosen.map((v, j) => (routeSport(filters[j]) ? [filters[j].preset!] : kept(filters[j]) ? v : []));
+    if (sportPicked) applySport(cleared, NO_SEARCH);
+    else apply(cleared, NO_SEARCH);
+    setSportPicked(false);
+  };
+
+  const pager = !loading && totalFound > PAGE_SIZES[0] && (
+    <Pager
+      className={styles.pager}
+      page={pageIndex}
+      pageCount={pageCount}
+      total={totalFound}
+      shown={pageItems.length}
+      pageSize={pageSize}
+      sizes={PAGE_SIZES}
+      loading={view.more}
+      disabled={view.pending}
+      onPage={goTo}
+      onPageSize={choosePageSize}
+    />
+  );
+
+  /** A listing page's cards (grid or list), new ones fading in. */
+  const listingCards = (items: DirectoryItem[], offset: number) => (
+    <div key={display} className={display === 'list' ? styles.listingList : styles.listingGrid}>
+      {items.map((item, i) => (
+        <div key={item.id} className={`${styles.listingItem} ${isNew(item.id) ? styles.listItemIn : ''}`}>
+          <ListingCard
+            card={item}
+            view={display}
+            eager={offset + i < 4}
+            facts={rowFacts(item, filters, prices)}
+            fallbackImage={(item as AddedItem).fallbackImage}
+            onOpen={() => setOpen(item)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  /** A listing page's results: the first cards, the partner spotlight, the rest and the pager (fewer cards: the pager first). */
+  const listingResults = (setup: ListingSetup) => {
+    const spotlight = <PartnerSpotlight partners={setup.partners} section={setup.section} />;
+    if (loading) {
+      return (
+        <div className={display === 'list' ? styles.listingList : styles.listingGrid} aria-hidden>
+          {Array.from({ length: placeholders }, (_, i) => (
+            <div key={i} className={`${styles.skeleton} ${display === 'list' ? styles.listingSkeletonRow : styles.listingSkeleton}`} />
+          ))}
+        </div>
+      );
+    }
+    const empty = !view.pending && pageItems.length === 0 && (
+      <div className={styles.listingEmpty} role="status">
+        No results match {anyChosen ? 'these filters' : 'this page yet'}.
+        {anyChosen && (
+          <>
+            {' '}
+            <button type="button" className={styles.listingClear} onClick={clearAll}>
+              Clear filters
+            </button>
+          </>
+        )}
+      </div>
+    );
+    const first = pageItems.slice(0, SPOTLIGHT_AFTER);
+    const rest = pageItems.slice(SPOTLIGHT_AFTER);
+    return rest.length > 0 ? (
+      <>
+        {listingCards(first, 0)}
+        {spotlight}
+        <div className={styles.listingRest}>{listingCards(rest, SPOTLIGHT_AFTER)}</div>
+        {pager}
+      </>
+    ) : (
+      <>
+        {empty}
+        {first.length > 0 && listingCards(first, 0)}
+        {pager}
+        {spotlight}
+      </>
+    );
+  };
+
   return (
-    <div ref={topRef} className={styles.directory} style={vars}>
+    <div ref={topRef} className={`${styles.directory} ${listing ? styles.listing : ''}`} style={vars} data-listing={listing ? '' : undefined}>
       {!shared && (
         <div className={styles.searchSlot}>
           <DirectorySearch query={search.q} location={search.loc} places={places} placeholder={searchPlaceholder(widgetId)} onSearch={(q, loc) => runSearch({ q, loc })} />
@@ -751,17 +848,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
               {search.q && <AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => runSearch({ ...search, q: '' })} />}
               {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => runSearch({ ...search, loc: '' })} />}
               {anyChosen && (
-                <button
-                  type="button"
-                  className={styles.clearAll}
-                  onClick={() => {
-                    setSearch(NO_SEARCH);
-                    const cleared = chosen.map((v, j) => (routeSport(filters[j]) ? [filters[j].preset!] : kept(filters[j]) ? v : []));
-                    if (sportPicked) applySport(cleared, NO_SEARCH);
-                    else apply(cleared, NO_SEARCH);
-                    setSportPicked(false);
-                  }}
-                >
+                <button type="button" className={styles.clearAll} onClick={clearAll}>
                   Clear all
                 </button>
               )}
@@ -815,8 +902,25 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
           )}
         </div>
       )}
+      {listing && (
+        <div className={styles.results} role="status">
+          {loading ? (
+            'Loading results…'
+          ) : (
+            <span>
+              <strong>
+                {totalFound} {totalFound === 1 ? 'result' : 'results'}
+              </strong>{' '}
+              {search.loc ? `near ${search.loc}` : listing.category ? `in ${listing.category}` : ''}
+            </span>
+          )}
+        </div>
+      )}
+      {listing && widgetId === MENTAL_HEALTH_WIDGET && <CrisisNotice />}
       <div className={`${styles.inner} ${view.pending ? styles.pending : ''}`} aria-busy={loading || view.pending}>
-        {loading && display === 'list' ? (
+        {listing ? (
+          listingResults(listing)
+        ) : loading && display === 'list' ? (
           <div className={styles.list} aria-hidden>
             {Array.from({ length: Math.min(placeholders, 4) }, (_, i) => (
               <div key={i} className={`${styles.skeleton} ${styles.skeletonRow}`} />
@@ -856,23 +960,9 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
           </div>
         )}
         {/* Pager (as the admin's): range, Previous / page numbers / Next, and the page size. Shown once the results
-            are more than the smallest page. */}
-        {!loading && totalFound > PAGE_SIZES[0] && (
-          <Pager
-            className={styles.pager}
-            page={pageIndex}
-            pageCount={pageCount}
-            total={totalFound}
-            shown={pageItems.length}
-            pageSize={pageSize}
-            sizes={PAGE_SIZES}
-            loading={view.more}
-            disabled={view.pending}
-            onPage={goTo}
-            onPageSize={choosePageSize}
-          />
-        )}
-        {!loading && !view.pending && filtered.length === 0 && emptyShown && (
+            are more than the smallest page. (A listing page places its own, see listingResults.) */}
+        {!listing && pager}
+        {!listing && !loading && !view.pending && filtered.length === 0 && emptyShown && (
           <div className={styles.emptyWrap} role="status">
             <div className={styles.empty}>No Results Found</div>
           </div>

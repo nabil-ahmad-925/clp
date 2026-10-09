@@ -537,3 +537,64 @@
     animation: none;
   }
 }
+
+/* ---- Listing pages (new design): 44px pills in Open Sans, no chip icons ---- */
+
+[data-listing] .wrap,
+[data-listing] .sortWrap {
+  --f-border: #ddddda;
+  font-family: var(--font-body);
+}
+
+[data-listing] .wrap {
+  height: 44px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+[data-listing] .chip {
+  gap: 8px;
+  padding: 0 16px;
+}
+
+[data-listing] .active .chip {
+  padding-right: 8px;
+}
+
+[data-listing] .icon {
+  display: none;
+}
+
+[data-listing] .chevron {
+  font-size: 14px;
+  color: #111;
+}
+
+/* Sort: the arrows on the left, the chevron on the right. */
+[data-listing] .sort:has(.sortIcon) {
+  gap: 10px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+[data-listing] .sort:has(.sortIcon) .sortIcon {
+  font-size: 20px;
+  color: #111;
+}
+
+[data-listing] .sort:has(.sortIcon) .sortChevron {
+  color: #666;
+  opacity: 1;
+}
+
+/* The pager's "Per page". */
+[data-listing] .sort:not(:has(.sortIcon)) {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 15px;
+}

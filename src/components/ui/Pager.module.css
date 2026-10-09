@@ -122,3 +122,36 @@
     font-size: 13px;
   }
 }
+
+/* Listing pages (new design): square 44px buttons, the current page black. */
+[data-listing] .pager {
+  font-family: var(--font-body);
+}
+
+[data-listing] .pagerInfo,
+[data-listing] .pagerSize,
+[data-listing] .pagerGap {
+  color: #666;
+}
+
+[data-listing] .pagerStep,
+[data-listing] .pagerNum {
+  height: 44px;
+  border-color: #ddddda;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+[data-listing] .pagerStep {
+  font-weight: 600;
+}
+
+[data-listing] .pagerNum {
+  min-width: 44px;
+}
+
+[data-listing] .pagerOn,
+[data-listing] .pagerOn:hover:not(:disabled) {
+  border-color: #111;
+  font-weight: 700;
+}

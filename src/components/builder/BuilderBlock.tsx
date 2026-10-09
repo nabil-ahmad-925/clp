@@ -13,12 +13,13 @@ import PostFilter from '@/components/sections/PostFilter';
 import ServiceNav from '@/components/sections/ServiceNav';
 import TeamDirectory from '@/components/sections/TeamDirectory';
 import RichText from '@/components/ui/RichText';
+import type { ListingSetup } from '@/content/listings';
 import type { Block } from '@/content/types';
 import BookingForm from './BookingForm';
 import styles from './BuilderBlock.module.css';
 
-/** Renders one page-builder block. */
-export default function BuilderBlock({ block }: { block: Block }) {
+/** Renders one page-builder block (`listing`: the page is an Experiences or Resources listing page, see TeamDirectory). */
+export default function BuilderBlock({ block, listing }: { block: Block; listing?: ListingSetup }) {
   switch (block.type) {
     case 'divider':
       return <div className={styles.divider} style={{ height: block.height }} aria-hidden />;
@@ -31,7 +32,7 @@ export default function BuilderBlock({ block }: { block: Block }) {
     case 'team':
       return (
         <div className={styles.teamColumn}>
-          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} widgetId={block.widgetId} />
+          <TeamDirectory layout={block.layout} filters={block.filters} items={block.items} paging={block.paging} widgetId={block.widgetId} listing={listing} />
         </div>
       );
     case 'serviceNav':

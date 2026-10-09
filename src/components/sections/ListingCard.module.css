@@ -1,0 +1,182 @@
+/* A listing card (new design): white, 10px corners, photo on top (grid) or on the left (list). */
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e5e5e2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: #d6d3cc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.media {
+  position: relative;
+  flex: 0 0 auto;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.03);
+}
+
+/* The photo darkens towards its top edge. */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 40%);
+  pointer-events: none;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 18px 20px;
+}
+
+.provider {
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0;
+  color: #111;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #666;
+  font-size: 14px;
+}
+
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fact svg {
+  flex: none;
+}
+
+.ages {
+  align-self: flex-start;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f2f1ee;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeeb;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.noPrice {
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cta:hover {
+  background: var(--white);
+  color: #111;
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* List view: the photo on the left, 320px wide. */
+.list {
+  flex-direction: row;
+}
+
+.list .media {
+  flex: 0 0 320px;
+  aspect-ratio: 16 / 10;
+}
+
+@media (max-width: 767px) {
+  .list {
+    flex-direction: column;
+  }
+
+  .list .media {
+    flex: 0 0 auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
+
+  .card:hover .image {
+    transform: none;
+  }
+}

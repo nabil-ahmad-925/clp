@@ -70,6 +70,36 @@ const WIDGET_NAMES: Record<number, string> = {
 /** A directory's category name ("Advancement & Workshops"), when it is one of the listing categories. */
 export const categoryName = (widgetId: number | undefined) => (widgetId != null ? WIDGET_NAMES[widgetId] : undefined);
 
+/** The line under a listing page's heading, by category (the new design's listing page). */
+const WIDGET_BLURBS: Record<number, string> = {
+  45: 'Skill clinics, ID and showcase prep, coaching workshops and player development.',
+  46: 'Brand-hosted pickups, pop-ups, fan events and sponsored experiences.',
+  47: 'Day camps, ID camps and weekend tournaments from CLP partners and local programs.',
+  6: 'Small-group sessions and one-on-one training with local coaches.',
+  37: 'Pickup runs, rec leagues and social clubs for every level.',
+  41: 'Travel programs, showcases and team retreats.',
+  40: 'Sports dietitians, meal planning and fueling guides for players and parents.',
+  16: 'Physical therapists, athletic trainers, recovery studios and prevention programs.',
+  39: 'Sport psychologists, counselors and mindset programs for athletes and families.',
+  33: 'Speed, strength and conditioning coaches, gyms and training plans.',
+};
+
+/** A listing category's line under the page heading. */
+export const categoryBlurb = (widgetId: number | undefined) => (widgetId != null ? WIDGET_BLURBS[widgetId] : undefined);
+
+/** Whether a directory widget is an Experiences or Resources category: its page uses the listing-page design. */
+export const isListingWidget = (widgetId: number | undefined): widgetId is number =>
+  widgetId != null && (WIDGET_TYPES[widgetId] === 'experiences' || WIDGET_TYPES[widgetId] === 'resources');
+
+/** Mental Health & Resilience: its listing page shows the crisis line first. */
+export const MENTAL_HEALTH_WIDGET = 39;
+
+/** A CLP partner in a listing page's spotlight (from the partner directory). */
+export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string };
+
+/** What a listing page's directory shows besides its cards: its menu, category and partner spotlight. */
+export type ListingSetup = { section: 'experiences' | 'resources'; category: string; partners: SpotlightPartner[] };
+
 /** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
 export const searchPlaceholder = (widgetId: number | undefined, fallback?: string) => {
   const name = categoryName(widgetId) ?? fallback?.replace(/\s+nearby$/i, '').trim();

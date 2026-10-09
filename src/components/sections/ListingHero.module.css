@@ -1,0 +1,67 @@
+/* The listing page's heading (new design): black band, Playfair title, grey line. The bottom padding leaves room for
+   the top half of the search bar on its edge (see DirectorySearch's .slot). */
+.hero {
+  position: relative;
+  /* Above the page content (as PageHero): the search bar's negative margin pulls the content up under the band, so
+     the band stays black behind the bar's top half. */
+  z-index: 2;
+  padding: calc(var(--header-height) + 48px) 48px 96px;
+  background: #0a0a0a;
+  color: var(--white);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 1344px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  max-width: 980px;
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.blurb {
+  max-width: 640px;
+  margin: 0;
+  padding: 0;
+  color: #bbb;
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+@media (max-width: 999px) {
+  .hero {
+    padding: calc(var(--header-height) + 40px) 32px 88px;
+  }
+
+  .title {
+    font-size: 48px;
+  }
+}
+
+/* Phones: the stacked search bar is taller, so is the room for its top half. */
+@media (max-width: 639px) {
+  .hero {
+    padding: calc(var(--header-height) + 32px) 16px 112px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .blurb {
+    font-size: 16px;
+  }
+}
