@@ -1,0 +1,733 @@
+/* A sport's photos (new design: albums, viewer and print on demand). */
+.page {
+  background: #f7f6f3;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ---- Heading (every view) ---- */
+.hero {
+  position: relative;
+  z-index: 2;
+  padding: calc(var(--header-height) + 40px) 48px 96px;
+  background: #0a0a0a;
+  color: var(--white);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 1344px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroTitle {
+  max-width: 1100px;
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.heroLine {
+  max-width: 680px;
+  margin: 0;
+  padding: 0;
+  color: #bbb;
+  font-size: 18px;
+}
+
+/* ---- Find your photos (on the heading's edge) ---- */
+.finder {
+  position: relative;
+  z-index: 3;
+  max-width: 1440px;
+  margin: -40px auto 0;
+  padding: 0 48px;
+}
+
+.findBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px 10px 10px 28px;
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.camera {
+  display: inline-flex;
+  color: #8a6f33;
+}
+
+.findInput {
+  flex: 1 1 300px;
+  min-width: 0;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 17px;
+  outline: none;
+}
+
+.findInput::placeholder {
+  color: #757575;
+}
+
+.findButton {
+  height: 56px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 10px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.findButton:hover {
+  background: #2a2a2a;
+}
+
+.findLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.findLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.findLink:hover {
+  color: #111;
+}
+
+.findDivider {
+  align-self: center;
+  width: 1px;
+  height: 18px;
+  background: #ddddda;
+}
+
+/* ---- Content ---- */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 56px 48px 120px;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: #777;
+  font-size: 14px;
+}
+
+.crumbs a {
+  color: #8a6f33;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+}
+
+.crumbSep {
+  color: #aaa;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-top: 16px;
+}
+
+.sectionLast {
+  padding-top: 72px;
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kicker {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #111;
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.gridTall {
+  gap: 32px 24px;
+}
+
+/* ---- Cards ---- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #111;
+  text-decoration: none;
+}
+
+.cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #ddddda;
+}
+
+.coverWide {
+  aspect-ratio: 4 / 3;
+  background: #222;
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cover img {
+  transform: scale(1.1);
+}
+
+.blur {
+  filter: blur(4px);
+}
+
+.blurStrong {
+  filter: blur(14px);
+}
+
+.lockOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.accessLabel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.cardText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.cardLine {
+  color: #666;
+  font-size: 14px;
+}
+
+.cardMuted {
+  color: #999;
+  font-size: 13px;
+}
+
+.catTitle {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.catCount {
+  color: #888;
+  font-size: 13px;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+/* ---- Category: filters, count and key ---- */
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pillWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.pill {
+  height: 44px;
+  padding: 0 40px 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.pillOn {
+  border-color: #111;
+  background: #111;
+  color: var(--white);
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pillChevron {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: inline-flex;
+  pointer-events: none;
+}
+
+.clear {
+  height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.countRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.countRow strong {
+  color: #111;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.swPublic {
+  border: 1px solid #999;
+  background: var(--white);
+}
+
+.swCode {
+  background: #111;
+}
+
+.swFamily {
+  background: #1b4f8c;
+}
+
+.swClient {
+  background: #dcbd7d;
+}
+
+.empty {
+  padding: 48px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  color: #666;
+  text-align: center;
+}
+
+/* ---- Album ---- */
+.album {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.albumHeadRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.albumHead {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 5px 9px;
+  border: 1px solid #ddddda;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.albumTitle {
+  margin: 0;
+  color: #111;
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.albumLine {
+  color: #666;
+  font-size: 15px;
+}
+
+.photoFilter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
+  background: var(--white);
+}
+
+.photoTab {
+  height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: #555;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.photoTab:hover {
+  color: #111;
+}
+
+.photoTabOn,
+.photoTabOn:hover {
+  background: #111;
+  color: var(--white);
+}
+
+.photoTab:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Masonry: columns of about 280px, each photo at its own shape. */
+.masonry {
+  columns: 4 280px;
+  column-gap: 12px;
+}
+
+.photo {
+  position: relative;
+  display: block;
+  margin: 0 0 12px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #ddddda;
+  cursor: zoom-in;
+  break-inside: avoid;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.4s ease;
+}
+
+.photo:hover img {
+  transform: scale(1.03);
+}
+
+.photo:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--white);
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.tagPaid {
+  background: #111;
+  color: var(--white);
+}
+
+.findButton:focus-visible,
+.findLink:focus-visible,
+.clear:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- Smaller screens ---- */
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 999px) {
+  .heroTitle {
+    font-size: 52px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding: calc(var(--header-height) + 28px) 20px 72px;
+  }
+
+  .heroTitle {
+    font-size: 38px;
+  }
+
+  .heroLine {
+    font-size: 16px;
+  }
+
+  .finder {
+    margin-top: -32px;
+    padding: 0 16px;
+  }
+
+  .findBar {
+    gap: 8px;
+    padding: 8px 8px 8px 16px;
+  }
+
+  .findInput {
+    flex-basis: 180px;
+    font-size: 15px;
+  }
+
+  .findButton {
+    flex: 1 1 100%;
+    height: 48px;
+  }
+
+  .body {
+    gap: 18px;
+    padding: 36px 16px 80px;
+  }
+
+  .sectionTitle {
+    font-size: 32px;
+  }
+
+  .sectionLast {
+    padding-top: 48px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+  }
+
+  .albumTitle {
+    font-size: 34px;
+  }
+
+  .photoFilter {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .photoFilter::-webkit-scrollbar {
+    display: none;
+  }
+
+  .photoTab {
+    height: 34px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .masonry {
+    columns: 2 150px;
+    column-gap: 8px;
+  }
+
+  .photo {
+    margin-bottom: 8px;
+    border-radius: 6px;
+  }
+
+  .tag {
+    top: 6px;
+    left: 6px;
+    font-size: 11px;
+  }
+
+  .empty {
+    padding: 32px 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cover img,
+  .photo img {
+    transition: none;
+  }
+
+  .card:hover .cover img,
+  .photo:hover img {
+    transform: scale(1.06);
+  }
+
+  .photo:hover img {
+    transform: none;
+  }
+}

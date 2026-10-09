@@ -1,0 +1,192 @@
+/* The photo pages' cart drawer (new design): from the right, items, then the total and Checkout. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000002;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(10, 10, 10, 0.45);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  animation: fade 0.2s ease;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: var(--white);
+  color: #111;
+  animation: slide 0.25s ease;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(40px);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #111;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: #f2f1ee;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 28px;
+}
+
+.empty {
+  margin: 0;
+  padding: 32px 0;
+  color: #777;
+}
+
+.item {
+  display: flex;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.thumb {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detail {
+  color: #777;
+  font-size: 13px;
+}
+
+.price {
+  font-weight: 700;
+}
+
+.remove {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #777;
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.remove:hover {
+  color: #111;
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px 28px calc(24px + env(safe-area-inset-bottom));
+  border-top: 1px solid #eeeeeb;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.note {
+  color: #666;
+  font-size: 13px;
+}
+
+.checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  border-radius: 8px;
+  background: #111;
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.checkout:hover {
+  background: #2a2a2a;
+}
+
+.disabled,
+.disabled:hover {
+  background: #e5e5e2;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.close:focus-visible,
+.checkout:focus-visible,
+.remove:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .head,
+  .body,
+  .foot {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .drawer {
+    animation: none;
+  }
+}

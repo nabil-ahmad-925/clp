@@ -65,29 +65,3 @@
     font-size: 16px;
   }
 }
-
-/* The photo pages (new design): a larger title, no search bar on the band's edge. */
-.large {
-  padding-bottom: 88px;
-}
-
-.large .title {
-  font-size: 72px;
-  line-height: 1.05;
-}
-
-@media (max-width: 999px) {
-  .large .title {
-    font-size: 52px;
-  }
-}
-
-@media (max-width: 639px) {
-  .large {
-    padding-bottom: 48px;
-  }
-
-  .large .title {
-    font-size: 38px;
-  }
-}

@@ -108,7 +108,7 @@ export type Block =
       /** The article category path of the grid (see content/articles.ts): its live articles replace `posts`. */
       source?: string;
     }
-  | { type: 'gallery'; id: string; name: string; breadcrumbs: { label: string; href?: string }[]; images: GalleryImage[] };
+  | { type: 'gallery'; id: string; name: string; breadcrumbs: { label: string; href?: string }[]; images: GalleryImage[]; access?: 'public' | 'code' | 'family' | 'client' };
 
 /** A post card in the category-filtered post grid (Blog Filter plugin); `categories` are category ids. */
 export type FilterPost = {
@@ -190,7 +190,8 @@ export type GradientTile = { title: string; fontSize: number; button: Cta; to: s
 export type GridImage = { src: string; full: string; alt: string; width: number; height: number };
 
 /** A gallery card in a photo album overview (NextGEN compact album). */
-export type AlbumItem = { title: string; href: string; image: string; count: number };
+/** `access`: who may see the album (content/gallery.ts AlbumAccess); public when not set. */
+export type AlbumItem = { title: string; href: string; image: string; count: number; access?: 'public' | 'code' | 'family' | 'client' };
 
 /** One photo of a gallery: `src` is the 400px-high mosaic version, `thumb` the lightbox strip thumbnail. */
 /** `download`: price of the photo's HD digital download, when the original sells one. */

@@ -7,8 +7,6 @@ import ZoomProjects from '@/components/sections/ZoomProjects';
 import ImageGrid from '@/components/sections/ImageGrid';
 import TeamCardGrid from '@/components/sections/TeamCardGrid';
 import MapDirectory from '@/components/sections/MapDirectory';
-import PhotoAlbum from '@/components/sections/PhotoAlbum';
-import PhotoGallery from '@/components/sections/PhotoGallery';
 import PostFilter from '@/components/sections/PostFilter';
 import ServiceNav from '@/components/sections/ServiceNav';
 import TeamDirectory from '@/components/sections/TeamDirectory';
@@ -44,8 +42,9 @@ export default function BuilderBlock({ block, listing }: { block: Block; listing
           {block.trailingBlank && <p className={styles.blank}>&nbsp;</p>}
         </div>
       );
+    // Photo pages are rendered whole by PhotoExplorer (BuilderPageView).
     case 'album':
-      return <PhotoAlbum items={block.items} />;
+      return null;
     case 'enquiryForm':
       return <EnquiryForm formId={block.formId} submit={block.submit} items={block.items} />;
     case 'contactForm':
@@ -91,6 +90,6 @@ export default function BuilderBlock({ block, listing }: { block: Block; listing
         </div>
       );
     case 'gallery':
-      return <PhotoGallery id={block.id} name={block.name} breadcrumbs={block.breadcrumbs} images={block.images} />;
+      return null;
   }
 }

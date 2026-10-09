@@ -220,7 +220,13 @@
 }
 
 .primary {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   height: 54px;
+  text-decoration: none;
   border: 0;
   border-radius: 8px;
   background: #111;
@@ -294,6 +300,408 @@
 
 .shareLinks a:hover {
   border-color: #111;
+}
+
+/* ---- Tabs: Digital download / Prints & products ---- */
+.tabs {
+  display: flex;
+  flex: none;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.tab {
+  flex: 1;
+  min-height: 56px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #999;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #111;
+}
+
+.tabOn {
+  border-bottom-color: #111;
+  color: #111;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.lineTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.lineTitle strong {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.muted {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---- Product list ---- */
+.group {
+  display: flex;
+  flex-direction: column;
+}
+
+.group .label {
+  padding-bottom: 6px;
+}
+
+.product {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid #eeeeeb;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product:hover .productText strong {
+  text-decoration: underline;
+}
+
+.product:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.productThumb {
+  display: flex;
+  flex: 0 0 56px;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  border-radius: 8px;
+  background: #f2f1ee;
+}
+
+.productText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.productText span {
+  color: #777;
+  font-size: 13px;
+}
+
+.from {
+  color: #555;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.from strong {
+  color: #111;
+}
+
+.chevron {
+  color: #999;
+  font-size: 18px;
+}
+
+/* The photo on a product (a frame and mat for framed prints). */
+.mockup {
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.mockup img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Configurator ---- */
+.back {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #777;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.back:hover {
+  color: #111;
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #f2f1ee;
+}
+
+.productHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.productName {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.productPrice {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.productDesc {
+  margin-top: -12px;
+  color: #666;
+  font-size: 14px;
+}
+
+.optGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.optLabel span {
+  color: #777;
+  font-weight: 500;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  max-height: 236px;
+  overflow-y: auto;
+  border: 1px solid #e5e5e2;
+  border-radius: 8px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 0;
+  border-bottom: 1px solid #eeeeeb;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.listItem:last-child {
+  border-bottom: 0;
+}
+
+.listOn {
+  background: #f7f6f3;
+}
+
+.radio {
+  box-sizing: border-box;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #bbb;
+  border-radius: 50%;
+}
+
+.listOn .radio {
+  border-color: #111;
+  background: #111;
+  box-shadow: inset 0 0 0 3px #f7f6f3;
+}
+
+.listLabel {
+  flex: 1;
+}
+
+.listOn .listLabel {
+  font-weight: 700;
+}
+
+.listPrice {
+  color: #555;
+}
+
+.seg {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid #ddddda;
+  border-radius: 8px;
+}
+
+.segItem {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-left: 1px solid #ddddda;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segItem:first-child {
+  border-left: 0;
+}
+
+.segOn {
+  background: #111;
+  color: var(--white);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 3px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.swatch span {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ddddda;
+  border-radius: 4px;
+}
+
+.swatchOn {
+  border-color: #111;
+}
+
+.select {
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+}
+
+.listItem:focus-visible,
+.segItem:focus-visible,
+.swatch:focus-visible,
+.select:focus-visible,
+.back:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.buyRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.qty {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.qty button {
+  width: 44px;
+  height: 50px;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.qty button:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.qty span {
+  width: 32px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.added {
+  margin: 0 32px 24px;
+}
+
+.added button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1e5b33;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* Tablets and phones: the photo on top (most of the screen), the panel under it; the whole viewer scrolls. */
