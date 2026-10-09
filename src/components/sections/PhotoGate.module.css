@@ -126,7 +126,10 @@
 }
 
 .note {
-  width: 100%;
+  /* Shown after a try: it wraps within the card's width instead of widening the card (0 to its width, then all of it). */
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
   padding: 12px 14px;
   border-radius: 8px;
   background: #fbf6ea;
