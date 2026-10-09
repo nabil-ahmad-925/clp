@@ -7,6 +7,8 @@
 .results {
   position: relative;
   min-height: 120px;
+  /* Below the results line ("8 articles in …"), as the listings' cards. */
+  padding-top: 32px;
 }
 
 /* Another page, search or sport loading: the current cards stay (no flash), dimmed. */

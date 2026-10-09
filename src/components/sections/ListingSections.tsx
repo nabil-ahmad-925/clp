@@ -141,3 +141,39 @@ export function ProgramPlans() {
     </section>
   );
 }
+
+const HOST_CARDS = [
+  {
+    title: 'Host open play',
+    desc: 'List free games or paid drop-ins. Players book and sign waivers on CLP, and paid sessions pay out to your Stripe.',
+    cta: 'List a session',
+  },
+  {
+    title: 'Find volunteers & mentors',
+    desc: 'Post shifts, mentoring roles or service trips. Background checks, SafeSport and volunteer hours are built in.',
+    cta: 'Post an opportunity',
+  },
+] as const;
+
+/** "Bring more people to the field": the gold panel at the end of a facilities page (Volunteering & Open Play design). */
+export function HostCta() {
+  return (
+    <section className={styles.plans} data-header-tone="dark">
+      <div className={styles.plansHead}>
+        <span className={styles.eyebrowDark}>ORGANIZERS, CLUBS &amp; FACILITIES</span>
+        <h2 className={styles.plansTitle}>Bring more people to the field</h2>
+      </div>
+      <div className={styles.hostGrid}>
+        {HOST_CARDS.map((c) => (
+          <div key={c.title} className={styles.hostCard}>
+            <span className={styles.hostTitle}>{c.title}</span>
+            <span className={styles.hostDesc}>{c.desc}</span>
+            <Link className={styles.hostCta} href={PARTNERSHIPS}>
+              {c.cta}
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

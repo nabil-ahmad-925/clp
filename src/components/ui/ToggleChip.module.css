@@ -16,3 +16,8 @@ button.toggle.toggle {
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
+
+/* Listing pages (new design): the same 16px sides as the filter pills. */
+[data-listing] button.toggle.toggle {
+  padding: 0 16px;
+}

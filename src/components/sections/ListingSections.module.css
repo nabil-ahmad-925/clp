@@ -373,3 +373,82 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---- Bring more people to the field (facilities) ---- */
+.hostGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: hidden;
+  border-radius: 16px;
+  background: #dcbd7d;
+  color: #000;
+}
+
+.hostCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 64px 56px;
+  text-align: center;
+}
+
+.hostCard + .hostCard {
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.hostTitle {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.hostDesc {
+  max-width: 420px;
+  color: #2b2412;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.hostCta {
+  display: inline-flex;
+  align-items: center;
+  height: 52px;
+  margin-top: 8px;
+  padding: 0 28px;
+  border-radius: 6px;
+  background: #111;
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.hostCta:hover {
+  opacity: 0.85;
+}
+
+.hostCta:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .hostGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hostCard + .hostCard {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: none;
+  }
+
+  .hostCard {
+    padding: 48px 24px;
+  }
+
+  .hostTitle {
+    font-size: 24px;
+  }
+}

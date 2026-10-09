@@ -173,11 +173,16 @@ export const categoryLinks = (paths: string[]) =>
     .map(categoryLink)
     .filter((l): l is Link => l !== null);
 
-/** The search field's placeholder of an article list: "Search Strategy and Insights articles…". */
-export function articleSearchPlaceholder(source: string | undefined) {
+/** An article list's category name ("Strategy and Insights", or a subcategory's), when it lists one. */
+export function articleCategoryName(source: string | undefined) {
   const [top, sub] = source?.split('/') ?? [];
   const category = ARTICLE_CATEGORIES.find((c) => c.slug === top);
-  const name = sub ? category?.subcategories.find((s) => s.slug === sub)?.name : category?.name;
+  return sub ? category?.subcategories.find((s) => s.slug === sub)?.name : category?.name;
+}
+
+/** The search field's placeholder of an article list: "Search Strategy and Insights articles…". */
+export function articleSearchPlaceholder(source: string | undefined) {
+  const name = articleCategoryName(source);
   return name ? `Search ${name} articles…` : 'Search articles…';
 }
 

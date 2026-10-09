@@ -1,4 +1,4 @@
-import type { Cta, DirectoryFilter, DirectoryItem } from './types';
+import type { Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
 
 /**
  * Directory cards added from the admin (clp-admin), stored in DynamoDB and served by the listings read API
@@ -82,6 +82,12 @@ const WIDGET_BLURBS: Record<number, string> = {
   16: 'Physical therapists, athletic trainers, recovery studios and prevention programs.',
   39: 'Sport psychologists, counselors and mindset programs for athletes and families.',
   33: 'Speed, strength and conditioning coaches, gyms and training plans.',
+  10: 'Fields, courts and indoor spaces to book.',
+  9: 'Fields, courts and indoor spaces to book.',
+  8: 'Fields, courts and indoor spaces to book.',
+  44: 'Fields, courts and indoor spaces to book.',
+  43: 'Courses, ranges and clubs to play and practice.',
+  42: 'Gaming centers, arenas and venues to play and compete.',
 };
 
 /** A listing category's line under the page heading. */
@@ -91,14 +97,20 @@ export const categoryBlurb = (widgetId: number | undefined) => (widgetId != null
 export const isListingWidget = (widgetId: number | undefined): widgetId is number =>
   widgetId != null && (WIDGET_TYPES[widgetId] === 'experiences' || WIDGET_TYPES[widgetId] === 'resources');
 
+/** Whether a directory widget is a sport's facilities: its page uses the facilities design (Volunteering & Open Play). */
+export const isFacilitiesWidget = (widgetId: number | undefined): widgetId is number => widgetId != null && WIDGET_TYPES[widgetId] === 'facilities';
+
 /** Mental Health & Resilience: its listing page shows the crisis line first. */
 export const MENTAL_HEALTH_WIDGET = 39;
 
 /** A CLP partner in a listing page's spotlight (from the partner directory). */
 export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string };
 
-/** What a listing page's directory shows besides its cards: its menu, category and partner spotlight. */
-export type ListingSetup = { section: 'experiences' | 'resources'; category: string; partners: SpotlightPartner[] };
+/**
+ * What a listing page's directory shows besides its cards: its design (an Experiences or Resources category, or a
+ * sport's facilities), its menu, category and the partner spotlight (none on facilities).
+ */
+export type ListingSetup = { kind: 'listing' | 'facilities'; section: 'experiences' | 'resources' | 'facilities'; category: string; partners: SpotlightPartner[] };
 
 /** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
 export const searchPlaceholder = (widgetId: number | undefined, fallback?: string) => {
@@ -111,6 +123,7 @@ const typeParam = (widgetId: number) => (WIDGET_TYPES[widgetId] ? `&type=${WIDGE
 
 type Listing = {
   id: string;
+  provider?: Provider;
   /** The built-in card this listing replaces (listings imported from the site's own data). */
   sourceId?: string;
   title: string;
@@ -209,6 +222,7 @@ export type AddedItem = DirectoryItem & { sourceId?: string; fallbackImage?: str
 
 const toItem = (l: Listing): AddedItem => ({
   id: l.id,
+  provider: l.provider,
   sourceId: l.sourceId,
   tags: l.tags,
   priceMin: l.priceMin,
@@ -241,13 +255,18 @@ export const listingsEnabled = (widgetId: number | undefined): widgetId is numbe
 
 /** After this long the page stops waiting and shows its built-in cards. */
 const TIMEOUT_MS = 4000;
+/**
+ * A directory page's first load waits longer (a cold API answers slowly, and its first answer brings every filter's
+ * counts): giving up early would show the built-in cards instead of the page's real listings.
+ */
+export const FIRST_LOAD_TIMEOUT_MS = 15_000;
 
 /** Filter groups as the API takes them: "a|b,c||d" (groups by "|", a group's values by ","). */
 const encodeGroups = (groups: string[][]) => groups.map((g) => g.join(',')).join('|');
 
 /** One GET of the listings API. Nothing is cached: every call asks the API (the browser too: no-store). */
-function get<T>(path: string): Promise<T> {
-  return fetch(`${API_URL}${path}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) }).then((res) =>
+function get<T>(path: string, timeoutMs = TIMEOUT_MS): Promise<T> {
+  return fetch(`${API_URL}${path}`, { cache: 'no-store', signal: AbortSignal.timeout(timeoutMs) }).then((res) =>
     res.ok ? (res.json() as Promise<T>) : Promise.reject(new Error(`listings API ${res.status}`)),
   );
 }
@@ -259,13 +278,16 @@ export type ListingsSort = 'recommended' | 'price-asc' | 'price-desc' | 'soonest
 
 /**
  * How a list is asked for besides its filter groups: `q` searches the title, subtitle and excerpt (every word must be
- * found), `loc` a place among the tags (a city or destination starting with it), `sort` orders it. The API ignores
- * case and accents.
+ * found), `loc` a place among the tags (a city or destination starting with it), `sort` orders it, `providers` keeps
+ * the listings of those providers (any of them). The API ignores case and accents.
  */
-export type ListingsOptions = { q?: string; loc?: string; sort?: ListingsSort };
+export type ListingsOptions = { q?: string; loc?: string; sort?: ListingsSort; providers?: Provider[]; timeoutMs?: number };
 
-const searchParam = ({ q, loc }: ListingsOptions = {}) =>
-  (q?.trim() ? `&q=${encodeURIComponent(q.trim())}` : '') + (loc?.trim() ? `&loc=${encodeURIComponent(loc.trim())}` : '');
+/** The search, location and provider of a request (lists and counts alike). */
+const searchParam = ({ q, loc, providers }: ListingsOptions = {}) =>
+  (q?.trim() ? `&q=${encodeURIComponent(q.trim())}` : '') +
+  (loc?.trim() ? `&loc=${encodeURIComponent(loc.trim())}` : '') +
+  (providers?.length ? `&provider=${providers.join(',')}` : '');
 
 const listPath = (widgetId: number, groups: string[][], facets: number[], limit: number, cursor?: string, options: ListingsOptions = {}) =>
   `/listings?widget=${widgetId}${typeParam(widgetId)}&${filtersParam(groups)}${facets.length ? `&facets=${facets.join(',')}` : ''}&limit=${limit}` +
@@ -306,7 +328,7 @@ async function rest(widgetId: number, groups: string[][], first: ListingsResult,
  * the `facets` groups. `limit` omitted: every page is loaded. Rejects when the API fails or is slow.
  */
 export const queryListings = (widgetId: number, groups: string[][], facets: number[] = [], limit?: number, options?: ListingsOptions) =>
-  get<ListingsResponse>(listPath(widgetId, groups, facets, limit ?? MAX_PAGE, undefined, options))
+  get<ListingsResponse>(listPath(widgetId, groups, facets, limit ?? MAX_PAGE, undefined, options), options?.timeoutMs)
     .then(toResult)
     .then((r) => (limit === undefined ? rest(widgetId, groups, r, options) : r));
 
@@ -348,4 +370,53 @@ export async function moreListings(
   // A listing can't repeat across pages, but one added meanwhile must not show twice either.
   const seen = new Set(loaded.items.map((i) => i.id));
   return { ...loaded, items: [...loaded.items, ...page.items.filter((i) => !seen.has(i.id))], nextCursor: page.nextCursor };
+}
+
+// --- Booking requests ("Book Now"; the bookings API, clp-api src/bookings.mjs) ---------------------------------------
+
+/** Whether a listing is booked on CLP ("Book Now"): CLP's own and its partners' listings. Others link out. */
+export const isBookable = (item: { provider?: Provider }) => item.provider === 'partner' || item.provider === 'clp';
+
+/** A listing's age rule from its Age tags, as the bookings API reads it: adults only (18+ / 21+), kids only, or all. */
+export type AgePolicy = { kind: 'adult'; minAge: number } | { kind: 'youth' } | { kind: 'all' };
+export function agePolicy(tags: string[]): AgePolicy {
+  const adult = tags.includes('adults-21') ? 21 : tags.includes('adults-18') ? 18 : null;
+  const youth = tags.some((t) => ['toddlers-2-4', 'youth-5-12', 'teens-13-17'].includes(t));
+  if (adult && !youth) return { kind: 'adult', minAge: adult };
+  if (youth && !adult) return { kind: 'youth' };
+  return { kind: 'all' };
+}
+
+export type BookingRequest = {
+  widgetId: number;
+  listingId: string;
+  /** The day ("YYYY-MM-DD"). */
+  date: string;
+  adults: number;
+  kids: number;
+  name: string;
+  email: string;
+  phone?: string;
+  notes?: string;
+  waiver: boolean;
+  guardian?: boolean;
+  ageConfirmed?: boolean;
+  /** Left empty by people (a field they don't see). */
+  website?: string;
+};
+export type BookingConfirmation = { id: string; date: string; people: number; pricePer?: number; total?: number; status: string };
+
+/** Sends a booking request; rejects with the API's message (e.g. "Pick one of the listed dates."). */
+export async function requestBooking(request: BookingRequest): Promise<BookingConfirmation> {
+  if (!API_URL) throw new Error('Booking isn’t available right now.');
+  const res = await fetch(`${API_URL}/bookings`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(request),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || (res.status === 429 ? 'Too many requests. Please try again in a minute.' : 'Could not send your request. Please try again.'));
+  return body.booking as BookingConfirmation;
 }

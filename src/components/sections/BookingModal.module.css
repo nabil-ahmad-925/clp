@@ -1,0 +1,650 @@
+/* "Book Now" popup (new design): the listing's photo on the left, the steps on the right. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(10, 10, 10, 0.6);
+  font-family: var(--font-body);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 980px;
+  height: min(780px, calc(100vh - 64px));
+  height: min(780px, calc(100dvh - 64px));
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--white);
+  color: #111;
+  line-height: 1.5;
+  outline: none;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: #f2f1ee;
+}
+
+/* ---- Photo ---- */
+.photo {
+  position: relative;
+  flex: 0 0 42%;
+  background: #111;
+}
+
+.photoImage {
+  object-fit: cover;
+}
+
+.photoShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.photoText {
+  position: absolute;
+  right: 32px;
+  bottom: 32px;
+  left: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--white);
+}
+
+.badge {
+  align-self: flex-start;
+  padding: 5px 9px;
+  border-radius: 4px;
+  background: #dcbd7d;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.photoProvider,
+.photoMeta {
+  color: #ddd;
+  font-size: 14px;
+}
+
+.photoProvider {
+  font-weight: 600;
+}
+
+.photoTitle {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* ---- Steps ---- */
+/* The steps: each one a scrolling body and, under it, a footer with its button (always in view). */
+.panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.step {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 40px 40px 28px;
+}
+
+.footer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 40px 24px;
+  border-top: 1px solid #eeeeeb;
+  background: var(--white);
+  box-shadow: 0 -10px 20px -16px rgba(0, 0, 0, 0.3);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kicker {
+  color: #888;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.about {
+  margin: 0;
+  padding: 0;
+  color: #222;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #eeeeeb;
+  border-radius: 10px;
+  background: #eeeeeb;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  background: var(--white);
+}
+
+.factValue {
+  font-weight: 600;
+}
+
+.note {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #e8d6a8;
+  border-radius: 10px;
+  background: #fbf6ea;
+  color: #444;
+  font-size: 14px;
+}
+
+.note svg {
+  flex: none;
+  margin-top: 2px;
+  color: #8a6f33;
+}
+
+.note strong {
+  color: #111;
+}
+
+.hosted {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 0;
+  border-top: 1px solid #eeeeeb;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.hostName {
+  font-weight: 700;
+}
+
+.hostMeta {
+  color: #1e5b33;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.primary {
+  height: 56px;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.primary:hover:not(:disabled) {
+  background: #2a2a2a;
+}
+
+.primary:disabled {
+  background: #e5e5e2;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.back {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #777;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.back:hover {
+  color: #111;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.policy {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.hint {
+  color: #777;
+  font-size: 13px;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  height: 56px;
+  padding: 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.day:hover {
+  border-color: #111;
+}
+
+.dow {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.dayOn,
+.dayOn:hover {
+  border-color: #111;
+  background: #111;
+  color: var(--white);
+}
+
+.counters {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+  border-top: 1px solid #eeeeeb;
+}
+
+.counterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.counterOff {
+  opacity: 0.4;
+}
+
+.counterText {
+  display: flex;
+  flex-direction: column;
+}
+
+.counterLabel {
+  font-weight: 600;
+}
+
+.counterNote {
+  color: #777;
+  font-size: 13px;
+}
+
+.counter {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.counter button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.counter button:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.counter span {
+  width: 32px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.panelNote {
+  padding: 16px;
+  border: 1px solid #ddddda;
+  border-radius: 10px;
+  background: #f7f6f3;
+}
+
+.check {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.box {
+  flex: 0 0 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1.5px solid #aaa;
+  border-radius: 4px;
+  background: var(--white) center / 12px no-repeat;
+}
+
+.check input:checked + .box {
+  border-color: #111;
+  background-color: #111;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+}
+
+.check input:focus-visible + .box {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.check a {
+  color: #111;
+  font-weight: 600;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.fieldWide {
+  grid-column: 1 / -1;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.input:focus {
+  border-color: #111;
+  outline: none;
+}
+
+/* Hidden from people (bots fill it in). */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.totals {
+  gap: 8px;
+}
+
+.totalLine,
+.totalMain {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.totalLine {
+  color: #666;
+  font-size: 15px;
+}
+
+.totalMain {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fbe9e7;
+  color: #9a3324;
+  font-size: 14px;
+}
+
+.doneKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 24px;
+  color: #1e5b33;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.doneTitle {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1.15;
+}
+
+.doneText {
+  color: #555;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid #ddddda;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.close:focus-visible,
+.primary:focus-visible,
+.back:focus-visible,
+.day:focus-visible,
+.counter button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Phones and small tablets: a full-screen sheet; the photo a band on top, the step's body scrolls, its footer stays at
+   the bottom. */
+@media (max-width: 767px) {
+  .overlay {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .dialog {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .close {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .photo {
+    flex: 0 0 200px;
+  }
+
+  .photoText {
+    right: 20px;
+    bottom: 16px;
+    left: 20px;
+    gap: 4px;
+  }
+
+  .photoTitle {
+    font-size: 22px;
+  }
+
+  .body {
+    padding: 22px 20px 20px;
+  }
+
+  .footer {
+    padding: 14px 20px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .footer .hint {
+    font-size: 12px;
+  }
+
+  .doneTitle {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo {
+    flex-basis: 160px;
+  }
+
+  .photoMeta {
+    display: none;
+  }
+
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .day {
+    min-width: 76px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: none;
+  }
+}

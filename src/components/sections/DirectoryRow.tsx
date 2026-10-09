@@ -7,7 +7,7 @@ import type { DirectoryItem } from '@/content/types';
 import styles from './DirectoryRow.module.css';
 
 /** What the row shows besides the card itself, read from its filter tags (see TeamDirectory). */
-export type RowFacts = { city?: string; ages?: string; months?: string; price?: string };
+export type RowFacts = { city?: string; ages?: string; months?: string; price?: string; access?: string[] };
 
 type Props = {
   card: DirectoryItem;

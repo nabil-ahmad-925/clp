@@ -290,25 +290,25 @@
   font-family: var(--font-body);
 }
 
-.listing .bar {
+[data-listing] .bar {
   margin: 40px 0 0;
   padding-left: 0;
 }
 
-.listing .barRow {
+[data-listing] .barRow {
   align-items: center;
   gap: 16px;
 }
 
-.listing .filters {
+[data-listing] .filters {
   gap: 10px;
 }
 
-.listing .sortSlot {
+[data-listing] .sortSlot {
   gap: 12px;
 }
 
-.listing .clearAll {
+[data-listing] .clearAll {
   height: 44px;
   font-family: var(--font-body);
   font-weight: 600;
@@ -414,7 +414,7 @@
     --listing-w: calc(100vw - 32px);
   }
 
-  .listing .bar {
+  [data-listing] .bar {
     margin-top: 28px;
   }
 
@@ -427,4 +427,95 @@
   .listingGrid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* The results line with the labels' key on its right (new design). */
+.resultsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-top: 20px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.resultsRow .results {
+  padding-top: 0;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.swatch {
+  flex: none;
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.swatchPartner {
+  background: #dcbd7d;
+}
+
+.swatchSponsored {
+  background: #111;
+}
+
+.swatchCommunity {
+  border: 1px solid #999;
+}
+
+/* Tablets: the key on its own line under the count. */
+@media (max-width: 1023px) {
+  .resultsRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Phones: the key's three labels one under the other, a little smaller. */
+@media (max-width: 639px) {
+  .resultsRow {
+    gap: 10px;
+    padding-top: 16px;
+  }
+
+  .legend {
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .legendItem {
+    align-items: flex-start;
+    white-space: normal;
+  }
+
+  /* Lined up with the label's first line. */
+  .swatch {
+    margin-top: 5px;
+  }
+}
+
+/* Between the provider filter and the page's other filters (as the design). */
+.barDivider {
+  flex: none;
+  width: 1px;
+  height: 28px;
+  margin: 0 4px;
+  background: #ddddda;
 }

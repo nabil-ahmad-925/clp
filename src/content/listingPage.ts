@@ -1,5 +1,5 @@
 import 'server-only';
-import { categoryBlurb, categoryName, isListingWidget, listingTypeOf, type ListingSetup, type SpotlightPartner } from './listings';
+import { categoryBlurb, categoryName, isFacilitiesWidget, isListingWidget, listingTypeOf, type ListingSetup, type SpotlightPartner } from './listings';
 import { getPartnerPage } from './partners';
 
 /** What a listing page (an Experiences or Resources category) shows around its directory, in the new design. */
@@ -15,10 +15,17 @@ function spotlightPartners(): SpotlightPartner[] {
   return archive.cards.slice(0, SPOTLIGHT_SIZE).map((c) => ({ name: c.title, href: c.href, image: c.image?.src, excerpt: c.excerpt }));
 }
 
-/** A builder page's listing-page setup, when its directory is an Experiences or Resources category. */
+/**
+ * A builder page's listing-page setup, when its directory is an Experiences or Resources category, or a sport's
+ * facilities (the Volunteering & Open Play design: no partner spotlight).
+ */
 export function listingPageOf(widgetId: number | undefined): ListingPage | undefined {
+  if (isFacilitiesWidget(widgetId)) {
+    return { kind: 'facilities', section: 'facilities', category: categoryName(widgetId) ?? '', blurb: categoryBlurb(widgetId), partners: [] };
+  }
   if (!isListingWidget(widgetId)) return undefined;
   return {
+    kind: 'listing',
     section: listingTypeOf(widgetId) as ListingPage['section'],
     category: categoryName(widgetId) ?? '',
     blurb: categoryBlurb(widgetId),

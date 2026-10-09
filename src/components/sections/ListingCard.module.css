@@ -180,3 +180,244 @@
     transform: none;
   }
 }
+
+/* ---- Facilities (Volunteering & Open Play design) ---- */
+
+.bigPrice {
+  color: #111;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* The chips and a full-width "Learn More" at the foot of the card. */
+.facilityFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeeb;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* A thin bar between chips. */
+.chip + .chip::before {
+  width: 1px;
+  height: 12px;
+  margin: 0 10px;
+  background: #ccc;
+  content: '';
+}
+
+.ctaWide {
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  font-size: 15px;
+}
+
+/* ---- Provider labels (CLP Partner, Compete Like Pros, Sponsored, Community) ---- */
+
+/* CLP's and its partners' cards: a gold edge. */
+.verified {
+  border-color: #e2d3ae;
+}
+
+.badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100% - 28px);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.badgePartner {
+  background: #dcbd7d;
+  color: #000;
+}
+
+.badgeSponsored {
+  background: #111;
+  color: var(--white);
+}
+
+.badgeCommunity {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+}
+
+/* "From public info · Claim this listing" on community cards. */
+.claim {
+  color: #888;
+  font-size: 12px;
+}
+
+/* Underlined, as the design's link. */
+.claim a,
+.claimLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.claim a:hover,
+.claimLink:hover {
+  color: var(--gold-deep);
+}
+
+.claimLink:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- Sponsored strip: two wide cards above the results ---- */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stripCard {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 240px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.stripCard:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.stripImage {
+  object-fit: cover;
+  opacity: 0.55;
+  transition: transform 0.4s ease;
+}
+
+.stripCard:hover .stripImage {
+  transform: scale(1.03);
+}
+
+.stripBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  padding: 28px;
+}
+
+/* In the strip the label sits in the text column. */
+.badgeStrip {
+  position: static;
+  align-self: flex-start;
+  padding: 5px 9px;
+  background: var(--white);
+  color: #111;
+}
+
+.stripProvider {
+  color: #ddd;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stripTitle {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stripFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #e5e5e5;
+  font-size: 14px;
+}
+
+.stripCta {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 6px;
+  background: var(--white);
+  color: #111;
+  font-weight: 700;
+}
+
+@media (max-width: 767px) {
+  .strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .stripCard {
+    min-height: 220px;
+  }
+
+  .stripBody {
+    padding: 22px;
+  }
+
+  .stripTitle {
+    font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stripImage {
+    transition: none;
+  }
+
+  .stripCard:hover .stripImage {
+    transform: none;
+  }
+}

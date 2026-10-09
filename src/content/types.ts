@@ -52,7 +52,12 @@ export type DirectoryItem = FacilityCard & {
   /** Its times ("HH:MM", 24-hour; with its dates): the Available time filter finds it by the start, and its row shows them. */
   startTime?: string;
   endTime?: string;
+  /** Who provides it (listings from the admin): its label on the listing pages' cards. Built-in cards have none. */
+  provider?: Provider;
 };
+
+/** Who provides a listing (the listings API's `provider`): CLP Partner, Compete Like Pros, Community or Sponsored. */
+export type Provider = 'partner' | 'clp' | 'community' | 'sponsored';
 
 /**
  * One drop-menu filter. `preset` is the option the original page selects on load (each sport page pre-selects its

@@ -16,6 +16,7 @@ import {
   ARTICLE_LENGTHS,
   ARTICLE_SORTS,
   ARTICLE_TAGS,
+  articleCategoryName,
   articleSearchPlaceholder,
   articlesEnabled,
   countArticles,
@@ -247,7 +248,8 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   const layout = { '--dir-width': '1200px', '--dir-col-gap': '32px' } as CSSProperties;
 
   return (
-    <div ref={topRef} className={`${dir.directory} ${styles.directory}`} style={layout}>
+    // data-listing: the filter bar, sort, view switch and pager as on the Experiences and Resources listings.
+    <div ref={topRef} className={`${dir.directory} ${styles.directory}`} style={layout} data-listing="">
       {!shared && (
         <div className={dir.searchSlot}>
           <DirectorySearch
@@ -384,6 +386,19 @@ export default function PostFilter({ categories: builtInCategories, posts: built
               Try again
             </button>
           </div>
+        )}
+      </div>
+      {/* "8 articles in Briefings & Field Reports", as the listings' results line. */}
+      <div className={dir.results} role="status">
+        {loading ? (
+          'Loading articles…'
+        ) : (
+          <span>
+            <strong>
+              {total} {total === 1 ? 'article' : 'articles'}
+            </strong>
+            {loc ? ` near ${loc}` : articleCategoryName(source) ? ` in ${articleCategoryName(source)}` : ''}
+          </span>
         )}
       </div>
 

@@ -11,6 +11,7 @@ import {
   LuDollarSign,
   LuHandshake,
   LuHeartPulse,
+  LuBadgeCheck,
   LuMapPin,
   LuPlane,
   LuSearch,
@@ -25,13 +26,15 @@ import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/Price
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { MENTAL_HEALTH_WIDGET, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsResult } from '@/content/listings';
+import { FIRST_LOAD_TIMEOUT_MS, MENTAL_HEALTH_WIDGET, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
-import type { DirectoryFilter, DirectoryItem, DirectoryLayout } from '@/content/types';
+import type { DirectoryFilter, DirectoryItem, DirectoryLayout, Provider } from '@/content/types';
 import BioModal from './BioModal';
+import BookingModal from './BookingModal';
+import ClaimModal from './ClaimModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
-import ListingCard from './ListingCard';
+import ListingCard, { SponsoredStrip } from './ListingCard';
 import { CrisisNotice, PartnerSpotlight } from './ListingSections';
 import TeamCard from './TeamCard';
 import styles from './TeamDirectory.module.css';
@@ -53,6 +56,27 @@ type Props = {
 
 /** On a listing page, the partner spotlight comes after this many cards. */
 const SPOTLIGHT_AFTER = 8;
+
+/**
+ * The listing pages' provider filter ("All providers" until one is ticked): the listings' providers, as the cards'
+ * labels name them. Like the other filters, any ticked one matches.
+ */
+const PROVIDER_OPTIONS: { value: Provider; label: string; providers: Provider[] }[] = [
+  { value: 'clp', label: 'Compete Like Pros', providers: ['clp'] },
+  { value: 'partner', label: 'CLP Partners', providers: ['partner'] },
+  { value: 'sponsored', label: 'Sponsored', providers: ['sponsored'] },
+  { value: 'community', label: 'Community', providers: ['community'] },
+];
+/** What requests send for the ticked providers (undefined: every provider). */
+const providersOf = (chosen: string[]): Provider[] | undefined => {
+  const providers = PROVIDER_OPTIONS.filter((o) => chosen.includes(o.value)).flatMap((o) => o.providers);
+  return providers.length ? providers : undefined;
+};
+/** The Provider filter's index among the open-filter states (the page's own filters are 0, 1, …). */
+const PROVIDER_FILTER = -1;
+
+/** How many sponsored listings the strip above a listing page's results shows. */
+const SPONSORED_STRIP = 2;
 
 /** A card's tags as the API's location search reads them (see clp-api placeTextOf): "new-york" -> "newyork", "new york". */
 const placeText = (tags: string[]) => ` ${tags.flatMap((t) => [t.replace(/[^a-z0-9]/g, ''), t.replace(/-+/g, ' ')]).join(' ')} `;
@@ -151,6 +175,8 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
   return {
     city: firstOf([...new Set(labelsOf((k) => LOCATION_KEYS.includes(k)))]),
     ages: firstOf(labelsOf((k) => k === 'age' || k === 'age-group')),
+    // The Accessibility filter's labels (Open Access, Members Only…), shown on the facilities' cards.
+    access: labelsOf((k) => k === 'extra-two'),
     // A dated listing shows its dates ("Oct 30 – Nov 2", with its times: "Oct 30, 9:30 AM – 11 AM"), others their months.
     months: item.startDate
       ? [dayRange(item.startDate, item.endDate ?? item.startDate), timeRange(item.startTime, item.endTime)].filter(Boolean).join(', ')
@@ -212,7 +238,7 @@ const PAGE_SIZES = [12, 24, 48];
 const apiSort = (sort: Sort) => (sort === 'featured' ? undefined : sort);
 
 /** What the shown results were loaded with (view.resultKey): filters, search, sort and page size. */
-type ResultKey = Search & { g: string[][]; sort: Sort; size: number };
+type ResultKey = Search & { g: string[][]; sort: Sort; size: number; p?: Provider[] };
 
 /** API mode: the listing service filters and counts in DynamoDB. Local mode: the built-in cards, filtered here. */
 type Mode = 'loading' | 'api' | 'local';
@@ -292,6 +318,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   const facetGroups = menus.filter(({ filter }) => !filter.preset || routeSport(filter)).map(({ i }) => i);
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [sort, setSort] = useState<Sort>('featured');
+  // Listing pages' provider select. The ref is what every request sends (set before a change reloads the results).
+  const [provider, setProvider] = useState<string[]>([]);
+  const providersNow = useRef<Provider[] | undefined>(undefined);
+  const withProviders = <T extends object>(options: T) => ({ ...options, providers: providersNow.current });
 
   const [chosen, setChosen] = useState<string[][]>(presets);
   // The applied search (searched by the API in API mode, else here over the built-in cards). On a directory page the
@@ -305,7 +335,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   useEffect(() => {
     searchNow.current = search;
   });
-  const filterKey = JSON.stringify({ g: chosen, ...search });
+  const filterKey = JSON.stringify({ g: chosen, ...search, provider });
   const [view, setView] = useState<View>(() => {
     const base = {
       resultKey: JSON.stringify({ g: presets, ...NO_SEARCH, sort: 'featured', size: PAGE_SIZE } satisfies ResultKey),
@@ -330,12 +360,19 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     if (view.mode !== 'loading' || widgetId == null) return;
     let active = true;
     const { presets: groups, facetGroups: facets, firstPage: limit } = initial.current;
-    queryListings(widgetId, groups, facets, limit)
+    // A slow (cold) API gets time and a second try: only a failed retry (or no listings at all) shows the built-in
+    // cards, never a timeout on a page that has listings.
+    const first = { timeoutMs: FIRST_LOAD_TIMEOUT_MS };
+    const load = (options: ListingsOptions = {}) =>
+      queryListings(widgetId, groups, facets, limit, { ...options, ...first }).catch(() =>
+        queryListings(widgetId, groups, facets, limit, { ...options, ...first }),
+      );
+    load()
       .then(async (r) => {
         // Searched while the page was loading: the API's listings for that search instead.
         const searched = searchNow.current;
         if (r.total === 0 || (!searched.q && !searched.loc)) return { r, searched: NO_SEARCH };
-        return { r: await queryListings(widgetId, groups, facets, limit, searched), searched };
+        return { r: await load(searched), searched };
       })
       .then(
         ({ r, searched }) =>
@@ -355,6 +392,49 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     };
   }, [view.mode, widgetId]);
 
+  // Listing pages: the newest sponsored listings of the page (its sport), for the strip above the results.
+  const listingPage = Boolean(listing);
+  // The two-card sponsored strip is an Experiences feature (Resources and Facilities show their sponsored listings'
+  // labels only).
+  const stripPage = listing?.section === 'experiences';
+  // Who runs a listing: a facility's "host", any other listing's "provider" (the filter's wording only).
+  const providerWord = listing?.section === 'facilities' ? { many: 'hosts', Title: 'Host' } : { many: 'providers', Title: 'Provider' };
+  const [sponsored, setSponsored] = useState<AddedItem[]>([]);
+  const loaded = view.mode !== 'loading';
+  useEffect(() => {
+    // After the page's own listings (not competing with their first load).
+    if (!stripPage || !enabled || widgetId == null || !loaded) return;
+    let live = true;
+    queryListings(widgetId, initial.current.presets, [], SPONSORED_STRIP, { providers: ['sponsored'], timeoutMs: FIRST_LOAD_TIMEOUT_MS }).then(
+      // Only listings the API marks sponsored (an API without providers sends every listing).
+      (r) => live && setSponsored(r.items.filter((item) => item.provider === 'sponsored')),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [stripPage, enabled, widgetId, loaded]);
+
+  // The Provider filter's counts (listing pages, API results): each provider's listings with the other filters and the
+  // search as applied.
+  const countsKey = mode === 'api' && listingPage ? JSON.stringify((({ g, q, loc }: ResultKey) => ({ g, q, loc }))(JSON.parse(view.resultKey))) : '';
+  const [providerCountsOf, setProviderCountsOf] = useState<{ key: string; counts: Record<string, number> } | null>(null);
+  useEffect(() => {
+    if (!countsKey || widgetId == null) return;
+    let live = true;
+    const { g, q, loc } = JSON.parse(countsKey) as ResultKey;
+    Promise.all(PROVIDER_OPTIONS.map((o) => countListings(widgetId, g, { q, loc, providers: o.providers }))).then(
+      (n) => live && setProviderCountsOf({ key: countsKey, counts: Object.fromEntries(PROVIDER_OPTIONS.map((o, i) => [o.value, n[i]])) }),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [countsKey, widgetId]);
+  // While new counts load the last ones stay (no flicker). The built-in cards have no provider: every count is 0.
+  const providerCounts: Record<string, number> | undefined =
+    mode === 'local' ? Object.fromEntries(PROVIDER_OPTIONS.map((o) => [o.value, 0])) : providerCountsOf?.counts;
+
   // Image fallbacks: an API card imported from a built-in card (sourceId) uses its image when it has none of its own.
   const byId = useMemo(() => new Map(builtIn.map((b) => [b.id, b])), [builtIn]);
   const apiItems = useMemo(
@@ -372,9 +452,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       }),
     [view.pages, pageIndex, byId],
   );
+  // Built-in cards have no provider: a provider choice keeps none of them.
   const filtered: DirectoryItem[] = useMemo(
-    () => (mode === 'api' ? apiItems : mode === 'local' ? matching(builtIn, chosen, search) : []),
-    [mode, apiItems, builtIn, chosen, search],
+    () => (mode === 'api' ? apiItems : mode === 'local' && provider.length === 0 ? matching(builtIn, chosen, search) : []),
+    [mode, apiItems, builtIn, chosen, search, provider],
   );
 
   // Grid (the plugin's cards) or list (tenpo.com's rows); the choice is remembered in this browser.
@@ -404,6 +485,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   if (cardsShown.now !== shownIds) setCardsShown({ now: shownIds, before: new Set(cardsShown.now.split('|')) });
   const isNew = (id: string) => !cardsShown.before.has(id);
   const [open, setOpen] = useState<DirectoryItem | null>(null);
+  // The listing being booked ("Book Now" on a listing page).
+  const [booking, setBooking] = useState<DirectoryItem | null>(null);
+  // The community listing being claimed ("Claim this listing").
+  const [claiming, setClaiming] = useState<DirectoryItem | null>(null);
   const [openFilter, setOpenFilter] = useState<number | null>(null);
   // As on the original, "No Results Found" appears only when a filter change empties a grid that had cards
   // (a page whose preset already matches nothing stays blank), and goes away once cards match again.
@@ -420,14 +505,14 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     }
     const request = ++latest.current;
     setView((v) => ({ ...v, pending: true, error: false }));
-    queryListings(widgetId, next, facetGroups, nextSize, { ...nextSearch, sort: apiSort(nextSort) }).then(
+    queryListings(widgetId, next, facetGroups, nextSize, withProviders({ ...nextSearch, sort: apiSort(nextSort) })).then(
       (r) => {
         if (request !== latest.current) return;
         showCount(r.total);
         setView((v) => ({
           ...v,
           result: r,
-          resultKey: JSON.stringify({ g: next, ...nextSearch, sort: nextSort, size: nextSize } satisfies ResultKey),
+          resultKey: JSON.stringify({ g: next, ...nextSearch, sort: nextSort, size: nextSize, p: providersNow.current } satisfies ResultKey),
           pending: false,
           more: false,
           pages: [r.items],
@@ -454,13 +539,13 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   }, [sportIndex, enabled, widgetId]);
   // The API's count of each sport with the other filters and the search (a page showing built-in cards asks for them;
   // one showing API listings has them in its facets).
-  const sportsKey = JSON.stringify({ g: chosen.map((v, j) => (j === sportIndex ? [] : v)), q: search.q, loc: search.loc });
+  const sportsKey = JSON.stringify({ g: chosen.map((v, j) => (j === sportIndex ? [] : v)), q: search.q, loc: search.loc, provider });
   const [apiSportsNow, setApiSportsNow] = useState<{ key: string; counts: Record<string, number> } | null>(null);
   useEffect(() => {
     if (sportIndex < 0 || !enabled || widgetId == null || mode !== 'local') return;
     let live = true;
     const { g, q, loc } = JSON.parse(sportsKey) as { g: string[][]; q: string; loc: string };
-    queryListings(widgetId, g, [sportIndex], 1, { q, loc }).then(
+    queryListings(widgetId, g, [sportIndex], 1, withProviders({ q, loc })).then(
       (r) => live && setApiSportsNow({ key: sportsKey, counts: r.facets[sportIndex]?.counts ?? {} }),
       () => {},
     );
@@ -496,7 +581,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     (apiSports ? Promise.resolve(next[si].some(inApi) ? 1 : 0) : countListings(widgetId, next.map((v, j) => (j === si ? v : []))))
       .then(async (available) => {
         if (available === 0) return null;
-        return queryListings(widgetId, next, facetGroups, pageSize, { ...nextSearch, sort: apiSort(nextSort) });
+        return queryListings(widgetId, next, facetGroups, pageSize, withProviders({ ...nextSearch, sort: apiSort(nextSort) }));
       })
       .then(
         (r) => {
@@ -506,7 +591,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
             ...v,
             mode: r ? 'api' : 'local',
             result: r,
-            resultKey: JSON.stringify({ g: next, ...nextSearch, sort: nextSort, size: pageSize } satisfies ResultKey),
+            resultKey: JSON.stringify({ g: next, ...nextSearch, sort: nextSort, size: pageSize, p: providersNow.current } satisfies ResultKey),
             pending: false,
             more: false,
             pages: r ? [r.items] : [],
@@ -516,6 +601,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         () => request === latest.current && setView((v) => ({ ...v, pending: false, error: true })),
       );
   };
+  /** The provider of a sheet draft (phones; listing pages): its Provider section's choice, none for all. */
+  const sheetProvider = (draft: SheetDraft): string[] => draft.provider ?? provider;
   /** The filter groups of a sheet draft (phones): its sections' values; none for Resources' Sport is the route's. */
   const sheetGroups = (draft: SheetDraft) =>
     chosen.map((v, j) => {
@@ -539,7 +626,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     }
     const request = latest.current;
     const key = view.resultKey;
-    const { g: groups, q, loc, sort: shownSort, size } = JSON.parse(key) as ResultKey;
+    const { g: groups, q, loc, sort: shownSort, size, p: providers } = JSON.parse(key) as ResultKey;
     const pages = [...view.pages];
     const cursors = [...view.cursors];
     setView((v) => ({ ...v, more: true, error: false }));
@@ -547,7 +634,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       for (let i = pages.length; i <= target; i++) {
         const cursor = cursors[i];
         if (!cursor) break;
-        const next = await listingsPage(widgetId, groups, cursor, size, { q, loc, sort: apiSort(shownSort) });
+        const next = await listingsPage(widgetId, groups, cursor, size, { q, loc, sort: apiSort(shownSort), providers });
         pages[i] = next.items;
         cursors[i + 1] = next.nextCursor;
       }
@@ -572,6 +659,12 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     setSort(next);
     if (mode === 'api') apply(chosen, search, next);
   };
+  /** A provider choice (listing pages): the API's listings again from the first page, with the filters as they are. */
+  const chooseProvider = (choice: string[], next = chosen, nextSearch = search, nextSort = sort) => {
+    setProvider(choice);
+    providersNow.current = providersOf(choice);
+    apply(next, nextSearch, nextSort);
+  };
   /** A search from the bar (searched by the API with the filters as they are). */
   const runSearch = (next: Search) => {
     setSearch(next);
@@ -592,7 +685,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   // chip shows none; a picked sport filters this page like any filter, and clearing it goes back to the route's sport.
   const [sportPicked, setSportPicked] = useState(false);
   const kept = (f: DirectoryFilter) => locked(f) || routeSport(f);
-  const anyChosen = shown.some(({ filter, i }) => !kept(filter) && chosen[i].length > 0) || sportPicked || Boolean(search.q || search.loc);
+  const anyChosen =
+    shown.some(({ filter, i }) => !kept(filter) && chosen[i].length > 0) || sportPicked || Boolean(search.q || search.loc) || provider.length > 0;
   const loading = mode === 'loading';
 
   /**
@@ -631,10 +725,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       ? {
           countFor: (draft: string[]) => {
             const groups = withFilter(i, draft);
-            const key = JSON.stringify({ groups, ...search });
+            const key = JSON.stringify({ groups, ...search, provider });
             let count = counts.current.get(key);
             if (!count) {
-              count = countListings(widgetId, groups, search);
+              count = countListings(widgetId, groups, withProviders(search));
               counts.current.set(key, count);
               count.catch(() => counts.current.delete(key));
             }
@@ -702,6 +796,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   /** "Clear all": no filters (the kept ones and Resources' route sport as they were) and no search. */
   const clearAll = () => {
     setSearch(NO_SEARCH);
+    setProvider([]);
+    providersNow.current = undefined;
     const cleared = chosen.map((v, j) => (routeSport(filters[j]) ? [filters[j].preset!] : kept(filters[j]) ? v : []));
     if (sportPicked) applySport(cleared, NO_SEARCH);
     else apply(cleared, NO_SEARCH);
@@ -732,19 +828,25 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
           <ListingCard
             card={item}
             view={display}
+            variant={listing?.kind === 'facilities' ? 'facility' : 'listing'}
             eager={offset + i < 4}
             facts={rowFacts(item, filters, prices)}
             fallbackImage={(item as AddedItem).fallbackImage}
             onOpen={() => setOpen(item)}
+            onBook={() => setBooking(item)}
+            onClaim={() => setClaiming(item)}
           />
         </div>
       ))}
     </div>
   );
 
-  /** A listing page's results: the first cards, the partner spotlight, the rest and the pager (fewer cards: the pager first). */
+  /**
+   * A listing page's results: the first cards, the partner spotlight, the rest and the pager (fewer cards: the pager
+   * first). Facilities have no spotlight: their cards and the pager.
+   */
   const listingResults = (setup: ListingSetup) => {
-    const spotlight = <PartnerSpotlight partners={setup.partners} section={setup.section} />;
+    const spotlight = setup.section !== 'facilities' && <PartnerSpotlight partners={setup.partners} section={setup.section} />;
     if (loading) {
       return (
         <div className={display === 'list' ? styles.listingList : styles.listingGrid} aria-hidden>
@@ -756,7 +858,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     }
     const empty = !view.pending && pageItems.length === 0 && (
       <div className={styles.listingEmpty} role="status">
-        No results match {anyChosen ? 'these filters' : 'this page yet'}.
+        {setup.kind === 'facilities' ? 'Nothing matches yet. Try another filter.' : `No results match ${anyChosen ? 'these filters' : 'this page yet'}.`}
         {anyChosen && (
           <>
             {' '}
@@ -769,8 +871,13 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     );
     const first = pageItems.slice(0, SPOTLIGHT_AFTER);
     const rest = pageItems.slice(SPOTLIGHT_AFTER);
-    return rest.length > 0 ? (
+    // Sponsored placements first (with every provider shown), as two wide cards; they are in the results too.
+    const strip = stripPage && provider.length === 0 && sponsored.length > 0 && (
+      <SponsoredStrip items={sponsored} factsOf={(item) => rowFacts(item, filters, prices)} onOpen={setOpen} />
+    );
+    return rest.length > 0 && spotlight ? (
       <>
+        {strip}
         {listingCards(first, 0)}
         {spotlight}
         <div className={styles.listingRest}>{listingCards(rest, SPOTLIGHT_AFTER)}</div>
@@ -778,6 +885,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       </>
     ) : (
       <>
+        {strip}
         {empty}
         {first.length > 0 && listingCards(first, 0)}
         {pager}
@@ -799,6 +907,26 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         <div className={styles.bar}>
           <div className={styles.barRow}>
             <div className={`${styles.filters} ${loading ? styles.busy : ''}`} inert={loading}>
+              {/* Listing pages: who provides the listings (the cards' labels), then the filters. */}
+              {listing && (
+                <>
+                  <FilterChip
+                    name={`All ${providerWord.many}`}
+                    heading={`${providerWord.Title} type`}
+                    icon={<LuBadgeCheck />}
+                    plural={providerWord.many}
+                    options={PROVIDER_OPTIONS.map(({ value, label }) => ({ value, label, count: providerCounts?.[value] }))}
+                    value={provider}
+                    open={openFilter === PROVIDER_FILTER}
+                    onOpenChange={(isOpen) => setOpenFilter(isOpen ? PROVIDER_FILTER : null)}
+                    {...(mode === 'api' && widgetId != null
+                      ? { countFor: (draft: string[]) => countListings(widgetId, chosen, { ...search, providers: providersOf(draft) }) }
+                      : { resultsFor: (draft: string[]) => (draft.length ? 0 : matching(builtIn, chosen, search).length) })}
+                    onApply={(values) => chooseProvider(values)}
+                  />
+                  <span className={styles.barDivider} aria-hidden />
+                </>
+              )}
               {bar.map(({ filter, i, options, buckets, of }) => {
                 const { name, icon, heading, plural } = chipFor(filter);
                 const key = filter.key ?? filter.label;
@@ -823,7 +951,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                         ? {
                             countFor: (draft: string[]) => {
                               const groups = withFilter(i, asApplied(draft));
-                              return asApplied(draft).some(inApi) ? countListings(widgetId, groups, search) : Promise.resolve(matching(builtIn, groups, search).length);
+                              return asApplied(draft).some(inApi) ? countListings(widgetId, groups, withProviders(search)) : Promise.resolve(matching(builtIn, groups, search).length);
                             },
                           }
                         : { resultsFor: (draft: string[]) => matching(builtIn, withFilter(i, asApplied(draft)), search).length })}
@@ -857,26 +985,46 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
             <div className={`${styles.mobileFilters} ${loading ? styles.busy : ''}`} inert={loading}>
               {(bar.length > 0 || sorts.length > 1) && (
                 <MobileFilters
-                  sections={bar.map(({ filter, i, options }) => ({
-                    id: String(i),
-                    heading: chipFor(filter).heading ?? chipFor(filter).name,
-                    options,
-                    // Resources' Sport: the route's sport is no choice made (see sportPicked).
-                    value: routeSport(filter) ? (sportPicked ? chosen[i] : []) : chosen[i],
-                    single: routeSport(filter),
-                  }))}
+                  sections={[
+                    // Listing pages: the provider (none ticked: all of them).
+                    ...(listing
+                      ? [
+                          {
+                            id: 'provider',
+                            heading: `${providerWord.Title} type`,
+                            options: PROVIDER_OPTIONS.map(({ value, label }) => ({ value, label, count: providerCounts?.[value] })),
+                            value: provider,
+                          },
+                        ]
+                      : []),
+                    ...bar.map(({ filter, i, options }) => ({
+                      id: String(i),
+                      heading: chipFor(filter).heading ?? chipFor(filter).name,
+                      options,
+                      // Resources' Sport: the route's sport is no choice made (see sportPicked).
+                      value: routeSport(filter) ? (sportPicked ? chosen[i] : []) : chosen[i],
+                      single: routeSport(filter),
+                    })),
+                  ]}
                   sort={sorts.length > 1 ? { value: sort, options: SORTS.filter((o) => sorts.includes(o.value)) } : undefined}
-                  applied={shown.filter(({ filter, i }) => !kept(filter) && chosen[i].length > 0).length + (sportPicked ? 1 : 0)}
+                  applied={shown.filter(({ filter, i }) => !kept(filter) && chosen[i].length > 0).length + (sportPicked ? 1 : 0) + (provider.length > 0 ? 1 : 0)}
                   countFor={(draft) => {
                     const next = sheetGroups(draft);
-                    if (!enabled || widgetId == null) return matching(builtIn, next, search).length;
+                    const choice = sheetProvider(draft);
+                    if (!enabled || widgetId == null) return choice.length === 0 ? matching(builtIn, next, search).length : 0;
                     const fromApi = sportIndex >= 0 ? next[sportIndex].some(inApi) : mode === 'api';
-                    return fromApi ? countListings(widgetId, next, search) : matching(builtIn, next, search).length;
+                    if (!fromApi) return choice.length === 0 ? matching(builtIn, next, search).length : 0;
+                    return countListings(widgetId, next, { ...search, providers: providersOf(choice) });
                   }}
                   onApply={(draft, nextSort) => {
                     const next = sheetGroups(draft);
                     const s = (nextSort as Sort | undefined) ?? sort;
                     setSort(s);
+                    const choice = sheetProvider(draft);
+                    if (JSON.stringify(choice) !== JSON.stringify(provider)) {
+                      if (sportIndex >= 0) setSportPicked((draft[String(sportIndex)] ?? []).length > 0);
+                      return chooseProvider(choice, next, search, s);
+                    }
                     if (sportIndex >= 0) {
                       setSportPicked((draft[String(sportIndex)] ?? []).length > 0);
                       if (JSON.stringify(next[sportIndex]) !== JSON.stringify(chosen[sportIndex])) return applySport(next, search, s);
@@ -903,17 +1051,34 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         </div>
       )}
       {listing && (
-        <div className={styles.results} role="status">
-          {loading ? (
-            'Loading results…'
-          ) : (
-            <span>
-              <strong>
-                {totalFound} {totalFound === 1 ? 'result' : 'results'}
-              </strong>{' '}
-              {search.loc ? `near ${search.loc}` : listing.category ? `in ${listing.category}` : ''}
+        <div className={styles.resultsRow}>
+          <span className={styles.results} role="status">
+            {loading ? (
+              'Loading results…'
+            ) : (
+              <>
+                <strong>
+                  {totalFound} {totalFound === 1 ? 'result' : 'results'}
+                </strong>{' '}
+                {search.loc ? `near ${search.loc}` : listing.category ? `in ${listing.category}` : ''}
+              </>
+            )}
+          </span>
+          {/* What the cards' labels mean (the new design's key). */}
+          <span className={styles.legend}>
+            <span className={styles.legendItem}>
+              <span className={`${styles.swatch} ${styles.swatchPartner}`} aria-hidden />
+              CLP Partner: verified, book on CLP
             </span>
-          )}
+            <span className={styles.legendItem}>
+              <span className={`${styles.swatch} ${styles.swatchSponsored}`} aria-hidden />
+              Sponsored: paid placement
+            </span>
+            <span className={styles.legendItem}>
+              <span className={`${styles.swatch} ${styles.swatchCommunity}`} aria-hidden />
+              Community: public listing
+            </span>
+          </span>
         </div>
       )}
       {listing && widgetId === MENTAL_HEALTH_WIDGET && <CrisisNotice />}
@@ -970,6 +1135,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       </div>
 
       {open && <BioModal card={open} variant="wps" onClose={() => setOpen(null)} />}
+      {booking && widgetId != null && (
+        <BookingModal item={booking} widgetId={widgetId} facts={rowFacts(booking, filters, prices)} onClose={() => setBooking(null)} />
+      )}
+      {claiming && <ClaimModal item={claiming} onClose={() => setClaiming(null)} />}
     </div>
   );
 }

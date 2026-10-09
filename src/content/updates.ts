@@ -242,3 +242,13 @@ export const updatesSections: PostSectionData[] = [
     }
   }
 ];
+
+/** Each category's label on cards ("FIELD REPORTS") and line under its heading on Updates & News (the new design). */
+export const updatesTopics: Record<string, { short: string; desc: string }> = {
+  'activations-branded-experiences': { short: 'ACTIVATIONS', desc: 'Inside CLP events, brand kickoffs and fan experiences.' },
+  'briefings-field-reports': { short: 'FIELD REPORTS', desc: 'News, ceremonies and what we’re seeing in the industry.' },
+  'diet-recovery-injury-prevention': { short: 'DIET & RECOVERY', desc: 'Fueling, hydration and staying healthy, reviewed by experts.' },
+  'product-development-reviews': { short: 'PRODUCT REVIEWS', desc: 'Gear, footwear and what actually works.' },
+  'resilience-performance-training': { short: 'PERFORMANCE', desc: 'Strength, mobility and mindset for athletes.' },
+  'strategy-and-insights': { short: 'STRATEGY', desc: 'Branding, sponsorship and the business of sport.' },
+};
