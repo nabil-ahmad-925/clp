@@ -146,12 +146,9 @@
 }
 
 .crumbs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
   color: #777;
   font-size: 14px;
+  line-height: 1.5;
 }
 
 .crumbs a {
@@ -165,7 +162,7 @@
 }
 
 .crumbSep {
-  color: #aaa;
+  padding: 0 0.35em;
 }
 
 .section {

@@ -12,21 +12,6 @@ const Check = () => (
   </svg>
 );
 
-/** "Need support right now?": the crisis line, first on the Mental Health & Resilience listings. */
-export function CrisisNotice() {
-  return (
-    <div className={styles.crisis} role="note">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" />
-      </svg>
-      <span className={styles.crisisText}>
-        <strong>Need support right now?</strong> In the US, call or text <strong>988</strong> to reach the Suicide &amp; Crisis Lifeline, any time. In an
-        emergency, call 911.
-      </span>
-    </div>
-  );
-}
-
 /** Initials for a partner without a photo ("Boston Athletic Training" -> "BAT"). */
 const initials = (name: string) =>
   name
@@ -70,7 +55,7 @@ export function PartnerSpotlight({ partners, section }: { partners: SpotlightPar
                 <span className={styles.partnerName}>{p.name}</span>
                 {p.excerpt && <span className={styles.partnerMeta}>{p.excerpt}</span>}
                 <span className={styles.partnerLink}>
-                  View partner<span aria-hidden>→</span>
+                  View partner<span className="glyph" aria-hidden>→</span>
                 </span>
               </div>
             </Link>

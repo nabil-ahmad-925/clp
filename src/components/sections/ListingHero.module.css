@@ -65,3 +65,62 @@
     font-size: 16px;
   }
 }
+
+/* An article list (new design's topic page): "← Updates & News" above a larger title; its content starts 136px from the
+   top (the design's 28px + 76px header, then 32px) with 88px below. */
+.withBack {
+  padding-top: calc(var(--header-height) + 20px);
+  padding-bottom: 88px;
+}
+.back {
+  color: #dcbd7d;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.withBack .inner {
+  gap: 14px;
+}
+
+.withBack .blurb {
+  max-width: 680px;
+}
+
+.withBack .title {
+  max-width: 1100px;
+  font-size: 72px;
+  line-height: 1.05;
+}
+
+@media (max-width: 999px) {
+  .withBack {
+    padding-top: calc(var(--header-height) + 40px);
+  }
+
+  .withBack .title {
+    font-size: 52px;
+  }
+}
+
+@media (max-width: 690px) {
+  .withBack {
+    padding-top: calc(var(--header-height) + 32px);
+    padding-bottom: 112px;
+  }
+
+  .withBack .title {
+    font-size: 36px;
+  }
+}

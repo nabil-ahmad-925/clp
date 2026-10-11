@@ -208,3 +208,9 @@ i {
 em {
   font-style: italic;
 }
+
+/* Arrows (← →) as the new design draws them: Open Sans has none, so the design's fallback, the system font, does (ours
+   would otherwise fall back to Arial's wider arrows). */
+.glyph {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}

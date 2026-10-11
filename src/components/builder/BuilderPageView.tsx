@@ -6,7 +6,7 @@ import ListingHero from '@/components/sections/ListingHero';
 import { HostCta, ProgramPlans } from '@/components/sections/ListingSections';
 import PageHero from '@/components/sections/PageHero';
 import { articleSearchPlaceholder } from '@/content/articles';
-import { listingPageOf } from '@/content/listingPage';
+import { articleListOf, listingPageOf } from '@/content/listingPage';
 import { photoSectionOf } from '@/content/photos';
 import { searchPlaceholder, type ListingSetup } from '@/content/listings';
 import { Container } from '@/components/ui/Section';
@@ -41,11 +41,19 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
   const search = Boolean(directory);
   const articles = directory?.type === 'postFilter';
   const listing = directory?.type === 'team' ? listingPageOf(directory.widgetId) : undefined;
+  // An article list (an Updates & News topic, or a service's articles): the new design's topic heading with its breadcrumb.
+  const articleList = directory?.type === 'postFilter' ? articleListOf(page.path, directory.source) : undefined;
   const setup: ListingSetup | undefined = listing && { kind: listing.kind, section: listing.section, category: listing.category, partners: listing.partners };
   const body = (
     <>
       {page.hero &&
-        (listing ? <ListingHero title={page.hero.title} blurb={listing.blurb} /> : <PageHero {...page.hero} compact={search} />)}
+        (listing ? (
+          <ListingHero title={page.hero.title} blurb={listing.blurb} />
+        ) : articleList ? (
+          <ListingHero title={page.hero.title} blurb={articleList.blurb} back={articleList.back} />
+        ) : (
+          <PageHero {...page.hero} compact={search} />
+        ))}
       <div className={`${styles.content} ${listing?.kind === 'listing' ? styles.listing : ''}`} data-header-tone="dark" data-listing={listing ? '' : undefined}>
         {!page.hero && <div className={styles.headerSpace} style={{ paddingTop: page.topSpacing }} aria-hidden />}
         {search && <DirectorySearchSlot />}

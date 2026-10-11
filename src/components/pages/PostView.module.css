@@ -1,28 +1,247 @@
-/* Salient single post ("default minimal" header, no sidebar). */
+/* An article (new design's article template): the black heading, the cover, the article, the author's card and "Keep
+   reading". The body (.content) is written in the admin; it is set in the design's article type. */
 
+.page {
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+}
+
+/* ---- Heading ---- */
+.head {
+  position: relative;
+  z-index: 2;
+  background: #0a0a0a;
+  color: var(--white);
+}
+
+.headInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 1040px;
+  margin: 0 auto;
+  /* 152px to the content (the design's 28px + 76px header, then 24px + 24px), 56px below. */
+  padding: calc(var(--header-height) + 36px) 48px 56px;
+  text-align: center;
+}
+
+.crumbs {
+  color: #999;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.crumbs a {
+  color: #dcbd7d;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+}
+
+.crumbs .crumbTopic {
+  color: #999;
+  font-weight: 400;
+}
+
+.title {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.byline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ccc;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.bylineText {
+  text-align: left;
+}
+
+.bylineName {
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.bylineName:hover {
+  text-decoration: underline;
+}
+
+.avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #8a6f33;
+  color: var(--white);
+  font-weight: 800;
+}
+
+.avatarCompany {
+  background: #111;
+}
+
+.lg {
+  width: 64px;
+  height: 64px;
+  font-size: 20px;
+}
+
+.md {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.sm {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+/* ---- Cover and article ---- */
 .body {
   position: relative;
   background: var(--white);
   color: var(--black);
 }
 
+.cover {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 48px 0;
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: 520px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 48px 0;
+}
+
+.kicker {
+  color: #888;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 1.5px;
+}
+
+.moreFrom:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* The design's article column: 720px of text (centred: the page has no sidebar). */
 .article {
-  max-width: 1000px;
-  margin: 0 auto 24px;
-  padding: 80px 0 0;
+  min-width: 0;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
+/* The design's article text: 18px Open Sans on 1.75 lines, #222, 22px between blocks. */
 .content {
-  padding-bottom: 80px;
+  padding-bottom: 8px;
+  color: #222;
+  font-size: 18px;
+  line-height: 1.75;
 }
 
-/* Article headings sit 10px below the preceding block. */
+.content p {
+  padding-bottom: 22px;
+}
+
+.content ul,
+.content ol {
+  margin-bottom: 22px;
+}
+
+/* Headings (the admin's Heading, Subheading and Small heading): Montserrat 800, #111, 12px more above them than
+   between paragraphs and 10px down to their text, sentence case. */
 .content h2,
 .content h3,
 .content h4,
 .content h5,
 .content h6 {
-  margin-top: 10px;
+  margin: 34px 0 10px;
+  color: #111;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content h2 {
+  font-size: 22px;
+}
+
+.content h3 {
+  font-size: 19px;
+}
+
+.content h4,
+.content h5,
+.content h6 {
+  font-size: 17px;
+}
+
+/* Italics stay in the article's font (the site's <em>/<i> are Playfair elsewhere). */
+.content em,
+.content i {
+  font-family: inherit;
+}
+
+.content i {
+  font-style: italic;
+}
+
+/* Links in the text: the design's dark gold (readable on white), underlined. */
+.content a {
+  color: #8a6f33;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.content a:hover {
+  color: #111;
+}
+
+/* A quote (the admin's Quote): a gold rule on the left, as in the editor. */
+.content blockquote {
+  margin: 0 0 22px;
+  padding: 4px 0 4px 18px;
+  border-left: 4px solid #dcbd7d;
+  color: #555;
+  font-style: italic;
 }
 
 /* Images show at their natural size (capped at the column), inline like the original. */
@@ -75,31 +294,218 @@
   text-align: left;
 }
 
-.related {
-  margin-top: 0;
+/* ---- About the author ---- */
+.authorCard {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-top: 24px;
+  padding: 28px;
+  border: 1px solid #e5e5e2;
+  border-radius: 12px;
 }
 
-.relatedTitle {
-  margin: 0 0 20px;
-  padding-top: 8%;
-  text-align: center;
+.authorText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-.comments {
+.authorName {
+  font-size: 17px;
+}
+
+.authorBio {
+  color: #555;
+}
+
+.authorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.moreFrom {
+  display: inline-flex;
+  align-items: center;
   height: 40px;
+  padding: 0 16px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #111;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
 }
 
+.moreFrom:hover {
+  background: #2a2a2a;
+}
+
+/* ---- Keep reading ---- */
+.keep {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 96px 48px 120px;
+}
+
+.keepTitle {
+  margin: 0;
+  color: #111;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.keepGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #111;
+  text-decoration: none;
+}
+
+.cardCover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #ddddda;
+}
+
+.cardCover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cardCover img {
+  transform: scale(1.04);
+}
+
+.cardTopic {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #666;
+  font-size: 13px;
+}
+
+.cardMetaText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.cardAuthor {
+  color: #111;
+  font-weight: 600;
+}
+
+/* ---- Smaller screens ---- */
 @media (max-width: 1100px) {
-  .article {
-    max-width: none;
-    margin: 0 var(--container-pad);
+  .keepGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 999px) {
-  .article {
-    max-width: 88%;
-    margin: 0 auto;
+@media (max-width: 900px) {
+  .title {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 767px) {
+  .headInner {
+    gap: 14px;
+    padding: calc(var(--header-height) + 20px) 20px 40px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .cover {
+    padding: 24px 16px 0;
+  }
+
+  .cover img {
+    height: 260px;
+  }
+
+  .layout {
+    padding: 28px 20px 0;
+    gap: 24px;
+  }
+
+  .content {
+    font-size: 17px;
+  }
+
+  .content h2 {
+    font-size: 21px;
+  }
+
+  .authorCard {
+    padding: 20px;
+  }
+
+  .keep {
+    padding: 64px 20px 80px;
+  }
+
+  .keepTitle {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .keepGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardCover img {
+    transition: none;
+  }
+
+  .card:hover .cardCover img {
+    transform: none;
   }
 }
 

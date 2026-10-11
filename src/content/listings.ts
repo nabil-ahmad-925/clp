@@ -100,9 +100,6 @@ export const isListingWidget = (widgetId: number | undefined): widgetId is numbe
 /** Whether a directory widget is a sport's facilities: its page uses the facilities design (Volunteering & Open Play). */
 export const isFacilitiesWidget = (widgetId: number | undefined): widgetId is number => widgetId != null && WIDGET_TYPES[widgetId] === 'facilities';
 
-/** Mental Health & Resilience: its listing page shows the crisis line first. */
-export const MENTAL_HEALTH_WIDGET = 39;
-
 /** A CLP partner in a listing page's spotlight (from the partner directory). */
 export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string };
 

@@ -1,6 +1,7 @@
 import taxonomy from './data/articleCategories.json';
 import type { ArchivePost } from './categories';
 import type { BlogPost, FilterPost, Link, Post, PostCard, PostNavLink } from './types';
+import { updatesTopics } from './updates';
 
 /**
  * Blog articles written in the admin's Articles tab, stored by clp-api and fetched in the browser (the site is a
@@ -113,11 +114,23 @@ const listQuery = ({ sports, lengths, tags, ...rest }: ArticleQuery & { limit?: 
   return qs;
 };
 
+/**
+ * A GET to the articles API. When the API is busy (429/503: its Lambdas are throttled while a page asks for several lists
+ * at once) the request is tried again, twice at most, after a short pause.
+ */
+async function getArticles(url: string) {
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+    if ((res.status !== 429 && res.status !== 503) || attempt === 3) return res;
+    await new Promise((resolve) => setTimeout(resolve, 400 * attempt + Math.random() * 400));
+  }
+}
+
 export async function fetchArticles({ sort, ...options }: ArticleQuery & { limit?: number; page?: number; counts?: 1; sort?: ArticleSort } = {}) {
   if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
   const qs = listQuery(options);
   if (sort && sort !== 'recommended') qs.set('sort', sort);
-  const res = await fetch(`${API_URL}/articles?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+  const res = await getArticles(`${API_URL}/articles?${qs}`);
   if (!res.ok) throw new Error(`Articles: ${res.status}`);
   return (await res.json()) as ArticleList;
 }
@@ -126,7 +139,7 @@ export async function fetchArticles({ sort, ...options }: ArticleQuery & { limit
 export async function countArticles(query: ArticleQuery) {
   if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
   const qs = listQuery({ ...query, count: 1 as const });
-  const res = await fetch(`${API_URL}/articles?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+  const res = await getArticles(`${API_URL}/articles?${qs}`);
   if (!res.ok) throw new Error(`Articles: ${res.status}`);
   return ((await res.json()) as { total: number }).total;
 }
@@ -134,7 +147,7 @@ export async function countArticles(query: ArticleQuery) {
 /** One published article with its page's links; null when there is none of that slug (deleted or unpublished). */
 export async function fetchArticle(slug: string): Promise<ArticlePageData | null> {
   if (!API_URL) throw new Error('NEXT_PUBLIC_LISTINGS_API_URL is not set');
-  const res = await fetch(`${API_URL}/articles/${encodeURIComponent(slug)}`, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+  const res = await getArticles(`${API_URL}/articles/${encodeURIComponent(slug)}`);
   if (!res.ok) {
     // Only the API's own answer means there is no such article (not, say, a gateway without the route).
     const body = await res.json().catch(() => ({}));
@@ -192,6 +205,13 @@ export const categoryOfArchive = (archivePath: string) => {
   return m ? (m[2] ? `${m[1]}/${m[2]}` : m[1]) : null;
 };
 
+/** An article's topic label ("FIELD REPORTS"): its first category that has one (content/updates.ts), else its name. */
+const topicShort = (categories: string[]) => {
+  const top = categories.map((c) => c.split('/')[0]);
+  const known = top.find((c) => updatesTopics[c]);
+  return known ? updatesTopics[known].short : ARTICLE_CATEGORIES.find((c) => top.includes(c.slug))?.name.toUpperCase();
+};
+
 export const toPostCard = (a: ArticleSummary): PostCard => ({ title: a.title, href: a.path, image: a.image, author: authorOf(a).name, date: articleDate(a.publishedAt) });
 
 /** An archive card: as toPostCard, with the labels of the article's categories (top level) over it. */
@@ -226,6 +246,7 @@ export function toFilterPost(a: ArticleSummary): FilterPost {
     excerpt: a.excerpt,
     comments: '0 Comments',
     readingTime: `${a.readingTime} min read`,
+    author: authorOf(a).name,
     location: locationsShown(a.locations),
   };
 }
@@ -248,6 +269,9 @@ export function toBlogPost({ item, previous, next, related }: ArticlePageData): 
     html: item.html,
     previous: navLink(previous, 'Previous Post'),
     next: navLink(next, 'Next Post'),
-    related: { title: 'You May Also Like', posts: related.map(toPostCard) },
+    related: {
+      title: 'Keep reading',
+      posts: related.map((a) => ({ ...toPostCard(a), topic: topicShort(a.categories), readingTime: `${a.readingTime} min read` })),
+    },
   };
 }

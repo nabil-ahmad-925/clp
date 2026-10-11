@@ -126,6 +126,8 @@ export type FilterPost = {
   comments: string;
   /** "5 min read" (live articles). */
   readingTime?: string;
+  /** The writer's name, for the card's "BY …" line (live articles). */
+  author?: string;
   /** The cities it is about, as shown ("Boston, Miami"; live articles). */
   location?: string;
 };
@@ -321,7 +323,8 @@ export type ServiceDetailPage = {
 };
 
 /** A post card (title, link, photo, author, date) as shown in post grids. */
-export type PostCard = { title: string; href: string; image: string; author?: string; date?: string };
+/** `topic` (its category's short label, "FIELD REPORTS") and `readingTime` ("6 min read"): live articles' "Keep reading" cards. */
+export type PostCard = { title: string; href: string; image: string; author?: string; date?: string; topic?: string; readingTime?: string };
 
 export type PostNavLink = { label: string; title: string; href: string; image?: string };
 

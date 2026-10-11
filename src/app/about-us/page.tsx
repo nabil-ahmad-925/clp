@@ -108,7 +108,9 @@ export default function AboutPage() {
               </span>
               <span className={styles.pillarTitle}>{p.title}</span>
               <span className={styles.pillarText}>{p.text}</span>
-              <span className={styles.pillarCta}>{p.cta} →</span>
+              <span className={styles.pillarCta}>
+                {p.cta} <span className="glyph" aria-hidden>→</span>
+              </span>
             </Link>
           ))}
         </div>

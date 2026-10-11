@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
-import { FaComments } from 'react-icons/fa';
 import { LuArrowUpDown, LuClock, LuMapPin, LuPenLine, LuSearch, LuTrendingUp, LuUsers, LuVolleyball } from 'react-icons/lu';
 import FilterChip from '@/components/ui/FilterChip';
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
@@ -412,7 +411,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
         ) : display === 'list' ? (
           <div className={styles.list}>
             {posts.map((post, i) => (
-              <ArticleRow key={post.id} post={post} eager={i < 3} />
+              <ArticleCard key={post.id} post={post} eager={i < 3} row />
             ))}
           </div>
         ) : (
@@ -423,9 +422,9 @@ export default function PostFilter({ categories: builtInCategories, posts: built
           </div>
         )}
         {!loading && !pending && posts.length === 0 && (
-          <div className={styles.emptyWrap} role="status">
-            <div className={styles.empty}>No Results Found</div>
-          </div>
+          <p className={styles.empty} role="status">
+            No articles match these filters yet.
+          </p>
         )}
         {!loading && total > PAGE_SIZES[0] && (
           <Pager
@@ -445,78 +444,33 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   );
 }
 
-/** The date badge on a card's photo ("07 / OCT"). */
+/** The date on a card's photo ("07 / OCT"). */
 function DateBadge({ post }: { post: FilterPost }) {
   return (
     <span className={styles.date}>
-      <span className={styles.day}>{post.day}</span>
+      <strong className={styles.day}>{post.day}</strong>
       <span className={styles.month}>{post.month}</span>
     </span>
   );
 }
 
-/** A card's foot: comments | reading time, then Read More. */
-function Foot({ post }: { post: FilterPost }) {
+/**
+ * An article in the results (the design's topic page): its photo with the date, "BY <writer>", the title and the
+ * reading time; the whole card opens it. The list view (`row`) lays the same out in a row.
+ */
+function ArticleCard({ post, eager, row }: { post: FilterPost; eager: boolean; row?: boolean }) {
   return (
-    <div className={styles.foot}>
-      <span className={styles.meta}>
-        <span className={styles.metaItem}>
-          <FaComments aria-hidden /> {post.comments}
-        </span>
-        {post.readingTime && (
-          <>
-            <span className={styles.metaSep} aria-hidden>
-              |
-            </span>
-            <span className={styles.metaItem}>
-              <LuClock aria-hidden /> {post.readingTime}
-            </span>
-          </>
-        )}
+    <a href={post.href} className={row ? styles.row : styles.card}>
+      <span className={styles.thumb}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
+        {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}
+        <DateBadge post={post} />
       </span>
-      <a className={styles.readMore} href={post.href} aria-label={`Read more: ${post.title}`}>
-        Read More
-      </a>
-    </div>
-  );
-}
-
-/** Grid card: photo with the date, title, excerpt, comments | reading time and Read More. */
-function ArticleCard({ post, eager }: { post: FilterPost; eager: boolean }) {
-  return (
-    <article className={styles.card}>
-      <a href={post.href} className={styles.thumb} tabIndex={-1} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
-        {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}
-        <DateBadge post={post} />
-      </a>
-      <div className={styles.body}>
-        <h3 className={styles.title}>
-          <a href={post.href}>{post.title}</a>
-        </h3>
-        {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
-        <Foot post={post} />
+      <div className={styles.text}>
+        {post.author && <span className={styles.byline}>BY {post.author.toUpperCase()}</span>}
+        <h3 className={styles.title}>{post.title}</h3>
+        {post.readingTime && <span className={styles.read}>{post.readingTime}</span>}
       </div>
-    </article>
-  );
-}
-
-/** List row: photo on the left, then the same content. */
-function ArticleRow({ post, eager }: { post: FilterPost; eager: boolean }) {
-  return (
-    <article className={styles.row}>
-      <a href={post.href} className={styles.rowThumb} tabIndex={-1} aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
-        {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}
-        <DateBadge post={post} />
-      </a>
-      <div className={styles.rowBody}>
-        <h3 className={styles.title}>
-          <a href={post.href}>{post.title}</a>
-        </h3>
-        {post.excerpt && <p className={styles.excerpt}>{post.excerpt}</p>}
-        <Foot post={post} />
-      </div>
-    </article>
+    </a>
   );
 }

@@ -68,6 +68,12 @@ export const updatesSections: PostSectionData[] = [
     },
     posts: [
       {
+        title: "Barbie and Hot Wheels at the Meijer LPGA Classic: Inside the Mattel Mini Golf Activation",
+        href: "/barbie-and-hot-wheels-at-the-meijer-lpga-classic-inside-the-mattel-mini-golf-activation/",
+        image: upload('/2026/06/20260619_092246-scaled.jpg'),
+        alt: "Compete Like pros"
+      },
+      {
         title: "Frantzdy Pierrot Day: Inside the Massachusetts State House Ceremony",
         href: "/frantzdy-pierrot-day-inside-the-massachusetts-state-house-ceremony-that-honored-haitis-world-cup-striker/",
         image: upload('/2026/05/20260526_135237.jpg.png'),
@@ -142,6 +148,12 @@ export const updatesSections: PostSectionData[] = [
       bottom: 10
     },
     posts: [
+      {
+        title: "Pickup Soccer in Boston: Inside a Summer of Open Play, World Cup Watch Parties and the Mini Goal Challenge",
+        href: "/pickup-soccer-in-boston-inside-a-summer-of-open-play-world-cup-watch-parties-and-the-mini-goal-challenge/",
+        image: upload('/2026/06/20260628_1218401-scaled.jpg'),
+        alt: "Compete Like pros"
+      },
       {
         title: "Can Basketball Make You Taller? Science Behind the Claim",
         href: "/can-basketball-make-you-taller-science-behind-the-claim/",
@@ -234,6 +246,12 @@ export const updatesSections: PostSectionData[] = [
         href: "/how-to-learn-sports-analytics-a-guide-for-us-sportspersons-and-enthusiasts/",
         image: upload('/2025/07/ext-1.jpeg'),
         alt: "Sports Analytics"
+      },
+      {
+        title: "How Athletes Train: Secrets Behind Peak Performance",
+        href: "/how-athletes-train-secrets-behind-peak-performance/",
+        image: upload('/2025/07/how-to-train-like-an-athlete.webp'),
+        alt: "How Athletes Train"
       }
     ],
     viewAll: {

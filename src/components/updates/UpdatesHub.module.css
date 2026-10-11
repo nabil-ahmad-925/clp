@@ -4,7 +4,8 @@
 .hero {
   position: relative;
   z-index: 2;
-  padding: calc(var(--header-height) + 32px) 48px 88px;
+  /* 136px to the content (the design's 28px + 76px header, then 32px), 88px below. */
+  padding: calc(var(--header-height) + 20px) 48px 88px;
   background: #0a0a0a;
   color: var(--white);
 }
@@ -187,7 +188,8 @@ a:hover .coverImage {
   font-family: var(--font-heading);
   font-size: 40px;
   font-weight: 800;
-  line-height: 1.2;
+  /* The design's text line (1.5): its heading has none of its own. */
+  line-height: 1.5;
   letter-spacing: -0.5px;
   text-transform: uppercase;
 }
@@ -425,6 +427,7 @@ a:hover .coverImage {
 
   .topicTitle {
     font-size: 28px;
+    line-height: 1.25;
   }
 
   .topicGrid {

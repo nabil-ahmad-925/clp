@@ -1,25 +1,4 @@
-/* The listing page's own sections (new design): crisis line, partner spotlight and "Run a program?". */
-
-/* ---- Crisis line (Mental Health & Resilience) ---- */
-.crisis {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-  margin-top: 24px;
-  padding: 18px 22px;
-  border: 1px solid #ddddda;
-  border-radius: 10px;
-  background: var(--white);
-  color: #111;
-  font-family: var(--font-body);
-}
-
-.crisisText {
-  flex: 1 1 400px;
-  font-size: 15px;
-  line-height: 1.5;
-}
+/* The listing page's own sections (new design): partner spotlight and "Run a program?". */
 
 /* ---- Partner spotlight: a black band the full width of the window ---- */
 .spotlight {

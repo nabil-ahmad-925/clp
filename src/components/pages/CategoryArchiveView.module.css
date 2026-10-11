@@ -27,6 +27,22 @@
   display: none;
 }
 
+.back {
+  display: block;
+  margin-bottom: 12px;
+  color: #dcbd7d;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
 .title h1 {
   margin: 0;
   font-family: var(--font-display);

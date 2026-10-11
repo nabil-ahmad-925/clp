@@ -313,7 +313,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, imag
                 setAdded(false);
               }}
             >
-              ← All products
+              <span className="glyph" aria-hidden>←</span> All products
             </button>
             <div className={styles.preview}>
               <Mockup product={product} chosen={chosen} src={image.src} max={220} />

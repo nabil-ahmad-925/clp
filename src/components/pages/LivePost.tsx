@@ -69,16 +69,22 @@ export default function LivePost({ slug, post }: { slug: string; post?: BlogPost
   }
   if (shown === undefined && slug && articlesEnabled) {
     return (
-      <>
-        <PageHero title={['']} height={550} backgroundColor="#2d2d2d" />
+      <div className={styles.page}>
+        {/* The new design's black heading (empty) while the article loads. */}
+        <section className={styles.head} data-header-tone="light" data-page-hero>
+          <div className={styles.headInner} />
+        </section>
         <div className={styles.body} data-header-tone="dark">
-          <div className={`${styles.article} ${styles.loading}`} aria-busy="true" aria-label="Loading the article">
-            <span />
-            <span />
-            <span />
+          <div className={styles.layout}>
+            <div />
+            <div className={`${styles.article} ${styles.loading}`} aria-busy="true" aria-label="Loading the article">
+              <span />
+              <span />
+              <span />
+            </div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
   return (

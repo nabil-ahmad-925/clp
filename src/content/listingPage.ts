@@ -1,6 +1,8 @@
 import 'server-only';
 import { categoryBlurb, categoryName, isFacilitiesWidget, isListingWidget, listingTypeOf, type ListingSetup, type SpotlightPartner } from './listings';
 import { getPartnerPage } from './partners';
+import { getServicePage } from './services';
+import { updatesTopics } from './updates';
 
 /** What a listing page (an Experiences or Resources category) shows around its directory, in the new design. */
 export type ListingPage = ListingSetup & { blurb?: string };
@@ -31,4 +33,16 @@ export function listingPageOf(widgetId: number | undefined): ListingPage | undef
     blurb: categoryBlurb(widgetId),
     partners: spotlightPartners(),
   };
+}
+
+/**
+ * An article list's heading extras (new design's topic page): the page it belongs to ("← Updates & News", or a
+ * service's own page for its articles at /<service>/articles/) and, for an Updates & News topic, its line.
+ */
+export function articleListOf(path: string, source: string | undefined): { back: { label: string; href: string }; blurb?: string } {
+  const service = path.match(/^\/([a-z0-9-]+)\/articles\/$/)?.[1];
+  const page = service ? getServicePage(service) : undefined;
+  if (page) return { back: { label: page.hero.title.join(' '), href: `/${service}/` } };
+  const top = source?.split('/')[0] ?? '';
+  return { back: { label: 'Updates & News', href: '/updates/' }, blurb: updatesTopics[top]?.desc };
 }

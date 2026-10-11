@@ -261,7 +261,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
               <div className={styles.body} data-scroll>
                 <div className={styles.stack}>
                   <button type="button" className={styles.back} onClick={() => setStep('details')}>
-                    ← Back to details
+                    <span className="glyph" aria-hidden>←</span> Back to details
                   </button>
 
                   <div className={styles.section}>

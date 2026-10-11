@@ -26,7 +26,7 @@ import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/Price
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { FIRST_LOAD_TIMEOUT_MS, MENTAL_HEALTH_WIDGET, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
+import { FIRST_LOAD_TIMEOUT_MS, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout, Provider } from '@/content/types';
 import BioModal from './BioModal';
@@ -35,7 +35,7 @@ import ClaimModal from './ClaimModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
 import ListingCard, { SponsoredStrip } from './ListingCard';
-import { CrisisNotice, PartnerSpotlight } from './ListingSections';
+import { PartnerSpotlight } from './ListingSections';
 import TeamCard from './TeamCard';
 import styles from './TeamDirectory.module.css';
 
@@ -394,9 +394,9 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
 
   // Listing pages: the newest sponsored listings of the page (its sport), for the strip above the results.
   const listingPage = Boolean(listing);
-  // The two-card sponsored strip is an Experiences feature (Resources and Facilities show their sponsored listings'
-  // labels only).
-  const stripPage = listing?.section === 'experiences';
+  // The two-card sponsored strip is on Experiences and Facilities (Resources show their sponsored listings' labels
+  // only).
+  const stripPage = listing?.section === 'experiences' || listing?.section === 'facilities';
   // Who runs a listing: a facility's "host", any other listing's "provider" (the filter's wording only).
   const providerWord = listing?.section === 'facilities' ? { many: 'hosts', Title: 'Host' } : { many: 'providers', Title: 'Provider' };
   const [sponsored, setSponsored] = useState<AddedItem[]>([]);
@@ -843,7 +843,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
 
   /**
    * A listing page's results: the first cards, the partner spotlight, the rest and the pager (fewer cards: the pager
-   * first). Facilities have no spotlight: their cards and the pager.
+   * first). Facilities have no spotlight: the sponsored strip, their cards and the pager.
    */
   const listingResults = (setup: ListingSetup) => {
     const spotlight = setup.section !== 'facilities' && <PartnerSpotlight partners={setup.partners} section={setup.section} />;
@@ -887,7 +887,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       <>
         {strip}
         {empty}
-        {first.length > 0 && listingCards(first, 0)}
+        {/* Every card of the page: without a spotlight (Facilities) nothing comes after the first ones. */}
+        {pageItems.length > 0 && listingCards(pageItems, 0)}
         {pager}
         {spotlight}
       </>
@@ -1081,7 +1082,6 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
           </span>
         </div>
       )}
-      {listing && widgetId === MENTAL_HEALTH_WIDGET && <CrisisNotice />}
       <div className={`${styles.inner} ${view.pending ? styles.pending : ''}`} aria-busy={loading || view.pending}>
         {listing ? (
           listingResults(listing)

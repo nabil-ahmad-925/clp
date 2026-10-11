@@ -142,7 +142,10 @@ export function TopicSection({ section }: { section: HubSection }) {
         ))}
       </div>
       <Link className={styles.viewAll} href={section.href}>
-        View all{shown ? ` ${shown.total}` : ''} →
+        View all{shown ? ` ${shown.total}` : ''}{' '}
+        <span className="glyph" aria-hidden>
+          →
+        </span>
       </Link>
     </section>
   );
