@@ -196,8 +196,27 @@ export type GridImage = { src: string; full: string; alt: string; width: number;
 export type AlbumItem = { title: string; href: string; image: string; count: number; access?: 'public' | 'code' | 'family' | 'client' };
 
 /** One photo of a gallery: `src` is the 400px-high mosaic version, `thumb` the lightbox strip thumbnail. */
-/** `download`: price of the photo's HD digital download, when the original sells one. */
-export type GalleryImage = { id: string; src: string; full: string; thumb: string; width: number; height: number; title: string; alt: string; download?: number };
+/**
+ * `download`: price of the photo's HD digital download, when the original sells one. A photo of an album made in the
+ * admin (content/albums.ts) has `downloadUrl` (its free download), or `noDownload` when the album offers none, and
+ * `printable` false when it can't be printed (the album isn't for sale, or the photo is under 12 MP).
+ */
+export type GalleryImage = {
+  id: string;
+  src: string;
+  full: string;
+  thumb: string;
+  width: number;
+  height: number;
+  title: string;
+  alt: string;
+  download?: number;
+  downloadUrl?: string;
+  noDownload?: boolean;
+  printable?: boolean;
+  /** Why a photo that isn't `printable` can't be printed (shown in the viewer's Prints & products tab). */
+  printNote?: string;
+};
 
 export type BuilderRow = {
   id?: string;

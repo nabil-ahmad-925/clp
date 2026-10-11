@@ -3,6 +3,18 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import {
+  albumDates,
+  albumsEnabled,
+  categoryOfSlug,
+  fetchAlbum,
+  fetchSportAlbums,
+  liveAlbumHref,
+  sportOfPage,
+  toGalleryImage,
+  type AlbumResult,
+  type LiveAlbum,
+} from '@/content/albums';
 import { ACCESS, PHOTOS_BLURB, dollars, type AlbumAccess } from '@/content/gallery';
 import type { PhotoAlbumRef, PhotoSection } from '@/content/photos';
 import type { GalleryImage } from '@/content/types';
@@ -16,7 +28,9 @@ export type PhotoView =
   | { kind: 'home' }
   | { kind: 'category'; slug: string }
   | { kind: 'gate'; access: Exclude<AlbumAccess, 'public'>; code?: string }
-  | { kind: 'album' };
+  | { kind: 'album' }
+  /** An album made in the admin (?album=<id>), fetched in the browser. */
+  | { kind: 'live'; id: string };
 
 type Props = PhotoSection & { view: PhotoView };
 
@@ -47,8 +61,11 @@ const FILTERS: { id: PhotoFilter; label: string }[] = [
   { id: 'paid', label: 'Paid download' },
   { id: 'prints', label: 'Prints & products' },
 ];
-/** A photo's download is paid when it has an HD price, free otherwise; every photo can be printed. */
+/** A photo's download is paid when it has an HD price, free otherwise (unless its album offers none). */
 const isPaid = (image: GalleryImage) => image.download != null;
+const isFree = (image: GalleryImage) => !isPaid(image) && !image.noDownload;
+/** Every built-in photo can be printed; an admin album's only when it is for sale (and the photo is print-quality). */
+const isPrintable = (image: GalleryImage) => image.printable !== false;
 
 const Camera = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -77,10 +94,51 @@ const Chevron = () => (
 export default function PhotoExplorer({ sport, albums, album, view }: Props) {
   const router = useRouter();
   const category = view.kind === 'category' ? albums.find((a) => a.slug === view.slug) : undefined;
+  // The sport of the page (the built-in albums' page when this is another address of it).
+  const sportSlug = sportOfPage(sport.href) ?? sportOfPage(albums[0]?.href.split('nggallery/')[0] ?? '');
+
+  // The sport's albums made in the admin (home and category views).
+  const [liveAlbums, setLiveAlbums] = useState<LiveAlbum[]>([]);
+  const wantsList = view.kind === 'home' || view.kind === 'category';
+  useEffect(() => {
+    if (!wantsList || !sportSlug || !albumsEnabled) return;
+    let active = true;
+    fetchSportAlbums(sportSlug).then(
+      (items) => active && setLiveAlbums(items),
+      () => {},
+    );
+    return () => {
+      active = false;
+    };
+  }, [wantsList, sportSlug]);
+
+  // An album made in the admin (?album=<id>): open, locked (private, needs its code) or missing.
+  const liveId = view.kind === 'live' ? view.id : '';
+  const [attempt, setAttempt] = useState(0);
+  const [liveState, setLiveState] = useState<{ id: string; result?: AlbumResult; error?: boolean } | null>(null);
+  useEffect(() => {
+    if (!liveId) return;
+    let active = true;
+    fetchAlbum(liveId).then(
+      (result) => active && setLiveState({ id: liveId, result }),
+      () => active && setLiveState({ id: liveId, error: true }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [liveId, attempt]);
+  const liveNow = liveState && liveState.id === liveId ? liveState : null;
+  const liveItem = liveNow?.result && liveNow.result.status !== 'missing' ? liveNow.result.item : undefined;
+  /** The built-in category album of a photo category (its tile, and the category view's address). */
+  const staticOf = (cat: string) => albums.find((a) => categoryOfSlug(a.slug) === cat);
 
   // The heading of each view.
   const hero =
-    view.kind === 'album' && album
+    view.kind === 'live'
+      ? liveItem
+        ? { title: liveItem.name, line: [albumDates(liveItem), liveItem.city, plural(liveItem.count, 'photo')].filter(Boolean).join(' · ') }
+        : { title: sport.title, line: liveNow ? 'This album isn’t available.' : 'Loading the album…' }
+      : view.kind === 'album' && album
       ? { title: album.title, line: `${plural(album.images.length, 'photo')} · ${sport.title}` }
       : view.kind === 'category' && category
         ? { title: category.category, line: 'Find your event by city and date.' }
@@ -89,8 +147,14 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
           : { title: sport.title, line: PHOTOS_BLURB };
 
   // The breadcrumb of each view (none on the home).
+  const liveCategory = liveItem ? staticOf(liveItem.category) : undefined;
   const crumbs: { label: string; href?: string }[] =
-    view.kind === 'album' && album
+    view.kind === 'live'
+      ? [
+          { label: sport.title, href: sport.href },
+          ...(liveItem ? [{ label: liveCategory?.category ?? liveItem.categoryName, href: liveCategory ? categoryHref(sport.href, liveCategory.slug) : undefined }, { label: liveItem.name }] : []),
+        ]
+      : view.kind === 'album' && album
       ? [{ label: sport.title, href: sport.href }, { label: album.category, href: categoryHref(sport.href, album.slug) }, { label: album.title }]
       : view.kind === 'category' && category
         ? [{ label: sport.title, href: sport.href }, { label: category.category }]
@@ -166,8 +230,44 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
           </nav>
         )}
 
-        {view.kind === 'home' && <Home sport={sport} albums={albums} />}
-        {view.kind === 'category' && category && <Category sport={sport} albums={albums.filter((a) => a.slug === category.slug)} />}
+        {view.kind === 'home' && <Home sport={sport} albums={albums} live={liveAlbums} />}
+        {view.kind === 'category' && category && (
+          <Category sport={sport} albums={albums.filter((a) => a.slug === category.slug)} live={liveAlbums.filter((a) => a.category === categoryOfSlug(category.slug))} />
+        )}
+        {view.kind === 'live' &&
+          (!liveNow ? (
+            <div className={styles.empty}>Loading the album…</div>
+          ) : liveNow.error ? (
+            <div className={styles.empty}>
+              The album couldn&rsquo;t be loaded.{' '}
+              <button type="button" className={styles.clear} onClick={() => setAttempt((n) => n + 1)}>
+                Try again
+              </button>
+            </div>
+          ) : liveNow.result?.status === 'missing' ? (
+            <div className={styles.empty}>
+              This album isn&rsquo;t available (it may have closed). <Link href={sport.href}>See the other albums</Link>
+            </div>
+          ) : liveNow.result?.status === 'locked' ? (
+            <section className={styles.album}>
+              <AlbumHead access="code" title={liveNow.result.item.name} line={`${albumDates(liveNow.result.item)} · Photos by ${liveNow.result.item.by}`} />
+              <PhotoGate key={liveId} kind="code" onUnlocked={() => setAttempt((n) => n + 1)} />
+            </section>
+          ) : liveNow.result?.status === 'open' ? (
+            <Album
+              sport={sport}
+              unlocked
+              album={{
+                slug: liveNow.result.item.id,
+                id: liveNow.result.item.id,
+                title: liveNow.result.item.name,
+                category: liveNow.result.item.categoryName,
+                access: liveNow.result.item.access,
+                by: liveNow.result.item.by,
+                images: liveNow.result.photos.map((p, i) => toGalleryImage((liveNow.result as { item: LiveAlbum }).item, p, i)),
+              }}
+            />
+          ) : null)}
         {view.kind === 'gate' && <Gate sport={sport} access={view.access} code={view.code} />}
         {view.kind === 'album' && album && <Album sport={sport} album={album} />}
       </div>
@@ -205,9 +305,46 @@ function AlbumCard({ album, sportTitle, eager }: { album: PhotoAlbumRef; sportTi
   );
 }
 
-/** The home: the albums with the most photos as "Recent events", then every category. */
-function Home({ sport, albums }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[] }) {
-  const recent = [...albums].filter((a) => a.access !== 'client').sort((a, b) => b.count - a.count).slice(0, 4);
+/**
+ * An album made in the admin, as the built-in cards: its cover (a private one's tiny preview, blurred and locked), its
+ * access label, name, category and place, and who took the photos.
+ */
+function LiveAlbumCard({ album, eager }: { album: LiveAlbum; eager?: boolean }) {
+  const access = ACCESS[album.access];
+  const locked = album.access !== 'public';
+  const src = album.cover || album.preview;
+  return (
+    <Link href={liveAlbumHref(album)} className={styles.card}>
+      <span className={`${styles.cover} ${styles.coverWide}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- the album's cover (a presigned link) */}
+        {src && <img src={src} alt="" loading={eager ? 'eager' : 'lazy'} className={locked ? styles.blurStrong : undefined} />}
+        {locked && (
+          <span className={styles.lockOverlay}>
+            <Lock size={28} />
+            {access.lock}
+          </span>
+        )}
+        <span className={styles.accessLabel} style={{ background: access.bg, color: access.fg }}>
+          {access.label}
+        </span>
+      </span>
+      <span className={styles.cardText}>
+        <span className={styles.cardTitle}>{album.name}</span>
+        <span className={styles.cardLine}>{[albumDates(album), album.city].filter(Boolean).join(' · ')}</span>
+        <span className={styles.cardMuted}>
+          {album.by} · {plural(album.count, 'photo')}
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/** The home: the newest albums made in the admin, then the built-in ones with the most photos, as "Recent events"; then every category. */
+function Home({ sport, albums, live }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[] }) {
+  const recentLive = live.slice(0, 4);
+  const recent = [...albums].filter((a) => a.access !== 'client').sort((a, b) => b.count - a.count).slice(0, 4 - recentLive.length);
+  /** Event albums of a category: its built-in one and those made in the admin. */
+  const inCategory = (a: PhotoAlbumRef) => (a.access === 'client' ? 0 : 1) + live.filter((l) => l.category === categoryOfSlug(a.slug)).length;
   return (
     <>
       <section className={styles.section}>
@@ -216,8 +353,11 @@ function Home({ sport, albums }: { sport: PhotoSection['sport']; albums: PhotoAl
           <h2 className={styles.sectionTitle}>Recent events</h2>
         </div>
         <div className={styles.grid}>
+          {recentLive.map((a, i) => (
+            <LiveAlbumCard key={a.id} album={a} eager={i < 4} />
+          ))}
           {recent.map((a, i) => (
-            <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={i < 4} />
+            <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={recentLive.length + i < 4} />
           ))}
         </div>
       </section>
@@ -235,7 +375,7 @@ function Home({ sport, albums }: { sport: PhotoSection['sport']; albums: PhotoAl
               </span>
               <span className={styles.cardText}>
                 <span className={styles.catTitle}>{a.category}</span>
-                <span className={styles.catCount}>{plural(a.access === 'client' ? 0 : 1, 'event album')}</span>
+                <span className={styles.catCount}>{plural(inCategory(a), 'event album')}</span>
               </span>
             </Link>
           ))}
@@ -265,15 +405,29 @@ function PillMenu({ label, value, options, onChange }: { label: string; value: s
   );
 }
 
-/** A category's albums: city, date and access filters, the sort, the count with the access key, and the album cards. */
-function Category({ sport, albums }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[] }) {
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const monthName = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
+
+/**
+ * A category's albums: city, date and access filters, the sort, the count with the access key, and the album cards
+ * (the albums made in the admin, newest event first, then the built-in one, which has no city or date).
+ */
+function Category({ sport, albums, live }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[] }) {
   const [city, setCity] = useState('all');
   const [month, setMonth] = useState('all');
   const [access, setAccess] = useState('all');
   const [sort, setSort] = useState<'new' | 'old'>('new');
-  const shown = albums.filter((a) => access === 'all' || (access === 'public' ? a.access === 'public' : a.access !== 'public'));
+  const accessOk = (a: { access: string }) => access === 'all' || (access === 'public' ? a.access === 'public' : a.access !== 'public');
+  const liveShown = live
+    .filter((a) => accessOk(a) && (city === 'all' || a.city === city) && (month === 'all' || a.eventDate.slice(0, 7) === month))
+    .sort((a, b) => (sort === 'new' ? b.eventDate.localeCompare(a.eventDate) : a.eventDate.localeCompare(b.eventDate)));
+  // The built-in album has no city or date: a city or date filter leaves it out.
+  const shown = city === 'all' && month === 'all' ? albums.filter(accessOk) : [];
   const ordered = sort === 'new' ? shown : [...shown].reverse();
   const filtered = city !== 'all' || month !== 'all' || access !== 'all';
+  const cities = [...new Set(live.map((a) => a.city).filter(Boolean))].sort().map((c) => ({ v: c, label: c }));
+  const months = [...new Set(live.map((a) => a.eventDate.slice(0, 7)))].sort().reverse().map((m) => ({ v: m, label: monthName(m) }));
+  const total = ordered.length + liveShown.length;
   const clear = () => {
     setCity('all');
     setMonth('all');
@@ -283,9 +437,9 @@ function Category({ sport, albums }: { sport: PhotoSection['sport']; albums: Pho
     <section className={styles.category}>
       <div className={styles.filterRow}>
         <div className={styles.filters}>
-          {/* Cities and dates come with the albums' event details (none yet). */}
-          <PillMenu label="All cities" value={city} options={[]} onChange={setCity} />
-          <PillMenu label="Any date" value={month} options={[]} onChange={setMonth} />
+          {/* Cities and dates are the event details of the albums made in the admin. */}
+          <PillMenu label="All cities" value={city} options={cities} onChange={setCity} />
+          <PillMenu label="Any date" value={month} options={months} onChange={setMonth} />
           <PillMenu
             label="All albums"
             value={access}
@@ -312,7 +466,7 @@ function Category({ sport, albums }: { sport: PhotoSection['sport']; albums: Pho
         </span>
       </div>
       <div className={styles.countRow}>
-        <strong>{plural(ordered.length, 'event album')}</strong>
+        <strong>{plural(total, 'event album')}</strong>
         <span className={styles.legend}>
           <span className={styles.legendItem}>
             <span className={`${styles.swatch} ${styles.swPublic}`} aria-hidden />
@@ -332,7 +486,7 @@ function Category({ sport, albums }: { sport: PhotoSection['sport']; albums: Pho
           </span>
         </span>
       </div>
-      {ordered.length === 0 ? (
+      {total === 0 ? (
         <div className={styles.empty}>
           No albums match these filters.{' '}
           <button type="button" className={styles.clear} onClick={clear}>
@@ -341,8 +495,11 @@ function Category({ sport, albums }: { sport: PhotoSection['sport']; albums: Pho
         </div>
       ) : (
         <div className={`${styles.grid} ${styles.gridTall}`}>
+          {liveShown.map((a, i) => (
+            <LiveAlbumCard key={a.id} album={a} eager={i < 4} />
+          ))}
           {ordered.map((a, i) => (
-            <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={i < 4} />
+            <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={liveShown.length + i < 4} />
           ))}
         </div>
       )}
@@ -378,13 +535,25 @@ function Gate({ sport, access, code }: { sport: PhotoSection['sport']; access: E
 }
 
 /** An album: its heading and photo filter, then its photos (or its gate), the viewer and the cart. */
-function Album({ sport, album }: { sport: PhotoSection['sport']; album: NonNullable<PhotoSection['album']> }) {
+function Album({
+  sport,
+  album,
+  unlocked,
+}: {
+  sport: PhotoSection['sport'];
+  album: NonNullable<PhotoSection['album']> & { by?: string };
+  /** A private album opened by its code (made in the admin). */
+  unlocked?: boolean;
+}) {
   const [filter, setFilter] = useState<PhotoFilter>('all');
   const [open, setOpen] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const locked = album.access !== 'public';
+  const locked = album.access !== 'public' && !unlocked;
   const shown = useMemo(
-    () => album.images.filter((image) => filter === 'all' || filter === 'prints' || (filter === 'paid' ? isPaid(image) : !isPaid(image))),
+    () =>
+      album.images.filter(
+        (image) => filter === 'all' || (filter === 'prints' ? isPrintable(image) : filter === 'paid' ? isPaid(image) : isFree(image)),
+      ),
     [album.images, filter],
   );
 
@@ -411,7 +580,7 @@ function Album({ sport, album }: { sport: PhotoSection['sport']; album: NonNulla
 
   return (
     <section className={styles.album}>
-      <AlbumHead access={album.access} title={album.title} line={`${plural(album.images.length, 'photo')} · ${sport.title} · Photos by Compete Like Pros`}>
+      <AlbumHead access={album.access} title={album.title} line={`${plural(album.images.length, 'photo')} · ${sport.title} · Photos by ${album.by ?? 'Compete Like Pros'}`}>
         {!locked && (
           <div className={styles.photoFilter} role="group" aria-label="Show">
             {FILTERS.map((f) => (
@@ -449,7 +618,9 @@ function Album({ sport, album }: { sport: PhotoSection['sport']; album: NonNulla
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- the original 400px-high gallery file */}
                 <img src={image.src} alt={image.alt} width={image.width} height={image.height} loading={i < 12 ? 'eager' : 'lazy'} />
-                <span className={`${styles.tag} ${paid ? styles.tagPaid : ''}`}>{`${paid ? dollars(image.download!) : 'Free'} · Prints`}</span>
+                <span className={`${styles.tag} ${paid ? styles.tagPaid : ''}`}>
+                  {[paid ? dollars(image.download!) : image.noDownload ? '' : 'Free', isPrintable(image) ? 'Prints' : ''].filter(Boolean).join(' · ') || 'View only'}
+                </span>
               </a>
             );
           })}
@@ -461,6 +632,7 @@ function Album({ sport, album }: { sport: PhotoSection['sport']; album: NonNulla
           galleryId={album.id}
           albumTitle={album.title}
           shareable={album.access === 'public'}
+          by={album.by}
           images={shown}
           index={open}
           startTab={filter === 'prints' ? 'print' : 'digital'}

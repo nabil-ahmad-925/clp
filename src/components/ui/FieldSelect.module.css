@@ -1,0 +1,46 @@
+/* A form drop-down (FieldSelect): the form's own field look for the trigger, the listing pages' sort menu for the list
+   (FilterChip.module.css .sortList / .sortItem / .sortCheck). */
+
+.wrap {
+  width: 100%;
+  font-family: inherit;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.placeholder {
+  color: #888;
+}
+
+.chevron {
+  flex: none;
+  font-size: 18px;
+  color: #666;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* As wide as the field, under it on the left. */
+.list {
+  right: auto;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  transform-origin: top left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

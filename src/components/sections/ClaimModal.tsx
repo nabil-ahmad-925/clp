@@ -2,33 +2,46 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
+import FieldSelect from '@/components/ui/FieldSelect';
+import claimOptions from '@/content/data/claimOptions.json';
+import { requestClaim, type ClaimConfirmation } from '@/content/listings';
 import type { DirectoryItem } from '@/content/types';
 import styles from './ClaimModal.module.css';
 
 type Props = {
   item: DirectoryItem;
+  /** The listing's directory (with the item's id, the claimed listing). */
+  widgetId: number;
   onClose: () => void;
 };
 
-const ROLES = ['Owner', 'Director or manager', 'Coach or instructor', 'Staff member', 'Other'];
+/** The roles a claimant picks from (one list with the claims API). */
+const ROLES = claimOptions.roles.map((r) => ({ value: r, label: r }));
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE = /^[0-9+().\-\s]{5,40}$/;
 
 /**
  * "Claim this listing" (Community listings; the new design's form popup): who the person is, their organization and
- * role, and how CLP can verify they run the program. UI only for now: the form is checked and shows its confirmation,
- * but nothing is sent yet. Esc, the close button or a click outside closes it.
+ * role, and how CLP can verify they run the program. Sent to the claims API, which keeps the claim and e-mails the
+ * listing's owner and CLP; the confirmation shows its reference. Esc, the close button or a click outside closes it
+ * (not while it is sending).
  */
-export default function ClaimModal({ item, onClose }: Props) {
-  const [form, setForm] = useState({ name: '', email: '', organization: item.subtitle ?? '', role: ROLES[0], phone: '', proof: '', message: '' });
+export default function ClaimModal({ item, widgetId, onClose }: Props) {
+  const [form, setForm] = useState({ name: '', email: '', organization: item.subtitle ?? '', role: '', phone: '', website: '', message: '' });
   const [authorized, setAuthorized] = useState(false);
   const [tried, setTried] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [failure, setFailure] = useState('');
+  const [sent, setSent] = useState<ClaimConfirmation | null>(null);
   const dialog = useRef<HTMLDivElement>(null);
 
   // Scroll locked behind it, Esc closes it, focus starts in it (once: the parent's re-renders don't move the focus).
+  // While the claim is being sent it stays open.
   const closeRef = useRef(onClose);
+  const sendingRef = useRef(false);
   useEffect(() => {
-    closeRef.current = onClose;
+    closeRef.current = () => !sendingRef.current && onClose();
+    sendingRef.current = sending;
   });
   useEffect(() => {
     document.body.classList.add('menu-open');
@@ -45,15 +58,39 @@ export default function ClaimModal({ item, onClose }: Props) {
     name: !form.name.trim() ? 'Enter your name.' : '',
     email: !EMAIL.test(form.email.trim()) ? 'Enter a valid work email.' : '',
     organization: !form.organization.trim() ? 'Enter the organization or program.' : '',
+    role: !form.role ? 'Choose your role.' : '',
+    phone: form.phone.trim() && !PHONE.test(form.phone.trim()) ? 'Enter the phone number with digits only.' : '',
     authorized: !authorized ? 'Confirm you’re authorized to manage this listing.' : '',
   };
   const valid = Object.values(errors).every((e) => !e);
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [key]: e.target.value });
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     setTried(true);
-    if (valid) setSent(true);
+    if (!valid || sending) return;
+    setSending(true);
+    setFailure('');
+    try {
+      setSent(
+        await requestClaim({
+          widgetId,
+          listingId: item.id,
+          name: form.name.trim(),
+          email: form.email.trim(),
+          organization: form.organization.trim(),
+          role: form.role,
+          phone: form.phone.trim() || undefined,
+          website: form.website.trim() || undefined,
+          message: form.message.trim() || undefined,
+          authorized,
+        }),
+      );
+    } catch (err) {
+      setFailure(err instanceof Error ? err.message : 'Could not send your claim. Please try again.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const error = (key: keyof typeof errors) =>
@@ -64,9 +101,9 @@ export default function ClaimModal({ item, onClose }: Props) {
     ) : null;
 
   return createPortal(
-    <div className={styles.overlay} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={styles.overlay} onMouseDown={(e) => e.target === e.currentTarget && !sending && onClose()}>
       <div ref={dialog} className={styles.dialog} role="dialog" aria-modal="true" aria-label={`Claim ${item.title}`} tabIndex={-1}>
-        <button type="button" className={styles.close} aria-label="Close" onClick={onClose}>
+        <button type="button" className={styles.close} aria-label="Close" disabled={sending} onClick={onClose}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             <path d="M6 6l12 12M18 6 6 18" />
           </svg>
@@ -84,8 +121,11 @@ export default function ClaimModal({ item, onClose }: Props) {
                 </span>
                 <span className={styles.title}>We&rsquo;ll verify your claim</span>
                 <span className={styles.text}>
-                  CLP checks that you run <strong>{item.title}</strong>, then emails <strong>{form.email.trim()}</strong> to hand the listing over. You&rsquo;ll
-                  be able to edit its details and photos, and take bookings on CLP once you&rsquo;re a partner.
+                  CLP checks that you run <strong>{sent.listingTitle}</strong>, then emails <strong>{sent.email}</strong> to hand the listing over. You&rsquo;ll be
+                  able to edit its details and photos, and take bookings on CLP once you&rsquo;re a partner.
+                </span>
+                <span className={styles.reference}>
+                  Claim reference <strong>{sent.id.replace(/^cl-/, '').slice(0, 8).toUpperCase()}</strong>
                 </span>
               </div>
             </div>
@@ -136,21 +176,34 @@ export default function ClaimModal({ item, onClose }: Props) {
                     />
                     {error('organization')}
                   </label>
-                  <label className={styles.field}>
-                    Your role
-                    <select className={styles.input} value={form.role} onChange={set('role')}>
-                      {ROLES.map((r) => (
-                        <option key={r}>{r}</option>
-                      ))}
-                    </select>
-                  </label>
+                  <div className={styles.field}>
+                    <span>Your role</span>
+                    <FieldSelect
+                      label="Your role"
+                      className={styles.input}
+                      value={form.role}
+                      options={ROLES}
+                      invalid={tried && Boolean(errors.role)}
+                      onChange={(role) => setForm({ ...form, role })}
+                    />
+                    {error('role')}
+                  </div>
                   <label className={styles.field}>
                     Phone (optional)
-                    <input className={styles.input} type="tel" autoComplete="tel" maxLength={40} value={form.phone} onChange={set('phone')} />
+                    <input
+                      className={styles.input}
+                      type="tel"
+                      autoComplete="tel"
+                      maxLength={40}
+                      value={form.phone}
+                      onChange={set('phone')}
+                      aria-invalid={tried && Boolean(errors.phone)}
+                    />
+                    {error('phone')}
                   </label>
                   <label className={styles.field}>
-                    Website or social page
-                    <input className={styles.input} type="url" inputMode="url" placeholder="https://" maxLength={300} value={form.proof} onChange={set('proof')} />
+                    Website or social page (optional)
+                    <input className={styles.input} type="url" inputMode="url" placeholder="https://" maxLength={300} value={form.website} onChange={set('website')} />
                   </label>
                   <label className={`${styles.field} ${styles.wide}`}>
                     How can we verify you run this program? (optional)
@@ -168,8 +221,13 @@ export default function ClaimModal({ item, onClose }: Props) {
             </div>
             {/* Always in view under the form. */}
             <div className={styles.footer}>
-              <button type="submit" className={styles.primary}>
-                Submit claim
+              {failure && (
+                <span className={styles.fieldError} role="alert">
+                  {failure}
+                </span>
+              )}
+              <button type="submit" className={styles.primary} disabled={sending}>
+                {sending ? 'Submitting…' : 'Submit claim'}
               </button>
               <span className={styles.hint}>CLP reviews every claim before handing a listing over, usually within 2 business days.</span>
             </div>

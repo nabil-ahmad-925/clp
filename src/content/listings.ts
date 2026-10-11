@@ -417,3 +417,43 @@ export async function requestBooking(request: BookingRequest): Promise<BookingCo
   if (!res.ok) throw new Error(body.error || (res.status === 429 ? 'Too many requests. Please try again in a minute.' : 'Could not send your request. Please try again.'));
   return body.booking as BookingConfirmation;
 }
+
+// --- Listing claims ("Claim this listing" on Community listings; the claims API, clp-api src/claims.mjs) -------------
+
+export type ClaimRequest = {
+  widgetId: number;
+  listingId: string;
+  name: string;
+  email: string;
+  organization: string;
+  /** One of CLAIM_ROLES. */
+  role: string;
+  phone?: string;
+  website?: string;
+  message?: string;
+  authorized: boolean;
+};
+export type ClaimConfirmation = { id: string; status: string; listingTitle: string; email: string; createdAt: string };
+
+/**
+ * Sends a claim: the API keeps it and e-mails the listing's owner and CLP. Claiming the same listing again within a
+ * day answers with the first claim. Rejects with the API's message (e.g. "Enter a valid work email.").
+ */
+export async function requestClaim(request: ClaimRequest): Promise<ClaimConfirmation> {
+  if (!API_URL) throw new Error('Claiming isn’t available right now.');
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}/claims`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(request),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch {
+    throw new Error('Could not send your claim. Check your connection and try again.');
+  }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || (res.status === 429 ? 'Too many claims. Please try again in an hour.' : 'Could not send your claim. Please try again.'));
+  return body.claim as ClaimConfirmation;
+}

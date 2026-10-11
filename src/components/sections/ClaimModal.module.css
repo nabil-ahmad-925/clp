@@ -2,7 +2,8 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  /* Above the site header (9999): the popup covers the whole page. */
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,7 +123,8 @@ textarea.input {
   outline: none;
 }
 
-.input[aria-invalid='true'] {
+.input[aria-invalid='true'],
+.input[data-invalid='true'] {
   border-color: #b03a2e;
 }
 
@@ -213,6 +215,27 @@ textarea.input {
 
 .primary:hover {
   background: #2a2a2a;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.close:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* The claim's reference, under the confirmation. */
+.reference {
+  color: #555;
+  font-size: 14px;
+}
+
+.reference strong {
+  color: #111;
+  letter-spacing: 1px;
 }
 
 .doneKicker {

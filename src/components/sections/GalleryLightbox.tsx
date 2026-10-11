@@ -14,6 +14,8 @@ type Props = {
   albumTitle: string;
   /** Public albums' photos can be shared; private, youth and client ones can't. */
   shareable: boolean;
+  /** Who took the photos ("Photographed by …"; Compete Like Pros when not given). */
+  by?: string;
   images: GalleryImage[];
   index: number;
   /** The side panel's tab on opening (the album's "Prints & products" filter opens on prints). */
@@ -67,7 +69,7 @@ function Mockup({ product, chosen, src, max }: { product: PrintProduct; chosen: 
  * (content/gallery.ts), then a product's options with a live preview, the quantity and "Add to cart". Arrow keys and
  * swipes step through the album, Esc or × closes it.
  */
-export default function GalleryLightbox({ galleryId, albumTitle, shareable, images, index, startTab = 'digital', onIndex, onClose, onOpenCart }: Props) {
+export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, images, index, startTab = 'digital', onIndex, onClose, onOpenCart }: Props) {
   const [tab, setTab] = useState<'digital' | 'print'>(startTab);
   const [product, setProduct] = useState<PrintProduct | null>(null);
   const [chosen, setChosen] = useState<Record<string, string>>({});
@@ -200,7 +202,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, imag
         <div className={styles.sideHead}>
           <span className={styles.kicker}>{albumTitle.toUpperCase()}</span>
           <span className={styles.photoTitle}>Photo {index + 1}</span>
-          <span className={styles.by}>Photographed by Compete Like Pros</span>
+          <span className={styles.by}>Photographed by {by ?? 'Compete Like Pros'}</span>
         </div>
 
         <div className={styles.tabs} role="tablist">
@@ -223,13 +225,18 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, imag
 
         {tab === 'digital' && (
           <div className={styles.sideBody}>
-            {price == null ? (
+            {image.noDownload ? (
+              <div className={styles.buy}>
+                <span className={styles.lineTitle}>Full-resolution download</span>
+                <span className={styles.muted}>Downloads aren&rsquo;t offered for this album.</span>
+              </div>
+            ) : price == null ? (
               <div className={styles.buy}>
                 <span className={styles.lineTitle}>
                   Full-resolution download<strong>Free</strong>
                 </span>
                 <span className={styles.muted}>Free for personal use.</span>
-                <a className={styles.primary} href={image.full} download onClick={() => setDownloaded(true)}>
+                <a className={styles.primary} href={image.downloadUrl ?? image.full} download onClick={() => setDownloaded(true)}>
                   {downloaded ? 'Downloaded ✓' : 'Download photo'}
                 </a>
               </div>
@@ -275,7 +282,16 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, imag
           </div>
         )}
 
-        {tab === 'print' && !product && (
+        {tab === 'print' && image.printable === false && (
+          <div className={styles.sideBody}>
+            <div className={styles.buy}>
+              <span className={styles.lineTitle}>Prints &amp; products</span>
+              <span className={styles.muted}>{image.printNote ?? 'Prints and products aren’t offered for this photo.'}</span>
+            </div>
+          </div>
+        )}
+
+        {tab === 'print' && image.printable !== false && !product && (
           <div className={styles.sideBody}>
             {PRINT_GROUPS.map((group) => (
               <div key={group} className={styles.group}>
@@ -303,7 +319,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, imag
           </div>
         )}
 
-        {tab === 'print' && product && (
+        {tab === 'print' && image.printable !== false && product && (
           <div className={styles.sideBody}>
             <button
               type="button"

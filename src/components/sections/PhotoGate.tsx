@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { albumsEnabled, liveAlbumHref, unlockAlbum, type LiveAlbum } from '@/content/albums';
 import type { AlbumAccess } from '@/content/gallery';
 import styles from './PhotoGate.module.css';
 
 type Props = {
   kind: Exclude<AlbumAccess, 'public'>;
-  /** A code already typed (the home page's "Find my photos"). */
+  /** A code already typed (the home page's "Find my photos", or a link with ?code=): it is tried at once. */
   initialCode?: string;
+  /** A private album opened by its code (default: go to the album). */
+  onUnlocked?: (album: LiveAlbum) => void;
 };
 
 const Lock = ({ color }: { color: string }) => (
@@ -18,17 +22,45 @@ const Lock = ({ color }: { color: string }) => (
 );
 
 /**
- * The gate of an album that isn't public (new design): a private album's access code, a youth album's parent sign-in,
- * or a client gallery's login. UI only for now: no album is unlocked yet, so a try answers with what to do next.
+ * The gate of an album that isn't public (new design): a private album's access code (it opens the album made in the
+ * admin with that code), a youth album's parent sign-in, or a client gallery's login (those two come later: a try
+ * answers with what to do next).
  */
-export default function PhotoGate({ kind, initialCode = '' }: Props) {
+export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props) {
+  const router = useRouter();
   const [code, setCode] = useState(initialCode);
   const [login, setLogin] = useState({ email: '', password: '' });
   const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const unlock = async (value: string) => {
+    if (!value.trim()) return setNote('Enter the access code.');
+    if (!albumsEnabled) return setNote('No album matches this code. Check the code on your photo card, ticket or invite.');
+    setBusy(true);
+    setNote('');
+    try {
+      const album = await unlockAlbum(value.trim());
+      if (onUnlocked) onUnlocked(album);
+      else router.push(liveAlbumHref(album));
+    } catch (err) {
+      setNote(err instanceof Error ? err.message : 'That didn’t work. Try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // A code that came with the address is tried once, straight away.
+  const tried = useRef(false);
+  useEffect(() => {
+    if (kind !== 'code' || !initialCode.trim() || tried.current) return;
+    tried.current = true;
+    void unlock(initialCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
+  }, []);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (kind === 'code') setNote(code.trim() ? 'No album matches this code. Check the code on your photo card, ticket or invite.' : 'Enter the access code.');
+    if (kind === 'code') void unlock(code);
     else if (kind === 'client') setNote(login.email.trim() && login.password ? 'We couldn’t sign you in. Check the client login we sent you.' : 'Enter your email and password.');
     else setNote('Parent accounts are coming soon. Ask the event organizer for your family’s photos meanwhile.');
   };
@@ -92,8 +124,8 @@ export default function PhotoGate({ kind, initialCode = '' }: Props) {
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
       />
-      <button type="submit" className={styles.primary}>
-        Unlock album
+      <button type="submit" className={styles.primary} disabled={busy}>
+        {busy ? 'Opening…' : 'Unlock album'}
       </button>
       {note && <span className={styles.note} role="status">{note}</span>}
       <span className={styles.small}>Private albums don&rsquo;t show up in search, and their photos can&rsquo;t be shared publicly.</span>

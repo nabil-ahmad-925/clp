@@ -1138,7 +1138,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       {booking && widgetId != null && (
         <BookingModal item={booking} widgetId={widgetId} facts={rowFacts(booking, filters, prices)} onClose={() => setBooking(null)} />
       )}
-      {claiming && <ClaimModal item={claiming} onClose={() => setClaiming(null)} />}
+      {claiming && widgetId != null && <ClaimModal item={claiming} widgetId={widgetId} onClose={() => setClaiming(null)} />}
     </div>
   );
 }

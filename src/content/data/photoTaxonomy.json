@@ -1,0 +1,37 @@
+{
+  "sports": [
+    { "slug": "baseball-softball", "name": "Baseball & Softball", "page": "/experiences/baseball/photos/" },
+    { "slug": "basketball", "name": "Basketball", "page": "/experiences/basketball-2/photos/" },
+    { "slug": "esports", "name": "Esports", "page": "/experiences/esports/esports-photos/" },
+    { "slug": "futbol-soccer", "name": "Fútbol (Soccer)", "page": "/experiences/futbol/futbol-soccer-photos/" },
+    { "slug": "golfing", "name": "Golfing", "page": "/experiences/golfing/golfing-photos/" },
+    { "slug": "pickleball", "name": "Pickleball", "page": "/experiences/pickleball/tennis-pickleball-photos/" }
+  ],
+  "categories": [
+    { "slug": "advancement-workshops", "name": "Advancement & Workshops", "widgets": ["45"] },
+    { "slug": "branded-activations", "name": "Branded Activations", "widgets": ["46"] },
+    { "slug": "camps-tournaments", "name": "Camps & Tournaments", "widgets": ["47"] },
+    { "slug": "groups-private-lessons", "name": "Groups & Private Lessons", "widgets": ["6"] },
+    { "slug": "leagues-social-clubs", "name": "Leagues & Social Clubs", "widgets": ["37"] },
+    { "slug": "strength-conditioning", "name": "Strength & Conditioning", "widgets": ["33"] },
+    { "slug": "volunteering-open-play", "name": "Volunteering & Open Play", "widgets": ["10", "9", "42", "8", "43", "44"] }
+  ],
+  "types": [
+    { "slug": "events", "name": "Events & Games" },
+    { "slug": "behind-the-scenes", "name": "Behind the Scenes" },
+    { "slug": "highlights", "name": "Highlights" },
+    { "slug": "partnerships", "name": "Partnerships" }
+  ],
+  "quality": {
+    "printMegapixels": 12,
+    "minMegapixels": 4,
+    "minSharpness": 40,
+    "duplicateDistance": 6
+  },
+  "plan": {
+    "lifetimeDays": [30, 21, 15],
+    "maxFree": [5, 10],
+    "saleReviewMonths": [12, 6],
+    "graceDays": 7
+  }
+}
