@@ -113,13 +113,17 @@ export type ListingSetup = { kind: 'listing' | 'facilities'; section: 'experienc
 const TITLE_SPORT = /^(Baseball (?:&|and) Softball|Basketball|Esports|Fútbol ?\(Soccer\)|Golf(?:ing)?|Pickleball)\s+(.+)$/;
 
 /**
- * A listing page's heading as the hero shows it: the sport on one line and the category on the next ("Fútbol (Soccer)",
- * "Advancement & Workshops Nearby"), whatever the page data's own break; one line when no sport leads it.
+ * A listing page's heading as the hero shows it, whatever the page data's own break: up to the category's "&" on the
+ * first line and the rest on the second ("Fútbol (Soccer) Dieting &", "Nutrition Nearby"); a category without one has
+ * the sport on the first line ("Basketball", "Branded Activations Nearby"); one line when no sport leads it.
  */
 export const listingTitleLines = (title: string[]) => {
   const text = title.join(' ').replace(/\s+/g, ' ').trim();
   const m = text.match(TITLE_SPORT);
-  return m ? [m[1].replace('Fútbol(', 'Fútbol (').replace(' and ', ' & '), m[2]] : [text];
+  if (!m) return [text];
+  const sport = m[1].replace('Fútbol(', 'Fútbol (').replace(' and ', ' & ');
+  const amp = m[2].indexOf(' & ');
+  return amp >= 0 ? [`${sport} ${m[2].slice(0, amp)} &`, m[2].slice(amp + 3)] : [sport, m[2]];
 };
 
 /** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
