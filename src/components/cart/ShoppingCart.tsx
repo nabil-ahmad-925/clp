@@ -83,7 +83,7 @@ export default function ShoppingCart({ images }: { images: Record<string, ShopIm
         <form className={`${styles.checkout} ${raw === null ? styles.loading : ''}`} onSubmit={checkout} noValidate>
           <div className={styles.links}>
             <a className={styles.btn} href="#" onClick={(e) => (e.preventDefault(), setCart([]))}>
-              Empty cart
+              Empty Cart
             </a>
           </div>
           <table className={styles.items}>
@@ -226,7 +226,7 @@ export default function ShoppingCart({ images }: { images: Record<string, ShopIm
           {items.length > 0 && (
             <div className={styles.buttons}>
               <button type="submit" className={styles.btn} disabled={!valid} title={valid ? undefined : FORM_ERROR}>
-                Pay by check
+                Pay by Check
               </button>
               <span className={styles.stripe}>
                 <button type="submit" className={styles.btn} disabled={!valid} title={valid ? undefined : FORM_ERROR}>
@@ -234,7 +234,7 @@ export default function ShoppingCart({ images }: { images: Record<string, ShopIm
                 </button>
               </span>
               <button type="submit" className={styles.btn} disabled={!valid} title={valid ? undefined : FORM_ERROR}>
-                Place order
+                Place Order
               </button>
             </div>
           )}

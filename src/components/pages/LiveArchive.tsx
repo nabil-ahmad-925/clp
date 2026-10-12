@@ -4,10 +4,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { articlesEnabled, categoryOfArchive, fetchArticles, toArchivePost } from '@/content/articles';
 import type { CategoryArchive } from '@/content/categories';
+import AuthorArchiveView from './AuthorArchiveView';
 import CategoryArchiveView from './CategoryArchiveView';
 
-/** Posts per archive page (as on the original site). */
+/** Posts per archive page (as on the original site); an author's page (three cards a row) has 12. */
 const PAGE_SIZE = 10;
+const AUTHOR_PAGE_SIZE = 12;
 /** The API's last page number. */
 const MAX_PAGE = 200;
 
@@ -26,7 +28,9 @@ function sourceOf(path: string) {
 function pagination(base: string, page: number, pages: number): CategoryArchive['pagination'] {
   if (pages < 2) return undefined;
   const at = (n: number) => (n === 1 ? base : `${base}?page=${n}`);
-  const shown = [...new Set([1, page - 1, page, page + 1, pages])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  const near = [...new Set([1, page - 1, page, page + 1, pages])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  // A gap of a single page shows that page instead ("1 2 3 4", not "1 2 … 4").
+  const shown = near.flatMap((n, i) => (i > 0 && n - near[i - 1] === 2 ? [n - 1, n] : [n]));
   const numbers = shown.flatMap((n, i) => [
     ...(i > 0 && n - shown[i - 1] > 1 ? [{ label: '…', kind: 'gap' as const }] : []),
     { label: String(n), href: n === page ? undefined : at(n), kind: 'page' as const },
@@ -56,7 +60,7 @@ export default function LiveArchive({ archive }: { archive: CategoryArchive }) {
     if (!source || !articlesEnabled) return;
     let active = true;
     const key = `${archive.path}|${page}`;
-    fetchArticles({ ...source.query, limit: PAGE_SIZE, page }).then(
+    fetchArticles({ ...source.query, limit: 'author' in source.query ? AUTHOR_PAGE_SIZE : PAGE_SIZE, page }).then(
       (r) => {
         if (!active) return;
         // Past the last page (an old link, or articles removed meanwhile): the last page.
@@ -71,7 +75,11 @@ export default function LiveArchive({ archive }: { archive: CategoryArchive }) {
     };
   }, [archive, page, router]);
 
-  if (live?.key === key) return <CategoryArchiveView archive={live.archive ?? archive} />;
-  // Loading: the built-in list when it is this page, otherwise the header alone.
-  return <CategoryArchiveView archive={page === (source?.page ?? 1) ? archive : { ...archive, posts: [], pagination: undefined }} />;
+  // An author's page is in the new design (AuthorArchiveView); a category's keeps the original archive.
+  const author = archive.path.startsWith('/author/');
+  if (live?.key === key) return author ? <AuthorArchiveView archive={live.archive ?? archive} /> : <CategoryArchiveView archive={live.archive ?? archive} />;
+  // Loading: the built-in list when it is this page, otherwise the header alone (an author's page shimmers).
+  const builtIn = page === (source?.page ?? 1);
+  if (author) return <AuthorArchiveView archive={archive} loading={!builtIn} />;
+  return <CategoryArchiveView archive={builtIn ? archive : { ...archive, posts: [], pagination: undefined }} />;
 }

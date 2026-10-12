@@ -313,11 +313,11 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
               <div className={styles.body} data-scroll>
                 <div className={styles.stack}>
                   <button type="button" className={styles.back} onClick={() => setStep('details')}>
-                    <span className="glyph" aria-hidden>←</span> Back to details
+                    <span className="glyph" aria-hidden>←</span> Back to Details
                   </button>
 
                   <div className={styles.section}>
-                    <span className={styles.label}>Pick a date</span>
+                    <span className={styles.label}>Pick a Date</span>
                     {days ? (
                       <div className={styles.days} role="radiogroup" aria-label="Date">
                         {days.map((d) => {
@@ -355,7 +355,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
 
                   <div className={styles.section}>
                     <span className={styles.labelRow}>
-                      <span className={styles.label}>Who&rsquo;s coming?</span>
+                      <span className={styles.label}>Who&rsquo;s Coming?</span>
                       <span className={styles.policy}>
                         {policy.kind === 'adult' ? `${policy.minAge}+ ONLY` : policy.kind === 'youth' ? 'KIDS ONLY' : 'ALL AGES WELCOME'}
                       </span>
@@ -401,7 +401,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                   )}
 
                   <div className={styles.section}>
-                    <span className={styles.label}>Your details</span>
+                    <span className={styles.label}>Your Details</span>
                     <div className={styles.fields}>
                       <label className={styles.field}>
                         Full name
@@ -454,7 +454,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                   </p>
                 )}
                 <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
-                  {sending ? 'Booking…' : 'Confirm booking'}
+                  {sending ? 'Booking…' : 'Confirm Booking'}
                 </button>
                 <span className={styles.hint}>{missing || `No payment online: you pay ${host} directly.`}</span>
               </div>
@@ -534,14 +534,14 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                         )
                       }
                     >
-                      Add to calendar
+                      Add to Calendar
                     </button>
                     <Link href={bookingPageHref(done.booking.id, done.token)} className={styles.dark}>
-                      Manage booking
+                      Manage Booking
                     </Link>
                   </div>
                   <button type="button" className={styles.backLink} onClick={onClose}>
-                    Back to listings
+                    Back to Listings
                   </button>
                 </div>
               </div>

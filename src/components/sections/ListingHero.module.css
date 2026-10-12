@@ -21,7 +21,7 @@
 }
 
 .title {
-  max-width: 980px;
+  max-width: 1120px;
   margin: 0;
   color: var(--white);
   font-family: var(--font-display);
@@ -29,6 +29,12 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0;
+}
+
+/* Each line of the title on its own (the sport, then the category), wrapped evenly when it doesn't fit. */
+.line {
+  display: block;
+  text-wrap: balance;
 }
 
 .blurb {

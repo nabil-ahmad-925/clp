@@ -16,43 +16,7 @@ export const updatesSections: PostSectionData[] = [
       top: 4,
       bottom: 4
     },
-    posts: [
-      {
-        title: "Rivaldo and Fernando Morientes in Boston: Inside the LALIGA x Walmart Legendary Kickoff",
-        href: "/rivaldo-and-fernando-morientes-in-boston-inside-the-laliga-x-walmart-legendary-kickoff/",
-        image: upload('/2026/06/20260626_172607-scaled.jpg'),
-        alt: "Compete Like pros",
-        date: "June 26, 2026"
-      },
-      {
-        title: "Athlete Performance Training: Proven Methods to Elevate Your Game",
-        href: "/athlete-performance-training-proven-methods-to-elevate-your-game/",
-        image: upload('/2025/07/Athlete-Performance-Training-Proven-Methods-to-Elevate-Your-Game.png'),
-        alt: "Athlete Performance Training",
-        date: "July 13, 2025"
-      },
-      {
-        title: "Are Basketball Shoes Good for Running? Know the Facts",
-        href: "/are-basketball-shoes-good-for-running-know-the-facts/",
-        image: upload('/2025/07/adidas-d-o-n-issue-6-main-2-22673422-main-scaled.webp'),
-        alt: "Are Basketball Shoes Good for Running? Know the Facts",
-        date: "May 10, 2025"
-      },
-      {
-        title: "How to Get Sponsored as an Athlete: Proven Strategies to Attract Brand Deals",
-        href: "/how-to-get-sponsored-as-an-athlete-proven-strategies-to-attract-brand-deals/",
-        image: upload('/2025/07/pexels-nappy-936094.jpg'),
-        alt: "Athlete Sponser",
-        date: "April 16, 2025"
-      },
-      {
-        title: "Why Is Sports Marketing Important for Modern Athletes?",
-        href: "/why-is-sports-marketing-important-for-modern-athletes/",
-        image: upload('/2025/07/premium_photo-1661677875843-5c66d889cfe9-scaled.jpeg'),
-        alt: "",
-        date: "April 11, 2025"
-      }
-    ],
+    posts: [],
     viewAll: {
       label: "View All",
       href: "/branded-activations-2/"
@@ -165,12 +129,6 @@ export const updatesSections: PostSectionData[] = [
         href: "/are-soccer-socks-compression-socks-the-truth-behind-performance-gear-every-athlete-should-know/",
         image: upload('/2025/07/IMG_9982-scaled.jpg'),
         alt: "Soccer Socks"
-      },
-      {
-        title: "Are Basketball Shoes Good for Running? Know the Facts",
-        href: "/are-basketball-shoes-good-for-running-know-the-facts/",
-        image: upload('/2025/07/adidas-d-o-n-issue-6-main-2-22673422-main-scaled.webp'),
-        alt: "Are Basketball Shoes Good for Running? Know the Facts"
       }
     ],
     viewAll: {
@@ -258,6 +216,20 @@ export const updatesSections: PostSectionData[] = [
       label: "View All",
       href: "/strategy-insights/"
     }
+  },
+  {
+    title: "Transfers & Scouting",
+    layout: "carousel",
+    spacing: {
+      top: 4,
+      bottom: 4
+    },
+    // A new category: its articles come from the API (no built-in posts).
+    posts: [],
+    viewAll: {
+      label: "View All",
+      href: "/transfers-scouting/"
+    }
   }
 ];
 
@@ -269,4 +241,5 @@ export const updatesTopics: Record<string, { short: string; desc: string }> = {
   'product-development-reviews': { short: 'PRODUCT REVIEWS', desc: 'Gear, footwear and what actually works.' },
   'resilience-performance-training': { short: 'PERFORMANCE', desc: 'Strength, mobility and mindset for athletes.' },
   'strategy-and-insights': { short: 'STRATEGY', desc: 'Branding, sponsorship and the business of sport.' },
+  'transfers-scouting': { short: 'TRANSFERS & SCOUTING', desc: 'Player moves, recruiting and the scouts finding the next talent.' },
 };

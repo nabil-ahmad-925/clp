@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { LuMapPin, LuSearch } from 'react-icons/lu';
+import { LuChevronDown, LuMapPin, LuSearch } from 'react-icons/lu';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import styles from './DirectorySearch.module.css';
 
@@ -33,8 +33,9 @@ export const fold = (s: string) =>
     .trim();
 
 /**
- * tenpo.com's search bar: "Sport or event" (searched in the cards' title, subtitle and description) and "Location"
- * (a city or destination of the cards, suggested as you type), applied by the search button, Enter or a suggestion.
+ * tenpo.com's search bar: "Sport or event" (searched in the cards' title, subtitle and description) and "Destination"
+ * (a city or destination of the cards, suggested as you type or from its dropdown arrow), applied by the search button,
+ * Enter or a suggestion.
  * Both are searched by the listings API.
  */
 export default function DirectorySearch({ query, location, places = [], onSearch, placeholder = 'Search camps, clinics, programs…', withLocation = true, label = 'Sport or event' }: Props) {
@@ -43,6 +44,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const locRef = useRef<HTMLDivElement>(null);
+  const locInput = useRef<HTMLInputElement>(null);
   const qId = useId();
   const locId = useId();
   const listId = useId();
@@ -89,8 +91,9 @@ export default function DirectorySearch({ query, location, places = [], onSearch
           <label className={styles.segLabel} htmlFor={locId}>
             <LuMapPin className={styles.segIcon} aria-hidden />
             <span className={styles.field}>
-              <span className={styles.srOnly}>Location</span>
+              <span className={styles.srOnly}>Destination</span>
               <input
+                ref={locInput}
                 id={locId}
                 className={styles.input}
                 type="search"
@@ -100,7 +103,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
                 aria-controls={listId}
                 aria-activedescendant={shown && active >= 0 ? `${listId}-${active}` : undefined}
                 autoComplete="off"
-                placeholder="City or destination"
+                placeholder="Destination"
                 value={loc}
                 onFocus={() => setOpen(true)}
                 onClick={() => setOpen(true)}
@@ -125,8 +128,24 @@ export default function DirectorySearch({ query, location, places = [], onSearch
               />
             </span>
           </label>
+          {/* The dropdown arrow: opens (or closes) the destinations with results. */}
+          <button
+            type="button"
+            className={`${styles.locToggle} ${shown ? styles.locToggleOpen : ''}`}
+            aria-label={shown ? 'Hide destinations' : 'Show destinations'}
+            aria-controls={listId}
+            aria-expanded={shown}
+            tabIndex={-1}
+            onClick={() => {
+              setActive(-1);
+              setOpen(!shown);
+              if (!shown) locInput.current?.focus();
+            }}
+          >
+            <LuChevronDown aria-hidden />
+          </button>
           {shown && (
-            <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
+            <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Destinations">
               {suggestions.map((p, i) => (
                 <li
                   key={p.value}

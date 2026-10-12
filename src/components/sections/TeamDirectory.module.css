@@ -314,18 +314,6 @@
   font-weight: 600;
 }
 
-/* "18 results in Camps & Tournaments". */
-.results {
-  padding-top: 20px;
-  color: #666;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.results strong {
-  color: #111;
-}
-
 .listing .inner {
   min-height: 0;
   padding-top: 32px;
@@ -430,25 +418,34 @@
 }
 
 /* The results line with the labels' key on its right (new design). */
+/* The key of the cards' labels, centred under the filters. */
 .resultsRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px 16px;
   padding-top: 20px;
   color: #666;
   font-size: 14px;
   line-height: 1.5;
+  text-align: center;
 }
 
-.resultsRow .results {
-  padding-top: 0;
+/* The results count, read out but not shown. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .legend {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px 18px;
 }
 
@@ -479,13 +476,6 @@
   border: 1px solid #999;
 }
 
-/* Tablets: the key on its own line under the count. */
-@media (max-width: 1023px) {
-  .resultsRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 
 /* Phones: the key's three labels one under the other, a little smaller. */
 @media (max-width: 639px) {
@@ -496,6 +486,7 @@
 
   .legend {
     flex-direction: column;
+    align-items: center;
     gap: 6px;
     font-size: 13px;
   }

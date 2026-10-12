@@ -15,7 +15,6 @@ import {
   ARTICLE_LENGTHS,
   ARTICLE_SORTS,
   ARTICLE_TAGS,
-  articleCategoryName,
   articleSearchPlaceholder,
   articlesEnabled,
   countArticles,
@@ -329,7 +328,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
                   applyTags([]);
                 }}
               >
-                Clear all
+                Clear All
               </button>
             )}
           </div>
@@ -339,7 +338,7 @@ export default function PostFilter({ categories: builtInCategories, posts: built
               sections={[
                 ...(sportOptions.length > 0 ? [{ id: 'sport', heading: 'Sport', options: sportOptions, value: sports, single: true }] : []),
                 ...(writerOptions.length > 0 ? [{ id: 'writer', heading: 'Writer', options: writerOptions, value: writers, single: true }] : []),
-                ...(lengthOptions.length > 0 ? [{ id: 'length', heading: 'Reading time', options: lengthOptions, value: lengths, single: true }] : []),
+                ...(lengthOptions.length > 0 ? [{ id: 'length', heading: 'Reading Time', options: lengthOptions, value: lengths, single: true }] : []),
                 // Each tag its own filter: a card with its one checkbox.
                 ...(local
                   ? []
@@ -382,25 +381,11 @@ export default function PostFilter({ categories: builtInCategories, posts: built
           <div className={dir.found} role="status">
             The articles couldn&apos;t be loaded.{' '}
             <button type="button" className={styles.retry} onClick={() => setRetry((n) => n + 1)}>
-              Try again
+              Try Again
             </button>
           </div>
         )}
       </div>
-      {/* "8 articles in Briefings & Field Reports", as the listings' results line. */}
-      <div className={dir.results} role="status">
-        {loading ? (
-          'Loading articles…'
-        ) : (
-          <span>
-            <strong>
-              {total} {total === 1 ? 'article' : 'articles'}
-            </strong>
-            {loc ? ` near ${loc}` : articleCategoryName(source) ? ` in ${articleCategoryName(source)}` : ''}
-          </span>
-        )}
-      </div>
-
       <div className={`${styles.results} ${pending ? styles.pending : ''}`} aria-busy={loading || pending}>
         {loading ? (
           <div className={display === 'list' ? styles.list : styles.grid} aria-hidden>
@@ -455,10 +440,11 @@ function DateBadge({ post }: { post: FilterPost }) {
 }
 
 /**
- * An article in the results (the design's topic page): its photo with the date, "BY <writer>", the title and the
- * reading time; the whole card opens it. The list view (`row`) lays the same out in a row.
+ * An article in the results: its photo with the date, the title, then the reading time and the writer on one line
+ * ("20 min read | By Nabil"); the whole card opens it, its text centred. The list view (`row`) lays the same out in a
+ * row, left-aligned.
  */
-function ArticleCard({ post, eager, row }: { post: FilterPost; eager: boolean; row?: boolean }) {
+export function ArticleCard({ post, eager, row }: { post: FilterPost; eager: boolean; row?: boolean }) {
   return (
     <a href={post.href} className={row ? styles.row : styles.card}>
       <span className={styles.thumb}>
@@ -467,9 +453,18 @@ function ArticleCard({ post, eager, row }: { post: FilterPost; eager: boolean; r
         <DateBadge post={post} />
       </span>
       <div className={styles.text}>
-        {post.author && <span className={styles.byline}>BY {post.author.toUpperCase()}</span>}
         <h3 className={styles.title}>{post.title}</h3>
-        {post.readingTime && <span className={styles.read}>{post.readingTime}</span>}
+        {(post.readingTime || post.author) && (
+          <span className={styles.read}>
+            {post.readingTime}
+            {post.readingTime && post.author && (
+              <span className={styles.sep} aria-hidden>
+                |
+              </span>
+            )}
+            {post.author && <span className={styles.by}>By {post.author}</span>}
+          </span>
+        )}
       </div>
     </a>
   );

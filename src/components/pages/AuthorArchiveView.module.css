@@ -1,0 +1,216 @@
+/* An author's articles in the new design of the article lists (ListingHero's topic heading, PostFilter's cards). */
+
+.page {
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+}
+
+/* ---- Heading: black, centred; its content starts 136px from the top (as a topic page's), 88px below ---- */
+.hero {
+  position: relative;
+  z-index: 2;
+  padding: calc(var(--header-height) + 20px) 48px 88px;
+  background: #0a0a0a;
+  color: var(--white);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.back {
+  color: #dcbd7d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin-top: 10px;
+  border-radius: 12px;
+  background: #dcbd7d;
+  color: #000;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.kicker {
+  color: #dcbd7d;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 2px;
+}
+
+.title {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.bio {
+  max-width: 680px;
+  margin: 0;
+  padding: 0;
+  color: #bbb;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Social links: round outline buttons on black, gold on hover. */
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.social {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #444;
+  border-radius: 50%;
+  color: var(--white);
+  font-size: 16px;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.social:hover {
+  border-color: #dcbd7d;
+  background: #dcbd7d;
+  color: #000;
+}
+
+.back:focus-visible,
+.social:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ---- Articles: three a row (two on tablets, one on phones), as the article lists ---- */
+.body {
+  box-sizing: border-box;
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 72px 48px 120px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px 32px;
+}
+
+.skeleton {
+  height: 360px;
+  border-radius: 10px;
+  background: linear-gradient(100deg, #ececec 30%, #f6f6f6 50%, #ececec 70%) 0 0 / 300% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.empty {
+  margin: 0;
+  padding: 40px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 56px;
+  font-family: var(--font-host-grotesk), var(--font-body);
+}
+
+.pager a {
+  text-decoration: none;
+}
+
+/* ---- Smaller screens ---- */
+@media (max-width: 991px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 24px;
+  }
+
+  .title {
+    font-size: 52px;
+  }
+}
+
+@media (max-width: 690px) {
+  .hero {
+    padding: calc(var(--header-height) + 32px) 16px 56px;
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .bio {
+    font-size: 16px;
+  }
+
+  .body {
+    padding: 48px 16px 80px;
+  }
+}
+
+@media (max-width: 639px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

@@ -120,7 +120,7 @@ export default function MobileFilters({ sections, sort, applied, countFor, onApp
             <div className={styles.body}>
               {sort && (
                 <section className={styles.card}>
-                  <h3 className={styles.heading}>Sort by</h3>
+                  <h3 className={styles.heading}>Sort By</h3>
                   {/* The desktop sort pill (not the browser's select), the sheet's width. */}
                   <div className={styles.sortPill}>
                     <PillSelect value={draftSort ?? sort.options[0]?.value ?? ''} options={sort.options} onChange={setDraftSort} label="Sort by" icon={<LuArrowUpDown />} />
@@ -164,7 +164,7 @@ export default function MobileFilters({ sections, sort, applied, countFor, onApp
                   setDraftSort(sort?.options[0]?.value);
                 }}
               >
-                Clear all
+                Clear All
               </button>
               <button
                 type="button"

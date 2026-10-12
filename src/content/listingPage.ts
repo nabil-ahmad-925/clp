@@ -1,20 +1,24 @@
 import 'server-only';
 import { categoryBlurb, categoryName, isFacilitiesWidget, isListingWidget, listingTypeOf, type ListingSetup, type SpotlightPartner } from './listings';
-import { getPartnerPage } from './partners';
+import { getPartnerPage, type PartnerArchive } from './partners';
 import { getServicePage } from './services';
 import { updatesTopics } from './updates';
 
 /** What a listing page (an Experiences or Resources category) shows around its directory, in the new design. */
 export type ListingPage = ListingSetup & { blurb?: string };
 
-/** How many partners the spotlight shows (one row). */
-const SPOTLIGHT_SIZE = 4;
+/** How many partners the spotlight's carousel holds (three rows of four). */
+const SPOTLIGHT_SIZE = 12;
 
-/** The first partners of the partner directory, for the spotlight. */
+/** The first partners of the partner directory (its first pages, in order), for the spotlight. */
 function spotlightPartners(): SpotlightPartner[] {
-  const archive = getPartnerPage('/clp-partners/');
-  if (archive?.kind !== 'archive') return [];
-  return archive.cards.slice(0, SPOTLIGHT_SIZE).map((c) => ({ name: c.title, href: c.href, image: c.image?.src, excerpt: c.excerpt }));
+  const cards: PartnerArchive['cards'] = [];
+  for (let page = 1; cards.length < SPOTLIGHT_SIZE; page++) {
+    const archive = getPartnerPage(page === 1 ? '/clp-partners/' : `/clp-partners/page/${page}/`);
+    if (archive?.kind !== 'archive') break;
+    cards.push(...archive.cards.filter((c) => !cards.some((seen) => seen.href === c.href)));
+  }
+  return cards.slice(0, SPOTLIGHT_SIZE).map((c) => ({ name: c.title, href: c.href, image: c.image?.src, excerpt: c.excerpt }));
 }
 
 /**

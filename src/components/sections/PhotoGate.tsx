@@ -71,12 +71,12 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
         <span className={`${styles.icon} ${styles.family}`}>
           <Lock color="#FFFFFF" />
         </span>
-        <span className={styles.title}>Youth album: families only</span>
+        <span className={styles.title}>Youth Album: Families Only</span>
         <span className={styles.text}>
           This event had players under 18. Only parents or guardians with a CLP account linked to a registered player can view these photos.
         </span>
         <button type="submit" className={styles.primary}>
-          Sign in with parent account
+          Sign In With Parent Account
         </button>
         {note && <span className={styles.note} role="status">{note}</span>}
         <span className={styles.small}>
@@ -92,7 +92,7 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
         <span className={`${styles.icon} ${styles.client}`}>
           <Lock color="#000000" />
         </span>
-        <span className={`${styles.title} ${styles.center}`}>Client gallery</span>
+        <span className={`${styles.title} ${styles.center}`}>Client Gallery</span>
         <span className={`${styles.text} ${styles.center}`}>Sign in with the client login we sent you.</span>
         <label className={styles.field}>
           Email
@@ -103,7 +103,7 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
           <input className={styles.input} type="password" autoComplete="current-password" value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
         </label>
         <button type="submit" className={styles.primary}>
-          Open gallery
+          Open Gallery
         </button>
         {note && <span className={styles.note} role="status">{note}</span>}
       </form>
@@ -114,7 +114,7 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
       <span className={`${styles.icon} ${styles.private}`}>
         <Lock color="#FFFFFF" />
       </span>
-      <span className={styles.title}>Private event album</span>
+      <span className={styles.title}>Private Event Album</span>
       <span className={styles.text}>Enter the access code from your photo card, ticket or invite.</span>
       <input
         className={`${styles.input} ${styles.code}`}
@@ -125,7 +125,7 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
         onChange={(e) => setCode(e.target.value.toUpperCase())}
       />
       <button type="submit" className={styles.primary} disabled={busy}>
-        {busy ? 'Opening…' : 'Unlock album'}
+        {busy ? 'Opening…' : 'Unlock Album'}
       </button>
       {note && <span className={styles.note} role="status">{note}</span>}
       <span className={styles.small}>Private albums don&rsquo;t show up in search, and their photos can&rsquo;t be shared publicly.</span>

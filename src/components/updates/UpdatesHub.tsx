@@ -37,6 +37,8 @@ const fromPost = (p: Post, category?: string): Story => ({ href: p.href, title: 
 
 /** "Compete Like Pros · June 26, 2026 · 6 min read" (what is known). */
 const metaLine = (s: Story) => [s.author, s.date, s.read].filter(Boolean).join(' · ');
+/** A card's line under its title: "June 26, 2026 | 6 min read" (what is known). */
+const dateLine = (s: Story) => [s.date, s.read].filter(Boolean).join(' | ');
 
 function Cover({ src, sizes, priority }: { src: string; sizes: string; priority?: boolean }) {
   return src ? <Image className={styles.coverImage} src={src} alt="" fill sizes={sizes} priority={priority} /> : null;
@@ -91,6 +93,7 @@ export function FeaturedStories({ sections }: { sections: HubSection[] }) {
               </span>
               {s.topic && <span className={styles.kicker}>{s.topic}</span>}
               <span className={styles.storyTitle}>{s.title}</span>
+              {dateLine(s) && <span className={styles.cardDate}>{dateLine(s)}</span>}
             </Link>
           ))}
         </div>
@@ -137,7 +140,7 @@ export function TopicSection({ section }: { section: HubSection }) {
             </span>
             {s.author && <span className={styles.byline}>BY {s.author.toUpperCase()}</span>}
             <span className={styles.storyTitle}>{s.title}</span>
-            {s.date && <span className={styles.cardDate}>{s.date}</span>}
+            {dateLine(s) && <span className={styles.cardDate}>{dateLine(s)}</span>}
           </Link>
         ))}
       </div>

@@ -7,7 +7,7 @@
 .results {
   position: relative;
   min-height: 120px;
-  /* Below the results line ("8 articles in …"), as on the design's topic page. */
+  /* Below the filter bar. */
   padding-top: 28px;
 }
 
@@ -39,8 +39,8 @@
   }
 }
 
-/* An article (the design's topic page): no box, the whole card is the link. The photo (3:2, the date on it), then
-   "BY <writer>", the title and the reading time. */
+/* An article (the design's topic page): no box, the whole card is the link. The photo (3:2, the date on it), then the
+   title and "<reading time> | By <writer>", centred (the list view's rows stay left-aligned). */
 .card,
 .row {
   display: flex;
@@ -118,13 +118,6 @@
   min-width: 0;
 }
 
-.byline {
-  color: #8a6f33;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
-
 .title {
   margin: 0;
   color: #111;
@@ -136,9 +129,32 @@
   text-transform: none;
 }
 
+.card .text {
+  align-items: center;
+  text-align: center;
+}
+
+/* "20 min read | By Nabil": the writer's name a shade darker than the time. */
 .read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
   color: #666;
   font-size: 14px;
+}
+
+.card .read {
+  justify-content: center;
+}
+
+.sep {
+  color: #ccc;
+}
+
+.by {
+  color: #111;
+  font-weight: 600;
 }
 
 /* List view: one article a row, the photo (280px) on the left, a hairline under each. */

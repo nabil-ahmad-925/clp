@@ -92,7 +92,7 @@ export default function AboutPage() {
 
       <section className={styles.what} data-header-tone="dark">
         <span className={styles.kicker}>WHAT WE DO</span>
-        <h2 className={styles.bigTitle}>One platform. Endless possibilities.</h2>
+        <h2 className={styles.bigTitle}>One Platform. Endless Possibilities.</h2>
         <div className={styles.pillars}>
           {aboutPillars.map((p) => (
             <Link

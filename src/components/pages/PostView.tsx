@@ -1,17 +1,9 @@
 import Link from 'next/link';
 import RichText from '@/components/ui/RichText';
-import { ARTICLE_CATEGORIES } from '@/content/articles';
+import AuthorSocials from '@/components/ui/AuthorSocials';
+import { ARTICLE_CATEGORIES, authorInitials, companyAuthorProfile } from '@/content/articles';
 import type { BlogPost } from '@/content/types';
 import styles from './PostView.module.css';
-
-/** "Compete Like Pros" -> "CLP", "H C" -> "HC". */
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 3)
-    .map((w) => w[0]!.toUpperCase())
-    .join('');
 
 /** The company's own articles (its avatar is black, the others' gold). */
 const COMPANY = 'Compete Like Pros';
@@ -26,18 +18,20 @@ function topicOf(post: BlogPost) {
 }
 
 /**
- * An article (new design's article template): the black heading with "Updates & News › topic", the title and the
- * author's line, the cover photo, then the article (its body exactly as written in the admin), the author's card,
- * and "Keep reading".
+ * An article (new design's article template): the black heading with "Updates & News › topic", the title and its date
+ * and reading time, the cover photo, then the article (its body exactly as written in the admin), the author's card
+ * (their bio and social links: a partner's from their account, the company's authors' from the taxonomy), and "Keep
+ * Reading".
  */
 export default function PostView({ post }: { post: BlogPost }) {
   const { hero } = post;
   const topic = topicOf(post);
-  const company = hero.author.name === COMPANY;
-  const firstName = hero.author.name.split(/\s+/)[0];
-  const avatar = (size: 'lg' | 'md' | 'sm', name = hero.author.name) => (
+  const company = companyAuthorProfile(hero.author.href);
+  const bio = hero.author.bio || company.bio || `Writes for ${COMPANY}.`;
+  const socials = hero.author.socials ?? company.socials ?? [];
+  const avatar = (size: 'lg' | 'sm', name = hero.author.name) => (
     <span className={`${styles.avatar} ${styles[size]} ${name === COMPANY ? styles.avatarCompany : ''}`} aria-hidden>
-      {initials(name)}
+      {authorInitials(name)}
     </span>
   );
 
@@ -57,20 +51,8 @@ export default function PostView({ post }: { post: BlogPost }) {
             )}
           </nav>
           <h1 className={styles.title}>{hero.title}</h1>
-          <div className={styles.byline}>
-            {avatar('md')}
-            <span className={styles.bylineText}>
-              {hero.author.href ? (
-                <Link href={hero.author.href} className={styles.bylineName}>
-                  {hero.author.name}
-                </Link>
-              ) : (
-                <strong className={styles.bylineName}>{hero.author.name}</strong>
-              )}
-              <br />
-              {[hero.date, hero.readingTime].filter(Boolean).join(' · ')}
-            </span>
-          </div>
+          {/* The author is on the card under the article. */}
+          <p className={styles.dateline}>{[hero.date, hero.readingTime].filter(Boolean).join(' · ')}</p>
         </div>
       </section>
 
@@ -92,10 +74,11 @@ export default function PostView({ post }: { post: BlogPost }) {
               <div className={styles.authorText}>
                 <span className={styles.kicker}>ABOUT THE AUTHOR</span>
                 <strong className={styles.authorName}>{hero.author.name}</strong>
-                <span className={styles.authorBio}>{company ? 'News and field reports from the CLP team.' : `Writes for ${COMPANY}.`}</span>
+                <span className={styles.authorBio}>{bio}</span>
+                <AuthorSocials name={hero.author.name} socials={socials} className={styles.authorSocials} linkClassName={styles.authorSocial} />
                 <div className={styles.authorActions}>
                   <Link href={hero.author.href ?? topic?.href ?? '/updates/'} className={styles.moreFrom}>
-                    More from {hero.author.href ? firstName : topic ? topic.name : 'Updates & News'}
+                    More from {hero.author.href ? hero.author.name : topic ? topic.name : 'Updates & News'}
                   </Link>
                 </div>
               </div>
@@ -105,7 +88,7 @@ export default function PostView({ post }: { post: BlogPost }) {
 
         {post.related.posts.length > 0 && (
           <section className={styles.keep}>
-            <h2 className={styles.keepTitle}>Keep reading</h2>
+            <h2 className={styles.keepTitle}>Keep Reading</h2>
             <div className={styles.keepGrid}>
               {post.related.posts.slice(0, 4).map((p) => (
                 <Link key={p.href} href={p.href} className={styles.card}>

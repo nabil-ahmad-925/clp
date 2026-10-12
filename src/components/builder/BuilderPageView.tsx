@@ -8,7 +8,7 @@ import PageHero from '@/components/sections/PageHero';
 import { articleSearchPlaceholder } from '@/content/articles';
 import { articleListOf, listingPageOf } from '@/content/listingPage';
 import { photoSectionOf } from '@/content/photos';
-import { searchPlaceholder, type ListingSetup } from '@/content/listings';
+import { listingTitleLines, searchPlaceholder, type ListingSetup } from '@/content/listings';
 import { Container } from '@/components/ui/Section';
 import type { BuilderPage, BuilderRow } from '@/content/types';
 import BuilderBlock from './BuilderBlock';
@@ -48,9 +48,9 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
     <>
       {page.hero &&
         (listing ? (
-          <ListingHero title={page.hero.title} blurb={listing.blurb} />
+          <ListingHero title={listingTitleLines(page.hero.title)} blurb={listing.blurb} />
         ) : articleList ? (
-          <ListingHero title={page.hero.title} blurb={articleList.blurb} back={articleList.back} />
+          <ListingHero title={[page.hero.title.join(' ')]} blurb={articleList.blurb} back={articleList.back} />
         ) : (
           <PageHero {...page.hero} compact={search} />
         ))}
@@ -60,7 +60,8 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
         {page.rows.map((row, i) => (
           <Row key={i} row={row} listing={setup} />
         ))}
-        {listing && (listing.kind === 'facilities' ? <HostCta /> : <ProgramPlans />)}
+        {listing &&
+          (listing.kind === 'facilities' ? <HostCta /> : <ProgramPlans category={listing.category} section={listing.section === 'resources' ? 'resources' : 'experiences'} />)}
       </div>
       {page.portfolioNav && <PortfolioNav links={page.portfolioNav} />}
     </>

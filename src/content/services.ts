@@ -632,7 +632,7 @@ export const servicePages: ServicePage[] = [
           excerpt: "In direct marketing, prospects are viewed through a statistical lens, and fundraising considers them as individuals with varying needs; Research suggests that interests influence values and preferences.",
           bio: "A direct mail campaign involves a top-level executive writing a letter to a prospect, donor, or member of the organization. This method of fundraising is much more effective than email fundraising. Donors receive a more personal touch when they receive direct mail, and they can make donations easily through online fundraising. Communication via direct mail should closely follow communication via the internet and e-mail.",
           cta: {
-            label: "Star a Project",
+            label: "Start a Project",
             href: "/fundraising-retailing/inquiry/"
           },
           socials: [
@@ -661,7 +661,7 @@ export const servicePages: ServicePage[] = [
           excerpt: "Using virtual or in-person fundraising, your organization can host events and sell products for fundraising.",
           bio: "Income earned from the sale of goods or services, or from work performed, is known as earned income. Earned income is becoming increasingly popular among nonprofits. Due to factors such as increased competition and a flagging economy, organizations now need to implement revenue-earning programs in order to stay afloat. To meet long-term sustainability and growth needs, organizations should diversify or expand their support bases.",
           cta: {
-            label: "Star a Project",
+            label: "Start a Project",
             href: "/fundraising-retailing/inquiry/"
           },
           socials: [
@@ -690,7 +690,7 @@ export const servicePages: ServicePage[] = [
           excerpt: "Designed to create a sense of urgency and excitement, these are temporary retail spaces. They feature unique products, collaborations, or experiences that cannot be found anywhere else.",
           bio: "Pop-up shops, also known as pop-up stores or flash retailing, are temporary retail spaces that operate for a limited time, typically a few days to a few weeks. They take advantage of fleeting trends, seasonal trends, or special events. There are a variety of holiday markets, Halloween stores, and limited-time experiential retail concepts to choose from.",
           cta: {
-            label: "Star a Project",
+            label: "Start a Project",
             href: "/fundraising-retailing/inquiry/"
           },
           socials: [
@@ -719,7 +719,7 @@ export const servicePages: ServicePage[] = [
           excerpt: "facilitates online fundraising, such as crowdfunding and peer-to-peer campaigns.",
           bio: "A crucial aspect of strong social media campaigns involves enlisting active support from as many existing and prospective donors as possible. Encourage your current supporters to spread the word about your organization’s purpose on your behalf. Their personal networks offer great potential for spreading your nonprofit’s reach even further.",
           cta: {
-            label: "Star a Project",
+            label: "Start a Project",
             href: "/fundraising-retailing/inquiry/"
           },
           socials: [

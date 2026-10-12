@@ -59,27 +59,13 @@
   text-transform: none;
 }
 
-.byline {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* The date and reading time under the title (the author is on the card under the article). */
+.dateline {
+  margin: 0;
+  padding: 0;
   color: #ccc;
   font-size: 15px;
   line-height: 1.35;
-}
-
-.bylineText {
-  text-align: left;
-}
-
-.bylineName {
-  color: var(--white);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-a.bylineName:hover {
-  text-decoration: underline;
 }
 
 .avatar {
@@ -101,12 +87,6 @@ a.bylineName:hover {
   width: 64px;
   height: 64px;
   font-size: 20px;
-}
-
-.md {
-  width: 40px;
-  height: 40px;
-  font-size: 14px;
 }
 
 .sm {
@@ -322,6 +302,40 @@ a.bylineName:hover {
   color: #555;
 }
 
+/* The author's social links: round outline buttons, gold on hover. */
+.authorSocials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+
+.authorSocial {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ddddda;
+  border-radius: 50%;
+  color: #111;
+  font-size: 15px;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.authorSocial:hover {
+  border-color: #dcbd7d;
+  background: #dcbd7d;
+}
+
+.authorSocial:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 .authorActions {
   display: flex;
   flex-wrap: wrap;
@@ -374,11 +388,14 @@ a.bylineName:hover {
   gap: 24px;
 }
 
+/* A card: its text centred under the photo. */
 .card {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 14px;
   color: #111;
+  text-align: center;
   text-decoration: none;
 }
 
@@ -420,6 +437,7 @@ a.bylineName:hover {
 .cardMeta {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   color: #666;
   font-size: 13px;
@@ -429,6 +447,7 @@ a.bylineName:hover {
   display: flex;
   flex-direction: column;
   line-height: 1.3;
+  text-align: left;
 }
 
 .cardAuthor {

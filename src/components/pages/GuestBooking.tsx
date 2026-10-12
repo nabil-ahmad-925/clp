@@ -78,10 +78,10 @@ export default function GuestBooking() {
           )}
           {current.status === 'invalid' && (
             <div className={styles.stack}>
-              <span className={styles.title}>This link isn&rsquo;t valid</span>
+              <span className={styles.title}>This Link Isn&rsquo;t Valid</span>
               <p className={styles.muted}>Open the link from your latest booking e-mail, or reply to that e-mail to reach the host.</p>
               <Link href="/experiences/" className={styles.secondary}>
-                Browse experiences
+                Browse Experiences
               </Link>
             </div>
           )}
@@ -91,7 +91,7 @@ export default function GuestBooking() {
                 {current.message}
               </p>
               <button type="button" className={styles.secondary} onClick={() => setAttempt((n) => n + 1)}>
-                Try again
+                Try Again
               </button>
             </div>
           )}
@@ -132,7 +132,7 @@ export default function GuestBooking() {
               {current.booking.status === 'requested' && <p className={styles.muted}>The host confirms your spot by e-mail, with the exact address.</p>}
               {current.booking.status === 'cancelled' ? (
                 <Link href="/experiences/" className={styles.secondary}>
-                  Find another experience
+                  Find Another Experience
                 </Link>
               ) : current.booking.canCancel ? (
                 confirming ? (
@@ -140,10 +140,10 @@ export default function GuestBooking() {
                     <span className={styles.confirmText}>Cancel this booking? Your spots go to someone else, and the host is told.</span>
                     <div className={styles.actions}>
                       <button type="button" className={styles.danger} disabled={cancelling} onClick={cancel}>
-                        {cancelling ? 'Cancelling…' : 'Yes, cancel it'}
+                        {cancelling ? 'Cancelling…' : 'Yes, Cancel It'}
                       </button>
                       <button type="button" className={styles.secondary} disabled={cancelling} onClick={() => setConfirming(false)}>
-                        Keep my booking
+                        Keep My Booking
                       </button>
                     </div>
                     {cancelError && (
@@ -155,7 +155,7 @@ export default function GuestBooking() {
                 ) : (
                   <div className={styles.stack}>
                     <button type="button" className={styles.secondary} onClick={() => setConfirming(true)}>
-                      Cancel booking
+                      Cancel Booking
                     </button>
                     <span className={styles.muted}>
                       Free cancellation until {longDay(current.booking.cancelBy)} at {CANCEL_TIME}.

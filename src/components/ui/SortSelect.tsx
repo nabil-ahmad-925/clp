@@ -8,7 +8,7 @@ export const SORTS = [
   { value: 'featured', label: 'Recommended' },
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'soonest', label: 'Soonest start date' },
+  { value: 'soonest', label: 'Soonest Start Date' },
 ] as const;
 
 export type Sort = (typeof SORTS)[number]['value'];

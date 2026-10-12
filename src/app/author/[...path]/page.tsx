@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import CategoryArchiveView from '@/components/pages/CategoryArchiveView';
+import AuthorArchiveView from '@/components/pages/AuthorArchiveView';
 import LiveArchive from '@/components/pages/LiveArchive';
 import { archiveParams, getArchive } from '@/content/categories';
 
 // Author archives ("All Posts By ..."), e.g. /author/michael/ and its second page /author/michael/page/2/.
-// They share the category archive template.
+// In the new design of the article lists (AuthorArchiveView).
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -32,7 +32,7 @@ export default async function AuthorPage(props: PageProps<'/author/[...path]'>) 
   if (!archive) notFound();
   // The page number (?page=) is only known in the browser: the static HTML has the built-in list.
   return (
-    <Suspense fallback={<CategoryArchiveView archive={archive} />}>
+    <Suspense fallback={<AuthorArchiveView archive={archive} />}>
       <LiveArchive archive={archive} />
     </Suspense>
   );

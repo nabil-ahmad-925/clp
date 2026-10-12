@@ -61,7 +61,7 @@ export default function LivePost({ slug, post }: { slug: string; post?: BlogPost
               setAttempt((n) => n + 1);
             }}
           >
-            Try again
+            Try Again
           </button>
         </Section>
       </>

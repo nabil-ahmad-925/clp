@@ -119,7 +119,7 @@ export default function ClaimModal({ item, widgetId, onClose }: Props) {
                   </svg>
                   CLAIM SUBMITTED
                 </span>
-                <span className={styles.title}>We&rsquo;ll verify your claim</span>
+                <span className={styles.title}>We&rsquo;ll Verify Your Claim</span>
                 <span className={styles.text}>
                   CLP checks that you run <strong>{sent.listingTitle}</strong>, then emails <strong>{sent.email}</strong> to hand the listing over. You&rsquo;ll be
                   able to edit its details and photos, and take bookings on CLP once you&rsquo;re a partner.
@@ -227,7 +227,7 @@ export default function ClaimModal({ item, widgetId, onClose }: Props) {
                 </span>
               )}
               <button type="submit" className={styles.primary} disabled={sending}>
-                {sending ? 'Submitting…' : 'Submit claim'}
+                {sending ? 'Submitting…' : 'Submit Claim'}
               </button>
               <span className={styles.hint}>CLP reviews every claim before handing a listing over, usually within 2 business days.</span>
             </div>

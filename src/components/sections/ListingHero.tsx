@@ -2,7 +2,7 @@ import Link from 'next/link';
 import styles from './ListingHero.module.css';
 
 type Props = {
-  /** The page heading's lines ("Fútbol (Soccer) Advancement", "& Workshops Nearby"), shown as one title. */
+  /** The title's lines, each on its own ("Fútbol (Soccer)", "Advancement & Workshops Nearby"; see listingTitleLines). */
   title: string[];
   blurb?: string;
   /** The page it belongs to, above the title ("← Updates & News"): an article list's breadcrumb, with its larger title. */
@@ -22,7 +22,14 @@ export default function ListingHero({ title, blurb, back }: Props) {
             <span className="glyph" aria-hidden>←</span> {back.label}
           </Link>
         )}
-        <h1 className={styles.title}>{title.join(' ')}</h1>
+        <h1 className={styles.title}>
+          {title.map((line, i) => (
+            <span key={i} className={styles.line}>
+              {i > 0 && ' '}
+              {line}
+            </span>
+          ))}
+        </h1>
         {blurb && <p className={styles.blurb}>{blurb}</p>}
       </div>
     </section>

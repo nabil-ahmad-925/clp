@@ -81,7 +81,7 @@ export const homeServices: FeatureRowData[] = [
 ];
 
 export const testimonials: { title: string; items: Testimonial[] } = {
-  title: 'What our community says!',
+  title: 'What Our Community Says!',
   items: [
     {
       quote:

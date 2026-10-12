@@ -109,6 +109,19 @@ export type SpotlightPartner = { name: string; href: string; image?: string; exc
  */
 export type ListingSetup = { kind: 'listing' | 'facilities'; section: 'experiences' | 'resources' | 'facilities'; category: string; partners: SpotlightPartner[] };
 
+/** The sport a listing page's heading starts with, as the pages spell it ("Fútbol(Soccer)", "Baseball and Softball"…). */
+const TITLE_SPORT = /^(Baseball (?:&|and) Softball|Basketball|Esports|Fútbol ?\(Soccer\)|Golf(?:ing)?|Pickleball)\s+(.+)$/;
+
+/**
+ * A listing page's heading as the hero shows it: the sport on one line and the category on the next ("Fútbol (Soccer)",
+ * "Advancement & Workshops Nearby"), whatever the page data's own break; one line when no sport leads it.
+ */
+export const listingTitleLines = (title: string[]) => {
+  const text = title.join(' ').replace(/\s+/g, ' ').trim();
+  const m = text.match(TITLE_SPORT);
+  return m ? [m[1].replace('Fútbol(', 'Fútbol (').replace(' and ', ' & '), m[2]] : [text];
+};
+
 /** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
 export const searchPlaceholder = (widgetId: number | undefined, fallback?: string) => {
   const name = categoryName(widgetId) ?? fallback?.replace(/\s+nearby$/i, '').trim();
@@ -179,7 +192,7 @@ const TIME_SLOTS: Record<string, [string, string][]> = {
 };
 export const START_TIME_FILTER: DirectoryFilter = {
   key: 'starttime',
-  label: 'Start time',
+  label: 'Start Time',
   options: [
     { value: 'time-morning', label: 'Morning (5 AM – 12 PM)' },
     { value: 'time-afternoon', label: 'Afternoon (12 PM – 5 PM)' },
@@ -188,13 +201,13 @@ export const START_TIME_FILTER: DirectoryFilter = {
   ],
 };
 
-/** Groups & Private Lessons and Leagues & Social Clubs (the other experiences say "Start time"); facilities all say "Available time". */
+/** Groups & Private Lessons and Leagues & Social Clubs (the other experiences say "Start Time"); facilities all say "Available Time". */
 const AVAILABLE_TIME_WIDGETS = [6, 37];
 
-/** The time filter of a directory: titled "Available time" for those, "Start time" for the rest. */
+/** The time filter of a directory: titled "Available Time" for those, "Start Time" for the rest. */
 export function startTimeFilterFor(widgetId: number | undefined): DirectoryFilter {
   const available = widgetId != null && (AVAILABLE_TIME_WIDGETS.includes(widgetId) || WIDGET_TYPES[widgetId] === 'facilities');
-  return available ? { ...START_TIME_FILTER, label: 'Available time' } : START_TIME_FILTER;
+  return available ? { ...START_TIME_FILTER, label: 'Available Time' } : START_TIME_FILTER;
 }
 
 /** Whether a card has a filter value: one of its tags, a part of the day it starts in (Available time), or (a month) one its dates fall in. */

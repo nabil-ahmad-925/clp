@@ -177,11 +177,11 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
                   onClaim();
                 }}
               >
-                Claim this listing
+                Claim This Listing
               </button>
             ) : (
               <Link href={CLAIM_HREF} onClick={(e) => e.stopPropagation()}>
-                Claim this listing
+                Claim This Listing
               </Link>
             )}
           </span>

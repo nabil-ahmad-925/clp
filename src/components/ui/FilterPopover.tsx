@@ -124,9 +124,9 @@ export default function FilterPopover({
   );
 }
 
-/** "Show 6 results"; "Show … results" while the count is on its way; "Show results" when it can't be known. */
+/** "Show 6 Results"; "Show … Results" while the count is on its way; "Show Results" when it can't be known. */
 export const showLabel = (results: number | 'loading' | null | undefined) =>
-  results === 'loading' ? 'Show … results' : results == null ? 'Show results' : `Show ${results} ${results === 1 ? 'result' : 'results'}`;
+  results === 'loading' ? 'Show … Results' : results == null ? 'Show Results' : `Show ${results} ${results === 1 ? 'Result' : 'Results'}`;
 
 /** Counts the results of a panel's draft: at once (`resultsFor`), or by asking the API (`countFor`). */
 export type DraftCount = {

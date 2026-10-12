@@ -207,7 +207,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
 
         <div className={styles.tabs} role="tablist">
           <button type="button" role="tab" aria-selected={tab === 'digital'} className={`${styles.tab} ${tab === 'digital' ? styles.tabOn : ''}`} onClick={() => setTab('digital')}>
-            Digital download
+            Digital Download
           </button>
           <button
             type="button"
@@ -219,7 +219,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
               setAdded(false);
             }}
           >
-            Prints &amp; products
+            Prints &amp; Products
           </button>
         </div>
 
@@ -227,7 +227,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
           <div className={styles.sideBody}>
             {image.noDownload ? (
               <div className={styles.buy}>
-                <span className={styles.lineTitle}>Full-resolution download</span>
+                <span className={styles.lineTitle}>Full-Resolution Download</span>
                 <span className={styles.muted}>Downloads aren&rsquo;t offered for this album.</span>
               </div>
             ) : price == null ? (
@@ -237,7 +237,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
                 </span>
                 <span className={styles.muted}>Free for personal use.</span>
                 <a className={styles.primary} href={image.downloadUrl ?? image.full} download onClick={() => setDownloaded(true)}>
-                  {downloaded ? 'Downloaded ✓' : 'Download photo'}
+                  {downloaded ? 'Downloaded ✓' : 'Download Photo'}
                 </a>
               </div>
             ) : (
@@ -285,7 +285,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
         {tab === 'print' && image.printable === false && (
           <div className={styles.sideBody}>
             <div className={styles.buy}>
-              <span className={styles.lineTitle}>Prints &amp; products</span>
+              <span className={styles.lineTitle}>Prints &amp; Products</span>
               <span className={styles.muted}>{image.printNote ?? 'Prints and products aren’t offered for this photo.'}</span>
             </div>
           </div>
@@ -329,7 +329,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
                 setAdded(false);
               }}
             >
-              <span className="glyph" aria-hidden>←</span> All products
+              <span className="glyph" aria-hidden>←</span> All Products
             </button>
             <div className={styles.preview}>
               <Mockup product={product} chosen={chosen} src={image.src} max={220} />

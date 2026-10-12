@@ -17,8 +17,8 @@ export const aboutHero = {
   hashtag: '#LeaveYourFootprints',
   image: upload('/2024/03/tt.jpg'),
   actions: [
-    { label: 'Start a project', href: '#start' },
-    { label: 'Explore experiences', href: '/experiences/' },
+    { label: 'Start a Project', href: '#start' },
+    { label: 'Explore Experiences', href: '/experiences/' },
   ],
 };
 
@@ -44,13 +44,13 @@ export const aboutWho = {
 export const aboutMissionVision = [
   {
     kicker: 'OUR MISSION',
-    title: 'Redefine what it means to compete.',
+    title: 'Redefine What It Means to Compete.',
     text: 'We create accessible, high-impact experiences that bring out the best in every athlete, brand, creator, coach and community, developing the whole person physically, mentally and creatively.',
     dark: false,
   },
   {
     kicker: 'OUR VISION',
-    title: 'Greatness within reach for all.',
+    title: 'Greatness Within Reach for All.',
     text: 'A world where sport, fitness and entertainment connect people across cultures, skill levels and industries, and every participant has the tools, support and platform to thrive.',
     dark: true,
   },
@@ -63,14 +63,14 @@ const firstResources = mainNav.find((n) => n.href === '/resources/')?.children?.
 /** "What we do": CLP's five parts, each with a link to it on the site. */
 export const aboutPillars = [
   {
-    title: 'Brand activations',
+    title: 'Brand Activations',
     text: 'Experiential campaigns that put brands in the game with real communities.',
-    cta: 'Start a project',
+    cta: 'Start a Project',
     href: '#start',
     image: serviceImage('EVENT'),
   },
   {
-    title: 'Commerce & supplies',
+    title: 'Commerce & Supplies',
     text: 'Team gear, custom merch and event supplies, sold on CLP and every partner store.',
     cta: 'Shop CLP',
     href: shop?.href ?? '/',
@@ -80,21 +80,21 @@ export const aboutPillars = [
   {
     title: 'Experiences',
     text: 'Camps, clinics, pickups, leagues and trips, booked in one place.',
-    cta: 'Browse experiences',
+    cta: 'Browse Experiences',
     href: '/experiences/',
     image: upload('/2024/03/CLP-Photos-Baseball-Camps.png'),
   },
   {
-    title: 'Partner pages',
+    title: 'Partner Pages',
     text: 'Clubs, athletes and creators get a home for bookings, merch, photos and donations.',
-    cta: 'Meet our partners',
+    cta: 'Meet Our Partners',
     href: '/clp-partners/',
     image: upload('/2024/04/CLP-Photos-Advancement.png'),
   },
   {
     title: 'Resources',
     text: 'Nutrition, recovery, mental health, training and jobs from vetted pros.',
-    cta: 'Find resources',
+    cta: 'Find Resources',
     href: firstResources,
     image: serviceImage('NUTRITION') || serviceImage('RECOVERY'),
   },
@@ -112,13 +112,13 @@ export const howWeWork = {
 
 export const aboutServe = {
   kicker: 'WHO WE SERVE',
-  title: 'Built for everyone in the game',
+  title: 'Built for Everyone in the Game',
   groups: [
     { title: 'Athletes', text: 'Train, compete, get seen' },
     { title: 'Brands', text: 'Activations that connect' },
-    { title: 'Cities & orgs', text: 'Community programming' },
-    { title: 'Clubs & teams', text: 'Fill rosters, sell merch' },
-    { title: 'Coaches & pros', text: 'Grow your practice' },
+    { title: 'Cities & Orgs', text: 'Community programming' },
+    { title: 'Clubs & Teams', text: 'Fill rosters, sell merch' },
+    { title: 'Coaches & Pros', text: 'Grow your practice' },
     { title: 'Creators', text: 'Meet fans, launch collabs' },
     { title: 'Parents', text: 'Safe, vetted programs' },
     { title: 'Schools', text: 'Programs & official stores' },

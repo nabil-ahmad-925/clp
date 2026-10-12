@@ -1,6 +1,7 @@
 import taxonomy from './data/articleCategories.json';
 import type { ArchivePost } from './categories';
-import type { BlogPost, FilterPost, Link, Post, PostCard, PostNavLink } from './types';
+import { socialLinks } from './site';
+import type { AuthorSocial, BlogPost, FilterPost, Link, Post, PostCard, PostNavLink } from './types';
 import { updatesTopics } from './updates';
 
 /**
@@ -22,7 +23,10 @@ export type ArticleSubcategory = { slug: string; name: string; sport?: string; f
 export type ArticleCategory = { slug: string; name: string; label?: { color: string; background: string }; page?: string; subcategories: ArticleSubcategory[] };
 
 export const ARTICLE_CATEGORIES = taxonomy.categories as ArticleCategory[];
-const AUTHORS = taxonomy.authors;
+/** The company's own authors (/author/<slug>/), with their bio for the article page's author card. */
+const AUTHORS: { slug: string; name: string; bio?: string }[] = taxonomy.authors;
+/** The company's name as an author (its articles' card shows CLP's own social links). */
+const COMPANY_NAME = 'Compete Like Pros';
 /** The Writer filter's choices: the company's articles, those of partners, or of sponsors (the API's `writer`). */
 export const ARTICLE_WRITERS = [
   { value: 'clp', label: 'Compete Like Pros' },
@@ -58,7 +62,10 @@ export type ArticleSummary = {
   tags?: string[];
 };
 export type Article = ArticleSummary & { html: string };
-export type ArticlePageData = { item: Article; previous: ArticleSummary | null; next: ArticleSummary | null; related: ArticleSummary[] };
+/** A partner author's public details, from their account (their bio and social links; empty when none). */
+export type AuthorProfile = { bio?: string; socials?: AuthorSocial[] };
+/** `authorProfile`: the partner's details when a partner wrote it (the company's authors' are in the taxonomy). */
+export type ArticlePageData = { item: Article; previous: ArticleSummary | null; next: ArticleSummary | null; related: ArticleSummary[]; authorProfile?: AuthorProfile };
 
 export const articlesEnabled = Boolean(API_URL);
 
@@ -83,7 +90,7 @@ export type ArticleList = {
 /** The list orders: "Recommended" is newest first (the API's default, sent as no sort). */
 export const ARTICLE_SORTS = [
   { value: 'recommended', label: 'Recommended' },
-  { value: 'oldest', label: 'Oldest first' },
+  { value: 'oldest', label: 'Oldest First' },
   { value: 'title-asc', label: 'Title: A to Z' },
   { value: 'title-desc', label: 'Title: Z to A' },
 ] as const;
@@ -169,6 +176,26 @@ export const authorOf = (a: Pick<ArticleSummary, 'author' | 'authorName'>) => {
   return author ? { name: author.name, href: `/author/${author.slug}/` } : { name: a.authorName || 'Compete Like Pros' };
 };
 
+/** An author's avatar letters: "Compete Like Pros" -> "CLP", "H C" -> "HC". */
+export const authorInitials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((w) => w[0]!.toUpperCase())
+    .join('');
+
+/**
+ * The author card's details of one of the company's authors (by their archive address): the taxonomy's bio, and CLP's
+ * own social links for Compete Like Pros. Empty for anyone else (a partner's come from their account).
+ */
+export function companyAuthorProfile(href?: string): AuthorProfile {
+  // An archive's later pages (/author/<slug>/page/2/) are the same author's.
+  const author = AUTHORS.find((a) => href?.startsWith(`/author/${a.slug}/`));
+  if (!author) return {};
+  return { bio: author.bio, socials: author.name === COMPANY_NAME ? socialLinks.map(({ network, href }) => ({ network, href })) : undefined };
+}
+
 /** A category path's name and archive ("Basketball", /category/strategy-and-insights/basketball-strategy-insights/). */
 export function categoryLink(path: string): Link | null {
   const [top, sub] = path.split('/');
@@ -217,6 +244,7 @@ export const toPostCard = (a: ArticleSummary): PostCard => ({ title: a.title, hr
 /** An archive card: as toPostCard, with the labels of the article's categories (top level) over it. */
 export const toArchivePost = (a: ArticleSummary): ArchivePost => ({
   ...toPostCard(a),
+  readingTime: `${a.readingTime} min read`,
   categories: ARTICLE_CATEGORIES.filter((c) => a.categories.includes(c.slug)).map((c) => ({
     label: c.name,
     href: `/category/${c.slug}/`,
@@ -251,8 +279,8 @@ export function toFilterPost(a: ArticleSummary): FilterPost {
   };
 }
 
-/** The post page's data from a live article. */
-export function toBlogPost({ item, previous, next, related }: ArticlePageData): BlogPost {
+/** The post page's data from a live article (a partner's bio and social links from their account). */
+export function toBlogPost({ item, previous, next, related, authorProfile }: ArticlePageData): BlogPost {
   return {
     path: item.path,
     meta: { title: `${item.title} - Compete Like Pros™`, description: item.excerpt },
@@ -260,7 +288,7 @@ export function toBlogPost({ item, previous, next, related }: ArticlePageData): 
       title: item.title,
       image: item.image,
       categories: categoryLinks(item.categories),
-      author: authorOf(item),
+      author: { ...authorOf(item), ...(authorProfile?.bio ? { bio: authorProfile.bio } : {}), ...(authorProfile?.socials?.length ? { socials: authorProfile.socials } : {}) },
       date: articleDate(item.publishedAt),
       location: locationsShown(item.locations),
       comments: { label: 'No Comments', href: '#respond' },
@@ -270,7 +298,7 @@ export function toBlogPost({ item, previous, next, related }: ArticlePageData): 
     previous: navLink(previous, 'Previous Post'),
     next: navLink(next, 'Next Post'),
     related: {
-      title: 'Keep reading',
+      title: 'Keep Reading',
       posts: related.map((a) => ({ ...toPostCard(a), topic: topicShort(a.categories), readingTime: `${a.readingTime} min read` })),
     },
   };

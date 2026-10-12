@@ -26,15 +26,15 @@ export function UpdatesJoin() {
     <section className={styles.join}>
       <div className={styles.write}>
         <span className={styles.eyebrowGold}>WRITE FOR CLP</span>
-        <h2 className={styles.writeTitle}>Coaches, dietitians, trainers and specialists: share what you know</h2>
+        <h2 className={styles.writeTitle}>Coaches, Dietitians, Trainers and Specialists: Share What You Know</h2>
         <p className={styles.writeText}>Get a verified contributor profile, a byline on every article and a link to your practice or programs on CLP.</p>
         <Link className={styles.writeCta} href="/partnerships/">
-          Apply to contribute
+          Apply to Contribute
         </Link>
       </div>
       <div className={styles.newsletter}>
         <span className={styles.eyebrowDark}>NEWSLETTER</span>
-        <span className={styles.newsTitle}>The weekly CLP rundown</span>
+        <span className={styles.newsTitle}>The Weekly CLP Rundown</span>
         <span className={styles.newsText}>New stories, events and expert tips. One email a week.</span>
         {ALERTS && (
           <a className={styles.newsCta} href={ALERTS.href} target="_blank" rel="noopener">

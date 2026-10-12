@@ -95,8 +95,10 @@
   color: var(--gold-deep);
 }
 
+/* A taller line than the pill's (1) so the clipping box (for the ellipsis) keeps the descenders of "Sport", "Length". */
 .text {
   overflow: hidden;
+  line-height: 1.4;
   text-overflow: ellipsis;
 }
 

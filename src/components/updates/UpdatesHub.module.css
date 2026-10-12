@@ -259,10 +259,10 @@ a:hover .coverImage {
   background: #cfae68;
 }
 
-/* ---- Write for CLP + newsletter ---- */
+/* ---- Write for CLP + newsletter: two equal panels, their text and buttons centred ---- */
 .join {
   display: grid;
-  grid-template-columns: 3fr 2fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   padding: 112px 48px 120px;
 }
@@ -270,11 +270,13 @@ a:hover .coverImage {
 .write {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
   padding: 56px;
   border-radius: 12px;
   background: #0a0a0a;
   color: var(--white);
+  text-align: center;
 }
 
 .eyebrowGold,
@@ -313,7 +315,7 @@ a:hover .coverImage {
 .newsCta {
   display: inline-flex;
   align-items: center;
-  align-self: flex-start;
+  align-self: center;
   height: 52px;
   margin-top: 8px;
   padding: 0 28px;
@@ -341,10 +343,13 @@ a:hover .coverImage {
 .newsletter {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 14px;
   padding: 48px;
   border-radius: 12px;
   background: #f7f6f3;
+  text-align: center;
 }
 
 .newsTitle {

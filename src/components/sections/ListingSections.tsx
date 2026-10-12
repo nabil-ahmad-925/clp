@@ -1,9 +1,12 @@
-import Image from 'next/image';
+'use client';
+
 import Link from 'next/link';
-import type { SpotlightPartner } from '@/content/listings';
+import { useState } from 'react';
+import type { ApplicationKind } from '@/content/applications';
+import ProgramModal from './ProgramModal';
 import styles from './ListingSections.module.css';
 
-/** Where a program applies to be listed, sponsored or partnered: the partnerships page. */
+/** Where an organizer offers open play or volunteering (facilities): the partnerships page. */
 const PARTNERSHIPS = '/partnerships/';
 
 const Check = () => (
@@ -12,75 +15,23 @@ const Check = () => (
   </svg>
 );
 
-/** Initials for a partner without a photo ("Boston Athletic Training" -> "BAT"). */
-const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter((w) => /^[A-Za-z]/.test(w))
-    .slice(0, 3)
-    .map((w) => w[0].toUpperCase())
-    .join('');
-
-/** The black "CLP Partners" band between the results: partners from the partner directory, and a link to all of them. */
-export function PartnerSpotlight({ partners, section }: { partners: SpotlightPartner[]; section: 'experiences' | 'resources' }) {
-  if (partners.length === 0) return null;
-  const resources = section === 'resources';
-  return (
-    <section className={styles.spotlight} data-header-tone="light">
-      <div className={styles.spotlightInner}>
-        <div className={styles.spotlightHead}>
-          <div className={styles.headText}>
-            <span className={styles.eyebrow}>CLP PARTNERS</span>
-            <h2 className={styles.spotlightTitle}>{resources ? 'Experts we back' : 'Train with the people we back'}</h2>
-            <p className={styles.spotlightSub}>
-              {resources
-                ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.'
-                : 'Verified programs that book, pay and check in through CLP.'}
-            </p>
-          </div>
-          <Link className={styles.allPartners} href="/clp-partners/">
-            View all partners
-          </Link>
-        </div>
-        <div className={styles.partners}>
-          {partners.map((p) => (
-            <Link key={p.href} className={styles.partner} href={p.href}>
-              <div className={styles.partnerMedia}>
-                {p.image && <Image className={styles.partnerImage} src={p.image} alt="" fill sizes="(max-width: 767px) 100vw, 320px" />}
-                <span className={styles.partnerLogo} aria-hidden>
-                  {p.image ? <Image src={p.image} alt="" width={64} height={64} /> : initials(p.name)}
-                </span>
-              </div>
-              <div className={styles.partnerBody}>
-                <span className={styles.partnerName}>{p.name}</span>
-                {p.excerpt && <span className={styles.partnerMeta}>{p.excerpt}</span>}
-                <span className={styles.partnerLink}>
-                  View partner<span className="glyph" aria-hidden>→</span>
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 const PLANS = [
   {
     tag: 'FREE',
-    title: 'Community listing',
+    title: 'Community Listing',
     desc: 'Claim the listing we found for your program and keep it accurate.',
     points: ['Edit details and photos', 'Link out to your own registration', 'Show up in search'],
-    cta: 'Claim your listing',
+    cta: 'Claim Your Listing',
+    kind: 'community',
     tone: 'light',
   },
   {
     tag: 'PAID',
-    title: 'Sponsored placement',
+    title: 'Sponsored Placement',
     desc: 'Boost a camp, clinic or league to the top of category pages.',
     points: ['Featured strip and in-grid placement', 'Clearly labeled as sponsored', 'Pick dates, cities and categories'],
-    cta: 'Sponsor a listing',
+    cta: 'Sponsor a Listing',
+    kind: 'sponsored',
     tone: 'dark',
   },
   {
@@ -88,18 +39,23 @@ const PLANS = [
     title: 'CLP Partner',
     desc: 'A full partner page, bookings and payments through CLP.',
     points: ['Verified badge and partner spotlight', 'Booking, check-in and reviews', 'Shop, partnerships and updates'],
-    cta: 'Apply to partner',
+    cta: 'Apply to Partner',
+    kind: 'partner',
     tone: 'gold',
   },
 ] as const;
 
-/** "Run a program?": the three ways to be listed, at the end of a listing page. */
-export function ProgramPlans() {
+/**
+ * "Run a program?": the three ways to be listed, at the end of a listing page. Each card's button opens its form
+ * (ProgramModal), sent with the page's category.
+ */
+export function ProgramPlans({ category, section }: { category?: string; section?: 'experiences' | 'resources' }) {
+  const [open, setOpen] = useState<ApplicationKind | null>(null);
   return (
     <section className={styles.plans} data-header-tone="dark">
       <div className={styles.plansHead}>
         <span className={styles.eyebrowDark}>RUN A PROGRAM?</span>
-        <h2 className={styles.plansTitle}>Get in front of more athletes</h2>
+        <h2 className={styles.plansTitle}>Get in Front of More Athletes</h2>
       </div>
       <div className={styles.planGrid}>
         {PLANS.map((p) => (
@@ -117,36 +73,37 @@ export function ProgramPlans() {
                 </span>
               ))}
             </div>
-            <Link className={styles.planCta} href={PARTNERSHIPS}>
+            <button type="button" className={styles.planCta} aria-haspopup="dialog" onClick={() => setOpen(p.kind)}>
               {p.cta}
-            </Link>
+            </button>
           </div>
         ))}
       </div>
+      {open && <ProgramModal kind={open} category={category} section={section} onClose={() => setOpen(null)} />}
     </section>
   );
 }
 
 const HOST_CARDS = [
   {
-    title: 'Host open play',
+    title: 'Host Open Play',
     desc: 'List free games or paid drop-ins. Players book and sign waivers on CLP, and paid sessions pay out to your Stripe.',
-    cta: 'List a session',
+    cta: 'List a Session',
   },
   {
-    title: 'Find volunteers & mentors',
+    title: 'Find Volunteers & Mentors',
     desc: 'Post shifts, mentoring roles or service trips. Background checks, SafeSport and volunteer hours are built in.',
-    cta: 'Post an opportunity',
+    cta: 'Post an Opportunity',
   },
 ] as const;
 
-/** "Bring more people to the field": the gold panel at the end of a facilities page (Volunteering & Open Play design). */
+/** "BRING MORE PEOPLE TO THE FIELD": the gold panel at the end of a facilities page (Volunteering & Open Play design). */
 export function HostCta() {
   return (
     <section className={styles.plans} data-header-tone="dark">
       <div className={styles.plansHead}>
         <span className={styles.eyebrowDark}>ORGANIZERS, CLUBS &amp; FACILITIES</span>
-        <h2 className={styles.plansTitle}>Bring more people to the field</h2>
+        <h2 className={styles.plansTitle}>BRING MORE PEOPLE TO THE FIELD</h2>
       </div>
       <div className={styles.hostGrid}>
         {HOST_CARDS.map((c) => (

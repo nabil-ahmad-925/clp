@@ -35,7 +35,7 @@ import ClaimModal from './ClaimModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
 import ListingCard, { SponsoredStrip } from './ListingCard';
-import { PartnerSpotlight } from './ListingSections';
+import PartnerSpotlight from './PartnerSpotlight';
 import TeamCard from './TeamCard';
 import styles from './TeamDirectory.module.css';
 
@@ -58,7 +58,7 @@ type Props = {
 const SPOTLIGHT_AFTER = 8;
 
 /**
- * The listing pages' provider filter ("All providers" until one is ticked): the listings' providers, as the cards'
+ * The listing pages' provider filter ("All Providers" until one is ticked): the listings' providers, as the cards'
  * labels name them. Like the other filters, any ticked one matches.
  */
 const PROVIDER_OPTIONS: { value: Provider; label: string; providers: Provider[] }[] = [
@@ -122,9 +122,9 @@ type Chip = { name: string; icon: ReactNode; heading?: string; plural?: string }
 const CHIPS: Record<string, Chip> = {
   'extra-one': { name: 'Sport', icon: <LuVolleyball />, plural: 'sports' },
   alldates: { name: 'Date', icon: <LuCalendar />, plural: 'months' },
-  starttime: { name: 'Available time', icon: <LuClock />, plural: 'times' },
-  age: { name: 'Age', icon: <LuUsers />, heading: 'Age group', plural: 'groups' },
-  'age-group': { name: 'Age', icon: <LuUsers />, heading: 'Age group', plural: 'groups' },
+  starttime: { name: 'Available Time', icon: <LuClock />, plural: 'times' },
+  age: { name: 'Age', icon: <LuUsers />, heading: 'Age Group', plural: 'groups' },
+  'age-group': { name: 'Age', icon: <LuUsers />, heading: 'Age Group', plural: 'groups' },
   'extra-five': { name: 'Price', icon: <LuDollarSign /> },
   'all-cost': { name: 'Price', icon: <LuDollarSign /> },
   language: { name: 'City', icon: <LuMapPin />, plural: 'cities' },
@@ -140,8 +140,17 @@ const CHIPS: Record<string, Chip> = {
   service: { name: 'Service', icon: <LuBriefcase />, plural: 'services' },
 };
 
-const chipFor = (filter: DirectoryFilter): Chip => {
+/**
+ * Resources categories whose level filter (Academies/Clubs, High School, Pro Athletes/Teams…) is the providers' coaching
+ * experience: Dieting & Nutrition, Mental Health & Resilience and Injury Prevention & Recovery.
+ */
+const COACHING_EXPERIENCE_WIDGETS = [40, 39, 16];
+
+const chipFor = (filter: DirectoryFilter, widgetId?: number): Chip => {
   if (filter.key === START_TIME_FILTER.key) return { ...CHIPS.starttime, name: filter.label };
+  if (filter.key === 'experiences' && widgetId != null && COACHING_EXPERIENCE_WIDGETS.includes(widgetId)) {
+    return { ...CHIPS.experiences, name: 'Coaching Experience' };
+  }
   if (filter.key && CHIPS[filter.key]) return CHIPS[filter.key];
   if (filter.key?.startsWith('experience')) return { name: 'Experience Type', icon: <LuSparkles />, plural: 'experience types' };
   const name = filter.label.replace(/^all\s+/i, '').toLowerCase();
@@ -398,7 +407,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   // only).
   const stripPage = listing?.section === 'experiences' || listing?.section === 'facilities';
   // Who runs a listing: a facility's "host", any other listing's "provider" (the filter's wording only).
-  const providerWord = listing?.section === 'facilities' ? { many: 'hosts', Title: 'Host' } : { many: 'providers', Title: 'Provider' };
+  const providerWord =
+    listing?.section === 'facilities' ? { many: 'hosts', all: 'All Hosts', heading: 'Host Type' } : { many: 'providers', all: 'All Providers', heading: 'Provider Type' };
   const [sponsored, setSponsored] = useState<AddedItem[]>([]);
   const loaded = view.mode !== 'loading';
   useEffect(() => {
@@ -755,7 +765,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     })
     .filter(({ options }) => options.length > 0)
     // The chips A to Z by name.
-    .sort((a, b) => chipFor(a.filter).name.localeCompare(chipFor(b.filter).name));
+    .sort((a, b) => chipFor(a.filter, widgetId).name.localeCompare(chipFor(b.filter, widgetId).name));
   // The location field's suggestions: the places of the page's city/destination filters that have results, with their
   // counts (the API's facets, else the built-in cards). Not while an API page loads (no counts yet). The list is the
   // one without a location applied, so a chosen place still offers the others.
@@ -793,7 +803,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     '--dir-row-gap': layout.rowGap != null ? `${layout.rowGap}px` : '0px',
   } as CSSProperties;
 
-  /** "Clear all": no filters (the kept ones and Resources' route sport as they were) and no search. */
+  /** "Clear All": no filters (the kept ones and Resources' route sport as they were) and no search. */
   const clearAll = () => {
     setSearch(NO_SEARCH);
     setProvider([]);
@@ -863,7 +873,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
           <>
             {' '}
             <button type="button" className={styles.listingClear} onClick={clearAll}>
-              Clear filters
+              Clear Filters
             </button>
           </>
         )}
@@ -912,8 +922,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
               {listing && (
                 <>
                   <FilterChip
-                    name={`All ${providerWord.many}`}
-                    heading={`${providerWord.Title} type`}
+                    name={providerWord.all}
+                    heading={providerWord.heading}
                     icon={<LuBadgeCheck />}
                     plural={providerWord.many}
                     options={PROVIDER_OPTIONS.map(({ value, label }) => ({ value, label, count: providerCounts?.[value] }))}
@@ -929,7 +939,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                 </>
               )}
               {bar.map(({ filter, i, options, buckets, of }) => {
-                const { name, icon, heading, plural } = chipFor(filter);
+                const { name, icon, heading, plural } = chipFor(filter, widgetId);
                 const key = filter.key ?? filter.label;
                 const common = {
                   name,
@@ -978,7 +988,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
               {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => runSearch({ ...search, loc: '' })} />}
               {anyChosen && (
                 <button type="button" className={styles.clearAll} onClick={clearAll}>
-                  Clear all
+                  Clear All
                 </button>
               )}
             </div>
@@ -992,7 +1002,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                       ? [
                           {
                             id: 'provider',
-                            heading: `${providerWord.Title} type`,
+                            heading: providerWord.heading,
                             options: PROVIDER_OPTIONS.map(({ value, label }) => ({ value, label, count: providerCounts?.[value] })),
                             value: provider,
                           },
@@ -1000,7 +1010,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
                       : []),
                     ...bar.map(({ filter, i, options }) => ({
                       id: String(i),
-                      heading: chipFor(filter).heading ?? chipFor(filter).name,
+                      heading: chipFor(filter, widgetId).heading ?? chipFor(filter, widgetId).name,
                       options,
                       // Resources' Sport: the route's sport is no choice made (see sportPicked).
                       value: routeSport(filter) ? (sportPicked ? chosen[i] : []) : chosen[i],
@@ -1053,17 +1063,11 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       )}
       {listing && (
         <div className={styles.resultsRow}>
-          <span className={styles.results} role="status">
-            {loading ? (
-              'Loading results…'
-            ) : (
-              <>
-                <strong>
-                  {totalFound} {totalFound === 1 ? 'result' : 'results'}
-                </strong>{' '}
-                {search.loc ? `near ${search.loc}` : listing.category ? `in ${listing.category}` : ''}
-              </>
-            )}
+          {/* The count is for screen readers only ("9 results in Dieting & Nutrition"); the row shows the key, centred. */}
+          <span className={styles.srOnly} role="status">
+            {loading
+              ? 'Loading results…'
+              : `${totalFound} ${totalFound === 1 ? 'result' : 'results'} ${search.loc ? `near ${search.loc}` : listing.category ? `in ${listing.category}` : ''}`.trim()}
           </span>
           {/* What the cards' labels mean (the new design's key). */}
           <span className={styles.legend}>

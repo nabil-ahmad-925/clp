@@ -48,18 +48,18 @@ const categoryHref = (sportHref: string, slug: string) => `${sportHref}?category
 
 /** The gates' headings (a gate view's hero, title and line). */
 const GATE_COPY: Record<Exclude<AlbumAccess, 'public'>, { title: string; album: string; hero: string }> = {
-  family: { title: 'My family’s photos', album: 'Your family’s photos', hero: 'Youth albums are private to the families of their players.' },
-  client: { title: 'Client gallery', album: 'Your client gallery', hero: 'Full-resolution files for the brands and teams we shoot for.' },
-  code: { title: 'Private event album', album: 'Your private album', hero: 'Enter the access code from your photo card, ticket or invite.' },
+  family: { title: 'My Family’s Photos', album: 'Your Family’s Photos', hero: 'Youth albums are private to the families of their players.' },
+  client: { title: 'Client Gallery', album: 'Your Client Gallery', hero: 'Full-resolution files for the brands and teams we shoot for.' },
+  code: { title: 'Private Event Album', album: 'Your Private Album', hero: 'Enter the access code from your photo card, ticket or invite.' },
 };
 
 /** The photo filter of an album: every photo, the free or paid downloads, or those that can be printed. */
 type PhotoFilter = 'all' | 'free' | 'paid' | 'prints';
 const FILTERS: { id: PhotoFilter; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'free', label: 'Free download' },
-  { id: 'paid', label: 'Paid download' },
-  { id: 'prints', label: 'Prints & products' },
+  { id: 'free', label: 'Free Download' },
+  { id: 'paid', label: 'Paid Download' },
+  { id: 'prints', label: 'Prints & Products' },
 ];
 /** A photo's download is paid when it has an HD price, free otherwise (unless its album offers none). */
 const isPaid = (image: GalleryImage) => image.download != null;
@@ -194,7 +194,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
             onChange={(e) => setQuery(e.target.value)}
           />
           <button type="submit" className={styles.findButton}>
-            Find my photos
+            Find My Photos
           </button>
         </form>
         <div className={styles.findLinks}>
@@ -204,12 +204,12 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
               <circle cx="17" cy="9" r="2.5" />
               <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.3-4.5 3-4.5s4 2 4 4.5" />
             </svg>
-            My family&rsquo;s photos
+            My Family&rsquo;s Photos
           </Link>
           <span className={styles.findDivider} aria-hidden />
           <Link href={`${sport.href}?access=client`} className={styles.findLink}>
             <Lock />
-            Client login
+            Client Login
           </Link>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
             <div className={styles.empty}>
               The album couldn&rsquo;t be loaded.{' '}
               <button type="button" className={styles.clear} onClick={() => setAttempt((n) => n + 1)}>
-                Try again
+                Try Again
               </button>
             </div>
           ) : liveNow.result?.status === 'missing' ? (
@@ -350,7 +350,7 @@ function Home({ sport, albums, live }: { sport: PhotoSection['sport']; albums: P
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <span className={styles.kicker}>FRESH FROM THE FIELD</span>
-          <h2 className={styles.sectionTitle}>Recent events</h2>
+          <h2 className={styles.sectionTitle}>Recent Events</h2>
         </div>
         <div className={styles.grid}>
           {recentLive.map((a, i) => (
@@ -364,7 +364,7 @@ function Home({ sport, albums, live }: { sport: PhotoSection['sport']; albums: P
       <section className={`${styles.section} ${styles.sectionLast}`}>
         <div className={styles.sectionHead}>
           <span className={styles.kicker}>BROWSE</span>
-          <h2 className={styles.sectionTitle}>By category</h2>
+          <h2 className={styles.sectionTitle}>By Category</h2>
         </div>
         <div className={styles.grid}>
           {albums.map((a) => (
@@ -490,7 +490,7 @@ function Category({ sport, albums, live }: { sport: PhotoSection['sport']; album
         <div className={styles.empty}>
           No albums match these filters.{' '}
           <button type="button" className={styles.clear} onClick={clear}>
-            Clear filters
+            Clear Filters
           </button>
         </div>
       ) : (
@@ -598,7 +598,7 @@ function Album({
         <div className={styles.empty}>
           No photos match this filter.{' '}
           <button type="button" className={styles.clear} onClick={() => setFilter('all')}>
-            Show all
+            Show All
           </button>
         </div>
       ) : (

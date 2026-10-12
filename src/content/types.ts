@@ -11,6 +11,9 @@ export type SocialNetwork = 'instagram' | 'linkedin' | 'facebook' | 'x' | 'tikto
 
 export type SocialLink = { network: SocialNetwork; label: string; href: string };
 
+/** One of an article author's social links (the API's social networks, as a listing's). */
+export type AuthorSocial = { network: SocialNetwork; href: string };
+
 export type Link = { label: string; href: string; external?: boolean };
 
 /** Controls the header colour while it sits over a section (Salient "midnight" behaviour). */
@@ -358,8 +361,11 @@ export type BlogPost = {
     title: string;
     image?: string;
     categories: Link[];
-    /** `href`: the author's archive (none for a partner). */
-    author: { name: string; href?: string };
+    /**
+     * `href`: the author's archive (none for a partner). `bio` and `socials`: a partner's, from their account (the
+     * company's own authors' are in the taxonomy, see companyAuthorProfile).
+     */
+    author: { name: string; href?: string; bio?: string; socials?: AuthorSocial[] };
     date: string;
     /** The cities it is about, as shown ("Boston, Miami"; live articles). */
     location?: string;

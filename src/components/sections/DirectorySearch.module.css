@@ -71,6 +71,46 @@
   cursor: text;
 }
 
+/* The location's text runs up to its dropdown arrow. */
+.locSeg .segLabel {
+  padding-right: 8px;
+}
+
+/* The location's dropdown arrow (its destinations), before the divider; it turns up while they're open. */
+.locToggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(17, 17, 17, 0.45);
+  font-size: 18px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.locToggle svg {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.locToggle:hover {
+  background: rgba(17, 17, 17, 0.06);
+  color: #111;
+}
+
+.locToggleOpen svg {
+  transform: rotate(180deg);
+}
+
 /* Divider between the two fields (the location comes first). */
 .locSeg::before {
   position: absolute;
@@ -257,6 +297,14 @@
 
   .locSeg {
     padding: 0;
+  }
+
+  .locSeg .segLabel {
+    padding-right: 6px;
+  }
+
+  .locToggle {
+    margin-right: 8px;
   }
 
   .suggestions {
