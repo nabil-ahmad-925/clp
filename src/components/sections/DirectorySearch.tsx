@@ -33,7 +33,7 @@ export const fold = (s: string) =>
     .trim();
 
 /**
- * tenpo.com's search bar: "Sport or event" (searched in the cards' title, subtitle and description) and "Destination"
+ * tenpo.com's search bar: "Sport or event" (searched in the cards' title, subtitle and description) and "Location"
  * (a city or destination of the cards, suggested as you type or from its dropdown arrow), applied by the search button,
  * Enter or a suggestion.
  * Both are searched by the listings API.
@@ -91,7 +91,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
           <label className={styles.segLabel} htmlFor={locId}>
             <LuMapPin className={styles.segIcon} aria-hidden />
             <span className={styles.field}>
-              <span className={styles.srOnly}>Destination</span>
+              <span className={styles.srOnly}>Location</span>
               <input
                 ref={locInput}
                 id={locId}
@@ -103,7 +103,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
                 aria-controls={listId}
                 aria-activedescendant={shown && active >= 0 ? `${listId}-${active}` : undefined}
                 autoComplete="off"
-                placeholder="Destination"
+                placeholder="City or Destination"
                 value={loc}
                 onFocus={() => setOpen(true)}
                 onClick={() => setOpen(true)}
@@ -128,11 +128,11 @@ export default function DirectorySearch({ query, location, places = [], onSearch
               />
             </span>
           </label>
-          {/* The dropdown arrow: opens (or closes) the destinations with results. */}
+          {/* The dropdown arrow: opens (or closes) the places with results. */}
           <button
             type="button"
             className={`${styles.locToggle} ${shown ? styles.locToggleOpen : ''}`}
-            aria-label={shown ? 'Hide destinations' : 'Show destinations'}
+            aria-label={shown ? 'Hide locations' : 'Show locations'}
             aria-controls={listId}
             aria-expanded={shown}
             tabIndex={-1}
@@ -145,7 +145,7 @@ export default function DirectorySearch({ query, location, places = [], onSearch
             <LuChevronDown aria-hidden />
           </button>
           {shown && (
-            <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Destinations">
+            <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
               {suggestions.map((p, i) => (
                 <li
                   key={p.value}
