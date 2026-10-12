@@ -2,7 +2,8 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  /* Above the site header (9999), as the claim popup. */
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,6 +342,46 @@
   color: var(--white);
 }
 
+/* A day with a capacity: its spots left, or Full (not selectable). The day grows to fit the line. */
+.dayLeft {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e5b33;
+}
+
+.dayOn .dayLeft {
+  color: #9ad3a8;
+}
+
+.day:has(.dayLeft) {
+  height: auto;
+  min-height: 56px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.dayFull,
+.dayFull:hover {
+  border-style: dashed;
+  border-color: #ddd;
+  background: #f7f6f3;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.dayFull .dayLeft {
+  color: #b03a2e;
+}
+
+/* What to bring: a short bullet list. */
+.bring {
+  margin: 0;
+  padding-left: 18px;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
 .counters {
   display: flex;
   flex-direction: column;
@@ -555,18 +596,121 @@ textarea.input {
   color: #555;
 }
 
-.summary {
+/* "You're booked" (the design's last step): where to go, the free-cancellation note, the calendar and the guest's page. */
+.done {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
+}
+
+.location {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
   padding: 16px;
   border: 1px solid #ddddda;
   border-radius: 10px;
+}
+
+.location svg {
+  flex: 0 0 20px;
+  margin-top: 2px;
+}
+
+.locationText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-size: 14px;
+  line-height: 1.5;
+}
+
+.locationKicker {
+  color: #888;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.locationMuted {
+  color: #666;
+}
+
+.directions {
+  align-self: flex-start;
+  color: #111;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.cancelNote {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border: 1px solid #e8d6a8;
+  border-radius: 10px;
+  background: #fbf6ea;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.cancelNote strong {
+  color: #111;
+}
+
+.doneActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.outline,
+.dark {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 20px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.outline {
+  background: var(--white);
+  color: #111;
+}
+
+.dark {
+  background: #111;
+  color: var(--white);
+}
+
+.dark:hover {
+  background: #2a2a2a;
+}
+
+.backLink {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #666;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .close:focus-visible,
 .primary:focus-visible,
+.outline:focus-visible,
+.dark:focus-visible,
+.backLink:focus-visible,
+.directions:focus-visible,
 .back:focus-visible,
 .day:focus-visible,
 .counter button:focus-visible {
@@ -626,6 +770,11 @@ textarea.input {
 }
 
 @media (max-width: 480px) {
+  .cancelNote {
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .photo {
     flex-basis: 160px;
   }

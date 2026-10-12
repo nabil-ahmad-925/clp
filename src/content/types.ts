@@ -54,6 +54,9 @@ export type DirectoryItem = FacilityCard & {
   endTime?: string;
   /** Who provides it (listings from the admin): its label on the listing pages' cards. Built-in cards have none. */
   provider?: Provider;
+  /** Booking (listings from the admin): spots per day (none: no limit) and what to bring. */
+  capacity?: number;
+  whatToBring?: string[];
 };
 
 /** Who provides a listing (the listings API's `provider`): CLP Partner, Compete Like Pros, Community or Sponsored. */

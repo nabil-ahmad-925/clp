@@ -1,0 +1,177 @@
+/* The guest's booking page: a white card on the listing pages' warm off-white, under the black heading. */
+
+.page {
+  position: relative;
+  padding: 0 16px 120px;
+  background: #f7f6f3;
+}
+
+.card {
+  position: relative;
+  z-index: 3;
+  max-width: 640px;
+  margin: -48px auto 0;
+  padding: 32px;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.muted {
+  margin: 0;
+  color: #666;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.requested {
+  background: #fbf1dd;
+  color: #8a6f33;
+}
+
+.confirmed {
+  background: #e6f2e9;
+  color: #1e5b33;
+}
+
+.cancelled {
+  background: #f0eee9;
+  color: #555;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 18px;
+  width: 100%;
+  margin: 8px 0 4px;
+  padding: 16px 0;
+  border-top: 1px solid #eeeeeb;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.facts dt {
+  color: #777;
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.where {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkIn {
+  color: #666;
+  font-weight: 400;
+}
+
+.directions {
+  align-self: flex-start;
+  color: #111;
+  text-decoration: underline;
+}
+
+.directions:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.secondary,
+.danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 20px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.danger {
+  border-color: #b03a2e;
+  background: #b03a2e;
+  color: var(--white);
+}
+
+.secondary:disabled,
+.danger:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.secondary:focus-visible,
+.danger:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  background: #fbe9e7;
+}
+
+.confirmText {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.error {
+  margin: 0;
+  color: #9a3324;
+  font-weight: 600;
+}
+
+@media (max-width: 639px) {
+  .card {
+    padding: 24px 20px;
+  }
+}

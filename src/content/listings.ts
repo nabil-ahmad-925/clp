@@ -137,6 +137,9 @@ type Listing = {
   endDate?: string;
   startTime?: string;
   endTime?: string;
+  /** Spots per day (none: no limit) and what to bring (CLP Partner and Compete Like Pros listings). */
+  capacity?: number;
+  whatToBring?: string[];
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
@@ -228,6 +231,8 @@ const toItem = (l: Listing): AddedItem => ({
   endDate: l.endDate,
   startTime: l.startTime,
   endTime: l.endTime,
+  capacity: l.capacity,
+  whatToBring: l.whatToBring,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,
@@ -401,10 +406,45 @@ export type BookingRequest = {
   /** Left empty by people (a field they don't see). */
   website?: string;
 };
-export type BookingConfirmation = { id: string; date: string; people: number; pricePer?: number; total?: number; status: string };
+/** A booking as its guest sees it (the "Book Now" answer, and their booking page). */
+export type BookingConfirmation = {
+  id: string;
+  listingTitle: string;
+  listingSubtitle?: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  adults: number;
+  kids: number;
+  people: number;
+  pricePer?: number;
+  total?: number;
+  name: string;
+  email: string;
+  status: 'requested' | 'confirmed' | 'cancelled';
+  cancelledBy?: 'guest' | 'host';
+  /** The last day it can be cancelled for free ("YYYY-MM-DD"), and whether the guest can cancel it now. */
+  cancelBy: string;
+  canCancel: boolean;
+  /** Where to go (confirmed bookings): the exact address and check-in instructions, private to booked guests. */
+  address?: string;
+  checkInInstructions?: string;
+};
 
-/** Sends a booking request; rejects with the API's message (e.g. "Pick one of the listed dates."). */
-export async function requestBooking(request: BookingRequest): Promise<BookingConfirmation> {
+/** A new booking (booked at once) and the token of the guest's own page (/booking/?id=…&token=…). */
+export type NewBooking = { booking: BookingConfirmation; token: string };
+
+/** The free-cancellation deadline's time on its last day (as the bookings API counts days, in US Eastern time). */
+export const CANCEL_TIME = '11:59 PM ET';
+
+/** The guest's own booking page (see or cancel it). */
+export const bookingPageHref = (id: string, token: string) => `/booking/?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`;
+
+/** Google Maps directions to an address. */
+export const directionsHref = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
+/** Books a day; rejects with the API's message (e.g. "Pick one of the listed dates."). */
+export async function requestBooking(request: BookingRequest): Promise<NewBooking> {
   if (!API_URL) throw new Error('Booking isn’t available right now.');
   const res = await fetch(`${API_URL}/bookings`, {
     method: 'POST',
@@ -415,7 +455,7 @@ export async function requestBooking(request: BookingRequest): Promise<BookingCo
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error || (res.status === 429 ? 'Too many requests. Please try again in a minute.' : 'Could not send your request. Please try again.'));
-  return body.booking as BookingConfirmation;
+  return { booking: body.booking as BookingConfirmation, token: body.token as string };
 }
 
 // --- Listing claims ("Claim this listing" on Community listings; the claims API, clp-api src/claims.mjs) -------------
@@ -456,4 +496,42 @@ export async function requestClaim(request: ClaimRequest): Promise<ClaimConfirma
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error || (res.status === 429 ? 'Too many claims. Please try again in an hour.' : 'Could not send your claim. Please try again.'));
   return body.claim as ClaimConfirmation;
+}
+
+/** Spots left each day (null capacity: no limit). Never throws: without an answer, no limit is shown. */
+export async function fetchAvailability(widgetId: number, listingId: string, dates: string[]): Promise<{ capacity: number | null; left: Record<string, number> }> {
+  if (!API_URL || dates.length === 0) return { capacity: null, left: {} };
+  try {
+    const qs = new URLSearchParams({ widget: String(widgetId), listing: listingId, dates: dates.slice(0, 62).join(',') });
+    const res = await fetch(`${API_URL}/bookings/availability?${qs}`, { cache: 'no-store', signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) return { capacity: null, left: {} };
+    return await res.json();
+  } catch {
+    return { capacity: null, left: {} };
+  }
+}
+
+/** The guest's booking, by the link in their e-mails; null when the link isn't valid. */
+export async function fetchGuestBooking(id: string, token: string): Promise<BookingConfirmation | null> {
+  if (!API_URL) throw new Error('Bookings aren’t available right now.');
+  const res = await fetch(`${API_URL}/bookings/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`, { cache: 'no-store', signal: AbortSignal.timeout(10_000) });
+  if (res.status === 404) return null;
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'Could not load your booking. Please try again.');
+  return body.booking as BookingConfirmation;
+}
+
+/** The guest cancels their booking (free up to 2 days before); rejects with the API's message (e.g. too late). */
+export async function cancelGuestBooking(id: string, token: string): Promise<BookingConfirmation> {
+  if (!API_URL) throw new Error('Bookings aren’t available right now.');
+  const res = await fetch(`${API_URL}/bookings/${encodeURIComponent(id)}/cancel`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ token }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15_000),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'Could not cancel your booking. Please try again.');
+  return body.booking as BookingConfirmation;
 }

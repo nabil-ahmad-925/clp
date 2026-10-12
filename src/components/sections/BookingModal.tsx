@@ -4,7 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { agePolicy, requestBooking, type BookingConfirmation } from '@/content/listings';
+import { downloadCalendarFile } from '@/content/calendar';
+import { agePolicy, bookingPageHref, CANCEL_TIME, directionsHref, fetchAvailability, requestBooking, type NewBooking } from '@/content/listings';
 import { footerLinks } from '@/content/site';
 import type { DirectoryItem } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
@@ -24,6 +25,8 @@ const WAIVER = footerLinks.flat().find((l) => /waiver/i.test(l.label))?.href ?? 
 const EXPECTATIONS = '/our-expectations/';
 /** Days offered for a listing running over many days; people per booking. */
 const MAX_DAYS = 21;
+/** Free cancellation by the guest: up to this many days before (as the bookings API's CANCEL_DAYS). */
+const CANCEL_DAYS = 2;
 const MAX_PEOPLE = 20;
 
 /** Today in US Eastern time ("YYYY-MM-DD"), as the bookings API checks dates. */
@@ -35,6 +38,8 @@ const dayParts = (day: string) => {
     dow: d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }),
     label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
     long: d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }),
+    /** "Sat, Oct 24" */
+    short: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }),
   };
 };
 const clock = (t: string) => {
@@ -51,8 +56,9 @@ type Step = 'details' | 'book' | 'done';
 /**
  * "Book Now" (CLP Partner and Compete Like Pros listings; the new design's booking popup): the listing's details,
  * then the day, who's coming (the listing's age rule decides adults and kids), the contact details and the waiver, and
- * a confirmation. Payment isn't taken online: the request goes to the bookings API and CLP or the partner confirms it
- * by email. Esc or the close button closes it.
+ * "You're booked": the guest is booked at once (the bookings API holds their spots) and sees where to go, the exact
+ * address and check-in instructions being private to booked guests. Payment isn't taken online. Esc or the close
+ * button closes it.
  */
 export default function BookingModal({ item, widgetId, facts, onClose }: Props) {
   const [step, setStep] = useState<Step>('details');
@@ -73,7 +79,30 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
   const [contact, setContact] = useState({ name: '', email: '', phone: '', notes: '', website: '' });
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [done, setDone] = useState<BookingConfirmation | null>(null);
+  const [done, setDone] = useState<NewBooking | null>(null);
+  // Spots left each day (a listing with a capacity); fetched on the booking step, again after a "full" answer.
+  const [avail, setAvail] = useState<{ capacity: number | null; left: Record<string, number> }>({ capacity: item.capacity ?? null, left: {} });
+  const [availTick, setAvailTick] = useState(0);
+  const availDates = days ?? (date ? [date] : []);
+  const availKey = availDates.join(',');
+  useEffect(() => {
+    if (step !== 'book' || !item.capacity || !availKey) return;
+    let active = true;
+    fetchAvailability(widgetId, item.id, availKey.split(',')).then((a) => active && setAvail(a));
+    return () => {
+      active = false;
+    };
+  }, [step, availKey, availTick, widgetId, item.id, item.capacity]);
+  /** Spots left on a day (null: no limit, or not known yet). */
+  const leftOn = (d: string) => (avail.capacity && d in avail.left ? avail.left[d] : null);
+  // A chosen day that turned out full moves to the first one with room.
+  useEffect(() => {
+    if (!days || leftOn(date) !== 0) return;
+    const open = days.find((d) => leftOn(d) !== 0);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- following the spots that just loaded
+    if (open && open !== date) setDate(open);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- when the spots change
+  }, [avail]);
   const dialog = useRef<HTMLDivElement>(null);
 
   // Scroll locked behind it, Esc closes it, focus starts in it (once: the parent's re-renders don't move the focus).
@@ -98,6 +127,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
 
   const per = item.priceMin ?? null;
   const count = adults + kids;
+  const spotsLeft = date ? leftOn(date) : null;
   const total = per == null ? null : per * count;
   const time = item.startTime ? `${clock(item.startTime)}${item.endTime ? ` – ${clock(item.endTime)}` : ''}` : '';
   // Who runs it: the listing's provider line, else CLP itself.
@@ -106,8 +136,12 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
   const missing =
     !date
       ? 'Pick a date.'
+      : spotsLeft === 0
+        ? 'This day is full. Pick another day.'
       : count < 1
         ? 'Add at least one person.'
+        : spotsLeft !== null && count > spotsLeft
+          ? `Only ${spotsLeft} spot${spotsLeft === 1 ? ' is' : 's are'} left on this day.`
         : policy.kind === 'adult' && !ageOk
           ? `Confirm everyone is ${policy.minAge} or older.`
           : kids > 0 && !guardian
@@ -126,7 +160,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
     setSending(true);
     setError('');
     try {
-      const booking = await requestBooking({
+      const booked = await requestBooking({
         widgetId,
         listingId: item.id,
         date,
@@ -141,10 +175,12 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
         ageConfirmed: policy.kind === 'adult' ? ageOk : undefined,
         website: contact.website,
       });
-      setDone(booking);
+      setDone(booked);
       setStep('done');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not send your request. Please try again.');
+      setError(err instanceof Error ? err.message : 'Could not book your spot. Please try again.');
+      // Someone may have just taken the last spots: show the days as they are now.
+      setAvailTick((n) => n + 1);
     } finally {
       setSending(false);
     }
@@ -161,7 +197,12 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
           −
         </button>
         <span aria-live="polite">{value}</span>
-        <button type="button" aria-label={`Add one: ${label}`} disabled={disabled || count >= MAX_PEOPLE} onClick={() => set(value + 1)}>
+        <button
+          type="button"
+          aria-label={`Add one: ${label}`}
+          disabled={disabled || count >= MAX_PEOPLE || (spotsLeft !== null && count >= spotsLeft)}
+          onClick={() => set(value + 1)}
+        >
           +
         </button>
       </span>
@@ -228,14 +269,24 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                   {facts.city && (
                     <div className={styles.note}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                        <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
-                        <circle cx="12" cy="9.5" r="2.5" />
+                        <rect x="5" y="11" width="14" height="10" rx="2" />
+                        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
                       </svg>
                       <span>
                         <strong>{facts.city}</strong>
                         <br />
-                        The exact address is shared with you when {host} confirms your booking.
+                        The exact address is shared with confirmed attendees after booking, to keep sessions safe for everyone.
                       </span>
+                    </div>
+                  )}
+                  {item.whatToBring && item.whatToBring.length > 0 && (
+                    <div className={styles.section}>
+                      <span className={styles.kicker}>WHAT TO BRING</span>
+                      <ul className={styles.bring}>
+                        {item.whatToBring.map((w) => (
+                          <li key={w}>{w}</li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                   <div className={styles.hosted}>
@@ -251,6 +302,7 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                   <button type="button" className={styles.primary} onClick={() => setStep('book')}>
                     Book Now{per != null && per > 0 ? ` · ${dollars(per)} per person` : ''}
                   </button>
+                  <span className={styles.hint}>Free cancellation up to {CANCEL_DAYS} days before.</span>
                 </div>
               )}
             </div>
@@ -270,10 +322,21 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                       <div className={styles.days} role="radiogroup" aria-label="Date">
                         {days.map((d) => {
                           const p = dayParts(d);
+                          const n = leftOn(d);
                           return (
-                            <button key={d} type="button" role="radio" aria-checked={date === d} className={`${styles.day} ${date === d ? styles.dayOn : ''}`} onClick={() => setDate(d)}>
+                            <button
+                              key={d}
+                              type="button"
+                              role="radio"
+                              aria-checked={date === d}
+                              aria-label={`${p.long}${n === 0 ? ', full' : n !== null ? `, ${n} spot${n === 1 ? '' : 's'} left` : ''}`}
+                              disabled={n === 0}
+                              className={`${styles.day} ${date === d ? styles.dayOn : ''} ${n === 0 ? styles.dayFull : ''}`}
+                              onClick={() => setDate(d)}
+                            >
                               <span className={styles.dow}>{p.dow}</span>
                               <span>{p.label}</span>
+                              {n !== null && <span className={styles.dayLeft}>{n === 0 ? 'Full' : `${n} left`}</span>}
                             </button>
                           );
                         })}
@@ -282,6 +345,12 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                       <input className={styles.input} type="date" aria-label="Date" min={now} max={addDays(now, 365)} value={date} onChange={(e) => setDate(e.target.value)} />
                     )}
                     {time && <span className={styles.hint}>{time}</span>}
+                    {spotsLeft !== null && spotsLeft > 0 && (
+                      <span className={styles.hint}>
+                        {spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left on this day
+                      </span>
+                    )}
+                    {!days && spotsLeft === 0 && <span className={styles.error}>This day is full. Pick another day.</span>}
                   </div>
 
                   <div className={styles.section}>
@@ -385,9 +454,9 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                   </p>
                 )}
                 <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
-                  {sending ? 'Sending…' : 'Send booking request'}
+                  {sending ? 'Booking…' : 'Confirm booking'}
                 </button>
-                <span className={styles.hint}>{missing || `No payment now: ${host} confirms your spot by email.`}</span>
+                <span className={styles.hint}>{missing || `No payment online: you pay ${host} directly.`}</span>
               </div>
             </form>
           )}
@@ -395,31 +464,86 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
           {step === 'done' && done && (
             <div className={styles.step}>
               <div className={styles.body} data-scroll>
-                <div className={styles.stack}>
+                <div className={styles.done}>
                   <span className={styles.doneKicker}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M20 6 9 17l-5-5" />
                     </svg>
-                    REQUEST SENT
+                    YOU&rsquo;RE BOOKED
                   </span>
-                  <span className={styles.doneTitle}>See you on {dayParts(done.date).long}</span>
+                  <span className={styles.doneTitle}>See you on {dayParts(done.booking.date).short}</span>
                   <span className={styles.doneText}>
-                    {people(adults, kids)}
-                    {time ? ` · ${time}` : ''}. We&rsquo;ve sent your request to {host}; you&rsquo;ll get a confirmation at{' '}
-                    <strong>{contact.email.trim()}</strong>.
+                    {people(done.booking.adults, done.booking.kids)}
+                    {time ? ` · ${time}` : ''}. A confirmation is on its way to your email.
                   </span>
-                  <div className={styles.summary}>
-                    <span className={styles.kicker}>YOUR BOOKING</span>
-                    <strong>{item.title}</strong>
-                    {facts.city && <span>{facts.city}</span>}
-                    {done.total != null && <span>Total {done.total === 0 ? 'Free' : dollars(done.total)}, paid when confirmed</span>}
+                  <div className={styles.location}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                      <circle cx="12" cy="9.5" r="2.5" />
+                    </svg>
+                    <span className={styles.locationText}>
+                      <span className={styles.locationKicker}>YOUR LOCATION</span>
+                      {facts.city && <strong>{facts.city}</strong>}
+                      {done.booking.address ? <span>{done.booking.address}</span> : <span className={styles.locationMuted}>{host} will e-mail you the exact address.</span>}
+                      {done.booking.checkInInstructions && <span className={styles.locationMuted}>{done.booking.checkInInstructions}</span>}
+                      {done.booking.address && (
+                        <a className={styles.directions} href={directionsHref(done.booking.address)} target="_blank" rel="noopener">
+                          Get directions <span className="glyph" aria-hidden>↗</span>
+                        </a>
+                      )}
+                    </span>
                   </div>
+                  <span className={styles.cancelNote}>
+                    {done.booking.canCancel ? (
+                      <>
+                        <strong>
+                          Free cancellation until {dayParts(done.booking.cancelBy).short} at {CANCEL_TIME}.
+                        </strong>{' '}
+                        <span>Cancel anytime before then from your booking page or the confirmation email.</span>
+                      </>
+                    ) : (
+                      <>
+                        <strong>This booking can&rsquo;t be cancelled for free.</strong>{' '}
+                        <span>It&rsquo;s less than {CANCEL_DAYS} days away. To change it, reply to your confirmation email.</span>
+                      </>
+                    )}
+                  </span>
+                  <div className={styles.doneActions}>
+                    <button
+                      type="button"
+                      className={styles.outline}
+                      onClick={() =>
+                        downloadCalendarFile(
+                          {
+                            uid: done.booking.id,
+                            title: item.title,
+                            date: done.booking.date,
+                            startTime: done.booking.startTime,
+                            endTime: done.booking.endTime,
+                            location: done.booking.address || facts.city,
+                            description: [
+                              `${people(done.booking.adults, done.booking.kids)} · hosted by ${host}`,
+                              done.booking.checkInInstructions ? `Check-in: ${done.booking.checkInInstructions}` : '',
+                              `Your booking: ${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
+                            ]
+                              .filter(Boolean)
+                              .join('\n'),
+                            url: `${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
+                          },
+                          item.title,
+                        )
+                      }
+                    >
+                      Add to calendar
+                    </button>
+                    <Link href={bookingPageHref(done.booking.id, done.token)} className={styles.dark}>
+                      Manage booking
+                    </Link>
+                  </div>
+                  <button type="button" className={styles.backLink} onClick={onClose}>
+                    Back to listings
+                  </button>
                 </div>
-              </div>
-              <div className={styles.footer}>
-                <button type="button" className={styles.primary} onClick={onClose}>
-                  Back to listings
-                </button>
               </div>
             </div>
           )}
