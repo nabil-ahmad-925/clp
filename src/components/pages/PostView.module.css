@@ -89,11 +89,6 @@
   font-size: 20px;
 }
 
-.sm {
-  width: 28px;
-  height: 28px;
-  font-size: 11px;
-}
 
 /* ---- Cover and article ---- */
 .body {
@@ -130,8 +125,7 @@
   letter-spacing: 1.5px;
 }
 
-.moreFrom:focus-visible,
-.card:focus-visible {
+.moreFrom:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
@@ -371,6 +365,7 @@
   padding: 96px 48px 120px;
 }
 
+/* "KEEP READING", centred over the cards. */
 .keepTitle {
   margin: 0;
   color: #111;
@@ -378,87 +373,29 @@
   font-size: 36px;
   font-weight: 400;
   line-height: 1.2;
-  letter-spacing: 0;
-  text-transform: none;
+  letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
 }
 
+/* Four cards a row; fewer are centred (a card keeps a quarter of the row's width). */
 .keepGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  --keep-columns: 4;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 24px;
 }
 
-/* A card: its text centred under the photo. */
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  color: #111;
-  text-align: center;
-  text-decoration: none;
-}
-
-.cardCover {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 10px;
-  background: #ddddda;
-}
-
-.cardCover img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.card:hover .cardCover img {
-  transform: scale(1.04);
-}
-
-.cardTopic {
-  color: #8a6f33;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
-
-.cardTitle {
-  font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.cardMeta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: #666;
-  font-size: 13px;
-}
-
-.cardMetaText {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-  text-align: left;
-}
-
-.cardAuthor {
-  color: #111;
-  font-weight: 600;
+.keepGrid > * {
+  flex: 0 0 calc((100% - (var(--keep-columns) - 1) * 24px) / var(--keep-columns));
+  min-width: 0;
 }
 
 /* ---- Smaller screens ---- */
 @media (max-width: 1100px) {
   .keepGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    --keep-columns: 2;
   }
 }
 
@@ -514,17 +451,7 @@
 
 @media (max-width: 480px) {
   .keepGrid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cardCover img {
-    transition: none;
-  }
-
-  .card:hover .cardCover img {
-    transform: none;
+    --keep-columns: 1;
   }
 }
 

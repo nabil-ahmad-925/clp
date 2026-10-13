@@ -37,8 +37,9 @@
   text-wrap: balance;
 }
 
+/* Wide enough for a category's line to fit on one row on desktop ("…from CLP partners and local programs."). */
 .blurb {
-  max-width: 640px;
+  max-width: 760px;
   margin: 0;
   padding: 0;
   color: #bbb;

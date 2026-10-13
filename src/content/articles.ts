@@ -279,6 +279,31 @@ export function toFilterPost(a: ArticleSummary): FilterPost {
   };
 }
 
+/**
+ * An article card (ArticleCard, as the article lists show it) for a story shown elsewhere (the Updates & News sections,
+ * "Keep Reading"): its date ("June 26, 2026") on the photo, then "6 min read | By Compete Like Pros".
+ */
+export function storyCard(s: { title: string; href: string; image: string; date?: string; readingTime?: string; author?: string }): FilterPost {
+  const day = s.date ? new Date(`${s.date} UTC`) : null;
+  const dated = day != null && !Number.isNaN(day.getTime());
+  return {
+    id: s.href,
+    categories: [],
+    day: dated ? String(day.getUTCDate()).padStart(2, '0') : '',
+    month: dated ? day.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }) : '',
+    image: s.image,
+    imageAlt: s.title,
+    imageWidth: 300,
+    imageHeight: 169,
+    title: s.title,
+    href: s.href,
+    excerpt: '',
+    comments: '',
+    readingTime: s.readingTime,
+    author: s.author,
+  };
+}
+
 /** The post page's data from a live article (a partner's bio and social links from their account). */
 export function toBlogPost({ item, previous, next, related, authorProfile }: ArticlePageData): BlogPost {
   return {

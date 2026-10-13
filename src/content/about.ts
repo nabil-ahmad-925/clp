@@ -44,13 +44,14 @@ export const aboutWho = {
 export const aboutMissionVision = [
   {
     kicker: 'OUR MISSION',
-    title: 'Redefine What It Means to Compete.',
+    // Its lines: "to" and "for" start the second one.
+    title: ['Redefine What It Means', 'to Compete.'],
     text: 'We create accessible, high-impact experiences that bring out the best in every athlete, brand, creator, coach and community, developing the whole person physically, mentally and creatively.',
     dark: false,
   },
   {
     kicker: 'OUR VISION',
-    title: 'Greatness Within Reach for All.',
+    title: ['Greatness Within Reach', 'for All.'],
     text: 'A world where sport, fitness and entertainment connect people across cultures, skill levels and industries, and every participant has the tools, support and platform to thrive.',
     dark: true,
   },
@@ -58,7 +59,6 @@ export const aboutMissionVision = [
 
 const serviceImage = (name: string) => homeServices.find((s) => s.title.includes(name))?.image ?? '';
 const shop = mainNav.find((n) => n.label === 'SHOP');
-const firstResources = mainNav.find((n) => n.href === '/resources/')?.children?.[0]?.href ?? '/resources/';
 
 /** "What we do": CLP's five parts, each with a link to it on the site. */
 export const aboutPillars = [
@@ -95,7 +95,7 @@ export const aboutPillars = [
     title: 'Resources',
     text: 'Nutrition, recovery, mental health, training and jobs from vetted pros.',
     cta: 'Find Resources',
-    href: firstResources,
+    href: '/resources/',
     image: serviceImage('NUTRITION') || serviceImage('RECOVERY'),
   },
 ];

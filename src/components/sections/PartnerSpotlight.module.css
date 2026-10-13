@@ -88,12 +88,15 @@
   flex: 1;
   flex-direction: column;
   overflow: hidden;
+  padding: 0;
   border: 1px solid #262626;
   border-radius: 10px;
   background: #161616;
   color: var(--white);
+  font: inherit;
   text-align: left;
   text-decoration: none;
+  cursor: pointer;
   transition: border-color 0.2s ease;
 }
 
@@ -103,6 +106,7 @@
 
 .media {
   position: relative;
+  display: block;
   height: 180px;
   background: #222;
 }
@@ -241,8 +245,11 @@
   padding: 0 26px;
   border: 1px solid #dcbd7d;
   border-radius: 6px;
+  background: transparent;
   color: #dcbd7d;
+  font: inherit;
   font-weight: 700;
+  cursor: pointer;
   text-decoration: none;
   transition:
     background-color 0.15s ease,

@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
+import SportsIndexView from '@/components/pages/SportsIndexView';
+import { resourcesIndex } from '@/content/resources';
 
 export const metadata: Metadata = {
   title: { absolute: 'RESOURCES - Compete Like Pros™' },
   alternates: { canonical: '/resources/' },
 };
 
-// The live /resources/ page has no content of its own: a solid header followed by the footer.
-// Each sport's resources live under /resources/<sport>/ (linked from the menu).
+/** The sports' resources, laid out as /experiences/ (see SportsIndexView); each sport's are under /resources/<sport>/. */
 export default function ResourcesPage() {
-  return <div style={{ height: 'calc(var(--header-height) + 40px)', background: '#fff' }} aria-hidden />;
+  return <SportsIndexView page={resourcesIndex} />;
 }

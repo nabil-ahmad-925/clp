@@ -10515,35 +10515,8 @@
         "height": 25
        },
        {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       },
-       {
         "type": "divider",
         "height": 25
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "booking",
-        "trailingBlank": true
        }
       ]
      }
@@ -14145,23 +14118,8 @@
         "height": 25
        },
        {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       },
-       {
         "type": "divider",
         "height": 25
-       },
-       {
-        "type": "booking"
        }
       ]
      }
@@ -48714,58 +48672,6 @@
       ]
      }
     ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "divider",
-        "height": 25
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "booking"
-       }
-      ]
-     }
-    ]
    }
   ]
  },
@@ -51166,37 +51072,6 @@
        {
         "type": "divider",
         "height": 25
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       },
-       {
-        "type": "divider",
-        "height": 25
-       },
-       {
-        "type": "booking",
-        "trailingBlank": true
        }
       ]
      }
@@ -55883,37 +55758,6 @@
        {
         "type": "divider",
         "height": 25
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       },
-       {
-        "type": "divider",
-        "height": 25
-       },
-       {
-        "type": "booking",
-        "trailingBlank": true
        }
       ]
      }
@@ -70819,37 +70663,6 @@
        {
         "type": "divider",
         "height": 25
-       }
-      ]
-     }
-    ]
-   },
-   {
-    "paddingTop": "0px",
-    "paddingBottom": "0px",
-    "columns": [
-     {
-      "width": "12",
-      "blocks": [
-       {
-        "type": "text",
-        "html": "<h3 style=\"text-align: center;\">Book a Session</h3>"
-       },
-       {
-        "type": "text",
-        "style": {
-         "paddingTop": "20px",
-         "paddingBottom": "20px"
-        },
-        "html": "<p style=\"text-align: center;\"><strong>Quisque id odio. Praesent blandit laoreet nibh.</strong><br><strong>Praesent ac sem eget est egestas volutpat.</strong><br><strong>Praesent ac sem eget est.</strong></p>"
-       },
-       {
-        "type": "divider",
-        "height": 25
-       },
-       {
-        "type": "booking",
-        "trailingBlank": true
        }
       ]
      }

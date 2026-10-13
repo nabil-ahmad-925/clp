@@ -145,14 +145,15 @@
   padding: 56px 48px 120px;
 }
 
+/* The breadcrumb over the heading's title: gold links, the page itself in grey. */
 .crumbs {
-  color: #777;
+  color: #999;
   font-size: 14px;
   line-height: 1.5;
 }
 
 .crumbs a {
-  color: #8a6f33;
+  color: #dcbd7d;
   font-weight: 600;
   text-decoration: none;
 }
@@ -283,10 +284,13 @@
   letter-spacing: 1.2px;
 }
 
+/* A card's text, centred under its cover. */
 .cardText {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
+  text-align: center;
 }
 
 .cardTitle {
@@ -398,22 +402,20 @@
   cursor: pointer;
 }
 
+/* The access key over a category's albums, centred. */
 .countRow {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px 16px;
   color: #666;
   font-size: 14px;
 }
 
-.countRow strong {
-  color: #111;
-}
-
 .legend {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 6px 18px;
 }
 

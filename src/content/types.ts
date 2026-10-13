@@ -272,6 +272,12 @@ export type LegalPage = {
   sections: { title: string; html: string }[];
 };
 
+/**
+ * An index of the sports' pages (/experiences/, /resources/), laid out as a sport's page (SportsIndexView): the
+ * heading, a quote per sport, a band per sport (its photo, name, line and "Learn More") and the FAQ.
+ */
+export type SportsIndexPage = { hero: PageHeroData; quotes: SportPage['quotes']; sports: SportPage['features']; faq: FaqData };
+
 export type SportPage = {
   section: 'experiences' | 'resources';
   slug: string;

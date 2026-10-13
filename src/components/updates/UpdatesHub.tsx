@@ -3,9 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ARTICLE_CATEGORIES, articleDate, articlesEnabled, authorOf, fetchArticles, type ArticleSummary } from '@/content/articles';
+import { ArticleCard } from '@/components/sections/PostFilter';
+import { ARTICLE_CATEGORIES, articleDate, articlesEnabled, authorOf, fetchArticles, storyCard, type ArticleSummary } from '@/content/articles';
 import type { Post } from '@/content/types';
 import { updatesTopics } from '@/content/updates';
+// The featured stories are laid out as the listing pages' sponsored strip (two wide photo cards).
+import strip from '@/components/sections/ListingCard.module.css';
 import styles from './UpdatesHub.module.css';
 
 /** A story on the hub: a live article, or a built-in post until they load (no author or reading time). */
@@ -35,33 +38,31 @@ const fromArticle = (a: ArticleSummary): Story => ({
 
 const fromPost = (p: Post, category?: string): Story => ({ href: p.href, title: p.title, image: p.image, date: p.date, topic: topicShort(category) });
 
-/** "Compete Like Pros · June 26, 2026 · 6 min read" (what is known). */
-const metaLine = (s: Story) => [s.author, s.date, s.read].filter(Boolean).join(' · ');
-/** A card's line under its title: "June 26, 2026 | 6 min read" (what is known). */
-const dateLine = (s: Story) => [s.date, s.read].filter(Boolean).join(' | ');
+/** "Compete Like Pros | June 26, 2026 | 6 min read" (what is known). */
+const metaLine = (s: Story) => [s.author, s.date, s.read].filter(Boolean).join(' | ');
 
-function Cover({ src, sizes, priority }: { src: string; sizes: string; priority?: boolean }) {
-  return src ? <Image className={styles.coverImage} src={src} alt="" fill sizes={sizes} priority={priority} /> : null;
-}
+/** How many featured stories the top row shows (as the listing pages' sponsored strip). */
+const FEATURED_SIZE = 2;
 
 /**
- * The featured row: the lead story (large, title over the photo) and two more beside it. The stories tagged Trending,
- * newest first, topped up with the newest articles; the newest built-in posts until they load.
+ * The featured row, as the listing pages' sponsored strip: two wide photo cards with the "FEATURED" label, the topic,
+ * the title, the byline and "Read More". The stories tagged Trending, newest first, topped up with the newest articles;
+ * the newest built-in posts until they load.
  */
 export function FeaturedStories({ sections }: { sections: HubSection[] }) {
   const builtIn = sections
     .flatMap((s) => s.posts.map((p) => fromPost(p, s.category)))
     .filter((s, i, all) => all.findIndex((x) => x.href === s.href) === i)
     .sort((a, b) => Date.parse(b.date ?? '') - Date.parse(a.date ?? ''))
-    .slice(0, 3);
+    .slice(0, FEATURED_SIZE);
   const [live, setLive] = useState<Story[] | null>(null);
 
   useEffect(() => {
     if (!articlesEnabled) return;
     let active = true;
-    Promise.all([fetchArticles({ tags: ['trending'], limit: 3 }), fetchArticles({ limit: 3 })]).then(
+    Promise.all([fetchArticles({ tags: ['trending'], limit: FEATURED_SIZE }), fetchArticles({ limit: FEATURED_SIZE })]).then(
       ([trending, newest]) => {
-        const picked = [...trending.items, ...newest.items].filter((a, i, all) => all.findIndex((x) => x.slug === a.slug) === i).slice(0, 3);
+        const picked = [...trending.items, ...newest.items].filter((a, i, all) => all.findIndex((x) => x.slug === a.slug) === i).slice(0, FEATURED_SIZE);
         if (active && picked.length) setLive(picked.map(fromArticle));
       },
       () => {},
@@ -71,39 +72,32 @@ export function FeaturedStories({ sections }: { sections: HubSection[] }) {
     };
   }, []);
 
-  const [lead, ...side] = live ?? builtIn;
-  if (!lead) return null;
+  const stories = live ?? builtIn;
+  if (stories.length === 0) return null;
   return (
     <section className={styles.featured}>
-      <Link className={styles.lead} href={lead.href}>
-        <Cover src={lead.image} sizes="(max-width: 900px) 100vw, 900px" priority />
-        <span className={styles.leadShade} aria-hidden />
-        <span className={styles.leadText}>
-          <span className={styles.leadKicker}>FEATURED{lead.topic ? ` · ${lead.topic}` : ''}</span>
-          <span className={styles.leadTitle}>{lead.title}</span>
-          {metaLine(lead) && <span className={styles.leadMeta}>{metaLine(lead)}</span>}
-        </span>
-      </Link>
-      {side.length > 0 && (
-        <div className={styles.side}>
-          {side.map((s) => (
-            <Link key={s.href} className={styles.sideStory} href={s.href}>
-              <span className={styles.sideCover}>
-                <Cover src={s.image} sizes="(max-width: 900px) 100vw, 440px" />
+      <div className={`${strip.strip} ${styles.featuredStrip}`}>
+        {stories.map((s, i) => (
+          <Link key={s.href} className={`${strip.stripCard} ${styles.featuredCard}`} href={s.href}>
+            {s.image && <Image className={strip.stripImage} src={s.image} alt="" fill sizes="(max-width: 767px) 100vw, 680px" priority={i === 0} />}
+            <span className={strip.stripBody}>
+              <span className={`${strip.badge} ${strip.badgeStrip}`}>FEATURED</span>
+              {s.topic && <span className={strip.stripProvider}>{s.topic}</span>}
+              <span className={strip.stripTitle}>{s.title}</span>
+              <span className={strip.stripFoot}>
+                <span>{metaLine(s)}</span>
+                <span className={strip.stripCta}>Read More</span>
               </span>
-              {s.topic && <span className={styles.kicker}>{s.topic}</span>}
-              <span className={styles.storyTitle}>{s.title}</span>
-              {dateLine(s) && <span className={styles.cardDate}>{dateLine(s)}</span>}
-            </Link>
-          ))}
-        </div>
-      )}
+            </span>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
 
 /**
- * A category's section: its heading and line, its newest four stories and "View all N" (its page). The built-in posts
+ * A category's section: its heading and line, its newest four stories and "View All N" (its page). The built-in posts
  * show until the live articles load; a category without any has no section.
  */
 export function TopicSection({ section }: { section: HubSection }) {
@@ -132,20 +126,14 @@ export function TopicSection({ section }: { section: HubSection }) {
         <h2 className={styles.topicTitle}>{name}</h2>
         {category && updatesTopics[category] && <span className={styles.topicDesc}>{updatesTopics[category].desc}</span>}
       </div>
+      {/* The article lists' cards: the date on the photo, then "6 min read | By Compete Like Pros". */}
       <div className={styles.topicGrid}>
         {stories.map((s) => (
-          <Link key={s.href} className={styles.card} href={s.href}>
-            <span className={styles.cardCover}>
-              <Cover src={s.image} sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 320px" />
-            </span>
-            {s.author && <span className={styles.byline}>BY {s.author.toUpperCase()}</span>}
-            <span className={styles.storyTitle}>{s.title}</span>
-            {dateLine(s) && <span className={styles.cardDate}>{dateLine(s)}</span>}
-          </Link>
+          <ArticleCard key={s.href} post={storyCard({ ...s, readingTime: s.read })} eager={false} />
         ))}
       </div>
       <Link className={styles.viewAll} href={section.href}>
-        View all{shown ? ` ${shown.total}` : ''}{' '}
+        View All{shown ? ` ${shown.total}` : ''}{' '}
         <span className="glyph" aria-hidden>
           →
         </span>

@@ -1,18 +1,9 @@
-// Content for /experiences/ (the index of sport experiences), from the original site.
-// Note: the heading and FAQ entries are the placeholder text the live page currently shows.
-import type { FaqData, PageHeroData } from './types';
+// Content for /experiences/ (the index of sport experiences): laid out as a sport's page, from the sports' own pages.
+import type { SportsIndexPage } from './types';
 import type { SportTile } from '@/components/sections/SportTiles';
 import { upload } from './site';
+import { sportPages } from './sports';
 
-export const experiencesHero: PageHeroData = {
-  title: ['EXPERIENCES'],
-  backgroundImage: upload('/2024/03/1704218043632-1.jpg'),
-  backgroundColor: '#0a0a0a',
-  height: 'fullscreen',
-  scrollArrow: true,
-};
-
-export const experiencesHeading = 'We Make Beautiful Things';
 
 const tile = (title: string, image: string, href: string, wide?: boolean): SportTile => ({
   title,
@@ -22,7 +13,8 @@ const tile = (title: string, image: string, href: string, wide?: boolean): Sport
   wide,
 });
 
-export const experienceTiles: SportTile[][] = [
+/** The sports' tiles (the original index's two rows): the photos and links of the sports' bands below. */
+const experienceTiles: SportTile[][] = [
   [
     tile('BASEBALL & SOFTBALL', '/2024/03/Baseball-Action.png', '/experiences/baseball/'),
     tile('BASKETBALL', '/2024/03/Basketball-Action.png', '/experiences/basketball-2/', true),
@@ -35,16 +27,39 @@ export const experienceTiles: SportTile[][] = [
   ],
 ];
 
-const placeholderAnswer =
-  'orem ipsum dolor sit amet, consectetur adipiscing elit. In eget bibendum libero. Etiam id velit at enim porttitor facilisis. Vivamus tincidunt lectus at risus pharetra ultrices. In tincidunt turpis at odio dapibus maximus.';
+/** Each sport's line on its band. */
+const SPORT_TEXT: Record<string, string> = {
+  'BASEBALL & SOFTBALL': 'Camps, clinics, leagues and trips for every level, from first-timers to travel-ball veterans.',
+  BASKETBALL: 'Tournaments, camps, private lessons and pickup runs to play, learn and compete.',
+  ESPORTS: 'Tournaments, training and private coaching to level up your competitive gaming.',
+  'FÚTBOL (SOCCER)': 'Clinics, camps, leagues and tournaments that challenge your game on and off the ball.',
+  'TENNIS & PICKLEBALL': 'Lessons, leagues, trips and open play for players of every level.',
+  GOLFING: 'Lessons, leagues, clinics and trips to sharpen your swing and your mental game.',
+};
 
-export const experiencesFaq: FaqData = {
-  title: "CLP EXPERIENCES FAQ's",
-  items: [
-    { question: 'What exactly is Salient Service?', answer: placeholderAnswer },
-    { question: 'What exactly is Salient Service?', answer: placeholderAnswer },
-    { question: 'What exactly is Salient Service?', answer: placeholderAnswer },
-    { question: 'Section', answer: '' },
-  ],
-  viewAll: { label: 'VIEW ALL', href: '#' },
+const sportsPages = sportPages.filter((p) => p.section === 'experiences');
+
+export const experiencesIndex: SportsIndexPage = {
+  hero: {
+    title: ['EXPERIENCES'],
+    backgroundImage: upload('/2024/03/1704218043632-1.jpg'),
+    backgroundColor: '#0a0a0a',
+    height: 'fullscreen',
+    scrollArrow: true,
+  },
+  // A quote from each sport's page (its first).
+  quotes: sportsPages.flatMap((p) => p.quotes.slice(0, 1)),
+  // A band per sport, as a sport page has a band per category.
+  sports: experienceTiles.flat().map((t) => ({
+    title: `${t.title} EXPERIENCES`,
+    text: SPORT_TEXT[t.title] ?? '',
+    image: t.image,
+    cta: { label: 'Learn More', href: t.cta.href },
+  })),
+  // Each sport's first question (what it offers), with the FAQ site's link.
+  faq: {
+    title: "CLP EXPERIENCES FAQ's",
+    items: sportsPages.flatMap((p) => p.faq.items.slice(0, 1)),
+    viewAll: { label: 'VIEW ALL', href: 'https://faq.competelikepros.com/', newTab: true },
+  },
 };

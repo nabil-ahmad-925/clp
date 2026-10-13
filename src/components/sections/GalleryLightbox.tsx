@@ -233,7 +233,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
             ) : price == null ? (
               <div className={styles.buy}>
                 <span className={styles.lineTitle}>
-                  Full-resolution download<strong>Free</strong>
+                  Full-Resolution Download<strong>Free</strong>
                 </span>
                 <span className={styles.muted}>Free for personal use.</span>
                 <a className={styles.primary} href={image.downloadUrl ?? image.full} download onClick={() => setDownloaded(true)}>
@@ -244,13 +244,13 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
               <div className={styles.buy}>
                 <div className={styles.option} aria-pressed="true">
                   <span className={styles.optionText}>
-                    <strong>Personal download</strong>
+                    <strong>Personal Download</strong>
                     <span>Full resolution, personal use</span>
                   </span>
                   <strong>{dollars(price)}</strong>
                 </div>
                 <button type="button" className={styles.primary} disabled={inCart.includes(image.id)} onClick={addDownload}>
-                  {inCart.includes(image.id) ? 'In your cart' : `Add to cart · ${dollars(price)}`}
+                  {inCart.includes(image.id) ? 'In Your Cart' : `Add to Cart · ${dollars(price)}`}
                 </button>
               </div>
             )}

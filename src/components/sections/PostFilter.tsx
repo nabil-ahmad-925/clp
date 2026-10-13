@@ -429,8 +429,9 @@ export default function PostFilter({ categories: builtInCategories, posts: built
   );
 }
 
-/** The date on a card's photo ("07 / OCT"). */
+/** The date on a card's photo ("07 / OCT"); none without a date. */
 function DateBadge({ post }: { post: FilterPost }) {
+  if (!post.day) return null;
   return (
     <span className={styles.date}>
       <strong className={styles.day}>{post.day}</strong>

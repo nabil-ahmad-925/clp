@@ -474,6 +474,7 @@
 
 .swatchCommunity {
   border: 1px solid #999;
+  background: var(--white);
 }
 
 

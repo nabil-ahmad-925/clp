@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { ArticleCard } from '@/components/sections/PostFilter';
+import PostNav from '@/components/sections/PostNav';
 import RichText from '@/components/ui/RichText';
 import AuthorSocials from '@/components/ui/AuthorSocials';
-import { ARTICLE_CATEGORIES, authorInitials, companyAuthorProfile } from '@/content/articles';
+import { ARTICLE_CATEGORIES, authorInitials, companyAuthorProfile, storyCard } from '@/content/articles';
 import type { BlogPost } from '@/content/types';
 import styles from './PostView.module.css';
 
@@ -19,9 +21,9 @@ function topicOf(post: BlogPost) {
 
 /**
  * An article (new design's article template): the black heading with "Updates & News › topic", the title and its date
- * and reading time, the cover photo, then the article (its body exactly as written in the admin), the author's card
- * (their bio and social links: a partner's from their account, the company's authors' from the taxonomy), and "Keep
- * Reading".
+ * and reading time ("July 25, 2025 | 5 min read"), the cover photo, then the article (its body exactly as written in
+ * the admin), the author's card (their bio and social links: a partner's from their account, the company's authors'
+ * from the taxonomy), the previous and next articles, and "KEEP READING" (the article lists' cards).
  */
 export default function PostView({ post }: { post: BlogPost }) {
   const { hero } = post;
@@ -29,9 +31,9 @@ export default function PostView({ post }: { post: BlogPost }) {
   const company = companyAuthorProfile(hero.author.href);
   const bio = hero.author.bio || company.bio || `Writes for ${COMPANY}.`;
   const socials = hero.author.socials ?? company.socials ?? [];
-  const avatar = (size: 'lg' | 'sm', name = hero.author.name) => (
-    <span className={`${styles.avatar} ${styles[size]} ${name === COMPANY ? styles.avatarCompany : ''}`} aria-hidden>
-      {authorInitials(name)}
+  const avatar = (
+    <span className={`${styles.avatar} ${styles.lg} ${hero.author.name === COMPANY ? styles.avatarCompany : ''}`} aria-hidden>
+      {authorInitials(hero.author.name)}
     </span>
   );
 
@@ -52,7 +54,7 @@ export default function PostView({ post }: { post: BlogPost }) {
           </nav>
           <h1 className={styles.title}>{hero.title}</h1>
           {/* The author is on the card under the article. */}
-          <p className={styles.dateline}>{[hero.date, hero.readingTime].filter(Boolean).join(' · ')}</p>
+          <p className={styles.dateline}>{[hero.date, hero.readingTime].filter(Boolean).join(' | ')}</p>
         </div>
       </section>
 
@@ -70,7 +72,7 @@ export default function PostView({ post }: { post: BlogPost }) {
             <RichText html={post.html} className={styles.content} />
 
             <div className={styles.authorCard}>
-              {avatar('lg')}
+              {avatar}
               <div className={styles.authorText}>
                 <span className={styles.kicker}>ABOUT THE AUTHOR</span>
                 <strong className={styles.authorName}>{hero.author.name}</strong>
@@ -86,28 +88,15 @@ export default function PostView({ post }: { post: BlogPost }) {
           </article>
         </div>
 
+        <PostNav previous={post.previous} next={post.next} />
+
         {post.related.posts.length > 0 && (
           <section className={styles.keep}>
-            <h2 className={styles.keepTitle}>Keep Reading</h2>
+            <h2 className={styles.keepTitle}>KEEP READING</h2>
+            {/* The article lists' cards: the date on the photo, then "5 min read | By Compete Like Pros". */}
             <div className={styles.keepGrid}>
               {post.related.posts.slice(0, 4).map((p) => (
-                <Link key={p.href} href={p.href} className={styles.card}>
-                  <span className={styles.cardCover}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
-                    {p.image && <img src={p.image} alt="" loading="lazy" />}
-                  </span>
-                  {p.topic && <span className={styles.cardTopic}>{p.topic}</span>}
-                  <span className={styles.cardTitle}>{p.title}</span>
-                  {(p.author || p.date) && (
-                    <span className={styles.cardMeta}>
-                      {p.author && avatar('sm', p.author)}
-                      <span className={styles.cardMetaText}>
-                        {p.author && <span className={styles.cardAuthor}>{p.author}</span>}
-                        <span>{[p.date, p.readingTime].filter(Boolean).join(' · ')}</span>
-                      </span>
-                    </span>
-                  )}
-                </Link>
+                <ArticleCard key={p.href} post={storyCard(p)} eager={false} />
               ))}
             </div>
           </section>

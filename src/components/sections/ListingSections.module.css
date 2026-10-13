@@ -19,6 +19,12 @@
   text-transform: none;
 }
 
+/* "Run a Program? Get in Front of More Athletes": bold, on one line where it fits (balanced when it wraps). */
+.plansTitleBold {
+  font-weight: 700;
+  text-wrap: balance;
+}
+
 /* ---- Run a program? ---- */
 .plans {
   display: flex;

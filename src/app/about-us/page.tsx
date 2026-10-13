@@ -39,7 +39,7 @@ export default function AboutPage() {
           <span className={styles.hashtag}>{aboutHero.hashtag}</span>
           <div className={styles.heroActions}>
             {aboutHero.actions.map((a, i) => (
-              <Link key={a.href} href={a.href} className={i === 0 ? styles.buttonGold : styles.buttonOutline}>
+              <Link key={a.href} href={a.href} className={i === 0 ? styles.buttonWhite : styles.buttonOutline}>
                 {a.label}
               </Link>
             ))}
@@ -59,7 +59,7 @@ export default function AboutPage() {
       </section>
 
       <section className={styles.who} data-header-tone="dark">
-        <span className={styles.kicker}>{aboutWho.kicker}</span>
+        <span className={`${styles.kicker} ${styles.kickerBlack}`}>{aboutWho.kicker}</span>
         <h2 className={styles.bigTitle}>
           {aboutWho.title[0]}
           <br />
@@ -82,7 +82,11 @@ export default function AboutPage() {
           {aboutMissionVision.map((m) => (
             <div key={m.kicker} className={`${styles.mv} ${m.dark ? styles.mvDark : ''}`}>
               <span className={styles.mvKicker}>{m.kicker}</span>
-              <span className={styles.mvTitle}>{m.title}</span>
+              <span className={styles.mvTitle}>
+                {m.title[0]}
+                <br />
+                {m.title[1]}
+              </span>
               <span className={styles.mvRule} aria-hidden />
               <span className={styles.mvText}>{m.text}</span>
             </div>
@@ -126,7 +130,7 @@ export default function AboutPage() {
             <span className={styles.stepsLine} aria-hidden />
             {howWeWork.steps.map((s, i) => (
               <div key={s.title} className={styles.step}>
-                <span className={styles.stepNumber}>{String(i + 1).padStart(2, '0')}</span>
+                <span className={styles.stepNumber}>{i + 1}</span>
                 <span className={styles.stepTitle}>{s.title}</span>
                 <span className={styles.stepText}>{s.text}</span>
               </div>

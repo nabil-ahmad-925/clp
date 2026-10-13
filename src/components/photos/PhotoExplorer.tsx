@@ -139,7 +139,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
         ? { title: liveItem.name, line: [albumDates(liveItem), liveItem.city, plural(liveItem.count, 'photo')].filter(Boolean).join(' · ') }
         : { title: sport.title, line: liveNow ? 'This album isn’t available.' : 'Loading the album…' }
       : view.kind === 'album' && album
-      ? { title: album.title, line: `${plural(album.images.length, 'photo')} · ${sport.title}` }
+      ? { title: album.title, line: '' }
       : view.kind === 'category' && category
         ? { title: category.category, line: 'Find your event by city and date.' }
         : view.kind === 'gate'
@@ -176,8 +176,23 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
     <div className={styles.page}>
       <section className={styles.hero} data-header-tone="light" data-page-hero>
         <div className={styles.heroInner}>
+          {/* The breadcrumb over the title (as an article's heading). */}
+          {crumbs.length > 0 && (
+            <nav aria-label="Breadcrumb" className={styles.crumbs}>
+              {crumbs.map((c, i) => (
+                <Fragment key={i}>
+                  {i > 0 && (
+                    <span className={styles.crumbSep} aria-hidden>
+                      ›
+                    </span>
+                  )}
+                  {c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current="page">{c.label}</span>}
+                </Fragment>
+              ))}
+            </nav>
+          )}
           <h1 className={styles.heroTitle}>{hero.title}</h1>
-          <p className={styles.heroLine}>{hero.line}</p>
+          {hero.line && <p className={styles.heroLine}>{hero.line}</p>}
         </div>
       </section>
 
@@ -215,21 +230,6 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
       </div>
 
       <div className={styles.body} data-header-tone="dark">
-        {crumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className={styles.crumbs}>
-            {crumbs.map((c, i) => (
-              <Fragment key={i}>
-                {i > 0 && (
-                  <span className={styles.crumbSep} aria-hidden>
-                    ›
-                  </span>
-                )}
-                {c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current="page">{c.label}</span>}
-              </Fragment>
-            ))}
-          </nav>
-        )}
-
         {view.kind === 'home' && <Home sport={sport} albums={albums} live={liveAlbums} />}
         {view.kind === 'category' && category && (
           <Category sport={sport} albums={albums.filter((a) => a.slug === category.slug)} live={liveAlbums.filter((a) => a.category === categoryOfSlug(category.slug))} />
@@ -299,7 +299,7 @@ function AlbumCard({ album, sportTitle, eager }: { album: PhotoAlbumRef; sportTi
         <span className={styles.cardLine}>
           {album.category} · {sportTitle.replace(/\s+Photos$/i, '')}
         </span>
-        <span className={styles.cardMuted}>Compete Like Pros · {plural(album.count, 'photo')}</span>
+        <span className={styles.cardMuted}>Compete Like Pros | {plural(album.count, 'photo')}</span>
       </span>
     </Link>
   );
@@ -332,7 +332,7 @@ function LiveAlbumCard({ album, eager }: { album: LiveAlbum; eager?: boolean }) 
         <span className={styles.cardTitle}>{album.name}</span>
         <span className={styles.cardLine}>{[albumDates(album), album.city].filter(Boolean).join(' · ')}</span>
         <span className={styles.cardMuted}>
-          {album.by} · {plural(album.count, 'photo')}
+          {album.by} | {plural(album.count, 'photo')}
         </span>
       </span>
     </Link>
@@ -466,7 +466,6 @@ function Category({ sport, albums, live }: { sport: PhotoSection['sport']; album
         </span>
       </div>
       <div className={styles.countRow}>
-        <strong>{plural(total, 'event album')}</strong>
         <span className={styles.legend}>
           <span className={styles.legendItem}>
             <span className={`${styles.swatch} ${styles.swPublic}`} aria-hidden />

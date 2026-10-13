@@ -9,7 +9,8 @@
  * title case.
  */
 export function albumName(title: string) {
-  const name = (title.includes(' - ') ? title.slice(title.indexOf(' - ') + 3) : title).trim();
+  // "Camps / Tournaments" reads "Camps & Tournaments".
+  const name = (title.includes(' - ') ? title.slice(title.indexOf(' - ') + 3) : title).trim().replace(/\s*\/\s*/g, ' & ');
   if (name !== name.toUpperCase()) return name;
   return name.toLowerCase().replace(/(^|[\s/(&-])(\p{L})/gu, (_, sep: string, c: string) => sep + c.toUpperCase());
 }

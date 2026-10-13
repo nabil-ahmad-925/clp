@@ -219,6 +219,7 @@
   font-size: 13px;
 }
 
+/* 54px high in a row or a column (flex: 1 alone would squeeze it to its text in a column, e.g. "Download Photo"). */
 .primary {
   display: inline-flex;
   flex: 1;
@@ -226,6 +227,7 @@
   justify-content: center;
   box-sizing: border-box;
   height: 54px;
+  min-height: 54px;
   text-decoration: none;
   border: 0;
   border-radius: 8px;
