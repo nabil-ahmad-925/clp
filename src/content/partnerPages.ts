@@ -137,14 +137,24 @@ export const reviewEligibility = (bookingId: string, token: string) => read<Revi
 export const sendReview = (bookingId: string, token: string, rating: number, text: string) =>
   call<{ review: PartnerReviewData }>('/reviews', { method: 'POST', body: JSON.stringify({ bookingId, token, rating, text }) });
 
-export type PartnerSignup = { email: string; name: string; password: string; partnerType: string; organization: string; area: string; sports: string[]; website: string };
+export type PartnerApplicationInput = {
+  name: string;
+  email: string;
+  phone?: string;
+  partnerType: string;
+  organization: string;
+  area: string;
+  sports: string[];
+  website?: string;
+  message?: string;
+};
 /**
- * The partner sign-up (the admin's own: POST /auth/signup): an unconfirmed account with its partner application, and a
- * 6-digit code e-mailed to the address. Confirmed with that code, the account waits for CLP's approval before it can sign in.
+ * Applies to become a CLP Partner (clp-api partner-applications: the admin's sign-up page sends the same). No account is
+ * made yet: once CLP approves it, the partner gets an e-mail with a temporary password and the sign-in link. `repeat`:
+ * the address already has an application waiting (that one comes back). An address with an account gets 409.
  */
-export const signUpPartner = (input: PartnerSignup) => call<{ needsConfirmation: true; email: string }>('/auth/signup', { method: 'POST', body: JSON.stringify(input) });
-export const confirmPartnerSignup = (email: string, code: string) => call<{ confirmed: true }>('/auth/confirm', { method: 'POST', body: JSON.stringify({ email, code }) });
-export const resendPartnerCode = (email: string) => call<{ sent: true }>('/auth/resend', { method: 'POST', body: JSON.stringify({ email }) });
+export const applyAsPartner = (input: PartnerApplicationInput) =>
+  call<{ application: { id: string; email: string; status: string }; repeat?: boolean }>('/partner-applications', { method: 'POST', body: JSON.stringify(input) });
 
 /** The admin, where approved partners sign in and manage their page. */
 export const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://d2v5g3qu3uuuvq.cloudfront.net').replace(/\/$/, '');

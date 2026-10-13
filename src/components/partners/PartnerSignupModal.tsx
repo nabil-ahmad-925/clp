@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import claim from '@/components/sections/ClaimModal.module.css';
 import FieldSelect from '@/components/ui/FieldSelect';
-import { PARTNER_SPORTS, PARTNER_TYPES, confirmPartnerSignup, partnerSignInHref, resendPartnerCode, signUpPartner } from '@/content/partnerPages';
+import { PARTNER_SPORTS, PARTNER_TYPES, PartnerApiError, applyAsPartner, partnerSignInHref } from '@/content/partnerPages';
 import own from './partnerSignupModal.module.css';
 
 type Props = {
@@ -14,30 +14,28 @@ type Props = {
 };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter and a number.';
-const weakPassword = (p: string) => p.length < 8 || !/[a-z]/.test(p) || !/[A-Z]/.test(p) || !/[0-9]/.test(p);
+const PHONE = /^[0-9+().\-\s]{5,40}$/;
 const TYPE_OPTIONS = PARTNER_TYPES.map((t) => ({ value: t.id, label: t.label }));
-const EMPTY = { name: '', email: '', password: '', repeat: '', organization: '', area: '', website: '' };
+const EMPTY = { name: '', email: '', phone: '', organization: '', area: '', website: '', message: '' };
 
 /**
- * "Become a Partner" (the form popup of the other program forms, see ProgramModal): the partner sign-up the admin has,
- * without leaving the site. Their details and application (POST /auth/signup), then the 6-digit code e-mailed to them
- * (POST /auth/confirm). Once confirmed, CLP reviews the application; approved partners sign in to the admin to build
- * their page. Esc, the close button or a click outside closes it (not while it is sending).
+ * "Become a Partner" (the form popup of the other program forms, see ProgramModal): the application to become a CLP
+ * Partner, without leaving the site. No password here: CLP reviews the application, and once it's approved the partner
+ * gets an e-mail with a temporary password and the sign-in link, where they choose their own password. Esc, the close
+ * button or a click outside closes it (not while it is sending).
  */
 export default function PartnerSignupModal({ type = '', onClose }: Props) {
-  const [step, setStep] = useState<'details' | 'code' | 'done'>('details');
   const [form, setForm] = useState(EMPTY);
   const [partnerType, setPartnerType] = useState(PARTNER_TYPES.some((t) => t.id === type) ? type : '');
   const [sports, setSports] = useState<string[]>([]);
-  const [code, setCode] = useState('');
   const [tried, setTried] = useState(false);
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState('');
-  const [note, setNote] = useState('');
+  const [exists, setExists] = useState(false);
+  const [sent, setSent] = useState<{ email: string; repeat: boolean } | null>(null);
   const dialog = useRef<HTMLDivElement>(null);
 
-  // Scroll locked behind it, Esc closes it, focus starts in it (once). While something is being sent it stays open.
+  // Scroll locked behind it, Esc closes it, focus starts in it (once). While it is sending it stays open.
   const closeRef = useRef(onClose);
   const sendingRef = useRef(false);
   useEffect(() => {
@@ -59,8 +57,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
   const errors = {
     name: !form.name.trim() ? 'Enter your name.' : '',
     email: !EMAIL.test(form.email.trim()) ? 'Enter a valid email address.' : '',
-    password: weakPassword(form.password) ? PASSWORD_HINT : '',
-    repeat: form.password !== form.repeat ? 'The passwords do not match.' : '',
+    phone: form.phone.trim() && !PHONE.test(form.phone.trim()) ? 'Enter the phone number with digits only.' : '',
     partnerType: !partnerType ? 'Choose what kind of partner you are.' : '',
     organization: !form.organization.trim() ? 'Enter your organization, or your name if you work on your own.' : '',
     area: !form.area.trim() ? 'Enter your city or area.' : '',
@@ -72,8 +69,8 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
         {errors[key]}
       </span>
     ) : null;
-  const input = (key: keyof typeof errors & keyof typeof EMPTY, label: string, extra: { max: number; type?: string; autoComplete?: string; wide?: boolean }) => (
-    <label className={`${claim.field} ${extra.wide ? claim.wide : ''}`}>
+  const input = (key: keyof typeof errors & keyof typeof EMPTY, label: string, extra: { max: number; type?: string; autoComplete?: string }) => (
+    <label className={claim.field}>
       {label}
       <input
         className={claim.input}
@@ -88,61 +85,45 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
     </label>
   );
 
-  /** Runs a request with the sending state and the failure shown. */
-  const run = async (task: () => Promise<void>) => {
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setTried(true);
+    if (!valid || sending) return;
+    const email = form.email.trim().toLowerCase();
     setSending(true);
     setFailure('');
-    setNote('');
+    setExists(false);
     try {
-      await task();
+      const result = await applyAsPartner({
+        name: form.name.trim(),
+        email,
+        phone: form.phone.trim() || undefined,
+        partnerType,
+        organization: form.organization.trim(),
+        area: form.area.trim(),
+        sports,
+        website: form.website.trim() || undefined,
+        message: form.message.trim() || undefined,
+      });
+      setSent({ email, repeat: Boolean(result.repeat) });
     } catch (err) {
-      setFailure(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      if (err instanceof PartnerApiError && err.status === 409) setExists(true);
+      setFailure(err instanceof Error ? err.message : 'Could not send your application. Please try again.');
     } finally {
       setSending(false);
     }
   };
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setTried(true);
-    if (!valid || sending) return;
-    const email = form.email.trim().toLowerCase();
-    void run(async () => {
-      await signUpPartner({ email, name: form.name.trim(), password: form.password, partnerType, organization: form.organization.trim(), area: form.area.trim(), sports, website: form.website.trim() });
-      setForm({ ...form, email });
-      setStep('code');
-    });
-  };
-  const confirm = (e: FormEvent) => {
-    e.preventDefault();
-    const digits = code.replace(/\D/g, '');
-    if (digits.length !== 6) return setFailure('Enter the 6-digit code from the email.');
-    if (sending) return;
-    void run(async () => {
-      await confirmPartnerSignup(form.email, digits);
-      setStep('done');
-    });
-  };
-  const resend = () =>
-    void run(async () => {
-      await resendPartnerCode(form.email);
-      setNote('A new code is on its way.');
-    });
-
-  const closeButton = (
-    <button type="button" className={claim.close} aria-label="Close" disabled={sending} onClick={onClose}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
-        <path d="M6 6l12 12M18 6 6 18" />
-      </svg>
-    </button>
-  );
-
   return createPortal(
     <div className={claim.overlay} onMouseDown={(e) => e.target === e.currentTarget && !sending && onClose()}>
       <div ref={dialog} className={claim.dialog} role="dialog" aria-modal="true" aria-label="Become a Partner" tabIndex={-1}>
-        {closeButton}
+        <button type="button" className={claim.close} aria-label="Close" disabled={sending} onClick={onClose}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
 
-        {step === 'done' ? (
+        {sent ? (
           <div className={claim.layout}>
             <div className={claim.body}>
               <div className={claim.stack}>
@@ -150,11 +131,13 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M20 6 9 17l-5-5" />
                   </svg>
-                  APPLICATION SUBMITTED
+                  {sent.repeat ? 'ALREADY RECEIVED' : 'APPLICATION SUBMITTED'}
                 </span>
-                <span className={claim.title}>Thanks for Applying</span>
+                <span className={claim.title}>{sent.repeat ? 'Your Application Is With Us' : 'Thanks for Applying'}</span>
                 <span className={claim.text}>
-                  Your email is confirmed and your application is with CLP. Once it’s approved you can sign in with <strong>{form.email}</strong> to build your partner page.
+                  {sent.repeat ? 'We already have an application from this address, and CLP is reviewing it. ' : 'CLP reviews every application, usually within 5 business days. '}
+                  Once it’s approved, we’ll email <strong>{sent.email}</strong> a temporary password and a link to sign in, where you choose your own password and
+                  start building your partner page.
                 </span>
               </div>
             </div>
@@ -164,50 +147,6 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
               </button>
             </div>
           </div>
-        ) : step === 'code' ? (
-          <form className={claim.layout} onSubmit={confirm} noValidate>
-            <div className={claim.body}>
-              <div className={claim.stack}>
-                <span className={claim.kicker}>CONFIRM YOUR EMAIL</span>
-                <span className={claim.title}>Enter the Code</span>
-                <span className={claim.text}>
-                  We sent a 6-digit code to <strong>{form.email}</strong>. Enter it to confirm your email and send your application.
-                </span>
-                <label className={claim.field}>
-                  6-digit code
-                  <input
-                    className={`${claim.input} ${own.code}`}
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={7}
-                    placeholder="000000"
-                    value={code}
-                    autoFocus
-                    onChange={(e) => setCode(e.target.value)}
-                  />
-                </label>
-                <span className={own.links}>
-                  <button type="button" className={own.link} disabled={sending} onClick={resend}>
-                    Send a new code
-                  </button>
-                  <button type="button" className={own.link} disabled={sending} onClick={() => setStep('details')}>
-                    Wrong email? Go back
-                  </button>
-                </span>
-                {note && <span className={own.note}>{note}</span>}
-              </div>
-            </div>
-            <div className={claim.footer}>
-              {failure && (
-                <span className={claim.fieldError} role="alert">
-                  {failure}
-                </span>
-              )}
-              <button type="submit" className={claim.primary} disabled={sending}>
-                {sending ? 'Confirming…' : 'Confirm & Apply'}
-              </button>
-            </div>
-          </form>
         ) : (
           <form className={claim.layout} onSubmit={submit} noValidate>
             <div className={claim.body}>
@@ -215,14 +154,14 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                 <span className={claim.kicker}>CLP PARTNER</span>
                 <span className={claim.title}>Become a Partner</span>
                 <span className={claim.text}>
-                  Your own page on CLP with bookings, a store, partnerships and verified reviews. Create your account; CLP reviews every application before it can sign in.
+                  Your own page on CLP with bookings, a store, partnerships and verified reviews. Tell us about you; once CLP approves your application, you’ll get an
+                  email with a temporary password to sign in.
                 </span>
 
                 <div className={claim.fields}>
                   {input('name', 'Full name', { max: 100, autoComplete: 'name' })}
                   {input('email', 'Email', { max: 254, type: 'email', autoComplete: 'email' })}
-                  {input('password', 'Password', { max: 256, type: 'password', autoComplete: 'new-password' })}
-                  {input('repeat', 'Confirm password', { max: 256, type: 'password', autoComplete: 'new-password' })}
+                  {input('phone', 'Phone (optional)', { max: 40, type: 'tel', autoComplete: 'tel' })}
                   <div className={claim.field}>
                     <span>I’m applying as</span>
                     <FieldSelect label="I’m applying as" className={claim.input} value={partnerType} options={TYPE_OPTIONS} invalid={tried && Boolean(errors.partnerType)} onChange={setPartnerType} />
@@ -230,7 +169,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                   </div>
                   {input('organization', 'Organization or name', { max: 100, autoComplete: 'organization' })}
                   {input('area', 'City or area', { max: 80, autoComplete: 'address-level2' })}
-                  <label className={claim.field}>
+                  <label className={`${claim.field} ${claim.wide}`}>
                     Website (optional)
                     <input className={claim.input} type="url" inputMode="url" placeholder="https://" maxLength={300} value={form.website} onChange={set('website')} />
                   </label>
@@ -247,6 +186,10 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                       })}
                     </span>
                   </div>
+                  <label className={`${claim.field} ${claim.wide}`}>
+                    Tell us about your program (optional)
+                    <textarea className={claim.input} rows={3} maxLength={1000} value={form.message} onChange={set('message')} />
+                  </label>
                 </div>
               </div>
             </div>
@@ -255,7 +198,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
               {failure && (
                 <span className={claim.fieldError} role="alert">
                   {failure}
-                  {failure.includes('already exists') && (
+                  {exists && (
                     <>
                       {' '}
                       <a href={partnerSignInHref} className={own.link} target="_blank" rel="noopener">
@@ -266,7 +209,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                 </span>
               )}
               <button type="submit" className={claim.primary} disabled={sending}>
-                {sending ? 'Creating account…' : 'Create Account & Apply'}
+                {sending ? 'Sending…' : 'Send Application'}
               </button>
               <span className={claim.hint}>
                 CLP reviews every application, usually within 5 business days. Already a partner?{' '}

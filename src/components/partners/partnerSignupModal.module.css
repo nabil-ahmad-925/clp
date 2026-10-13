@@ -1,4 +1,4 @@
-/* The partner sign-up popup's own bits (the rest is the form popup's, see ClaimModal.module.css). */
+/* The partner application popup's own bits (the rest is the form popup's, see ClaimModal.module.css). */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -29,17 +29,7 @@
   color: #fff;
 }
 
-.code {
-  font-size: 22px;
-  letter-spacing: 0.4em;
-  text-align: center;
-}
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 20px;
-}
 
 .link {
   padding: 0;
@@ -57,8 +47,3 @@
   cursor: default;
 }
 
-.note {
-  color: #1e5b33;
-  font-size: 14px;
-  font-weight: 600;
-}
