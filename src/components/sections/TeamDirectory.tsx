@@ -896,9 +896,10 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         />
       ));
     if (loading) {
+      // The grid's two full rows: eight cards, trimmed by the CSS to six, four or two as the columns drop.
       return (
         <div className={display === 'list' ? styles.listingList : styles.listingGrid} aria-hidden>
-          {Array.from({ length: placeholders }, (_, i) => (
+          {Array.from({ length: display === 'list' ? placeholders : 8 }, (_, i) => (
             <div key={i} className={`${styles.skeleton} ${display === 'list' ? styles.listingSkeletonRow : styles.listingSkeleton}`} />
           ))}
         </div>
