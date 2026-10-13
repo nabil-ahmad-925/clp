@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { ApplicationKind } from '@/content/applications';
+import BecomePartner from '@/components/partners/BecomePartner';
 import ProgramModal from './ProgramModal';
 import styles from './ListingSections.module.css';
 
@@ -72,9 +73,14 @@ export function ProgramPlans({ category, section }: { category?: string; section
                 </span>
               ))}
             </div>
-            <button type="button" className={styles.planCta} aria-haspopup="dialog" onClick={() => setOpen(p.kind)}>
-              {p.cta}
-            </button>
+            {/* Partners apply by signing up (their type and page start there), in a popup; the others send a form. */}
+            {p.kind === 'partner' ? (
+              <BecomePartner className={styles.planCta}>{p.cta}</BecomePartner>
+            ) : (
+              <button type="button" className={styles.planCta} aria-haspopup="dialog" onClick={() => setOpen(p.kind)}>
+                {p.cta}
+              </button>
+            )}
           </div>
         ))}
       </div>

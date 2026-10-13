@@ -78,15 +78,7 @@ const PROVIDER_FILTER = -1;
 /** How many sponsored listings the strip above a listing page's results shows. */
 const SPONSORED_STRIP = 2;
 
-/**
- * Branded Activations: the partner spotlight shows the brands sponsoring a listing of the page (up to this many), and
- * its button the page's sponsored listings; the partner directory while there are none.
- */
-const SPONSOR_SPOTLIGHT_WIDGETS = [46];
-const SPONSOR_SPOTLIGHT = 12;
 
-/** Groups & Private Lessons: the spotlight's "View All Partners" shows the page's CLP Partner coaches (Provider filter). */
-const PARTNER_COACH_WIDGETS = [6];
 
 /** A card's tags as the API's location search reads them (see clp-api placeTextOf): "new-york" -> "newyork", "new york". */
 const placeText = (tags: string[]) => ` ${tags.flatMap((t) => [t.replace(/[^a-z0-9]/g, ''), t.replace(/-+/g, ' ')]).join(' ')} `;
@@ -425,8 +417,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     // After the page's own listings (not competing with their first load).
     if (!stripPage || !enabled || widgetId == null || !loaded) return;
     let live = true;
-    const count = SPONSOR_SPOTLIGHT_WIDGETS.includes(widgetId) ? SPONSOR_SPOTLIGHT : SPONSORED_STRIP;
-    queryListings(widgetId, initial.current.presets, [], count, { providers: ['sponsored'], timeoutMs: FIRST_LOAD_TIMEOUT_MS }).then(
+    queryListings(widgetId, initial.current.presets, [], SPONSORED_STRIP, { providers: ['sponsored'], timeoutMs: FIRST_LOAD_TIMEOUT_MS }).then(
       // Only listings the API marks sponsored (an API without providers sends every listing).
       (r) => live && setSponsored(r.items.filter((item) => item.provider === 'sponsored')),
       () => {},
@@ -686,11 +677,6 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
     providersNow.current = providersOf(choice);
     apply(next, nextSearch, nextSort);
   };
-  /** The partner spotlight's button: the page's results by provider (its partner coaches, its sponsors), back up at them. */
-  const showProviders = (choice: string[]) => {
-    chooseProvider(choice);
-    toTop();
-  };
   /** A search from the bar (searched by the API with the filters as they are). */
   const runSearch = (next: Search) => {
     setSearch(next);
@@ -868,33 +854,11 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   );
 
   /**
-   * A listing page's results: the first cards, the partner spotlight, the rest and the pager (fewer cards: the pager
-   * first). Facilities have no spotlight: the sponsored strip, their cards and the pager.
+   * A listing page's results: the first cards, the partner spotlight (its partner category's CLP Partners), the rest
+   * and the pager (fewer cards: the pager first). Facilities show theirs once there are facility partners.
    */
   const listingResults = (setup: ListingSetup) => {
-    const sponsorSpotlight = widgetId != null && SPONSOR_SPOTLIGHT_WIDGETS.includes(widgetId) && sponsored.length > 0;
-    const spotlight =
-      setup.section !== 'facilities' &&
-      (sponsorSpotlight ? (
-        <PartnerSpotlight
-          sponsors
-          section={setup.section}
-          partners={sponsored.map((item) => ({
-            name: item.subtitle || item.title,
-            href: item.id,
-            image: item.image || item.fallbackImage,
-            excerpt: item.title,
-            onOpen: () => setOpen(item),
-          }))}
-          onViewAll={() => showProviders(['sponsored'])}
-        />
-      ) : (
-        <PartnerSpotlight
-          partners={setup.partners}
-          section={setup.section}
-          onViewAll={widgetId != null && PARTNER_COACH_WIDGETS.includes(widgetId) ? () => showProviders(['partner']) : undefined}
-        />
-      ));
+    const spotlight = <PartnerSpotlight section={setup.section} category={setup.partnerCategory} sport={setup.sport} />;
     if (loading) {
       // The grid's two full rows: eight cards, trimmed by the CSS to six, four or two as the columns drop.
       return (
@@ -936,7 +900,7 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
       <>
         {strip}
         {empty}
-        {/* Every card of the page: without a spotlight (Facilities) nothing comes after the first ones. */}
+        {/* Every card of the page: without a spotlight nothing comes after the first ones. */}
         {pageItems.length > 0 && listingCards(pageItems, 0)}
         {pager}
         {spotlight}

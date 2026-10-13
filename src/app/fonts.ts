@@ -1,4 +1,4 @@
-import { Host_Grotesk, Lato, Montserrat, Open_Sans, Oswald, Playfair_Display, Poppins, Roboto } from 'next/font/google';
+import { Archivo, Host_Grotesk, Instrument_Sans, Lato, Montserrat, Open_Sans, Oswald, Playfair_Display, Poppins, Roboto } from 'next/font/google';
 
 export const openSans = Open_Sans({
   subsets: ['latin', 'latin-ext'],
@@ -64,4 +64,18 @@ export const hostGrotesk = Host_Grotesk({
   display: 'swap',
 });
 
-export const fontVariables = [openSans, montserrat, oswald, playfair, roboto, lato, poppins, hostGrotesk].map((f) => f.variable).join(' ');
+// The partner pages' type (the Partner page template): Archivo (its width axis for the expanded headings) and Instrument Sans.
+export const archivo = Archivo({
+  subsets: ['latin'],
+  axes: ['wdth'],
+  variable: '--font-archivo',
+  display: 'swap',
+});
+
+export const instrumentSans = Instrument_Sans({
+  subsets: ['latin'],
+  variable: '--font-instrument',
+  display: 'swap',
+});
+
+export const fontVariables = [openSans, montserrat, oswald, playfair, roboto, lato, poppins, hostGrotesk, archivo, instrumentSans].map((f) => f.variable).join(' ');

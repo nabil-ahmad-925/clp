@@ -73,3 +73,8 @@
   background-color: #f7f6f3;
   color: #111;
 }
+
+/* A partner category's directory, under the search bar. */
+.partnerListing {
+  padding: 0 0 120px;
+}

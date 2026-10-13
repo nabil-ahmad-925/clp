@@ -70,6 +70,30 @@ const WIDGET_NAMES: Record<number, string> = {
 /** A directory's category name ("Advancement & Workshops"), when it is one of the listing categories. */
 export const categoryName = (widgetId: number | undefined) => (widgetId != null ? WIDGET_NAMES[widgetId] : undefined);
 
+/**
+ * The partner category (partnerConfig's partnerCategories) related to a listing page's category: its CLP Partners show
+ * in the page's spotlight and "View All Partners" opens their listing.
+ */
+const WIDGET_PARTNER_CATEGORIES: Record<number, string> = {
+  45: 'advancement-educational',
+  46: 'athletes-brands-influencers',
+  47: 'clubs-teams',
+  6: 'performance-training-coaching',
+  37: 'clubs-teams',
+  41: 'travel-logistics',
+  40: 'dieting-nutrition',
+  16: 'injury-prevention-recovery',
+  39: 'injury-prevention-recovery',
+  33: 'performance-training-coaching',
+  10: 'facilities-parks',
+  9: 'facilities-parks',
+  42: 'facilities-parks',
+  8: 'facilities-parks',
+  43: 'facilities-parks',
+  44: 'facilities-parks',
+};
+export const partnerCategoryOf = (widgetId: number | undefined) => (widgetId != null ? WIDGET_PARTNER_CATEGORIES[widgetId] : undefined);
+
 /** The line under a listing page's heading, by category (the new design's listing page). */
 const WIDGET_BLURBS: Record<number, string> = {
   45: 'Skill clinics, ID and showcase prep, coaching workshops and player development.',
@@ -107,7 +131,15 @@ export type SpotlightPartner = { name: string; href: string; image?: string; exc
  * What a listing page's directory shows besides its cards: its design (an Experiences or Resources category, or a
  * sport's facilities), its menu, category and the partner spotlight (none on facilities).
  */
-export type ListingSetup = { kind: 'listing' | 'facilities'; section: 'experiences' | 'resources' | 'facilities'; category: string; partners: SpotlightPartner[] };
+export type ListingSetup = {
+  kind: 'listing' | 'facilities';
+  section: 'experiences' | 'resources' | 'facilities';
+  category: string;
+  /** Its related partner category (see partnerCategoryOf). */
+  partnerCategory?: string;
+  /** The page's sport (a sport's page), whose partners its spotlight shows. */
+  sport?: string;
+};
 
 /** The sport a listing page's heading starts with, as the pages spell it ("Fútbol(Soccer)", "Baseball and Softball"…). */
 const TITLE_SPORT = /^(Baseball (?:&|and) Softball|Basketball|Esports|Fútbol ?\(Soccer\)|Golf(?:ing)?|Pickleball)\s+(.+)$/;
@@ -135,7 +167,7 @@ export const searchPlaceholder = (widgetId: number | undefined, fallback?: strin
 /** The `type=` of a widget's requests: the API answers with listings of that type only. */
 const typeParam = (widgetId: number) => (WIDGET_TYPES[widgetId] ? `&type=${WIDGET_TYPES[widgetId]}` : '');
 
-type Listing = {
+export type Listing = {
   id: string;
   provider?: Provider;
   /** The built-in card this listing replaces (listings imported from the site's own data). */
@@ -237,7 +269,8 @@ const bioToHtml = (bio: string) =>
 /** A card from the API; `fallbackImage` is the built-in card's image, used if its own is missing or fails to load. */
 export type AddedItem = DirectoryItem & { sourceId?: string; fallbackImage?: string };
 
-const toItem = (l: Listing): AddedItem => ({
+/** A card from an API listing (the directories, a partner page's experiences). */
+export const toItem = (l: Listing): AddedItem => ({
   id: l.id,
   provider: l.provider,
   sourceId: l.sourceId,

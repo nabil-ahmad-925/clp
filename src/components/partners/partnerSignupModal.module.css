@@ -1,0 +1,64 @@
+/* The partner sign-up popup's own bits (the rest is the form popup's, see ClaimModal.module.css). */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d9d7d2;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.chipOn {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.code {
+  font-size: 22px;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.note {
+  color: #1e5b33;
+  font-size: 14px;
+  font-weight: 600;
+}

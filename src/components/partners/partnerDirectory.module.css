@@ -1,0 +1,280 @@
+/* A partner category's cards (the listing card's design, see ListingCard.module.css). */
+
+/* The cards and pager under the filter bar, spaced as on the listing pages. */
+.results {
+  padding-top: 32px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e5e5e2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  text-decoration: none;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: #d6d3cc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.media {
+  position: relative;
+  flex: 0 0 auto;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.03);
+}
+
+/* No photo: the partner's monogram on their colour. */
+.mono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-size: 56px;
+  font-style: italic;
+  font-weight: 900;
+}
+
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background: var(--gold);
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.logo {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border: 2px solid var(--white);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 900;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 18px 18px 20px;
+}
+
+.kind {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.name {
+  color: #111;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.line {
+  color: #555;
+  font-size: 14px;
+}
+
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.fact svg {
+  flex: none;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f2f1ee;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeeb;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.rating svg {
+  fill: var(--gold);
+  color: var(--gold);
+}
+
+.rating span {
+  color: #777;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.fresh {
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.card:hover .cta {
+  background: var(--white);
+  color: #111;
+}
+
+/* The last card: becoming a partner (the original's "Your Brand Should Be Here"). */
+.join {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  gap: 12px;
+  min-height: 420px;
+  padding: 28px 24px;
+  border-radius: 10px;
+  background: #0a0a0a;
+  color: var(--white);
+  font-family: var(--font-body);
+  text-decoration: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.join:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.join:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.joinKicker {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.joinTitle {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.joinLine {
+  color: #bbb;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.joinCta {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 11px 18px;
+  border-radius: 6px;
+  background: var(--gold);
+  color: #111;
+  font-size: 14px;
+  font-weight: 700;
+}

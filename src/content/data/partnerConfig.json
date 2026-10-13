@@ -1,0 +1,499 @@
+{
+  "types": [
+    {
+      "id": "club",
+      "label": "Club & team",
+      "short": "Club",
+      "group": "MY CLUB",
+      "listings": "Experiences",
+      "single": "experience",
+      "color": "#7A1F2B",
+      "donations": true,
+      "partnerCategory": "clubs-teams"
+    },
+    {
+      "id": "org",
+      "label": "Organization & nonprofit",
+      "short": "Organization",
+      "group": "MY ORGANIZATION",
+      "listings": "Programs",
+      "single": "program",
+      "color": "#0B2A5B",
+      "donations": true,
+      "partnerCategory": "community-engagement-volunteering"
+    },
+    {
+      "id": "school",
+      "label": "School",
+      "short": "School",
+      "group": "MY SCHOOL",
+      "listings": "Events",
+      "single": "event",
+      "color": "#1B4F8C",
+      "donations": true,
+      "partnerCategory": "advancement-educational"
+    },
+    {
+      "id": "athlete",
+      "label": "Athlete",
+      "short": "Athlete",
+      "group": "MY ATHLETE PAGE",
+      "listings": "Appearances & clinics",
+      "single": "appearance",
+      "color": "#333333",
+      "donations": false,
+      "partnerCategory": "athletes-brands-influencers"
+    },
+    {
+      "id": "creator",
+      "label": "Influencer & creator",
+      "short": "Creator",
+      "group": "MY CREATOR PAGE",
+      "listings": "Meet & greets",
+      "single": "meet & greet",
+      "color": "#6B2A7A",
+      "donations": false,
+      "partnerCategory": "athletes-brands-influencers"
+    },
+    {
+      "id": "brand",
+      "label": "Brand",
+      "short": "Brand",
+      "group": "MY BRAND",
+      "listings": "Activations",
+      "single": "activation",
+      "color": "#111111",
+      "donations": false,
+      "partnerCategory": "athletes-brands-influencers"
+    },
+    {
+      "id": "coach",
+      "label": "Coach & trainer",
+      "short": "Coach",
+      "group": "MY COACHING",
+      "listings": "Sessions",
+      "single": "session",
+      "color": "#1E5B33",
+      "donations": false,
+      "partnerCategory": "performance-training-coaching"
+    },
+    {
+      "id": "sc",
+      "label": "Strength & conditioning",
+      "short": "Strength & conditioning",
+      "group": "MY TRAINING",
+      "listings": "Training sessions",
+      "single": "training session",
+      "color": "#1B4F8C",
+      "donations": false,
+      "partnerCategory": "performance-training-coaching"
+    },
+    {
+      "id": "nutrition",
+      "label": "Nutritionist & dietitian",
+      "short": "Nutritionist",
+      "group": "MY PRACTICE",
+      "listings": "Consults & plans",
+      "single": "consult",
+      "color": "#1E5B33",
+      "donations": false,
+      "partnerCategory": "dieting-nutrition"
+    },
+    {
+      "id": "writer",
+      "label": "Writer & contributor",
+      "short": "Writer",
+      "group": "MY WRITING",
+      "listings": "Articles",
+      "single": "listing",
+      "color": "#8A6F33",
+      "donations": false,
+      "partnerCategory": "advancement-educational"
+    },
+    {
+      "id": "analyst",
+      "label": "Analyst",
+      "short": "Analyst",
+      "group": "MY ANALYSIS",
+      "listings": "Reports & services",
+      "single": "service",
+      "color": "#1D6363",
+      "donations": false,
+      "partnerCategory": "advancement-educational"
+    },
+    {
+      "id": "agency",
+      "label": "Sports agency",
+      "short": "Agency",
+      "group": "MY AGENCY",
+      "listings": "Services & clients",
+      "single": "service",
+      "color": "#111111",
+      "donations": false,
+      "partnerCategory": "athletes-brands-influencers"
+    },
+    {
+      "id": "agent",
+      "label": "Agent",
+      "short": "Agent",
+      "group": "MY CLIENTS",
+      "listings": "Athletes & services",
+      "single": "listing",
+      "color": "#333333",
+      "donations": false,
+      "partnerCategory": "athletes-brands-influencers"
+    }
+  ],
+  "sports": [
+    {
+      "id": "baseball-softball",
+      "label": "Baseball & Softball"
+    },
+    {
+      "id": "basketball",
+      "label": "Basketball"
+    },
+    {
+      "id": "esports",
+      "label": "Esports"
+    },
+    {
+      "id": "futbol-soccer",
+      "label": "Fútbol (Soccer)"
+    },
+    {
+      "id": "golf",
+      "label": "Golf"
+    },
+    {
+      "id": "pickleball",
+      "label": "Pickleball"
+    }
+  ],
+  "sections": [
+    {
+      "id": "about",
+      "label": "About",
+      "meta": "Bio, highlights, team, FAQ",
+      "tab": true
+    },
+    {
+      "id": "partnerships",
+      "label": "Partnerships",
+      "meta": "Brand deals and collabs",
+      "tab": true
+    },
+    {
+      "id": "experiences",
+      "label": "Experiences",
+      "meta": "Your upcoming listings",
+      "tab": true
+    },
+    {
+      "id": "news",
+      "label": "Updates & News",
+      "meta": "Your articles and press",
+      "tab": true
+    },
+    {
+      "id": "shop",
+      "label": "Shop",
+      "meta": "Products from your store",
+      "tab": true
+    },
+    {
+      "id": "photos",
+      "label": "Photos",
+      "meta": "Photos in About",
+      "tab": false
+    },
+    {
+      "id": "reviews",
+      "label": "Reviews",
+      "meta": "Verified reviews",
+      "tab": false
+    }
+  ],
+  "collabTypes": [
+    {
+      "id": "nil",
+      "label": "NIL",
+      "review": true,
+      "bg": "#F3E8F5",
+      "fg": "#6B2A7A"
+    },
+    {
+      "id": "seeding",
+      "label": "Product seeding",
+      "review": false,
+      "bg": "#E6F2E9",
+      "fg": "#1E5B33"
+    },
+    {
+      "id": "review",
+      "label": "Product review",
+      "review": false,
+      "bg": "#E8EEF7",
+      "fg": "#1B4F8C"
+    },
+    {
+      "id": "sponsorship",
+      "label": "Sponsorship",
+      "review": true,
+      "bg": "#111111",
+      "fg": "#FFFFFF"
+    },
+    {
+      "id": "merch",
+      "label": "Co-branded merch",
+      "review": true,
+      "bg": "#FBF1DD",
+      "fg": "#8A6F33"
+    },
+    {
+      "id": "content",
+      "label": "Content creation",
+      "review": false,
+      "bg": "#E7F4F4",
+      "fg": "#1D6363"
+    },
+    {
+      "id": "events",
+      "label": "Events & activations",
+      "review": false,
+      "bg": "#FBE9E7",
+      "fg": "#9A3324"
+    }
+  ],
+  "storeCategories": [
+    "Wall art",
+    "Photo prints",
+    "Apparel",
+    "Headwear",
+    "Drinkware",
+    "Home",
+    "Accessories",
+    "Team gear"
+  ],
+  "storeCollections": ["Club merch", "Season gear", "Fundraiser"],
+  "catalog": [
+    {
+      "id": "canvas",
+      "name": "Canvas",
+      "category": "Wall art",
+      "supplier": "Canvas partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["8 × 10", "11 × 14", "16 × 20", "24 × 36"],
+      "min": 59,
+      "recommended": 79,
+      "max": 129,
+      "approval": false
+    },
+    {
+      "id": "metal-print",
+      "name": "Metal print",
+      "category": "Wall art",
+      "supplier": "Metal partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["8 × 12", "12 × 18", "20 × 30"],
+      "min": 69,
+      "recommended": 89,
+      "max": 149,
+      "approval": false
+    },
+    {
+      "id": "poster",
+      "name": "Poster",
+      "category": "Photo prints",
+      "supplier": "Poster partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["12 × 18", "18 × 24", "24 × 36"],
+      "min": 19,
+      "recommended": 29,
+      "max": 49,
+      "approval": false
+    },
+    {
+      "id": "photo-print",
+      "name": "Photo print",
+      "category": "Photo prints",
+      "supplier": "Print partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["4 × 6", "5 × 7", "8 × 10"],
+      "min": 6,
+      "recommended": 12,
+      "max": 24,
+      "approval": false
+    },
+    {
+      "id": "hoodie",
+      "name": "Script Hoodie",
+      "category": "Apparel",
+      "supplier": "Blanks partner",
+      "optionLabel": "Colors to offer",
+      "options": ["Maroon", "Black", "Heather", "Cream"],
+      "min": 45,
+      "recommended": 55,
+      "max": 75,
+      "approval": true
+    },
+    {
+      "id": "crew-tee",
+      "name": "Crew Tee",
+      "category": "Apparel",
+      "supplier": "Blanks partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["S", "M", "L", "XL", "2XL"],
+      "min": 22,
+      "recommended": 28,
+      "max": 40,
+      "approval": true
+    },
+    {
+      "id": "dad-hat",
+      "name": "Dad Hat",
+      "category": "Headwear",
+      "supplier": "Headwear partner",
+      "optionLabel": "Colors to offer",
+      "options": ["Black", "Cream", "Navy"],
+      "min": 24,
+      "recommended": 30,
+      "max": 40,
+      "approval": true
+    },
+    {
+      "id": "mug",
+      "name": "11 oz mug",
+      "category": "Drinkware",
+      "supplier": "Drinkware partner",
+      "optionLabel": "Colors to offer",
+      "options": ["White", "Black"],
+      "min": 14,
+      "recommended": 18,
+      "max": 28,
+      "approval": true
+    },
+    {
+      "id": "tumbler",
+      "name": "20 oz tumbler",
+      "category": "Drinkware",
+      "supplier": "Drinkware partner",
+      "optionLabel": "Colors to offer",
+      "options": ["White", "Black", "Steel"],
+      "min": 26,
+      "recommended": 32,
+      "max": 45,
+      "approval": true
+    },
+    {
+      "id": "blanket",
+      "name": "Fleece blanket",
+      "category": "Home",
+      "supplier": "Blanket partner",
+      "optionLabel": "Sizes to offer",
+      "options": ["50 × 60", "60 × 80"],
+      "min": 45,
+      "recommended": 59,
+      "max": 89,
+      "approval": false
+    },
+    {
+      "id": "stickers",
+      "name": "Sticker pack",
+      "category": "Accessories",
+      "supplier": "Sticker partner",
+      "optionLabel": "Packs to offer",
+      "options": ["1", "5", "10"],
+      "min": 4,
+      "recommended": 6,
+      "max": 12,
+      "approval": false
+    },
+    {
+      "id": "socks",
+      "name": "Crew socks",
+      "category": "Team gear",
+      "supplier": "Soxcessful",
+      "optionLabel": "Sizes to offer",
+      "options": ["S/M", "L/XL"],
+      "min": 12,
+      "recommended": 16,
+      "max": 24,
+      "approval": true
+    }
+  ],
+  "partnerCategories": [
+    {
+      "id": "advancement-educational",
+      "label": "Advancement & Educational",
+      "href": "/portfolio/advancement-educational-partners/",
+      "blurb": "Schools, academies, writers and analysts helping players grow on and off the field."
+    },
+    {
+      "id": "athletes-brands-influencers",
+      "label": "Athletes, Brands & Influencers",
+      "href": "/portfolio/athletes-brands-influencers-partners/",
+      "blurb": "Athletes, creators, brands and agencies building the game with CLP."
+    },
+    {
+      "id": "clubs-teams",
+      "label": "Clubs & Teams",
+      "href": "/portfolio/clubs-teams-partners/",
+      "blurb": "Clubs and teams running pickups, leagues, camps and tournaments."
+    },
+    {
+      "id": "community-engagement-volunteering",
+      "label": "Community Engagement & Volunteering",
+      "href": "/portfolio/community-engagement-volunteering-partners/",
+      "blurb": "Nonprofits and organizations bringing more people to the field."
+    },
+    {
+      "id": "dieting-nutrition",
+      "label": "Dieting & Nutrition",
+      "href": "/portfolio/dieting-nutrition-partners/",
+      "blurb": "Sports dietitians and nutrition pros fueling players and families."
+    },
+    {
+      "id": "equipment-supplies",
+      "label": "Equipment & Supplies",
+      "href": "/portfolio/equipment-supplies-partners/",
+      "blurb": "Gear, apparel and equipment for every level."
+    },
+    {
+      "id": "facilities-parks",
+      "label": "Facilities & Parks",
+      "href": "/portfolio/facilities-parks-partners/",
+      "blurb": "Fields, courts, parks and venues to play and host at."
+    },
+    {
+      "id": "food-beverages",
+      "label": "Food & Beverages",
+      "href": "/portfolio/food-beverages-partners/",
+      "blurb": "Food and drink brands that fuel game day."
+    },
+    {
+      "id": "injury-prevention-recovery",
+      "label": "Injury Prevention & Recovery",
+      "href": "/portfolio/injury-prevention-recovery-partners/",
+      "blurb": "Physical therapists, athletic trainers and recovery studios keeping players healthy."
+    },
+    {
+      "id": "performance-training-coaching",
+      "label": "Performance Training & Coaching",
+      "href": "/portfolio/performance-training-coaching-partners/",
+      "blurb": "Coaches, trainers and strength & conditioning pros."
+    },
+    {
+      "id": "software-tech",
+      "label": "Software & Tech",
+      "href": "/portfolio/software-tech-partners/",
+      "blurb": "Apps and tech that help teams, players and organizers."
+    },
+    {
+      "id": "travel-logistics",
+      "label": "Travel & Logistics",
+      "href": "/portfolio/travel-logistics-partners/",
+      "blurb": "Travel, transport and logistics for teams, trips and tournaments."
+    }
+  ]
+}

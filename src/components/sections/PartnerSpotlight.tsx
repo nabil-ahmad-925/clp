@@ -5,7 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
+import BecomePartner from '@/components/partners/BecomePartner';
 import type { SpotlightPartner } from '@/content/listings';
+import { PARTNER_CATEGORIES, PARTNER_SPORTS, loadLivePartners, partnerCategoryHref, partnerHref } from '@/content/partnerPages';
 import styles from './PartnerSpotlight.module.css';
 
 /** Initials for a partner without a photo ("Boston Athletic Training" -> "BAT"). */
@@ -17,24 +19,42 @@ const initials = (name: string) =>
     .map((w) => w[0].toUpperCase())
     .join('');
 
-/** A card of the spotlight: a partner (its page), or a sponsored listing of the page (`onOpen` opens its bio). */
-export type SpotlightCard = SpotlightPartner & { onOpen?: () => void };
-
 type Props = {
-  partners: SpotlightCard[];
-  section: 'experiences' | 'resources';
-  /** The cards are the brands sponsoring a listing of the page (Branded Activations), not the partner directory. */
-  sponsors?: boolean;
-  /** The button under the cards filters the page's results (e.g. to its partner coaches) instead of opening /clp-partners/. */
-  onViewAll?: () => void;
+  section: 'experiences' | 'resources' | 'facilities';
+  /** The page's partner category: its CLP Partners are the cards (none yet: a note and "Become a Partner"), and "View
+   *  All Partners" opens its partner listing. No category: no band. */
+  category?: string;
+  /** The page's sport: only its partners (and those listing no sport), and the partner listing opens on it. */
+  sport?: string;
 };
 
 /**
- * The black "CLP Partners" band between a listing page's results: the heading centred, the partners from the partner
- * directory (or the page's sponsors) in a carousel (four at a time; arrows, dots or a swipe for more) and "View All
- * Partners" under them.
+ * The black "CLP Partners" band between a listing page's results: the heading centred, the page's category's partners in
+ * a carousel (four at a time; arrows, dots or a swipe for more), each opening their page, and "View All Partners" under
+ * them; without any yet, a note and "Become a Partner".
  */
-export default function PartnerSpotlight({ partners, section, sponsors = false, onViewAll }: Props) {
+export default function PartnerSpotlight({ section, category, sport }: Props) {
+  // The CLP Partners of the page's category and sport, each opening their page (null: still loading).
+  const [live, setLive] = useState<SpotlightPartner[] | null>(null);
+  useEffect(() => {
+    if (!category) return;
+    let active = true;
+    loadLivePartners().then((items) => {
+      if (!active) return;
+      setLive(
+        items
+          .filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport)))
+          .map((p) => ({ name: p.name, href: partnerHref(p.slug), image: p.hero || p.logo, excerpt: [p.category, p.area].filter(Boolean).join(' · ') })),
+      );
+    });
+    return () => {
+      active = false;
+    };
+  }, [category, sport]);
+  const partners = live ?? [];
+  const empty = live?.length === 0;
+  const categoryHref = partnerCategoryHref(category);
+  const allHref = categoryHref ? `${categoryHref}${sport ? `?sport=${sport}` : ''}` : '/clp-partners/';
   const [emblaRef, embla] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps', slidesToScroll: 'auto' });
   // The carousel's pages (one per dot), the one shown and whether there is more either way.
   const [pages, setPages] = useState(0);
@@ -57,26 +77,16 @@ export default function PartnerSpotlight({ partners, section, sponsors = false, 
   const prev = useCallback(() => embla?.scrollPrev(), [embla]);
   const next = useCallback(() => embla?.scrollNext(), [embla]);
 
-  if (partners.length === 0) return null;
+  if (!category || live === null) return null;
   const resources = section === 'resources';
-  const copy = sponsors
-    ? {
-        eyebrow: 'SPONSORED PARTNERS',
-        title: 'Brands in the Game',
-        sub: 'Partners sponsoring a listing on this page. Sponsored placements are paid and always labeled.',
-        more: 'View Listing',
-        all: 'View Sponsored Listings',
-      }
-    : {
-        eyebrow: 'CLP PARTNERS',
-        title: resources ? 'Experts We Back' : 'Train With the People We Back',
-        sub: resources
-          ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.'
-          : 'Verified programs that book, pay and check in through CLP.',
-        more: 'View Partner',
-        all: 'View All Partners',
-      };
-  const card = (p: SpotlightCard) => (
+  const copy = {
+    eyebrow: 'CLP PARTNERS',
+    title: resources ? 'Experts We Back' : 'Train With the People We Back',
+    sub: resources ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.' : 'Verified programs that book, pay and check in through CLP.',
+    more: 'View Partner',
+    all: 'View All Partners',
+  };
+  const card = (p: SpotlightPartner) => (
     <>
       <span className={styles.media}>
         {p.image && <Image className={styles.image} src={p.image} alt="" fill sizes="(max-width: 480px) 85vw, (max-width: 1100px) 50vw, 320px" />}
@@ -104,20 +114,23 @@ export default function PartnerSpotlight({ partners, section, sponsors = false, 
           <h2 className={styles.title}>{copy.title}</h2>
           <p className={styles.sub}>{copy.sub}</p>
         </div>
-        <div className={styles.carousel} role="region" aria-roledescription="carousel" aria-label={sponsors ? 'Sponsored partners' : 'CLP partners'}>
+        {empty ? (
+          <div className={styles.none}>
+            <p>
+              No {PARTNER_CATEGORIES.find((c) => c.id === category)?.label} partners
+              {sport ? ` for ${PARTNER_SPORTS.find((sp) => sp.id === sport)?.label}` : ''} yet. Be the first with your own page on CLP.
+            </p>
+            <BecomePartner className={styles.join}>Become a Partner</BecomePartner>
+          </div>
+        ) : (
+          <div className={styles.carousel} role="region" aria-roledescription="carousel" aria-label="CLP partners">
           <div className={styles.viewport} ref={emblaRef}>
             <ul className={styles.track}>
               {partners.map((p, i) => (
                 <li key={p.href} className={styles.slide} aria-roledescription="slide" aria-label={`${i + 1} of ${partners.length}`}>
-                  {p.onOpen ? (
-                    <button type="button" className={styles.partner} aria-haspopup="dialog" onClick={p.onOpen}>
-                      {card(p)}
-                    </button>
-                  ) : (
-                    <Link className={styles.partner} href={p.href}>
-                      {card(p)}
-                    </Link>
-                  )}
+                  <Link className={styles.partner} href={p.href}>
+                    {card(p)}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -145,12 +158,10 @@ export default function PartnerSpotlight({ partners, section, sponsors = false, 
             </div>
           )}
         </div>
-        {onViewAll ? (
-          <button type="button" className={styles.allPartners} onClick={onViewAll}>
-            {copy.all}
-          </button>
-        ) : (
-          <Link className={styles.allPartners} href="/clp-partners/">
+        )}
+        {/* No partners yet: nothing to view all of. */}
+        {!empty && (
+          <Link className={styles.allPartners} href={allHref}>
             {copy.all}
           </Link>
         )}

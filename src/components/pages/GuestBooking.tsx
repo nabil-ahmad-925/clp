@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BookingReview from '@/components/partners/BookingReview';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ListingHero from '@/components/sections/ListingHero';
@@ -167,6 +168,8 @@ export default function GuestBooking() {
                   Free cancellation ended on {longDay(current.booking.cancelBy)}. To change your booking, reply to your booking e-mail to reach the host.
                 </p>
               )}
+              {/* Checked in at a CLP Partner's session: a verified review for their page. */}
+              {current.booking.status === 'confirmed' && <BookingReview id={id} token={token} />}
             </div>
           )}
         </div>
