@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- the partner's photos are their own uploads (the media bucket), shown as they are. */
 
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import BookingModal from '@/components/sections/BookingModal';
 import BioModal from '@/components/sections/BioModal';
@@ -129,7 +129,9 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 /** The facts the booking popup shows of a listing (its dates, times and price). */
 const factsOf = (l: Experience): RowFacts => ({
   months: l.startDate
-    ? [`${parts(l.startDate).mon} ${parts(l.startDate).day}`, [clock(l.startTime), clock(l.endTime)].filter(Boolean).join(' – ')].filter(Boolean).join(', ')
+    ? [`${parts(l.startDate).mon} ${parts(l.startDate).day}`, [clock(l.startTime), clock(l.endTime)].filter(Boolean).join(' – ')]
+        .filter(Boolean)
+        .join(', ')
     : undefined,
   price: priceText(l) || undefined,
 });
@@ -174,13 +176,25 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   } | null>(null);
   const [details, setDetails] = useState<DirectoryItem | null>(null);
   const [product, setProduct] = useState<PartnerProduct | null>(null);
+  const [shop, setShop] = useState<ShopView>({ all: false, collection: '' });
+  /** "View all" (of a collection, or every product) from the Shop tab or the About tab's store. */
+  const openShop = (collection: string) => {
+    setShop({ all: true, collection });
+    pick('shop');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const hasShop = tabs.some((t) => t.id === 'shop');
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(readCart);
   const mine = cart.filter((l) => l.slug === page.slug);
   const cartCount = mine.reduce((n, l) => n + l.qty, 0);
   // The site header, co-branded as the design's ("CLP │ × AFC"), with this page's cart beside the menu.
   useEffect(() => {
-    setHeaderBrand({ label: page.short, cartCount, onCart: () => setCartOpen(true) });
+    setHeaderBrand({
+      label: page.short,
+      cartCount,
+      onCart: () => setCartOpen(true),
+    });
   }, [page.short, cartCount]);
   useEffect(() => () => setHeaderBrand(null), []);
   const saveCart = (lines: CartLine[]) => {
@@ -197,144 +211,179 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const socials = [...page.socials, ...(page.website ? [{ network: 'website', href: page.website }] : [])];
 
   return (
-    <div className={s.page} style={{ '--accent': accent } as CSSProperties}>
-      {page.preview && <div className={s.previewBar}>Preview: this page isn’t public yet. CLP reviews new partner pages before they go live.</div>}
+    <AccentContext.Provider value={accent}>
+      <div className={s.page} style={{ '--accent': accent } as CSSProperties}>
+        {page.preview && (
+          <div className={s.previewBar}>Preview: this page isn’t public yet. CLP reviews new partner pages before they go live.</div>
+        )}
 
-      <section className={s.hero} data-header-tone="light" data-page-hero>
-        {page.hero && <img className={s.heroImage} src={page.hero} alt="" />}
-        <span className={s.heroShade} aria-hidden />
-        <div className={`${s.wrap} ${s.heroInner}`}>
-          <span className={s.logo}>{page.logo ? <img src={page.logo} alt={`${page.name} logo`} /> : page.mono}</span>
-          <div className={s.heroText}>
-            <h1 className={s.name}>{page.name}</h1>
-            <span className={s.heroLine}>
-              {[page.category || type.label, page.area].filter(Boolean).join('  ·  ')}
-              {showReviews && page.rating != null && (
-                <button type="button" className={s.heroRating} onClick={() => setDialog('reviews')}>
-                  <Star fill="#FFFFFF" />
-                  <strong>{page.rating}</strong>
-                  <span className={s.underline}>
-                    {page.reviewCount} review{page.reviewCount === 1 ? '' : 's'}
-                  </span>
+        <section className={s.hero} data-header-tone="light" data-page-hero>
+          {page.hero && <img className={s.heroImage} src={page.hero} alt="" />}
+          <span className={s.heroShade} aria-hidden />
+          <div className={`${s.wrap} ${s.heroInner}`}>
+            <span className={s.logo}>{page.logo ? <img src={page.logo} alt={`${page.name} logo`} /> : page.mono}</span>
+            <div className={s.heroText}>
+              <h1 className={s.name}>{page.name}</h1>
+              <span className={s.heroLine}>
+                {[page.category || type.label, page.area].filter(Boolean).join('  ·  ')}
+                {showReviews && page.rating != null && (
+                  <button type="button" className={s.heroRating} onClick={() => setDialog('reviews')}>
+                    <Star fill="#FFFFFF" />
+                    <strong>{page.rating}</strong>
+                    <span className={s.underline}>
+                      {page.reviewCount} review
+                      {page.reviewCount === 1 ? '' : 's'}
+                    </span>
+                  </button>
+                )}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <div className={s.tabBar} data-header-tone="dark">
+          <div className={`${s.wrap} ${s.tabBarInner}`}>
+            <nav className={s.tabs} aria-label="Partner sections">
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  className={`${s.tab} ${tab === t.id ? s.tabOn : ''}`}
+                  aria-current={tab === t.id ? 'page' : undefined}
+                  onClick={() => {
+                    // The Shop tab opens on its featured products.
+                    if (t.id === 'shop') setShop({ all: false, collection: '' });
+                    pick(t.id);
+                  }}
+                >
+                  {tabLabel(t.id)}
                 </button>
-              )}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <div className={s.tabBar} data-header-tone="dark">
-        <div className={`${s.wrap} ${s.tabBarInner}`}>
-          <nav className={s.tabs} aria-label="Partner sections">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`${s.tab} ${tab === t.id ? s.tabOn : ''}`}
-                aria-current={tab === t.id ? 'page' : undefined}
-                onClick={() => pick(t.id)}
-              >
-                {tabLabel(t.id)}
-              </button>
-            ))}
-          </nav>
-          <div className={s.tabActions}>
-            {socials.length > 0 && (
-              <>
-                <div className={s.socials}>
-                  {socials.map((so) => (
-                    <a key={so.network} href={so.href} target="_blank" rel="noopener noreferrer" className={s.social} aria-label={so.network}>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        aria-hidden
+              ))}
+            </nav>
+            <div className={s.tabActions}>
+              {socials.length > 0 && (
+                <>
+                  <div className={s.socials}>
+                    {socials.map((so) => (
+                      <a
+                        key={so.network}
+                        href={so.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={s.social}
+                        aria-label={so.network}
                       >
-                        {SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website}
-                      </svg>
-                    </a>
-                  ))}
-                </div>
-                <span className={s.divider} />
-              </>
-            )}
-            <button type="button" className={s.btn} onClick={() => setDialog('share')}>
-              Share
-            </button>
-            <button type="button" className={`${s.btn} ${s.btnAccent}`} onClick={() => setDialog('subscribe')}>
-              Subscribe
-            </button>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
+                          {SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website}
+                        </svg>
+                      </a>
+                    ))}
+                  </div>
+                  <span className={s.divider} />
+                </>
+              )}
+              <button type="button" className={s.btn} onClick={() => setDialog('share')}>
+                Share
+              </button>
+              <button type="button" className={`${s.btn} ${s.btnAccent}`} onClick={() => setDialog('subscribe')}>
+                Subscribe
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div data-header-tone="dark">
-        {tab === 'about' && (
-          <About
-            data={data}
-            showPhotos={showPhotos}
-            showReviews={showReviews}
-            onReviews={() => setDialog('reviews')}
-            onPhoto={setPhoto}
-            upcoming={experiences.length}
-            listingsLabel={type.listings}
+        <div data-header-tone="dark">
+          {tab === 'about' && (
+            <About
+              data={data}
+              showPhotos={showPhotos}
+              showReviews={showReviews}
+              onReviews={() => setDialog('reviews')}
+              onPhoto={setPhoto}
+              upcoming={experiences.length}
+              listingsLabel={type.listings}
+            />
+          )}
+          {/* The store on the About tab too (when the page shows its Shop and it has products). */}
+          {tab === 'about' && hasShop && products.length > 0 && (
+            <ShopFeatured page={page} products={products} onOpen={setProduct} onAll={openShop} />
+          )}
+          {tab === 'partnerships' && <Partnerships page={page} collabs={collabs} onWork={() => setDialog('work')} />}
+          {tab === 'experiences' && <Experiences items={experiences} label={type.listings} onOpen={open} />}
+          {tab === 'news' && <News page={page} articles={articles} />}
+          {tab === 'shop' &&
+            (shop.all ? (
+              <ShopAll
+                page={page}
+                products={products}
+                collection={shop.collection}
+                onCollection={(collection) => setShop({ all: true, collection })}
+                onBack={() => setShop({ all: false, collection: '' })}
+                onOpen={setProduct}
+              />
+            ) : (
+              <ShopFeatured page={page} products={products} onOpen={setProduct} onAll={openShop} />
+            ))}
+        </div>
+
+        {dialog === 'reviews' && <ReviewsDialog page={page} reviews={reviews} onClose={() => setDialog(null)} />}
+        {dialog === 'work' && <WorkDialog slug={page.slug} short={page.short} onClose={() => setDialog(null)} />}
+        {dialog === 'subscribe' && (
+          <SubscribeDialog slug={page.slug} name={page.name} preview={page.preview} onClose={() => setDialog(null)} />
+        )}
+        {dialog === 'share' && <ShareDialog name={page.name} onClose={() => setDialog(null)} />}
+        {photo && (
+          <Overlay onClose={() => setPhoto(null)}>
+            <img src={photo} alt="" className={s.lightbox} />
+          </Overlay>
+        )}
+        {product && (
+          <ProductDialog
+            product={product}
+            short={page.short}
+            onClose={() => setProduct(null)}
+            onAdd={(option, qty) => {
+              const key = `${page.slug}#${product.id}#${option}`;
+              const existing = cart.find((l) => l.key === key);
+              saveCart(
+                existing
+                  ? cart.map((l) => (l.key === key ? { ...l, qty: l.qty + qty } : l))
+                  : [
+                      ...cart,
+                      {
+                        key,
+                        slug: page.slug,
+                        productId: product.id,
+                        title: product.title,
+                        option,
+                        qty,
+                        price: product.price,
+                        image: product.image,
+                      },
+                    ],
+              );
+              setProduct(null);
+              setCartOpen(true);
+            }}
           />
         )}
-        {tab === 'partnerships' && <Partnerships page={page} collabs={collabs} onWork={() => setDialog('work')} />}
-        {tab === 'experiences' && <Experiences items={experiences} label={type.listings} onOpen={open} />}
-        {tab === 'news' && <News page={page} articles={articles} />}
-        {tab === 'shop' && <Shop page={page} products={products} onOpen={setProduct} />}
+        {cartOpen && (
+          <CartDrawer lines={mine} onClose={() => setCartOpen(false)} onRemove={(key) => saveCart(cart.filter((l) => l.key !== key))} />
+        )}
+        {booking && <BookingModal item={booking.item} widgetId={booking.widgetId} facts={booking.facts} onClose={() => setBooking(null)} />}
+        {details && <BioModal card={details} variant="wps" onClose={() => setDetails(null)} />}
       </div>
-
-
-      {dialog === 'reviews' && <ReviewsDialog page={page} reviews={reviews} onClose={() => setDialog(null)} />}
-      {dialog === 'work' && <WorkDialog slug={page.slug} short={page.short} onClose={() => setDialog(null)} />}
-      {dialog === 'subscribe' && <SubscribeDialog slug={page.slug} name={page.name} preview={page.preview} onClose={() => setDialog(null)} />}
-      {dialog === 'share' && <ShareDialog name={page.name} onClose={() => setDialog(null)} />}
-      {photo && (
-        <Overlay onClose={() => setPhoto(null)}>
-          <img src={photo} alt="" className={s.lightbox} />
-        </Overlay>
-      )}
-      {product && (
-        <ProductDialog
-          product={product}
-          short={page.short}
-          onClose={() => setProduct(null)}
-          onAdd={(option, qty) => {
-            const key = `${page.slug}#${product.id}#${option}`;
-            const existing = cart.find((l) => l.key === key);
-            saveCart(
-              existing
-                ? cart.map((l) => (l.key === key ? { ...l, qty: l.qty + qty } : l))
-                : [
-                    ...cart,
-                    {
-                      key,
-                      slug: page.slug,
-                      productId: product.id,
-                      title: product.title,
-                      option,
-                      qty,
-                      price: product.price,
-                      image: product.image,
-                    },
-                  ],
-            );
-            setProduct(null);
-            setCartOpen(true);
-          }}
-        />
-      )}
-      {cartOpen && <CartDrawer lines={mine} onClose={() => setCartOpen(false)} onRemove={(key) => saveCart(cart.filter((l) => l.key !== key))} />}
-      {booking && <BookingModal item={booking.item} widgetId={booking.widgetId} facts={booking.facts} onClose={() => setBooking(null)} />}
-      {details && <BioModal card={details} variant="wps" onClose={() => setDetails(null)} />}
-    </div>
+    </AccentContext.Provider>
   );
 }
 
@@ -492,13 +541,27 @@ function About({
   );
 }
 
-function Partnerships({ page, collabs, onWork }: { page: PartnerPageResponse['page']; collabs: PartnerPageResponse['collabs']; onWork: () => void }) {
+function Partnerships({
+  page,
+  collabs,
+  onWork,
+}: {
+  page: PartnerPageResponse['page'];
+  collabs: PartnerPageResponse['collabs'];
+  onWork: () => void;
+}) {
   const [cat, setCat] = useState('all');
   const [sort, setSort] = useState('new');
   const lead = collabs.find((c) => c.live);
   const shown = collabs
     .filter((c) => cat === 'all' || c.type === cat)
-    .sort((a, b) => (sort === 'az' ? a.title.localeCompare(b.title) : sort === 'za' ? b.title.localeCompare(a.title) : b.createdAt.localeCompare(a.createdAt)));
+    .sort((a, b) =>
+      sort === 'az'
+        ? a.title.localeCompare(b.title)
+        : sort === 'za'
+          ? b.title.localeCompare(a.title)
+          : b.createdAt.localeCompare(a.createdAt),
+    );
   const used = COLLAB_TYPES.filter((t) => collabs.some((c) => c.type === t.id));
   const card = (c: PartnerPageResponse['collabs'][number]) => {
     const inner = (
@@ -578,7 +641,13 @@ function Partnerships({ page, collabs, onWork }: { page: PartnerPageResponse['pa
         <span className={s.kicker}>PARTNER WITH {page.short.toUpperCase()}</span>
         <h3 className={s.display}>Have an idea? Let’s build it.</h3>
         <p>Brands and organizations, whether you’re on CLP or not, can tell us about a partnership, product drop or experience.</p>
-        <button type="button" className={`${s.btn} ${s.btnAccent} ${s.btnLg}`} style={{ marginTop: 12 }} disabled={page.preview} onClick={onWork}>
+        <button
+          type="button"
+          className={`${s.btn} ${s.btnAccent} ${s.btnLg}`}
+          style={{ marginTop: 12 }}
+          disabled={page.preview}
+          onClick={onWork}
+        >
           Work with us
         </button>
       </div>
@@ -602,7 +671,8 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
     const p = parts(l.startDate < today ? today : l.startDate);
     return `${p.dow} ${p.mon} ${p.day}`;
   };
-  const meta = (l: Experience) => [[clock(l.startTime), clock(l.endTime)].filter(Boolean).join('–'), l.subtitle].filter(Boolean).join(' · ');
+  const meta = (l: Experience) =>
+    [[clock(l.startTime), clock(l.endTime)].filter(Boolean).join('–'), l.subtitle].filter(Boolean).join(' · ');
   const cta = (l: Experience) => (isBookable(toItem(l)) ? 'Register' : 'Details');
   const places = [...new Set(items.map((l) => l.subtitle).filter(Boolean))] as string[];
 
@@ -619,7 +689,8 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
         <div className={s.feat}>
           <div className={s.featDate}>
             <span className={s.kicker} style={{ fontSize: 14 }}>
-              {parts(featured.startDate! < today ? today : featured.startDate!).dow} · {parts(featured.startDate! < today ? today : featured.startDate!).mon}
+              {parts(featured.startDate! < today ? today : featured.startDate!).dow} ·{' '}
+              {parts(featured.startDate! < today ? today : featured.startDate!).mon}
             </span>
             <span className={s.featDay}>{parts(featured.startDate! < today ? today : featured.startDate!).day}</span>
           </div>
@@ -630,7 +701,12 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
           </div>
           <div className={s.featBuy}>
             {priceText(featured) && <span className={s.featPrice}>{priceText(featured)}</span>}
-            <button type="button" className={`${s.btn} ${s.btnAccent}`} style={{ height: 56, padding: '0 32px' }} onClick={() => onOpen(featured)}>
+            <button
+              type="button"
+              className={`${s.btn} ${s.btnAccent}`}
+              style={{ height: 56, padding: '0 32px' }}
+              onClick={() => onOpen(featured)}
+            >
               {cta(featured)}
             </button>
           </div>
@@ -665,10 +741,20 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
               </label>
             )}
             <div className={s.viewToggle} role="group" aria-label="View">
-              <button type="button" className={view === 'list' ? s.viewOn : ''} aria-pressed={view === 'list'} onClick={() => setView('list')}>
+              <button
+                type="button"
+                className={view === 'list' ? s.viewOn : ''}
+                aria-pressed={view === 'list'}
+                onClick={() => setView('list')}
+              >
                 List
               </button>
-              <button type="button" className={view === 'grid' ? s.viewOn : ''} aria-pressed={view === 'grid'} onClick={() => setView('grid')}>
+              <button
+                type="button"
+                className={view === 'grid' ? s.viewOn : ''}
+                aria-pressed={view === 'grid'}
+                onClick={() => setView('grid')}
+              >
                 Images
               </button>
             </div>
@@ -731,7 +817,12 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
       )}
 
       {!all && rest.length > shown.length && (
-        <button type="button" className={`${s.btn} ${s.btnLg}`} style={{ alignSelf: 'center', borderColor: '#111' }} onClick={() => setAll(true)}>
+        <button
+          type="button"
+          className={`${s.btn} ${s.btnLg}`}
+          style={{ alignSelf: 'center', borderColor: '#111' }}
+          onClick={() => setAll(true)}
+        >
           See all {items.length} {label.toLowerCase()}
         </button>
       )}
@@ -787,7 +878,13 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
           {top.image ? <img src={top.image} alt="" /> : <span className={s.topPostBlank} />}
           <span className={s.topPostText}>
             <span className={s.postTags}>
-              <span style={{ color: top.kind === 'press' ? '#111' : 'var(--accent)' }}>{top.label}</span>
+              <span
+                style={{
+                  color: top.kind === 'press' ? '#111' : 'var(--accent)',
+                }}
+              >
+                {top.label}
+              </span>
               <span>{date(top.date)}</span>
             </span>
             <span className={s.topPostTitle}>{top.title}</span>
@@ -820,7 +917,12 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
                   ['press', 'In the news'],
                 ] as const
               ).map(([f, l]) => (
-                <button key={f} type="button" className={`${s.postFilter} ${filter === f ? s.postFilterOn : ''}`} onClick={() => setFilter(f)}>
+                <button
+                  key={f}
+                  type="button"
+                  className={`${s.postFilter} ${filter === f ? s.postFilterOn : ''}`}
+                  onClick={() => setFilter(f)}
+                >
                   {l}
                 </button>
               ))}
@@ -829,7 +931,13 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
           {rest.length ? (
             <div className={s.posts}>
               {rest.map((p) => (
-                <a key={p.key} className={s.post} href={p.href || undefined} target={p.kind === 'press' ? '_blank' : undefined} rel="noopener noreferrer">
+                <a
+                  key={p.key}
+                  className={s.post}
+                  href={p.href || undefined}
+                  target={p.kind === 'press' ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                >
                   <span className={s.postImage}>{p.image ? <img src={p.image} alt="" loading="lazy" /> : p.source || page.short}</span>
                   <span className={s.postTags}>
                     <span
@@ -854,13 +962,25 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
   );
 }
 
-function Shop({ page, products, onOpen }: { page: PartnerPageResponse['page']; products: PartnerProduct[]; onOpen: (p: PartnerProduct) => void }) {
+/** What the Shop tab shows: its featured products, or all of them (by collection, category, sort and page). */
+type ShopView = { all: boolean; collection: string };
+
+/**
+ * The store's featured products (the design's "Shop: featured"): its heading, its collections (each opens all of its
+ * products), the first four products and "View all N products". The Shop tab's first view, and on the About tab.
+ */
+function ShopFeatured({
+  page,
+  products,
+  onOpen,
+  onAll,
+}: {
+  page: PartnerPageResponse['page'];
+  products: PartnerProduct[];
+  onOpen: (p: PartnerProduct) => void;
+  onAll: (collection: string) => void;
+}) {
   const collections = [...new Set(products.map((p) => p.collection))];
-  const [col, setCol] = useState('');
-  const [all, setAll] = useState(false);
-  const matching = products.filter((p) => !col || p.collection === col);
-  // The first row, then "View all" (a collection shows all of its own).
-  const shown = all || col ? matching : matching.slice(0, 4);
   return (
     <section className={`${s.wrap} ${s.section}`} style={{ alignItems: 'center', gap: 48, paddingTop: 72 }}>
       <div className={s.shopHead}>
@@ -870,37 +990,325 @@ function Shop({ page, products, onOpen }: { page: PartnerPageResponse['page']; p
         {collections.length > 1 && (
           <div className={s.collections} style={{ marginTop: 10 }}>
             {collections.map((c) => (
-              <button key={c} type="button" className={`${s.collection} ${col === c ? s.collectionOn : ''}`} onClick={() => setCol(col === c ? '' : c)}>
+              <button key={c} type="button" className={s.collection} onClick={() => onAll(c)}>
                 {c} <span style={{ opacity: 0.6 }}>{products.filter((p) => p.collection === c).length}</span>
               </button>
             ))}
           </div>
         )}
       </div>
-      {shown.length ? (
+      {products.length ? (
         <div className={s.products}>
-          {shown.map((p) => (
-            <button key={p.id} type="button" className={s.product} onClick={() => onOpen(p)}>
-              <span className={s.productImage}>{p.image ? <img src={p.image} alt={p.title} loading="lazy" /> : p.category.toUpperCase()}</span>
-              <span className={s.productCat}>{p.category.toUpperCase()}</span>
-              <span className={s.productName}>{p.title}</span>
-              <span className={s.productPrice}>{dollars(p.price)}</span>
-            </button>
+          {products.slice(0, 4).map((p) => (
+            <ProductTile key={p.id} product={p} onOpen={onOpen} />
           ))}
         </div>
       ) : (
         <p className={s.empty}>The store opens soon.</p>
       )}
-      {shown.length < matching.length && (
-        <button type="button" className={`${s.btn} ${s.btnDark}`} onClick={() => setAll(true)}>
-          View all {matching.length} products
+      {products.length > 0 && (
+        <button type="button" className={`${s.btn} ${s.btnDark} ${s.btnLg}`} onClick={() => onAll('')}>
+          View all {products.length} product{products.length === 1 ? '' : 's'}
         </button>
       )}
     </section>
   );
 }
 
+function ProductTile({ product: p, onOpen, tall }: { product: PartnerProduct; onOpen: (p: PartnerProduct) => void; tall?: boolean }) {
+  return (
+    <button type="button" className={s.product} onClick={() => onOpen(p)}>
+      <span className={`${s.productImage} ${tall ? s.productImageTall : ''}`}>
+        {p.image ? <img src={p.image} alt={p.title} loading="lazy" /> : '[PRODUCT PHOTO]'}
+      </span>
+      <span className={s.productCat}>{p.category.toUpperCase()}</span>
+      <span className={s.productName}>{p.title}</span>
+      <span className={s.productPrice}>{dollars(p.price)}</span>
+    </button>
+  );
+}
+
+const SORTS = [
+  { id: 'featured', label: 'Featured' },
+  { id: 'price-asc', label: 'Price: low to high' },
+  { id: 'price-desc', label: 'Price: high to low' },
+  { id: 'newest', label: 'Newest' },
+] as const;
+type Sort = (typeof SORTS)[number]['id'];
+const PAGE_SIZES = [20, 40, 60];
+
+/**
+ * All the store's products (the design's "Shop: all products"): back to the shop, the count, sort and page size; on the
+ * left what it is filtered by and the shopping options (collection, category) with their counts; then the products.
+ */
+function ShopAll({
+  page,
+  products,
+  collection,
+  onCollection,
+  onBack,
+  onOpen,
+}: {
+  page: PartnerPageResponse['page'];
+  products: PartnerProduct[];
+  collection: string;
+  onCollection: (c: string) => void;
+  onBack: () => void;
+  onOpen: (p: PartnerProduct) => void;
+}) {
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState<Sort>('featured');
+  const [size, setSize] = useState(PAGE_SIZES[0]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [open, setOpen] = useState({ collection: true, category: true });
+  const collections = [...new Set(products.map((p) => p.collection))];
+  const categories = [...new Set(products.map((p) => p.category))];
+  const matching = products
+    .filter((p) => (!collection || p.collection === collection) && (!category || p.category === category))
+    .sort((a, b) =>
+      sort === 'price-asc'
+        ? a.price - b.price
+        : sort === 'price-desc'
+          ? b.price - a.price
+          : sort === 'newest'
+            ? (b.addedAt ?? '').localeCompare(a.addedAt ?? '')
+            : 0,
+    );
+  const pages = Math.max(1, Math.ceil(matching.length / size));
+  const current = Math.min(pageIndex, pages - 1);
+  const shown = matching.slice(current * size, (current + 1) * size);
+  // A change of filter, sort or page size starts again on the first page.
+  const reset =
+    <T,>(fn: (v: T) => void) =>
+    (v: T) => {
+      fn(v);
+      setPageIndex(0);
+    };
+  const active = [
+    ...(collection
+      ? [
+          {
+            label: 'Collection',
+            value: collection,
+            clear: () => reset(onCollection)(''),
+          },
+        ]
+      : []),
+    ...(category
+      ? [
+          {
+            label: 'Category',
+            value: category,
+            clear: () => reset(setCategory)(''),
+          },
+        ]
+      : []),
+  ];
+  const groups = [
+    ...(collections.length > 1
+      ? [
+          {
+            id: 'collection' as const,
+            label: 'COLLECTION',
+            options: collections,
+            value: collection,
+            pick: (v: string) => reset(onCollection)(collection === v ? '' : v),
+            of: (p: PartnerProduct) => p.collection,
+          },
+        ]
+      : []),
+    {
+      id: 'category' as const,
+      label: 'CATEGORY',
+      options: categories,
+      value: category,
+      pick: (v: string) => reset(setCategory)(category === v ? '' : v),
+      of: (p: PartnerProduct) => p.category,
+    },
+  ];
+
+  return (
+    <section className={`${s.wrap} ${s.section}`} style={{ gap: 48, paddingTop: 48 }}>
+      <div className={s.shopAllHead}>
+        <div className={s.shopAllTitle}>
+          <button type="button" className={s.back} onClick={onBack}>
+            ← Back to shop
+          </button>
+          <h2>All {page.short} products</h2>
+        </div>
+        <div className={s.shopAllControls}>
+          <span>
+            {matching.length} of {products.length} products
+          </span>
+          <label>
+            Sort by
+            <select value={sort} onChange={(e) => reset(setSort)(e.target.value as Sort)}>
+              {SORTS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Show
+            <select value={size} onChange={(e) => reset(setSize)(Number(e.target.value))}>
+              {PAGE_SIZES.map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+            per page
+          </label>
+        </div>
+      </div>
+
+      <div className={s.shopAllBody}>
+        <aside className={s.shopAside}>
+          <div className={s.shopAsideBlock}>
+            <span className={s.shopAsideLabel}>NOW SHOPPING BY</span>
+            {active.length ? (
+              <>
+                {active.map((f) => (
+                  <button
+                    key={f.label}
+                    type="button"
+                    className={s.activeFilter}
+                    onClick={f.clear}
+                    aria-label={`Remove ${f.label}: ${f.value}`}
+                  >
+                    <span>{f.label}:</span> <strong>{f.value}</strong>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      aria-hidden
+                    >
+                      <path d="M6 6l12 12M18 6 6 18" />
+                    </svg>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className={s.clearAll}
+                  onClick={() => {
+                    onCollection('');
+                    setCategory('');
+                    setPageIndex(0);
+                  }}
+                >
+                  Clear all
+                </button>
+              </>
+            ) : (
+              <span className={s.shopAsideAll}>All products</span>
+            )}
+          </div>
+          <div>
+            <span className={s.shopAsideLabel} style={{ display: 'block', paddingBottom: 12 }}>
+              SHOPPING OPTIONS
+            </span>
+            {groups.map((g) => (
+              <div key={g.id} className={s.optionGroup}>
+                <button
+                  type="button"
+                  className={s.optionGroupHead}
+                  aria-expanded={open[g.id]}
+                  onClick={() => setOpen({ ...open, [g.id]: !open[g.id] })}
+                >
+                  {g.label}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d={open[g.id] ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} />
+                  </svg>
+                </button>
+                {open[g.id] && (
+                  <div className={s.optionList}>
+                    {g.options.map((o) => {
+                      const on = g.value === o;
+                      return (
+                        <button
+                          key={o}
+                          type="button"
+                          className={`${s.optionPick} ${on ? s.optionPickOn : ''}`}
+                          aria-pressed={on}
+                          onClick={() => g.pick(o)}
+                        >
+                          <span className={s.optionBox} aria-hidden>
+                            {on && (
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#FFFFFF"
+                                strokeWidth="3.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M20 6 9 17l-5-5" />
+                              </svg>
+                            )}
+                          </span>
+                          {o}
+                          <span className={s.optionCount}>{products.filter((p) => g.of(p) === o).length}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </aside>
+
+        <div className={s.shopAllMain}>
+          {shown.length ? (
+            <div className={s.productsAll}>
+              {shown.map((p) => (
+                <ProductTile key={p.id} product={p} onOpen={onOpen} tall />
+              ))}
+            </div>
+          ) : (
+            <p className={s.empty}>No products match. Clear a filter to see more.</p>
+          )}
+          {pages > 1 && (
+            <nav className={s.pager} aria-label="Pages">
+              <button type="button" className={s.btn} disabled={current === 0} onClick={() => setPageIndex(current - 1)}>
+                ← Previous
+              </button>
+              <span>
+                Page {current + 1} of {pages}
+              </span>
+              <button type="button" className={s.btn} disabled={current >= pages - 1} onClick={() => setPageIndex(current + 1)}>
+                Next →
+              </button>
+            </nav>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // --- Dialogs ------------------------------------------------------------------------------------------------------------
+
+/** The partner's accent colour, for the popups: they render in a portal outside the page, where --accent isn't set. */
+const AccentContext = createContext('');
 
 function Overlay({ children, onClose, wide }: { children: React.ReactNode; onClose: () => void; wide?: boolean }) {
   useEffect(() => {
@@ -912,9 +1320,14 @@ function Overlay({ children, onClose, wide }: { children: React.ReactNode; onClo
       window.removeEventListener('keydown', onKey);
     };
   }, [onClose]);
+  const accent = useContext(AccentContext);
   const isImage = !wide && typeof children === 'object' && children !== null && (children as { type?: unknown }).type === 'img';
   return createPortal(
-    <div className={s.overlay} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className={s.overlay}
+      style={accent ? ({ '--accent': accent } as CSSProperties) : undefined}
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
       {isImage ? (
         children
       ) : (
@@ -930,7 +1343,15 @@ function Overlay({ children, onClose, wide }: { children: React.ReactNode; onClo
   );
 }
 
-function ReviewsDialog({ page, reviews, onClose }: { page: PartnerPageResponse['page']; reviews: PartnerReviewData[]; onClose: () => void }) {
+function ReviewsDialog({
+  page,
+  reviews,
+  onClose,
+}: {
+  page: PartnerPageResponse['page'];
+  reviews: PartnerReviewData[];
+  onClose: () => void;
+}) {
   return (
     <Overlay onClose={onClose}>
       <div className={s.dialogBody}>
@@ -949,8 +1370,8 @@ function ReviewsDialog({ page, reviews, onClose }: { page: PartnerPageResponse['
           </span>
         </div>
         <div className={s.reviewRules}>
-          <strong>To keep reviews real</strong>, only people checked in at a session with {page.short} can leave one: they get the link with their booking.
-          Reading reviews is open to everyone.
+          <strong>To keep reviews real</strong>, only people checked in at a session with {page.short} can leave one: they get the link with
+          their booking. Reading reviews is open to everyone.
         </div>
         {reviews.length === 0 ? (
           <p className={s.empty}>No reviews yet.</p>
@@ -1024,7 +1445,13 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
           <h3 className={`${s.display} ${s.dialogTitle}`}>Partnership interest form</h3>
           <label className={s.field}>
             Your name
-            <input className={s.input} maxLength={120} autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <input
+              className={s.input}
+              maxLength={120}
+              autoComplete="name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
           </label>
           <label className={s.field}>
             Brand or organization
@@ -1053,7 +1480,11 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
               <button type="button" className={`${s.size} ${form.onClp ? s.sizeOn : ''}`} onClick={() => setForm({ ...form, onClp: true })}>
                 Yes, we’re on CLP
               </button>
-              <button type="button" className={`${s.size} ${!form.onClp ? s.sizeOn : ''}`} onClick={() => setForm({ ...form, onClp: false })}>
+              <button
+                type="button"
+                className={`${s.size} ${!form.onClp ? s.sizeOn : ''}`}
+                onClick={() => setForm({ ...form, onClp: false })}
+              >
                 Not yet
               </button>
             </div>
@@ -1196,26 +1627,50 @@ function ProductDialog({
 }) {
   const [option, setOption] = useState(product.options[0] ?? '');
   const [qty, setQty] = useState(1);
+  const [photo, setPhoto] = useState(0);
+  const images = product.images.length ? product.images : product.image ? [product.image] : [];
   return (
     <Overlay onClose={onClose} wide>
       <div className={s.productDialog}>
-        <div className={s.productDialogImage}>{product.image ? <img src={product.image} alt={product.title} /> : product.category.toUpperCase()}</div>
+        <div className={s.productDialogMedia}>
+          <div className={s.productDialogImage}>
+            {images[photo] ? <img src={images[photo]} alt={product.title} /> : product.category.toUpperCase()}
+          </div>
+          {images.length > 1 && (
+            <div className={s.productThumbs}>
+              {images.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  className={`${s.productThumb} ${photo === i ? s.productThumbOn : ''}`}
+                  aria-label={`Photo ${i + 1}`}
+                  onClick={() => setPhoto(i)}
+                >
+                  <img src={src} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className={s.dialogBody}>
           <span className={s.productCat}>
             {short.toUpperCase()} · {product.category.toUpperCase()}
           </span>
           <h3 className={`${s.display} ${s.dialogTitle}`}>{product.title}</h3>
           <span style={{ fontSize: 22, fontWeight: 700 }}>{dollars(product.price)}</span>
-          <div className={s.field}>
-            {product.optionLabel}
-            <div className={s.sizes}>
-              {product.options.map((o) => (
-                <button key={o} type="button" className={`${s.size} ${option === o ? s.sizeOn : ''}`} onClick={() => setOption(o)}>
-                  {o}
-                </button>
-              ))}
+          {product.description && <p className={s.productDescription}>{product.description}</p>}
+          {product.options.length > 0 && (
+            <div className={s.field}>
+              {product.optionLabel}
+              <div className={s.sizes}>
+                {product.options.map((o) => (
+                  <button key={o} type="button" className={`${s.size} ${option === o ? s.sizeOn : ''}`} onClick={() => setOption(o)}>
+                    {o}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           <div className={s.field}>
             Quantity
             <span className={s.qty}>
@@ -1243,8 +1698,14 @@ function ProductDialog({
 function CartDrawer({ lines, onClose, onRemove }: { lines: CartLine[]; onClose: () => void; onRemove: (key: string) => void }) {
   const total = lines.reduce((n, l) => n + l.price * l.qty, 0);
   const [note, setNote] = useState(false);
+  const accent = useContext(AccentContext);
   return createPortal(
-    <>
+    <div
+      style={{
+        display: 'contents',
+        ...(accent ? ({ '--accent': accent } as CSSProperties) : {}),
+      }}
+    >
       <div className={s.overlay} style={{ background: 'rgba(10,10,10,.4)' }} onMouseDown={onClose} />
       <aside className={s.drawer} role="dialog" aria-modal="true" aria-label="Your cart">
         <div className={s.drawerHead}>
@@ -1305,7 +1766,7 @@ function CartDrawer({ lines, onClose, onRemove }: { lines: CartLine[]; onClose: 
           </button>
         </div>
       </aside>
-    </>,
+    </div>,
     document.body,
   );
 }

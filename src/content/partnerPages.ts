@@ -36,6 +36,8 @@ export type PartnerCardData = {
   about: string;
   rating: number | null;
   reviewCount: number;
+  /** Where CLP put it on its categories' listings ({ <category>: 1… }, position 1 first); others follow. */
+  positions?: Record<string, number>;
 };
 
 export type PartnerPageData = PartnerCardData & {
@@ -54,7 +56,23 @@ export type PartnerPageData = PartnerCardData & {
 };
 
 export type PartnerCollab = { id: string; title: string; brand: string; type: string; dates: string; description: string; image: string; link: string; live: boolean; createdAt: string };
-export type PartnerProduct = { id: string; title: string; category: string; optionLabel: string; options: string[]; price: number; collection: string; image: string };
+/** A store product of the partner's (published and approved by CLP). */
+export type PartnerProduct = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  /** What the options are ("Sizes", "Colors"…), and the options (none: one size). */
+  optionLabel: string;
+  options: string[];
+  price: number;
+  collection: string;
+  /** The first photo (the card), and all of them. */
+  image: string;
+  images: string[];
+  /** When the partner added it to their store (the "Newest" sort). */
+  addedAt?: string;
+};
 export type PartnerReviewData = { id: string; rating: number; text: string; name: string; badge: string; session: string; date: string; reply?: { text: string; at: string }; createdAt: string };
 export type PartnerArticle = { slug: string; path: string; title: string; excerpt: string; image: string; publishedAt: string; readingTime: number; categories: string[] };
 
@@ -66,8 +84,6 @@ export type PartnerPageResponse = {
   experiences: (Listing & { widgetId: string; listingType?: string })[];
   articles: PartnerArticle[];
 };
-
-export type PartnershipsItem = { id: string; featured: boolean; partner?: PartnerCardData; external?: { name: string; mono: string; color: string; logo: string; link: string; category: string; meta: string } };
 
 export class PartnerApiError extends Error {
   constructor(
@@ -122,9 +138,6 @@ export const fetchPartners = (params: { type?: string; sport?: string; q?: strin
 /** The live partners, fetched once per visit and shared by every place that lists them. */
 let livePartners: Promise<PartnerCardData[]> | null = null;
 export const loadLivePartners = () => (livePartners ??= fetchPartners().catch(() => ((livePartners = null), [])));
-
-/** The partners shown on /partnerships/, in order. */
-export const fetchPartnershipsPage = () => read<{ items: PartnershipsItem[] }>('/partnerships-page').then((r) => r.items);
 
 export type LeadInput = { name: string; organization: string; email: string; onClp: boolean; collabType: string; idea: string; website?: string };
 /** A "Work with us" idea, e-mailed to the partner and CLP. */

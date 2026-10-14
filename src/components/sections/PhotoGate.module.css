@@ -144,6 +144,42 @@
   line-height: 1.5;
 }
 
+/* The photo login's sign-in (families only, client gallery): its fields, as the client login's. */
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  text-align: left;
+}
+
+.login .primary {
+  margin-top: 4px;
+}
+
+.fieldHint {
+  color: #888;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.link {
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #555;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: #111;
+}
+
 @media (max-width: 640px) {
   .gate {
     box-sizing: border-box;

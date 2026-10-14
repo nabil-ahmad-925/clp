@@ -1,17 +1,31 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { albumsEnabled, liveAlbumHref, unlockAlbum, type LiveAlbum } from '@/content/albums';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import {
+  albumsEnabled,
+  chooseFirstPassword,
+  forgotPassword,
+  liveAlbumHref,
+  resetPassword,
+  signIn,
+  signOut,
+  unlockAlbum,
+  type LiveAlbum,
+} from '@/content/albums';
 import type { AlbumAccess } from '@/content/gallery';
+import usePhotoLogin from '@/components/photos/usePhotoLogin';
 import styles from './PhotoGate.module.css';
 
 type Props = {
-  kind: Exclude<AlbumAccess, 'public'>;
+  /** An album's gate, or `login`: the photo login's own sign-in (the invitation e-mail's link). */
+  kind: Exclude<AlbumAccess, 'public'> | 'login';
   /** A code already typed (the home page's "Find my photos", or a link with ?code=): it is tried at once. */
   initialCode?: string;
   /** A private album opened by its code (default: go to the album). */
   onUnlocked?: (album: LiveAlbum) => void;
+  /** A families-only album or a client gallery that the signed-in photo login wasn't added to. */
+  notAdded?: boolean;
 };
 
 const Lock = ({ color }: { color: string }) => (
@@ -21,15 +35,152 @@ const Lock = ({ color }: { color: string }) => (
   </svg>
 );
 
+const message = (err: unknown) => (err instanceof Error ? err.message : 'That didn’t work. Try again.');
+const PASSWORD_HINT = 'At least 8 characters, with an uppercase letter, a lowercase letter and a number.';
+
+/**
+ * Signing in with a photo login (the e-mail and password CLP sent): the sign-in, the first sign-in's own password (in
+ * place of the invitation's temporary one), and a forgotten password's reset by e-mailed code. Signed in, the page
+ * opens what the login may see (its parent listens to the sign-in).
+ */
+function LoginForm({ button, children }: { button: string; children?: ReactNode }) {
+  const [step, setStep] = useState<'signin' | 'new' | 'forgot' | 'reset'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [session, setSession] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setNote('');
+    try {
+      await fn();
+    } catch (err) {
+      setNote(message(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const go = (next: typeof step, text = '') => {
+    setStep(next);
+    setPassword('');
+    setCode('');
+    setNote(text);
+  };
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+    if (!email.trim()) return setNote('Enter your email address.');
+    if (step === 'signin') {
+      if (!password) return setNote('Enter your password.');
+      return void run(async () => {
+        const r = await signIn(email.trim(), password);
+        if ('challenge' in r) {
+          setSession(r.session);
+          go('new', 'Welcome! Choose your own password to finish signing in.');
+        }
+      });
+    }
+    if (step === 'new') {
+      if (!password) return setNote('Choose a password.');
+      return void run(() => chooseFirstPassword(email.trim(), session, password));
+    }
+    if (step === 'forgot') {
+      return void run(async () => {
+        await forgotPassword(email.trim());
+        go('reset', 'If this email has a photo login, we sent it a 6-digit code. Enter it with your new password.');
+      });
+    }
+    if (!code.trim()) return setNote('Enter the 6-digit code from the email.');
+    if (!password) return setNote('Choose a new password.');
+    return void run(async () => {
+      await resetPassword(email.trim(), code.trim(), password);
+      go('signin', 'Your password was reset. Sign in with your new password.');
+    });
+  };
+
+  return (
+    <form className={styles.login} onSubmit={submit} noValidate>
+      {children}
+      <label className={styles.field}>
+        Email
+        <input
+          className={styles.input}
+          type="email"
+          autoComplete="email"
+          value={email}
+          readOnly={step === 'new' || step === 'reset'}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </label>
+      {step === 'reset' && (
+        <label className={styles.field}>
+          Code
+          <input className={styles.input} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value)} />
+        </label>
+      )}
+      {step !== 'forgot' && (
+        <label className={styles.field}>
+          {step === 'signin' ? 'Password' : 'New password'}
+          <input
+            className={styles.input}
+            type="password"
+            autoComplete={step === 'signin' ? 'current-password' : 'new-password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {step !== 'signin' && <span className={styles.fieldHint}>{PASSWORD_HINT}</span>}
+        </label>
+      )}
+      <button type="submit" className={styles.primary} disabled={busy}>
+        {busy ? 'One moment…' : step === 'signin' ? button : step === 'new' ? 'Save Password' : step === 'forgot' ? 'Send Code' : 'Reset Password'}
+      </button>
+      {note && (
+        <span className={styles.note} role="status">
+          {note}
+        </span>
+      )}
+      {step === 'signin' ? (
+        <button type="button" className={styles.link} onClick={() => go('forgot')}>
+          Forgot your password?
+        </button>
+      ) : (
+        <button type="button" className={styles.link} onClick={() => go('signin')}>
+          Back to sign in
+        </button>
+      )}
+      {step === 'forgot' && <span className={styles.small}>Haven&rsquo;t signed in yet? Use the temporary password from your invitation email.</span>}
+    </form>
+  );
+}
+
+/** Signed in, but this album's owner didn't add this login: who is signed in, and a way to switch. */
+function NotAdded({ email }: { email: string }) {
+  return (
+    <>
+      <span className={styles.note} role="status">
+        You&rsquo;re signed in as <strong>{email}</strong>, but this login hasn&rsquo;t been added to this album. Ask the organizer to add your email.
+      </span>
+      <button type="button" className={styles.primary} onClick={() => void signOut()}>
+        Sign In With Another Login
+      </button>
+    </>
+  );
+}
+
 /**
  * The gate of an album that isn't public (new design): a private album's access code (it opens the album made in the
- * admin with that code), a youth album's parent sign-in, or a client gallery's login (those two come later: a try
- * answers with what to do next).
+ * admin with that code), a youth album's parent sign-in, or a client gallery's login (both with the photo login CLP
+ * e-mailed the people its owner added); `login` is that sign-in on its own.
  */
-export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props) {
+export default function PhotoGate({ kind, initialCode = '', onUnlocked, notAdded }: Props) {
   const router = useRouter();
+  const email = usePhotoLogin();
   const [code, setCode] = useState(initialCode);
-  const [login, setLogin] = useState({ email: '', password: '' });
+  const [parentForm, setParentForm] = useState(false);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -43,7 +194,7 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
       if (onUnlocked) onUnlocked(album);
       else router.push(liveAlbumHref(album));
     } catch (err) {
-      setNote(err instanceof Error ? err.message : 'That didn’t work. Try again.');
+      setNote(message(err));
     } finally {
       setBusy(false);
     }
@@ -58,59 +209,58 @@ export default function PhotoGate({ kind, initialCode = '', onUnlocked }: Props)
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on arrival
   }, []);
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    if (kind === 'code') void unlock(code);
-    else if (kind === 'client') setNote(login.email.trim() && login.password ? 'We couldn’t sign you in. Check the client login we sent you.' : 'Enter your email and password.');
-    else setNote('Parent accounts are coming soon. Ask the event organizer for your family’s photos meanwhile.');
-  };
+  const signedInElsewhere = Boolean(notAdded && email);
 
   if (kind === 'family') {
+    const form = parentForm && !signedInElsewhere;
     return (
-      <form className={`${styles.gate} ${styles.wide}`} onSubmit={submit}>
+      <div className={`${styles.gate} ${styles.wide} ${form ? styles.left : ''}`}>
         <span className={`${styles.icon} ${styles.family}`}>
           <Lock color="#FFFFFF" />
         </span>
-        <span className={styles.title}>Youth Album: Families Only</span>
-        <span className={styles.text}>
-          This event had players under 18. Only parents or guardians with a CLP account linked to a registered player can view these photos.
+        <span className={`${styles.title} ${styles.center}`}>Youth Album: Families Only</span>
+        <span className={`${styles.text} ${styles.center}`}>
+          This event had players under 18. Only the parents or guardians the organizer added can view these photos, signed in with the photo login we
+          emailed them.
         </span>
-        <button type="submit" className={styles.primary}>
-          Sign In With Parent Account
-        </button>
-        {note && <span className={styles.note} role="status">{note}</span>}
-        <span className={styles.small}>
+        {signedInElsewhere ? (
+          <NotAdded email={email!} />
+        ) : form ? (
+          <LoginForm button="Sign In" />
+        ) : (
+          <button type="button" className={styles.primary} onClick={() => setParentForm(true)}>
+            Sign In With Parent Account
+          </button>
+        )}
+        <span className={`${styles.small} ${styles.center}`}>
           Youth photos are never public or searchable, and downloads are for personal use only. Don&rsquo;t see your child&rsquo;s event? Ask the organizer to
           add your account.
         </span>
-      </form>
+      </div>
     );
   }
-  if (kind === 'client') {
+  if (kind === 'client' || kind === 'login') {
     return (
-      <form className={`${styles.gate} ${styles.left}`} onSubmit={submit}>
-        <span className={`${styles.icon} ${styles.client}`}>
-          <Lock color="#000000" />
+      <div className={`${styles.gate} ${styles.left}`}>
+        <span className={`${styles.icon} ${kind === 'client' ? styles.client : styles.private}`}>
+          <Lock color={kind === 'client' ? '#000000' : '#FFFFFF'} />
         </span>
-        <span className={`${styles.title} ${styles.center}`}>Client Gallery</span>
-        <span className={`${styles.text} ${styles.center}`}>Sign in with the client login we sent you.</span>
-        <label className={styles.field}>
-          Email
-          <input className={styles.input} type="email" autoComplete="email" value={login.email} onChange={(e) => setLogin({ ...login, email: e.target.value })} />
-        </label>
-        <label className={styles.field}>
-          Password
-          <input className={styles.input} type="password" autoComplete="current-password" value={login.password} onChange={(e) => setLogin({ ...login, password: e.target.value })} />
-        </label>
-        <button type="submit" className={styles.primary}>
-          Open Gallery
-        </button>
-        {note && <span className={styles.note} role="status">{note}</span>}
-      </form>
+        <span className={`${styles.title} ${styles.center}`}>{kind === 'client' ? 'Client Gallery' : 'Your Photos'}</span>
+        <span className={`${styles.text} ${styles.center}`}>
+          {kind === 'client' ? 'Sign in with the client login we sent you.' : 'Sign in with the photo login we emailed you.'}
+        </span>
+        {signedInElsewhere ? <NotAdded email={email!} /> : <LoginForm button={kind === 'client' ? 'Open Gallery' : 'Sign In'} />}
+      </div>
     );
   }
   return (
-    <form className={styles.gate} onSubmit={submit}>
+    <form
+      className={styles.gate}
+      onSubmit={(e) => {
+        e.preventDefault();
+        void unlock(code);
+      }}
+    >
       <span className={`${styles.icon} ${styles.private}`}>
         <Lock color="#FFFFFF" />
       </span>

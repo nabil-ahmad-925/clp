@@ -154,7 +154,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
                 <span className={claim.kicker}>CLP PARTNER</span>
                 <span className={claim.title}>Become a Partner</span>
                 <span className={claim.text}>
-                  Your own page on CLP with bookings, a store, partnerships and verified reviews. Tell us about you; once CLP approves your application, you’ll get an
+                  Your own page on CLP with bookings, a store, partnerships and verified reviews. Tell us about you, once CLP approves your application, you’ll get an
                   email with a temporary password to sign in.
                 </span>
 
@@ -211,12 +211,6 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
               <button type="submit" className={claim.primary} disabled={sending}>
                 {sending ? 'Sending…' : 'Send Application'}
               </button>
-              <span className={claim.hint}>
-                CLP reviews every application, usually within 5 business days. Already a partner?{' '}
-                <a href={partnerSignInHref} className={own.link} target="_blank" rel="noopener">
-                  Sign in
-                </a>
-              </span>
             </div>
           </form>
         )}

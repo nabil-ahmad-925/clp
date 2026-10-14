@@ -41,15 +41,18 @@ const matches = (p: PartnerCardData, f: Filters, search: Search) => {
 /** Top rated first (more reviews breaking ties), then A to Z. */
 const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
 const byName = (a: PartnerCardData, b: PartnerCardData) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+/** The positions CLP set for the category (the admin's Partnerships page) first, position 1 at the top; the rest top rated first. */
+const byPosition = (category: string) => (a: PartnerCardData, b: PartnerCardData) =>
+  (a.positions?.[category] ?? Infinity) - (b.positions?.[category] ?? Infinity) || byRating(a, b);
 
-/** The sort menu (the listing pages' "Recommended" pill): top rated first, or by name. */
+/** The sort menu (the listing pages' "Recommended" pill): CLP's order, or by name. */
 const SORTS = [
   { value: 'recommended', label: 'Recommended' },
   { value: 'az', label: 'Name: A to Z' },
   { value: 'za', label: 'Name: Z to A' },
 ] as const;
 type PartnerSort = (typeof SORTS)[number]['value'];
-const ORDER: Record<PartnerSort, (a: PartnerCardData, b: PartnerCardData) => number> = { recommended: byRating, az: byName, za: (a, b) => byName(b, a) };
+const orderOf = (sort: PartnerSort, category: string) => (sort === 'az' ? byName : sort === 'za' ? (a: PartnerCardData, b: PartnerCardData) => byName(b, a) : byPosition(category));
 
 /**
  * A partner category's listing (/portfolio/<category>-partners/), in the experiences listing design: the search bar on
@@ -137,7 +140,7 @@ function Directory({ category, label }: { category: string; label: string }) {
   };
 
   if (!items) return <Skeleton />;
-  const shown = items.filter((p) => matches(p, filters, search)).sort(ORDER[sort]);
+  const shown = items.filter((p) => matches(p, filters, search)).sort(orderOf(sort, category));
   const count = (f: Filters) => items.filter((p) => matches(p, f, search)).length;
   const key = JSON.stringify([filters, search, size, sort]);
   const pageCount = Math.max(1, Math.ceil(shown.length / size));

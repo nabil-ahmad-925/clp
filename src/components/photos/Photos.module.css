@@ -602,6 +602,44 @@
   outline-offset: 2px;
 }
 
+/* ---- Photo logins (families-only albums, client galleries) ---- */
+.mine {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.signedIn {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.signOut {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.signOut:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* An open client gallery's line (as the design). */
+.clientBanner {
+  padding: 18px 22px;
+  border: 1px solid #e8d6a8;
+  border-radius: 10px;
+  background: #fbf6ea;
+  font-size: 15px;
+}
+
 /* ---- Smaller screens ---- */
 @media (max-width: 1100px) {
   .grid {

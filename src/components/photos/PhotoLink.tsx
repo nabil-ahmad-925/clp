@@ -7,16 +7,19 @@ import PageHero from '@/components/sections/PageHero';
 import PhotoGate from '@/components/sections/PhotoGate';
 import Section from '@/components/ui/Section';
 import { albumsEnabled, fetchAlbum, liveAlbumHref } from '@/content/albums';
+import { MyAlbums } from './PhotoExplorer';
 
 /**
  * /photos/?album=<id> goes to the album on its sport's photo page; /photos/?code=<code> opens a private album with its
- * code (the gate tries it at once, then goes to the album).
+ * code (the gate tries it at once, then goes to the album); /photos/?signin=1 (the photo login's invitation e-mail) is
+ * its sign-in, then the albums it was added to.
  */
 export default function PhotoLink() {
   const params = useSearchParams();
   const router = useRouter();
   const id = params.get('album') ?? '';
   const code = params.get('code') ?? '';
+  const signin = params.get('signin') !== null;
   const [missing, setMissing] = useState(false);
 
   useEffect(() => {
@@ -45,6 +48,8 @@ export default function PhotoLink() {
           <p style={{ textAlign: 'center' }}>
             This album isn&rsquo;t available (it may have closed). <Link href="/experiences/">See Experiences</Link>
           </p>
+        ) : signin ? (
+          <MyAlbums />
         ) : (
           <PhotoGate kind="code" initialCode={code} />
         )}

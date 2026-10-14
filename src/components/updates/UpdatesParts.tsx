@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import BecomePartner from '@/components/partners/BecomePartner';
 import { footerLinks } from '@/content/site';
 import styles from './UpdatesHub.module.css';
 
@@ -18,7 +18,7 @@ export function UpdatesHero() {
 const ALERTS = footerLinks.flat().find((l) => /alerts/i.test(l.label));
 
 /**
- * "Write for CLP" (contributors apply through the partnerships page) and the newsletter panel (the alerts sign-up),
+ * "Write for CLP" (contributors apply in the Become a Partner popup) and the newsletter panel (the alerts sign-up),
  * at the end of Updates & News.
  */
 export function UpdatesJoin() {
@@ -28,9 +28,7 @@ export function UpdatesJoin() {
         <span className={styles.eyebrowGold}>WRITE FOR CLP</span>
         <h2 className={styles.writeTitle}>Coaches, Dietitians, Trainers and Specialists: Share What You Know</h2>
         <p className={styles.writeText}>Get a verified contributor profile, a byline on every article and a link to your practice or programs on CLP.</p>
-        <Link className={styles.writeCta} href="/partnerships/">
-          Apply to Contribute
-        </Link>
+        <BecomePartner className={styles.writeCta}>Apply to Contribute</BecomePartner>
       </div>
       <div className={styles.newsletter}>
         <span className={styles.eyebrowDark}>NEWSLETTER</span>

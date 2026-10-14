@@ -204,6 +204,10 @@
   color: #000;
   font-weight: 700;
   text-decoration: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
   transition: opacity 0.15s ease;
 }
 

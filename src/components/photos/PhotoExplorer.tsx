@@ -8,8 +8,10 @@ import {
   albumsEnabled,
   categoryOfSlug,
   fetchAlbum,
+  fetchMyAlbums,
   fetchSportAlbums,
   liveAlbumHref,
+  signOut,
   sportOfPage,
   toGalleryImage,
   type AlbumResult,
@@ -21,6 +23,7 @@ import type { GalleryImage } from '@/content/types';
 import GalleryCart from '@/components/sections/GalleryCart';
 import GalleryLightbox from '@/components/sections/GalleryLightbox';
 import PhotoGate from '@/components/sections/PhotoGate';
+import usePhotoLogin from './usePhotoLogin';
 import styles from './Photos.module.css';
 
 /** What the photo page shows: the sport's home, a category's albums, a gate (family, client or a code), or an album. */
@@ -112,6 +115,27 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
     };
   }, [wantsList, sportSlug]);
 
+  // Signed in with a photo login: the albums of this sport it was added to show open (a client gallery only to them).
+  const login = usePhotoLogin();
+  const [mine, setMine] = useState<{ login: string; items: LiveAlbum[] } | null>(null);
+  useEffect(() => {
+    if (!wantsList || !login || !albumsEnabled) return;
+    let active = true;
+    fetchMyAlbums().then(
+      (items) => active && setMine({ login, items: items.filter((a) => a.sport === sportSlug) }),
+      () => {},
+    );
+    return () => {
+      active = false;
+    };
+  }, [wantsList, login, sportSlug]);
+  const myAlbums = login && mine?.login === login ? mine.items : [];
+  const openIds = new Set(myAlbums.map((a) => a.id));
+  const listed = [
+    ...liveAlbums.map((a) => myAlbums.find((m) => m.id === a.id) ?? a),
+    ...myAlbums.filter((m) => m.access === 'client' && !liveAlbums.some((a) => a.id === m.id)),
+  ];
+
   // An album made in the admin (?album=<id>): open, locked (private, needs its code) or missing.
   const liveId = view.kind === 'live' ? view.id : '';
   const [attempt, setAttempt] = useState(0);
@@ -126,7 +150,8 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
     return () => {
       active = false;
     };
-  }, [liveId, attempt]);
+    // Signing in or out opens or closes a families-only album or a client gallery.
+  }, [liveId, attempt, login]);
   const liveNow = liveState && liveState.id === liveId ? liveState : null;
   const liveItem = liveNow?.result && liveNow.result.status !== 'missing' ? liveNow.result.item : undefined;
   /** The built-in category album of a photo category (its tile, and the category view's address). */
@@ -230,9 +255,15 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
       </div>
 
       <div className={styles.body} data-header-tone="dark">
-        {view.kind === 'home' && <Home sport={sport} albums={albums} live={liveAlbums} />}
+        {/* As the design: a client gallery isn't among the recent events or a category's count, only in its category. */}
+        {view.kind === 'home' && <Home sport={sport} albums={albums} live={listed.filter((a) => a.access !== 'client')} openIds={openIds} />}
         {view.kind === 'category' && category && (
-          <Category sport={sport} albums={albums.filter((a) => a.slug === category.slug)} live={liveAlbums.filter((a) => a.category === categoryOfSlug(category.slug))} />
+          <Category
+            sport={sport}
+            albums={albums.filter((a) => a.slug === category.slug)}
+            live={listed.filter((a) => a.category === categoryOfSlug(category.slug))}
+            openIds={openIds}
+          />
         )}
         {view.kind === 'live' &&
           (!liveNow ? (
@@ -250,13 +281,26 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
             </div>
           ) : liveNow.result?.status === 'locked' ? (
             <section className={styles.album}>
-              <AlbumHead access="code" title={liveNow.result.item.name} line={`${albumDates(liveNow.result.item)} · Photos by ${liveNow.result.item.by}`} />
-              <PhotoGate key={liveId} kind="code" onUnlocked={() => setAttempt((n) => n + 1)} />
+              <AlbumHead access={liveNow.result.item.access} title={liveNow.result.item.name} line={`${albumDates(liveNow.result.item)} · Photos by ${liveNow.result.item.by}`} />
+              {liveNow.result.item.access === 'code' ? (
+                <PhotoGate key={liveId} kind="code" onUnlocked={() => setAttempt((n) => n + 1)} />
+              ) : (
+                <PhotoGate key={liveId} kind={liveNow.result.item.access === 'client' ? 'client' : 'family'} notAdded={liveNow.result.notAdded} />
+              )}
             </section>
           ) : liveNow.result?.status === 'open' ? (
             <Album
               sport={sport}
               unlocked
+              login={liveNow.result.item.access === 'family' || liveNow.result.item.access === 'client' ? login : null}
+              banner={
+                liveNow.result.item.access === 'client' ? (
+                  <div className={styles.clientBanner}>
+                    <strong>Client gallery for {liveNow.result.item.clientName}.</strong>
+                    {liveNow.result.item.freeDownloads ? ' Full-resolution files, licensed for your brand’s use.' : ''}
+                  </div>
+                ) : undefined
+              }
               album={{
                 slug: liveNow.result.item.id,
                 id: liveNow.result.item.id,
@@ -306,12 +350,13 @@ function AlbumCard({ album, sportTitle, eager }: { album: PhotoAlbumRef; sportTi
 }
 
 /**
- * An album made in the admin, as the built-in cards: its cover (a private one's tiny preview, blurred and locked), its
- * access label, name, category and place, and who took the photos.
+ * An album made in the admin, as the built-in cards: its cover (a locked one's tiny preview, blurred), its access
+ * label, name, category and place, and who took the photos. `open`: a families-only album or a client gallery the
+ * signed-in photo login was added to (its real cover, no lock).
  */
-function LiveAlbumCard({ album, eager }: { album: LiveAlbum; eager?: boolean }) {
+function LiveAlbumCard({ album, eager, open }: { album: LiveAlbum; eager?: boolean; open?: boolean }) {
   const access = ACCESS[album.access];
-  const locked = album.access !== 'public';
+  const locked = album.access !== 'public' && !open;
   const src = album.cover || album.preview;
   return (
     <Link href={liveAlbumHref(album)} className={styles.card}>
@@ -340,7 +385,7 @@ function LiveAlbumCard({ album, eager }: { album: LiveAlbum; eager?: boolean }) 
 }
 
 /** The home: the newest albums made in the admin, then the built-in ones with the most photos, as "Recent events"; then every category. */
-function Home({ sport, albums, live }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[] }) {
+function Home({ sport, albums, live, openIds }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[]; openIds: Set<string> }) {
   const recentLive = live.slice(0, 4);
   const recent = [...albums].filter((a) => a.access !== 'client').sort((a, b) => b.count - a.count).slice(0, 4 - recentLive.length);
   /** Event albums of a category: its built-in one and those made in the admin. */
@@ -354,7 +399,7 @@ function Home({ sport, albums, live }: { sport: PhotoSection['sport']; albums: P
         </div>
         <div className={styles.grid}>
           {recentLive.map((a, i) => (
-            <LiveAlbumCard key={a.id} album={a} eager={i < 4} />
+            <LiveAlbumCard key={a.id} album={a} eager={i < 4} open={openIds.has(a.id)} />
           ))}
           {recent.map((a, i) => (
             <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={recentLive.length + i < 4} />
@@ -412,7 +457,7 @@ const monthName = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.sl
  * A category's albums: city, date and access filters, the sort, the count with the access key, and the album cards
  * (the albums made in the admin, newest event first, then the built-in one, which has no city or date).
  */
-function Category({ sport, albums, live }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[] }) {
+function Category({ sport, albums, live, openIds }: { sport: PhotoSection['sport']; albums: PhotoAlbumRef[]; live: LiveAlbum[]; openIds: Set<string> }) {
   const [city, setCity] = useState('all');
   const [month, setMonth] = useState('all');
   const [access, setAccess] = useState('all');
@@ -495,7 +540,7 @@ function Category({ sport, albums, live }: { sport: PhotoSection['sport']; album
       ) : (
         <div className={`${styles.grid} ${styles.gridTall}`}>
           {liveShown.map((a, i) => (
-            <LiveAlbumCard key={a.id} album={a} eager={i < 4} />
+            <LiveAlbumCard key={a.id} album={a} eager={i < 4} open={openIds.has(a.id)} />
           ))}
           {ordered.map((a, i) => (
             <AlbumCard key={a.slug} album={a} sportTitle={sport.title} eager={liveShown.length + i < 4} />
@@ -523,13 +568,79 @@ function AlbumHead({ access, title, line, children }: { access: AlbumAccess; tit
   );
 }
 
-/** A gate view ("My family's photos", "Client login", a private code): the album heading and its gate. */
+/**
+ * A gate view ("My family's photos", "Client login", a private code): the album heading and its gate; signed in with a
+ * photo login, its families-only albums or client galleries.
+ */
 function Gate({ sport, access, code }: { sport: PhotoSection['sport']; access: Exclude<AlbumAccess, 'public'>; code?: string }) {
   return (
     <section className={styles.album}>
       <AlbumHead access={access} title={GATE_COPY[access].album} line={`${sport.title} · Photos by Compete Like Pros`} />
-      <PhotoGate key={`${access}-${code ?? ''}`} kind={access} initialCode={code} />
+      {access === 'code' ? <PhotoGate key={`${access}-${code ?? ''}`} kind={access} initialCode={code} /> : <MyAlbums kind={access} />}
     </section>
+  );
+}
+
+/** Who is signed in with a photo login, and signing out. */
+function SignedInLine({ email }: { email: string }) {
+  return (
+    <p className={styles.signedIn}>
+      Signed in as <strong>{email}</strong> ·{' '}
+      <button type="button" className={styles.signOut} onClick={() => void signOut()}>
+        Sign Out
+      </button>
+    </p>
+  );
+}
+
+/**
+ * The albums of the signed-in photo login (every sport's): its families-only albums or client galleries (`kind`), or
+ * all of them (the invitation e-mail's /photos/?signin=1). Signed out, its sign-in.
+ */
+export function MyAlbums({ kind }: { kind?: 'family' | 'client' }) {
+  const login = usePhotoLogin();
+  const [state, setState] = useState<{ login: string; items?: LiveAlbum[]; error?: string } | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!login) return;
+    let active = true;
+    fetchMyAlbums().then(
+      (items) => active && setState({ login, items }),
+      (err) => active && setState({ login, error: err instanceof Error ? err.message : 'Your albums couldn’t be loaded.' }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [login, attempt]);
+
+  if (!login) return <PhotoGate kind={kind ?? 'login'} />;
+  const now = state?.login === login ? state : null;
+  const items = now?.items?.filter((a) => !kind || a.access === kind);
+  return (
+    <div className={styles.mine}>
+      <SignedInLine email={login} />
+      {!now ? (
+        <div className={styles.empty}>Loading your albums…</div>
+      ) : now.error ? (
+        <div className={styles.empty}>
+          {now.error}{' '}
+          <button type="button" className={styles.clear} onClick={() => setAttempt((n) => n + 1)}>
+            Try Again
+          </button>
+        </div>
+      ) : items && items.length > 0 ? (
+        <div className={styles.grid}>
+          {items.map((a, i) => (
+            <LiveAlbumCard key={a.id} album={a} eager={i < 4} open />
+          ))}
+        </div>
+      ) : (
+        <div className={styles.empty}>
+          {kind === 'family' ? 'No families-only albums' : kind === 'client' ? 'No client galleries' : 'No albums'} for this login yet. Ask the organizer to add
+          your email.
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -538,11 +649,17 @@ function Album({
   sport,
   album,
   unlocked,
+  login,
+  banner,
 }: {
   sport: PhotoSection['sport'];
   album: NonNullable<PhotoSection['album']> & { by?: string };
-  /** A private album opened by its code (made in the admin). */
+  /** A private album opened by its code, or a families-only one or a client gallery by a photo login (made in the admin). */
   unlocked?: boolean;
+  /** The photo login it was opened with (shown, with signing out). */
+  login?: string | null;
+  /** Shown over the photos (an open client gallery's line). */
+  banner?: ReactNode;
 }) {
   const [filter, setFilter] = useState<PhotoFilter>('all');
   const [open, setOpen] = useState<number | null>(null);
@@ -590,6 +707,8 @@ function Album({
           </div>
         )}
       </AlbumHead>
+      {login && <SignedInLine email={login} />}
+      {!locked && banner}
 
       {locked ? (
         <PhotoGate kind={album.access as Exclude<AlbumAccess, 'public'>} />

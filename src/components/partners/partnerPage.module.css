@@ -1233,6 +1233,268 @@ button.stat {
   font-weight: 700;
 }
 
+/* ---- Shop: all products (the design's: count, sort and page size; shopping options on the left) ---- */
+.productImageTall {
+  aspect-ratio: auto;
+  height: 420px;
+}
+
+.shopAllHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #ededea;
+}
+
+.shopAllTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.shopAllTitle h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.shopAllControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 28px;
+  color: #777;
+  font-size: 14px;
+}
+
+.shopAllControls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shopAllControls select {
+  height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-bottom: 1px solid #ccc;
+  background: transparent;
+  color: #111;
+  font: inherit;
+}
+
+.shopAllBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 64px;
+}
+
+.shopAside {
+  display: flex;
+  flex: 0 1 280px;
+  flex-direction: column;
+  gap: 40px;
+  min-width: 240px;
+}
+
+.shopAsideBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.shopAsideLabel {
+  color: #999;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.shopAsideAll {
+  color: #555;
+  font-size: 15px;
+}
+
+.activeFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #f2f1ee;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.activeFilter > span {
+  color: #888;
+}
+
+.clearAll {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.optionGroup {
+  border-top: 1px solid #e5e5e2;
+}
+
+.optionGroup:last-child {
+  border-bottom: 1px solid #e5e5e2;
+}
+
+.optionGroupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 16px;
+}
+
+.optionPick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 0 0 4px;
+  border: 0;
+  background: transparent;
+  color: #555;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.optionPickOn {
+  color: #111;
+}
+
+.optionBox {
+  display: flex;
+  flex: 0 0 18px;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  border: 1.5px solid #bbb;
+  border-radius: 4px;
+}
+
+.optionPickOn .optionBox {
+  border-color: #111;
+  background: #111;
+}
+
+.optionCount {
+  margin-left: auto;
+  color: #999;
+  font-size: 14px;
+}
+
+.shopAllMain {
+  display: flex;
+  flex: 999 1 640px;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+}
+
+.productsAll {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 48px 32px;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #555;
+}
+
+.pager button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* ---- A product's dialog: its photos (thumbnails under the main one) and description ---- */
+.productDialogMedia {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.productThumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 10px 10px;
+}
+
+.productThumb {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: #f2f1ee;
+  cursor: pointer;
+}
+
+.productThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productThumbOn {
+  border-color: #111;
+}
+
+.productDescription {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
 /* ---- Dialogs ---- */
 .overlay {
   position: fixed;
