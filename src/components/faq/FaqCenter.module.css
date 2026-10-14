@@ -1,0 +1,451 @@
+/* The FAQ's body (the new design, FAQ.html): search on the heading's edge, topic tabs, the topic's parts as a switch,
+   the questions as rows opening one by one, and the gold "Still have a question?" band. */
+.page {
+  background: #fff;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* The search bar, half over the black heading (ListingHero keeps room for it). */
+.searchSlot {
+  position: relative;
+  z-index: 3;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 860px;
+  margin: -40px auto 0;
+  padding: 10px 10px 10px 28px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.search svg {
+  flex: 0 0 auto;
+  color: #8a6f33;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 17px;
+}
+
+.clear {
+  height: 44px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 36px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px 48px 0;
+  border-bottom: 1px solid #eeeeeb;
+}
+
+.tab {
+  margin-bottom: -1px;
+  padding: 0 0 14px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #888;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: #111;
+}
+
+.tabOn {
+  border-bottom-color: #dcbd7d;
+  color: #111;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 48px 48px 0;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: #111;
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.sub {
+  max-width: 600px;
+  color: #666;
+}
+
+/* A topic's parts (its sports, partners, audiences or services): the design's grey switch. */
+.parts {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #f2f1ee;
+}
+
+.part {
+  height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #666;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.part:hover {
+  color: #111;
+}
+
+.partOn {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  color: #111;
+}
+
+.count {
+  color: #666;
+  font-size: 14px;
+}
+
+.count strong {
+  color: #111;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #e5e5e2;
+}
+
+.item {
+  border-bottom: 1px solid #e5e5e2;
+}
+
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 22px 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.questionText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tag {
+  color: #8a6f33;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.q {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sign {
+  display: flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid #dcbd7d;
+  border-radius: 50%;
+  color: #8a6f33;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.answer {
+  padding: 0 52px 24px 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.answer p,
+.answer ul {
+  margin: 0;
+}
+
+.answer > * + * {
+  margin-top: 10px;
+}
+
+.answer ul {
+  padding-left: 22px;
+}
+
+.empty {
+  margin: 0;
+  padding: 40px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  color: #666;
+  text-align: center;
+}
+
+.askWrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 112px 48px 120px;
+}
+
+.ask {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 56px 48px;
+  border-radius: 16px;
+  background: #dcbd7d;
+  text-align: center;
+}
+
+.askTitle {
+  margin: 0;
+  color: #000;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.askSub {
+  max-width: 520px;
+  color: #2b2412;
+}
+
+.askActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.askPrimary,
+.askSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  padding: 0 26px;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.askPrimary {
+  border: 0;
+  background: #111;
+  color: #fff;
+}
+
+.askSecondary {
+  border: 1.5px solid #111;
+  color: #111;
+}
+
+.askForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+  text-align: left;
+}
+
+.askRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.askForm input,
+.askForm select,
+.askForm textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+}
+
+.askForm input,
+.askForm select {
+  height: 48px;
+  padding: 0 14px;
+}
+
+.askForm textarea {
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.askForm [aria-invalid='true'] {
+  box-shadow: 0 0 0 2px #a4161a;
+}
+
+.askError {
+  color: #6b0f12;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.askDone {
+  max-width: 560px;
+  color: #000;
+  font-size: 18px;
+}
+
+@media (max-width: 999px) {
+  .searchSlot,
+  .tabs,
+  .body {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+
+  .askWrap {
+    padding: 88px 32px 96px;
+  }
+}
+
+@media (max-width: 639px) {
+  .searchSlot,
+  .body {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .search {
+    margin-top: -32px;
+    padding-left: 18px;
+  }
+
+  .search input {
+    font-size: 16px;
+  }
+
+  /* The topics on one row that scrolls sideways. */
+  .tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 24px;
+    padding: 36px 16px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .body {
+    padding-top: 36px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .q {
+    font-size: 16px;
+  }
+
+  .answer {
+    padding-right: 0;
+  }
+
+  .askWrap {
+    padding: 72px 16px 80px;
+  }
+
+  .ask {
+    padding: 40px 20px;
+  }
+
+  .askTitle {
+    font-size: 24px;
+  }
+
+  .askRow {
+    grid-template-columns: 1fr;
+  }
+}

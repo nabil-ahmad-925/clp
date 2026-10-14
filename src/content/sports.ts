@@ -290,7 +290,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/baseball/"
+        href: "/faq/experiences/baseball/"
       }
     }
   },
@@ -589,7 +589,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/basketball/"
+        href: "/faq/experiences/basketball/"
       }
     }
   },
@@ -880,7 +880,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/esports/"
+        href: "/faq/experiences/esports/"
       }
     }
   },
@@ -1175,7 +1175,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/futbol/"
+        href: "/faq/experiences/futbol/"
       }
     }
   },
@@ -1462,7 +1462,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/golfing/"
+        href: "/faq/experiences/golfing/"
       }
     }
   },
@@ -1749,7 +1749,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/pickleball/"
+        href: "/faq/experiences/pickleball/"
       }
     }
   },
@@ -1810,7 +1810,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "mailto:jobs@competelikepros.com"
+          href: "/jobs/?sport=esports"
         }
       },
       {
@@ -2030,7 +2030,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/esports/"
+        href: "/faq/resources/esports/"
       }
     }
   },
@@ -2087,7 +2087,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "https://jobs.competelikepros.com/"
+          href: "/jobs/?sport=golf"
         }
       },
       {
@@ -2307,7 +2307,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/golfing/"
+        href: "/faq/resources/golfing/"
       }
     }
   },
@@ -2364,7 +2364,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "mailto:jobs@competelikepros.com"
+          href: "/jobs/?sport=pickleball"
         }
       },
       {
@@ -2584,7 +2584,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/pickleball/"
+        href: "/faq/resources/pickleball/"
       }
     }
   },
@@ -2645,7 +2645,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "mailto:jobs@competelikepros.com"
+          href: "/jobs/?sport=baseball-softball"
         }
       },
       {
@@ -2865,7 +2865,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/baseball/"
+        href: "/faq/resources/baseball/"
       }
     }
   },
@@ -2934,7 +2934,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "mailto:jobs@competelikepros.com"
+          href: "/jobs/?sport=basketball"
         }
       },
       {
@@ -3154,7 +3154,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/basketball/"
+        href: "/faq/resources/basketball/"
       }
     }
   },
@@ -3219,7 +3219,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/04/CLP-Photos-Jobs.png'),
         cta: {
           label: "Learn More",
-          href: "https://jobs.competelikepros.com/"
+          href: "/jobs/?sport=futbol-soccer"
         }
       },
       {
@@ -3439,7 +3439,7 @@ export const sportPages: SportPage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/resources/futbol/"
+        href: "/faq/resources/futbol/"
       }
     }
   }

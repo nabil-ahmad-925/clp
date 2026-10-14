@@ -60,6 +60,6 @@ export const experiencesIndex: SportsIndexPage = {
   faq: {
     title: "CLP EXPERIENCES FAQ's",
     items: sportsPages.flatMap((p) => p.faq.items.slice(0, 1)),
-    viewAll: { label: 'VIEW ALL', href: 'https://faq.competelikepros.com/', newTab: true },
+    viewAll: { label: 'VIEW ALL', href: '/faq/experiences/' },
   },
 };

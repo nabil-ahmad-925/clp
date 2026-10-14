@@ -1,0 +1,476 @@
+/* Jobs & Internships (the listing pages' design): a role's card (the listing card's frame, text only), the "Hiring?"
+   card and a role's popup. */
+.results {
+  padding-top: 32px;
+}
+
+.skeleton {
+  min-height: 340px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  padding: 20px 18px;
+  border: 1px solid #e5e5e2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: #d6d3cc;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 6px;
+}
+
+.mark {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  color: var(--white);
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.org {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.orgName {
+  overflow: hidden;
+  color: #111;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.verified,
+.orgLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.orgLink {
+  text-decoration: none;
+}
+
+.orgLink:hover {
+  text-decoration: underline;
+}
+
+.kind {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  color: #111;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f2f1ee;
+  color: #111;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tagGold {
+  background: #fbf4e4;
+  color: #8a6f33;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.fact svg {
+  flex: none;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeeb;
+}
+
+.posted {
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.deadline {
+  color: #b03a2e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  margin-left: auto;
+  padding: 0 16px;
+  border: 1px solid #111;
+  border-radius: 6px;
+  background: #111;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.card:hover .cta {
+  background: var(--white);
+  color: #111;
+}
+
+/* The last card: posting roles as a CLP partner. */
+.join {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 340px;
+  padding: 28px 24px;
+  border-radius: 10px;
+  background: #0a0a0a;
+  color: var(--white);
+  font-family: var(--font-body);
+}
+
+.joinKicker {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.joinTitle {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.joinLine {
+  color: #bbb;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.joinCta {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--gold);
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.joinLink {
+  color: #ddd;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* A role's popup (the site's popups: see ClaimModal). */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(10, 10, 10, 0.6);
+  font-family: var(--font-body);
+}
+
+.dialog {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100dvh - 64px);
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--white);
+  color: #111;
+  line-height: 1.5;
+  outline: none;
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: #f2f1ee;
+}
+
+.dialogBody {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 40px 44px 28px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.dialogHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 40px;
+}
+
+.dialogTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.facts4 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.factBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7f6f3;
+  font-size: 15px;
+}
+
+.factBox svg {
+  flex: none;
+  margin-top: 3px;
+  color: #8a6f33;
+}
+
+.factBox span {
+  display: flex;
+  flex-direction: column;
+}
+
+.factBox strong {
+  color: #888;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dialogH3 {
+  margin: 12px 0 0;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.text {
+  margin: 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fbf4e4;
+  color: #5c4a1e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.check svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.postedLine {
+  color: #888;
+  font-size: 13px;
+}
+
+.dialogNote {
+  margin: 0;
+  color: #666;
+}
+
+.dialogFoot {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 44px 24px;
+  border-top: 1px solid #eeeeeb;
+  box-shadow: 0 -10px 20px -16px rgba(0, 0, 0, 0.3);
+}
+
+.apply,
+.applySecondary {
+  display: inline-flex;
+  flex: 1 1 200px;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  padding: 0 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.apply {
+  background: #111;
+  color: var(--white);
+}
+
+.apply:hover {
+  background: #333;
+}
+
+.applySecondary {
+  border: 1.5px solid #111;
+  color: #111;
+}
+
+@media (max-width: 639px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .dialog {
+    max-height: 92dvh;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .dialogBody {
+    padding: 32px 20px 20px;
+  }
+
+  .dialogFoot {
+    padding: 14px 20px 20px;
+  }
+
+  .dialogTitle {
+    font-size: 22px;
+  }
+
+  .facts4 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,6 +3,7 @@ import { SITE_URL } from '@/content/site';
 import { sportPages } from '@/content/sports';
 import { servicePages } from '@/content/services';
 import { legalPages } from '@/content/legal';
+import { faqHref, faqTopics } from '@/content/faq';
 
 // Generated at build time (required for the static export).
 export const dynamic = 'force-static';
@@ -18,6 +19,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about-us/',
     '/partnerships/',
     '/our-expectations/',
+    '/faq/',
+    '/jobs/',
+    ...faqTopics.flatMap((t) => [faqHref(t.id), ...t.subs.map((s) => faqHref(t.id, s.id))]),
     ...sportPages.map((p) => `/${p.section}/${p.slug}/`),
     ...servicePages.map((p) => `/${p.slug}/`),
     ...legalPages.map((p) => `/${p.slug}/`),

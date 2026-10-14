@@ -59,5 +59,5 @@ export const partnershipsFaq: FaqData = {
         'To grow the sport, we actively look for partners such as schools, clubs, community centers, and nonprofits to promote, host events, and develop programs.',
     },
   ],
-  viewAll: { label: 'VIEW ALL', href: 'https://faq.competelikepros.com/partnerships/' },
+  viewAll: { label: 'VIEW ALL', href: '/faq/partnerships/' },
 };

@@ -83,7 +83,7 @@ export const socialLinks: SocialLink[] = [
 export const footerLinks: NavItem[][] = [
   [
     { label: 'ABOUT US', href: '/about-us/' },
-    { label: 'FAQ', href: 'https://faq.competelikepros.com/' },
+    { label: 'FAQ', href: '/faq/' },
     { label: 'PARTNERSHIPS', href: '/partnerships/' },
     { label: 'SHIPPING & RETURNS', href: '/shipping-returns/' },
     { label: 'TERMS AND CONDITIONS', href: '/terms-conditions/' },

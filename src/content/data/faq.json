@@ -1,0 +1,2534 @@
+{
+ "topics": [
+  {
+   "id": "experiences",
+   "label": "Experiences",
+   "sub": "Booking, safety, equipment and what to expect at a CLP experience, by sport.",
+   "subs": [
+    {
+     "id": "baseball",
+     "label": "Baseball & Softball",
+     "items": [
+      {
+       "q": "What is your cancellation policy for baseball experiences?",
+       "a": [
+        "Depending on the type and timing of the cancellation, our cancellation policy varies. For specific details regarding cancellations and refunds, please review our terms and conditions."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during baseball experiences?",
+       "a": [
+        "Our top priority is participant safety, and we follow all relevant safety guidelines and protocols. First aid provisions and emergency protocols are made available to all participants by our team of experienced operational owners/trainer partners."
+       ]
+      },
+      {
+       "q": "Can I book a baseball experience for a group or team?",
+       "a": [
+        "You can participate in baseball experiences together as a team, school, organization, or corporate group. We offer group discounts and customized packages."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the baseball experiences?",
+       "a": [
+        "Depending on the type of experience, accommodations and meals may be included. Our baseball-themed trips often include lodging and some meals, while day-long clinics or tournaments may not include accommodations but may offer food options on-site or nearby."
+       ]
+      },
+      {
+       "q": "How do I register for a baseball experience?",
+       "a": [
+        "Our website allows you to register for our baseball experiences online. You can sign up for any experience you like, fill out the registration form, pay, and receive confirmation after you fill it out."
+       ]
+      },
+      {
+       "q": "Can I participate in your baseball experiences if I’ve never played baseball before?",
+       "a": [
+        "Yes, absolutely! Beginners are welcome to our baseball experiences. Introducing newcomers to the sport is made easier with our expert operational owners/trainers partners."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own baseball gear?",
+       "a": [
+        "We provide some basic equipment, such as baseballs and bats, but we recommend that participants bring their own equipment, including gloves, cleats, helmets, and appropriate attire"
+       ]
+      },
+      {
+       "q": "What ages are your baseball experiences suitable for?",
+       "a": [
+        "Baseball experiences are tailored to participants of all ages, including youth players, adults, and families. The activities and coaching we offer are age-appropriate to ensure that all age groups have a positive and enjoyable experience."
+       ]
+      },
+      {
+       "q": "Are your baseball experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for players of all skill levels, from beginners to advanced. To ensure a rewarding experience for everyone, we tailor our sessions and activities to suit different skill levels."
+       ]
+      },
+      {
+       "q": "What types of baseball experiences do you offer?",
+       "a": [
+        "Training camps, skills clinics, coaching sessions, friendly games, tournaments, and baseball-themed trips to iconic stadiums and cities are just some of the baseball experiences we offer.",
+        "Are your baseball experiences suitable for all skill levels?",
+        "We offer experiences for players of all skill levels, from beginners to advanced. To ensure a rewarding experience for everyone, we tailor our sessions and activities to suit different skill levels."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "basketball",
+     "label": "Basketball",
+     "items": [
+      {
+       "q": "What is your cancellation policy for basketball experiences?",
+       "a": [
+        "We have different cancellation policies depending on the experience and the timing of the cancellation. In order to obtain specific details regarding cancellations and refunds, please review our terms and conditions or contact us directly."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during basketball experiences?",
+       "a": [
+        "Safety is our top priority, and we adhere to all relevant safety protocols and guidelines. We provide first aid and emergency protocols, as well as experienced operational owners/trainers partners, to ensure a safe and enjoyable environment for all participants."
+       ]
+      },
+      {
+       "q": "Can I book a basketball experience for a group or team?",
+       "a": [
+        "We offer group bookings for teams, schools, organizations, and corporate groups. Packages can be customized, and group discounts are available."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the basketball experiences?",
+       "a": [
+        "Meals and accommodations may be included, depending on the type of experience. Typically, basketball-themed trips include lodging and meals, while day-long clinics and tournaments may not include accommodations, but may serve food on-site or nearby."
+       ]
+      },
+      {
+       "q": "How do I register for a basketball experience?",
+       "a": [
+        "Our website allows you to register for our basketball experiences online. Follow the instructions for payment and confirmation after selecting the experience you’d like to participate in."
+       ]
+      },
+      {
+       "q": "Can I participate in your basketball experiences if I’ve never played basketball before?",
+       "a": [
+        "Yes, absolutely! Newcomers to basketball are welcome in our experiences. In our supportive learning environment, our operational owners/trainers partners teach students fundamental skills and foster a sense of belonging."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own basketball gear?",
+       "a": [
+        "Although we provide some basic equipment, such as balls and cones, we recommend that participants bring their own basketball gear, such as shoes, shorts, shirts, and appropriate attire for training and games."
+       ]
+      },
+      {
+       "q": "What types of basketball experiences do you offer?",
+       "a": [
+        "We offer a variety of basketball experiences, including skills clinics, training camps, coaching sessions, pick-up games, tournaments, and basketball-themed trips to iconic courts and cities."
+       ]
+      },
+      {
+       "q": "Are your basketball experiences suitable for all skill levels?",
+       "a": [
+        "Players of all skill levels are welcome to participate in our experiences. Regardless of skill level, our activities and sessions are tailored to suit everyone’s needs."
+       ]
+      },
+      {
+       "q": "What ages are your basketball experiences suitable for?",
+       "a": [
+        "Basketball experiences are designed for players of all ages, including youth players, adults, and families. Age-appropriate activities and coaching ensure a positive and enjoyable experience for all ages."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "esports",
+     "label": "Esports",
+     "items": [
+      {
+       "q": "What is your cancellation policy for eSports experiences?",
+       "a": [
+        "Based on the experience type and the timing of cancellations, our cancellation policy differs. For specific details regarding cancellations and refunds, we recommend reviewing our terms and conditions or contacting us directly."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during eSports experiences?",
+       "a": [
+        "As part of our commitment to participant safety, we adhere strictly to all relevant safety protocols and guidelines, including cybersecurity measures, policies on player conduct, and equipment maintenance. To ensure a fair and secure environment for every player, our operational owners/trainers partners monitor gameplay."
+       ]
+      },
+      {
+       "q": "Can I book an eSports experience for a group or team?",
+       "a": [
+        "Group bookings are available for esports teams, schools, organizations, or corporate groups. Personalized packages and group discounts are available for cohesive gaming experiences."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the eSports experiences?",
+       "a": [
+        "Unless otherwise specified, accommodations and meals are not included in our eSports experiences. Unless we recommend a nearby amenity or option, participants are responsible for their lodging and dining arrangements."
+       ]
+      },
+      {
+       "q": "How do I register for an eSports experience?",
+       "a": [
+        "Our esports experiences can be registered online through our website or in person at physical locations. We ask that you select the experience you are interested in, fill out the registration form, and follow the instructions for payment and confirmation."
+       ]
+      },
+      {
+       "q": "Can I participate in your esports experiences if I’ve never played competitive games before?",
+       "a": [
+        "Yes, absolutely! We welcome new gamers to competitive gaming. Our operational owners/trainers partners teach fundamental strategies, improve gameplay mechanics, and provide guidance to help beginners succeed in esports."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own gaming equipment?",
+       "a": [
+        "While our facilities provide gaming equipment, like gaming PCs, consoles, and peripherals, participants may bring their own gaming gear in some cases. This includes gaming mice, keyboards, controllers, and headsets."
+       ]
+      },
+      {
+       "q": "What ages are your esports experiences suitable for?",
+       "a": [
+        "Participants of all ages can participate in our esports experiences, including juniors, adults, and competitive gamers. Our age-appropriate activities and coaching ensure that all participants have an enjoyable and rewarding experience."
+       ]
+      },
+      {
+       "q": "Are your esports experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for gamers at all skill levels, from beginners to experts. Through our eSports partners, you’ll have the chance to learn, practice, and compete with other eSports enthusiasts."
+       ]
+      },
+      {
+       "q": "What types of esports experiences do you offer?",
+       "a": [
+        "Esports experiences include tournaments, gaming clinics, coaching sessions, esports camps, and esports-themed events."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "futbol",
+     "label": "Fútbol (Soccer)",
+     "items": [
+      {
+       "q": "What is your cancellation policy for soccer experiences?",
+       "a": [
+        "We have different cancellation policies depending on the experience and the timing of the cancellation. Please review our cancellation and refund policy or contact us directly for details."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during soccer experiences?",
+       "a": [
+        "Our safety protocols and guidelines place a high priority on participant safety. Operational owner/trainer partners and staff provide a safe and enjoyable environment for all participants through emergency protocols and first aid provisions."
+       ]
+      },
+      {
+       "q": "Can I book a soccer experience for a group or team?",
+       "a": [
+        "Yes, we offer group bookings to teams, schools, organizations, and corporations. Customized packages and group discounts are available."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the soccer experiences?",
+       "a": [
+        "In some cases, meals and accommodations are included in the experience. Some of our soccer-themed trips include lodging and meals, while day-long clinics and tournaments may not include accommodations, but may include food options nearby."
+       ]
+      },
+      {
+       "q": "How do I register for a soccer experience?",
+       "a": [
+        "Our website allows you to register for our soccer experiences online. Follow the instructions for payment and confirmation after selecting the experience you are interested in and filling out the registration form."
+       ]
+      },
+      {
+       "q": "Can I participate in your soccer experiences if I’ve never played soccer before?",
+       "a": [
+        "Absolutely! Beginners who have never played soccer before are welcome to join us. A supportive learning environment is fostered by our experienced coaches and instructors, who are able to teach fundamental skills."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own soccer gear?",
+       "a": [
+        "Participants should bring their own soccer gear, including cleats, shin guards, and appropriate attire for training or matches. We provide some basic equipment, such as balls and cones."
+       ]
+      },
+      {
+       "q": "What ages are your soccer experiences suitable for?",
+       "a": [
+        "Our soccer experiences are designed for participants of various ages, including youth players, adults, and even families. We offer age-appropriate activities and coaching to ensure a positive and enjoyable experience for all age groups."
+       ]
+      },
+      {
+       "q": "Are your soccer experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for players of all skill levels, from beginners to advanced. Sessions and activities are tailored to accommodate different skill levels and ensure that everyone has a rewarding experience."
+       ]
+      },
+      {
+       "q": "What types of soccer experiences do you offer?",
+       "a": [
+        "As a soccer experience provider, we offer a variety of soccer-related activities, such as training camps, coaching clinics, friendly matches, tournaments, and trips to iconic soccer stadiums."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "golfing",
+     "label": "Golfing",
+     "items": [
+      {
+       "q": "What is your cancellation policy for golfing experiences?",
+       "a": [
+        "Our cancellation policy varies depending on the type and timing of the cancellation. Our terms and conditions provide specific details about cancellations and refunds."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during golfing experiences?",
+       "a": [
+        "Our top priority is participant safety, and we adhere to all relevant safety protocols and golf course rules. Our instructors provide guidance on safety practices and course etiquette during training sessions."
+       ]
+      },
+      {
+       "q": "Can I book a golfing experience for a group or team?",
+       "a": [
+        "You can reserve a group for your golf team, corporate outing, social group, or family gathering. We offer group discounts and customized packages for memorable golfing experiences."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the golfing experiences?",
+       "a": [
+        "Depending on the experience, meals and accommodations may be included. While some of our golfing getaways and trips include lodging, meals, and golf course access, single-day clinics and tournaments may not include accommodations, but may provide meals."
+       ]
+      },
+      {
+       "q": "How do I register for a golfing experience?",
+       "a": [
+        "Our website offers online registration for our golfing experiences. Follow the instructions for payment and confirmation after selecting the experience you’re interested in."
+       ]
+      },
+      {
+       "q": "Can I participate in your golfing experiences if I’ve never played golf before?",
+       "a": [
+        "Yes, absolutely! Beginners who are new to golf are welcome at our experiences. To help beginners improve their skills and enjoy the game, our professional instructors teach fundamental techniques and provide guidance."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own golf equipment?",
+       "a": [
+        "While we provide basic golf equipment, such as clubs and balls, we recommend that players bring their own clubs, gloves, golf shoes, and appropriate attire to the course/experience"
+       ]
+      },
+      {
+       "q": "What ages are your golfing experiences suitable for?",
+       "a": [
+        "Participants of all ages are welcome to take part in our golfing experiences, from juniors to seniors. Our programs create an enjoyable and inclusive environment for all ages with age-appropriate instruction and activities."
+       ]
+      },
+      {
+       "q": "Are your golfing experiences suitable for all skill levels?",
+       "a": [
+        "Yes, our experiences are suitable for all levels of golfers. Each participant’s needs are met through personalized activities and coaching, ensuring that everyone has a rewarding experience."
+       ]
+      },
+      {
+       "q": "What types of golfing experiences do you offer?",
+       "a": [
+        "Our golfing experiences include clinics, training sessions, tournaments, golfing getaways, and golf-themed trips to renowned courses and destinations."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "pickleball",
+     "label": "Pickleball",
+     "items": [
+      {
+       "q": "What is your cancellation policy for pickleball experiences?",
+       "a": [
+        "Depending on the type and timing of the cancellation, our cancellation policy varies. For specific details regarding cancellations and refunds, please review our terms and conditions."
+       ]
+      },
+      {
+       "q": "What safety measures do you have in place during pickleball experiences?",
+       "a": [
+        "As part of our commitment to participant safety, we adhere to all relevant safety protocols and guidelines, including court maintenance, equipment checks, and player conduct policies. In order for all participants to have a fun and safe experience, our staff ensures a safe environment."
+       ]
+      },
+      {
+       "q": "Can I book a pickleball experience for a group or team?",
+       "a": [
+        "Certainly, we offer group bookings for pickleball teams, clubs, schools, organizations, and corporate groups. Our group outing packages and group discounts make it easy to plan the perfect outing for your group."
+       ]
+      },
+      {
+       "q": "Are accommodations and meals included in the pickleball experiences?",
+       "a": [
+        "Our pickleball experiences do not typically include accommodations or meals, unless otherwise specified. Although we may provide recommendations or options for nearby amenities, participants are responsible for making their own lodging and dining arrangements."
+       ]
+      },
+      {
+       "q": "How do I register for a pickleball experience?",
+       "a": [
+        "Online registration is available through our website, or you can register in person at an experience. Choose the experience you’re interested in, complete the registration form, and follow the instructions for payment and confirmation."
+       ]
+      },
+      {
+       "q": "Can I participate in your pickleball experiences if I’ve never played before?",
+       "a": [
+        "Yes, absolutely! We welcome newcomers to pickleball with our experience. Beginners can easily learn and enjoy pickleball thanks to our instructors’ experience teaching basic techniques, rules, and strategies."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own pickleball equipment?",
+       "a": [
+        "While we provide pickleball equipment at our experiences, such as paddles, balls, and nets, participants are welcome to bring their own equipment. In this category, you will find pickleball shoes, apparel, and accessories."
+       ]
+      },
+      {
+       "q": "What ages are your pickleball experiences suitable for?",
+       "a": [
+        "Participants of various ages can enjoy pickleball with us, including youth players, adults, and seniors. To ensure that all age groups have a rewarding and enjoyable experience, we offer age-appropriate activities and coaching."
+       ]
+      },
+      {
+       "q": "Are your pickleball experiences suitable for all skill levels?",
+       "a": [
+        "Pickleball players of all skill levels are welcome at our experiences. Our program provides participants with opportunities for skill development, friendly matches, and competitive play tailored to their needs."
+       ]
+      },
+      {
+       "q": "What types of pickleball experiences do you offer?",
+       "a": [
+        "Our pickleball experiences include clinics, training sessions, social play events, tournaments, and excursions themed around pickleball."
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "partnerships",
+   "label": "Partnerships",
+   "sub": "For athletes, brands, coaches, clubs, facilities and pros working with CLP.",
+   "subs": [
+    {
+     "id": "athletes-talents",
+     "label": "Athletes & Talents",
+     "items": [
+      {
+       "q": "What is CompeteLikePros powered by Soxcessful ®?",
+       "a": [
+        "CompeteLikePros powered by Soxcessful ® is a platform connecting athletes, coaches, and facilities to deliver sports programs (e.g., camps, lessons, leagues) across baseball/softball, basketball, esports, football/soccer, golf, and pickleball. It emphasizes professional training, inclusivity, and community engagement, with a revenue-share model where providers retain 60-70% of gross revenue."
+       ]
+      },
+      {
+       "q": "What is the Local Heroes initiative?",
+       "a": [
+        "Local Heroes is a content creation program that tells authentic stories of local athletes, teams, and communities through videos, articles, podcasts, and photo stories. It aims to build emotional connections and brand loyalty, distributed via social media (X, Instagram, TikTok, YouTube, LinkedIn and other channels)."
+       ]
+      },
+      {
+       "q": "Why partner with CompeteLikePros powered by Soxcessful ®?",
+       "a": [
+        "Partners gain exposure through co-branded content, access to a growing platform, opportunities to lead programs (e.g., camps, lessons), and community impact. You’ll also benefit from CompeteLikePros powered by Soxcessful ®’s partnerships with venues, sponsors, and local providers."
+       ]
+      },
+      {
+       "q": "Who can partner?",
+       "a": [
+        "NIL athletes (college athletes leveraging their name, image, likeness), current/ex-pros, and influencers with a sports-related following (5,000-100,000+ followers) are eligible. Partners should align with the platform’s mission of authenticity and community engagement."
+       ]
+      },
+      {
+       "q": "What roles can I play?",
+       "a": [
+        "Roles include brand ambassador, content creator for Local Heroes, guest coach for camps/workshops, meet-and-greets, or merchandise drops and more. You can also nominate local stories or connect with community groups."
+       ]
+      },
+      {
+       "q": "How do I join as a partner?",
+       "a": [
+        "Complete our onboarding questionnaire sent to you. The team reviews submissions, conducts interviews, and verifies background checks ($50, covered by CompeteLikePros). Approved partners sign an agreement outlining roles, earnings, and potential opportunities."
+       ]
+      },
+      {
+       "q": "What is the onboarding timeline?",
+       "a": [
+        "Onboarding takes 2-4 weeks: 1 week for questionnaire review, 1 week for interviews and background checks, and 1-2 weeks for contract signing."
+       ]
+      },
+      {
+       "q": "Do I need a background check?",
+       "a": [
+        "All partners involved in groups or private training may require a $50 background check (covered by CompeteLikePros powered by Soxcessful ® for partners, unlike providers). This ensures safety and compliance."
+       ]
+      },
+      {
+       "q": "Do I need liability insurance?",
+       "a": [
+        "If you plan on running sessions or other activities in person on your own then Yes, a $1M liability insurance will be required. In situations CompeteLikePros powered by Soxcessful ® is the host, our $2M blanket policy supplements or covers this."
+       ]
+      },
+      {
+       "q": "What is expected of me as a partner?",
+       "a": [
+        "Depending on your role, you may create Local Heroes content (e.g., videos, interviews), lead programs (e.g., private lessons, camps), host meet-and-greets, or promote CompeteLikePros powered by Soxcessful ® on social media."
+       ]
+      },
+      {
+       "q": "How much time is required?",
+       "a": [
+        "Time commitment varies: content creation (2-5 hours/month), coaching (5-20 hours/month), events (1-2 days/event). You specify availability during onboarding."
+       ]
+      },
+      {
+       "q": "What are the potential fees for partnerships?",
+       "a": [
+        "Brand Partnerships: Fixed fees of $100 -$25,000+ per campaign for social media posts, content features, or ambassador roles, depending on your follower count and engagement.",
+        "Meet-and-Greets: $250 – $10,000 per event (1-2 hours), based on attendance and location (e.g., Travel expenses covered for events outside your primary location.",
+        "Brand/Product Development: Development costs (e.g., design, prototyping) may be split 50/50 with CompeteLikePros powered by Soxcessful ®. However, earnings may range from $100 – $100,000+ for various projects.",
+        "Content Creation (Local Heroes): With no upfront cost to you; CompeteLikePros covers production, and you earn a 25% revenue on your branded merchandise shipped directly to customers and $100-$15,000 per appearance fee for events. Coaching/Programs: 60-70% revenue share (same as providers) for leading lessons, camps, or workshops, with CompeteLikePros taking 30-40%. Example: $150 private lesson yields $90-$105 for you."
+       ]
+      },
+      {
+       "q": "Are there costs I need to cover?",
+       "a": [
+        "You cover your $1M liability insurance (est. $500-$1,000/year) and any travel expenses not pre-approved for events. Content production and background checks are covered by CompeteLikePros powered by Soxcessful ®."
+       ]
+      },
+      {
+       "q": "How are payments handled?",
+       "a": [
+        "Payments are processed via Stripe, bank transfers or checks, with revenue shares or fixed fees disbursed monthly. Transparent dashboards track earnings from bookings and merchandise."
+       ]
+      },
+      {
+       "q": "How do I contribute to Local Heroes?",
+       "a": [
+        "Share your story or nominate local athletes/teams. Participate in interviews, filming, or podcasts (2-5 hours per story). Content is produced by CompeteLikePros’ team of photographers, videographers, and editors."
+       ]
+      },
+      {
+       "q": "What types of content will I be featured in?",
+       "a": [
+        "You may appear in short videos (1-3 minutes), long-form documentaries (5-10 minutes), photo stories, articles (300-500 words), or podcasts (15-20 minutes), distributed on X, Instagram, TikTok, YouTube, LinkedIn, and the app/website."
+       ]
+      },
+      {
+       "q": "Can I promote my own brand in Local Heroes content?",
+       "a": [
+        "Yes, co-branding is encouraged (e.g., your logo alongside CompeteLikePros powered by Soxcessful ®), limited to 20% of visual space. Approval ensures alignment with brand guidelines."
+       ]
+      },
+      {
+       "q": "Can I use my existing audience to promote programs?",
+       "a": [
+        "Absolutely. You can promote camps, lessons, or events to your followers."
+       ]
+      },
+      {
+       "q": "Do I need to promote CompeteLikePros on my social media?",
+       "a": [
+        "Yes, partners are expected to share co-branded content (e.g., Local Heroes videos, event teasers) on their social channels (1-2 posts/month). Templates and assets are provided for ease."
+       ]
+      },
+      {
+       "q": "Can I lead my own programs?",
+       "a": [
+        "Yes, you can lead private lessons, group lessons, camps, or workshops, retaining 60-70% of revenue. You’ll use the app/website for scheduling and bookings, with 30% customization allowed for your coaching style."
+       ]
+      },
+      {
+       "q": "How does co-branding work?",
+       "a": [
+        "Your name/image/logo can appear on content, merchandise, or programs (e.g., “[Your Name]’s Elite Camp powered by CompeteLikePros”). Co-branding is subject to approval to ensure CompeteLikePros powered by Soxcessful ® prominence."
+       ]
+      },
+      {
+       "q": "What are the benefits of co-branding?",
+       "a": [
+        "Increase your brand visibility, leverage CompeteLikePros’ global partners and sponsors, and reach new audiences through co-branded campaigns and events."
+       ]
+      },
+      {
+       "q": "How is my data used?",
+       "a": [
+        "Your profile, social media metrics, and program performance (e.g., coaching hours, bookings) are tracked via the app/website to optimize partnerships and measure ROI. Anonymized engagement data may be shared with sponsors."
+       ]
+      },
+      {
+       "q": "Is my data secure?",
+       "a": [
+        "Yes, CompeteLikePros powered by Soxcessful ® uses GDPR-compliant, secure storage for all partner data. Personal information is only shared with your consent (e.g., for co-branded content)."
+       ]
+      },
+      {
+       "q": "What if I have conflicts with other partnerships?",
+       "a": [
+        "Disclose existing partnerships during onboarding. CompeteLikePros will work to avoid conflicts or negotiate non-exclusive terms with sponsors (e.g., allowing both Nike and Adidas affiliations)."
+       ]
+      },
+      {
+       "q": "What if I can’t meet expectations?",
+       "a": [
+        "CompeteLikePros powered by Soxcessful ® offers flexible roles to match your availability. If performance issues arise (e.g., low engagement), the team provides feedback and support. Persistent underperformance may lead to contract review."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "brands",
+     "label": "Brands",
+     "items": [
+      {
+       "q": "What types of brands does CLP collaborate with?",
+       "a": [
+        "CLP partners with brands that support youth/ault sports, athlete development, performance, recovery, lifestyle, apparel, content, and community growth — from startups to global leaders."
+       ]
+      },
+      {
+       "q": "What are the partnership levels?",
+       "a": [
+        "We offer tiers ranging from local event presence to full-scale national activations, digital brand integrations, and product collaborations."
+       ]
+      },
+      {
+       "q": "Can we activate at CLP-hosted events?",
+       "a": [
+        "Yes. Partners can set up branded zones, hydration or wellness stations, skills challenges, product demos, and giveaways."
+       ]
+      },
+      {
+       "q": "Do you offer digital campaign integration?",
+       "a": [
+        "Yes. We offer carousel takeovers, reels featuring your products, newsletter drops, athlete collabs, and shoppable links through our microsites."
+       ]
+      },
+      {
+       "q": "Can we co-create products with CLP?",
+       "a": [
+        "Yes. We offer co-branded gear, apparel, equipment, and digital tools. We also provide design and manufacturing support through verified partners."
+       ]
+      },
+      {
+       "q": "Do you support paid influencer or ambassador programs?",
+       "a": [
+        "Yes. We source and manage athlete talent (youth to pro) for your brand or campaign through CLP’s network."
+       ]
+      },
+      {
+       "q": "What kind of visibility can we expect?",
+       "a": [
+        "Reach includes:",
+        "• 50K+ youth athletes",
+        "• 100+ coaches and clubs",
+        "• Live event impressions",
+        "• Content views across CLP-owned channels",
+        "• Partner-specific metrics"
+       ]
+      },
+      {
+       "q": "What content rights are included?",
+       "a": [
+        "All content produced through collaboration includes shared usage rights for promotional use (pending final terms)."
+       ]
+      },
+      {
+       "q": "Can we sponsor specific sports?",
+       "a": [
+        "Absolutely. Brands can align with a specific sport (e.g., basketball, futbol(soccer), golf, pickleball, esports), athlete segment, or campaign pillar."
+       ]
+      },
+      {
+       "q": "How does CLP handle fulfillment and product logistics?",
+       "a": [
+        "We offer support from our national network of warehouse and drop-shipping partners or coordinate direct-to-event delivery."
+       ]
+      },
+      {
+       "q": "Are there options for retail or e-commerce collabs?",
+       "a": [
+        "Yes. We offer limited drops, exclusive designs, affiliate store placements, and web-to-field integration tools."
+       ]
+      },
+      {
+       "q": "Can we test product concepts with CLP athletes?",
+       "a": [
+        "Yes. Through beta groups, product sampling, and survey-based field testing, we collect insights from players, parents, and coaches."
+       ]
+      },
+      {
+       "q": "What kind of reporting is available?",
+       "a": [
+        "Partners receive campaign reports with KPIs, impressions, athlete reach, engagement stats, and recaps with photos and media."
+       ]
+      },
+      {
+       "q": "Do you offer press, PR, or media support?",
+       "a": [
+        "Yes. We coordinate press releases, trade publication features, event sizzle reels, and branded storytelling assets."
+       ]
+      },
+      {
+       "q": "Can we align with your charitable or equity pillars?",
+       "a": [
+        "Yes. Brands can support BIPOC-led programs, girls in sports, underserved communities, and nonprofit youth efforts."
+       ]
+      },
+      {
+       "q": "Can CLP source talent or staff for events?",
+       "a": [
+        "Yes. We can provide event staffing, emcees, brand reps, athlete talent, photographers, and video crews."
+       ]
+      },
+      {
+       "q": "Do you provide mockups or campaign decks?",
+       "a": [
+        "Yes. We co-develop creative briefs, pitch decks, brand mockups, and media plans tailored to your goals."
+       ]
+      },
+      {
+       "q": "How do we get started?",
+       "a": [
+        "Email partnerships@competelikepros.com or fill out the Partner Interest Form. A team member will follow up with next steps."
+       ]
+      },
+      {
+       "q": "Are there exclusivity options?",
+       "a": [
+        "Yes. Based on tier, certain categories or regions can be reserved for exclusive partner rights."
+       ]
+      },
+      {
+       "q": "Can we participate in seasonal or World Cup programs?",
+       "a": [
+        "Absolutely. We run themed programs aligned with global sports moments — including activations, product collabs, and special releases."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "camps-tournaments",
+     "label": "Camps & Tournaments",
+     "items": [
+      {
+       "q": "What does CLP bring to a camp or tournament?",
+       "a": [
+        "CLP provides high-quality athlete and event content, pop-up activations, recovery and nutrition education, NIL visibility, and merchandise collaborations — all tailored to enhance athlete experience and promote your event."
+       ]
+      },
+      {
+       "q": "What services can you provide at our event?",
+       "a": [
+        "Options include:",
+        "• Mobile content team (reels, highlights, recaps)",
+        "• Athlete try-on and merch zone",
+        "• Guest coaches or trainers",
+        "• Recovery and rehab corner",
+        "• Nutrition & mindset stations",
+        "• Athlete interviews / NIL storytelling",
+        "• Real-time or post-event media delivery"
+       ]
+      },
+      {
+       "q": "Does CLP charge for partnership services?",
+       "a": [
+        "No upfront cost unless services are requested à la carte. We often work through brand sponsorships, merchandise revenue share, or value-based activations that cost nothing to the organizer."
+       ]
+      },
+      {
+       "q": "Can you promote the camp or tournament in advance?",
+       "a": [
+        "Yes. If details are confirmed early, we can create promo content, athlete spotlights, countdown posts, and media kits for social amplification."
+       ]
+      },
+      {
+       "q": "Can we use the content after the event?",
+       "a": [
+        "Absolutely. You will receive fully edited and branded footage, reels, or photos that you can use for marketing, recruiting, or promotion of future events."
+       ]
+      },
+      {
+       "q": "Do you need exclusive access?",
+       "a": [
+        "Not unless required. We’re flexible and respectful of other vendors, photographers, and media. We’ll work with you to coordinate smooth, non-intrusive content capture or activations."
+       ]
+      },
+      {
+       "q": "What do you need from us for a successful activation?",
+       "a": [
+        "Just:",
+        "• Access to the space",
+        "• Basic event rundown (schedule, team info)",
+        "• Permission to engage athletes and film",
+        "• Contact info for logistics and any waivers",
+        "• We handle the rest — from gear to staff to delivery."
+       ]
+      },
+      {
+       "q": "Can our coaches or trainers be featured with CLP?",
+       "a": [
+        "Yes! We love highlighting quality leaders. We can integrate your coaches into content, interviews, gear reviews, or clinics — with proper co-branding."
+       ]
+      },
+      {
+       "q": "What’s the benefit of working with CLP versus local media or trainers?",
+       "a": [
+        "We bring:",
+        "• National visibility",
+        "• Access to professional-level production",
+        "• Athlete-first programming (not just hype videos)",
+        "• Integration with real partners — not just logos",
+        "• A future pathway for athletes and staff into our content and development network"
+       ]
+      },
+      {
+       "q": "Do you offer multi-event partnerships?",
+       "a": [
+        "Yes! We support annual tournaments, seasonal camps, or a series of events under one agreement. We’ll help scale your vision while building consistency in branding and athlete experience."
+       ]
+      },
+      {
+       "q": "How do we get started?",
+       "a": [
+        "Fill out the onboarding form. We’ll schedule a quick discovery call to align, then begin planning your CLP-powered activation.",
+        "Optional Add-Ons:",
+        "• Post-event content drop with custom edit titles",
+        "• Athlete or team-specific highlight packages",
+        "• Co-branded event recap mini-documentary",
+        "• Merch partnership or pop-up for fundraising",
+        "• Access to post-event athlete surveys & testimonials"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "coaches-trainers",
+     "label": "Coaches & Trainers",
+     "items": [
+      {
+       "q": "What is CLP and how do coaches fit in?",
+       "a": [
+        "platform focused on performance, development, and opportunity across youth and competitive sports. Coaches are a key pillar — helping athletes not just train, but transform."
+       ]
+      },
+      {
+       "q": "What does a partnership include?",
+       "a": [
+        "• Co-branded team development workshops or sessions",
+        "• Access to recovery and performance tools for your athletes",
+        "• Content creation support (interviews, highlights, drills)",
+        "• Mentorship or panel roles for leadership summits"
+       ]
+      },
+      {
+       "q": "Will I be paid for my involvement?",
+       "a": [
+        "Yes. Compensation depends on scope — in-person, online, media contributions, or event support. We also do partnership swaps (access to gear or facilities, for example)."
+       ]
+      },
+      {
+       "q": "Can I contribute content without being on camera?",
+       "a": [
+        "Yes. You can contribute written guides, curriculum tips, or lead internal Zooms. Some coaches are mentors behind-the-scenes."
+       ]
+      },
+      {
+       "q": "What kind of athletes will I support through CLP?",
+       "a": [
+        "• Youth and high school players",
+        "• Club teams or travel squads",
+        "• Rising elite players or under-the-radar athletes"
+       ]
+      },
+      {
+       "q": "Can I share my coaching philosophy?",
+       "a": [
+        "Yes — we welcome blogs, carousel series (“Coach’s Corner”), or behind-the-whistle storytelling. You’ll be supported editorially."
+       ]
+      },
+      {
+       "q": "Do I need a full team or can I participate solo?",
+       "a": [
+        "You can join solo, with a staff, or bring an entire club. We build around your goals — team outreach, exposure, or development."
+       ]
+      },
+      {
+       "q": "What if I run seasonal clinics or camps?",
+       "a": [
+        "Perfect. We can promote them via our site and socials, co-host, or include you in sponsored development weekends or tournament activations."
+       ]
+      },
+      {
+       "q": "Can I highlight my coaching wins?",
+       "a": [
+        "Yes. We’ll showcase championships, college placements, or athlete success stories in reels, quote tiles, or mini-docs."
+       ]
+      },
+      {
+       "q": "Do you support female and BIPOC-led programs?",
+       "a": [
+        "Absolutely. CLP prioritizes equity and inclusion, especially for coaches driving community or identity-based impact."
+       ]
+      },
+      {
+       "q": "Can I sponsor or activate at CLP events?",
+       "a": [
+        "Yes. Coach-led stations, skill labs, and on-field leadership roles are available. Bring your brand or program visibility."
+       ]
+      },
+      {
+       "q": "Who provides media releases or waivers?",
+       "a": [
+        "CLP provides all legal templates for any filmed or collaborative content."
+       ]
+      },
+      {
+       "q": "ow do I start?",
+       "a": [
+        "Submit a coaching interest form. A CLP rep will follow up to align on goals and tailor the path forward."
+       ]
+      },
+      {
+       "q": "What support does CLP offer during the season?",
+       "a": [
+        "We offer athlete monitoring templates, media day coordination, partner discounts, and access to scouting breakdowns or highlight producers."
+       ]
+      },
+      {
+       "q": "Can CLP help my players get recruited?",
+       "a": [
+        "Yes. Through our relationships with clubs, colleges, and content platforms, we help players get seen — and help you build the right resume for your program."
+       ]
+      },
+      {
+       "q": "Do I need to change my current team branding to participate?",
+       "a": [
+        "Not at all. CLP collaborates without disrupting your program identity. We aim to elevate what’s already working — not replace it."
+       ]
+      },
+      {
+       "q": "Can I use CLP tools at my own events or practices?",
+       "a": [
+        "Yes. We offer access to digital resources, training challenges, warmup templates, and even leadership cards you can introduce into practice."
+       ]
+      },
+      {
+       "q": "Are there opportunities for coaches to grow professionally?",
+       "a": [
+        "Definitely. Coaches can join virtual roundtables, get early access to industry tools, attend leadership summits, and collaborate on premium learning series."
+       ]
+      },
+      {
+       "q": "What sports does CLP currently support?",
+       "a": [
+        "Baseball, softball, basketball, soccer, golf, pickleball, esports — with custom builds possible for other programs."
+       ]
+      },
+      {
+       "q": "Is there a referral benefit if I introduce another coach or program?",
+       "a": [
+        "Yes — we offer media credits, gear, or cash stipends for eligible referrals depending on scale and activation.",
+        "Optional Add-Ons for Coaches:",
+        "• “Coach’s Journal” video series",
+        "• Access to youth stat reports",
+        "• Sponsored team apparel or drills",
+        "• Co-created digital playbooks",
+        "• Exclusive invites to scout showcases",
+        "• CLP “Challenge Pack” (practice gamification tool)",
+        "• Highlight packages for your athletes"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "clubs-facilities",
+     "label": "Clubs & Facilities",
+     "items": [
+      {
+       "q": "What is CLP, and what makes this partnership different?",
+       "a": [
+        "CLP is a performance-driven platform bringing elite-level training, gear access, and content creation directly to athletes—where they already play and train. Unlike event companies or recruiters, we focus on development, visibility, and opportunity through strategic partnerships, not rentals or commissions."
+       ]
+      },
+      {
+       "q": "What do you offer facilities or clubs?",
+       "a": [
+        "We provide:",
+        "• Branded events hosted at your location",
+        "• Access to professional and collegiate-level partners (coaches, trainers, nutritionists)",
+        "• Exposure through CLP content, media, and athlete spotlights",
+        "• Opportunities to monetize your space while enhancing value for your athletes",
+        "• Co-branded merchandise, digital content, or team stories"
+       ]
+      },
+      {
+       "q": "Do you charge clubs/facilities to partner?",
+       "a": [
+        "No. CLP covers production and staffing costs when needed. We often share revenue or provide in-kind value (content, gear, visibility). We believe in mutual growth—no “pay-to-play.”"
+       ]
+      },
+      {
+       "q": "Do we need to shut down operations during a CLP activation?",
+       "a": [
+        "Not necessarily. Our mobile team is designed to integrate with your schedule. We’ll coordinate around your busiest times or blend our programming with your existing training sessions or events."
+       ]
+      },
+      {
+       "q": "Who handles athlete waivers or parental consent for media?",
+       "a": [
+        "CLP provides branded consent forms for any content capture. If your club already has a media waiver, we can adapt to your policies or combine legal coverage as needed."
+       ]
+      },
+      {
+       "q": "Can our coaches and staff be involved or featured?",
+       "a": [
+        "Absolutely. We want your team involved. We can spotlight coaches in training segments, tutorials, interviews, or co-branded coaching education."
+       ]
+      },
+      {
+       "q": "Can you help promote our club, facility, or events?",
+       "a": [
+        "Yes. As a CLP partner, you’ll be listed in our network, tagged in relevant media, and considered for special exposure such as “Facility of the Month,” email features, or national brand collabs."
+       ]
+      },
+      {
+       "q": "Do we need special equipment or setup?",
+       "a": [
+        "No. We bring everything needed to shoot, stream, or activate. If you already have tech or gear, great—we’ll optimize your setup."
+       ]
+      },
+      {
+       "q": "Can we host multiple activations per year?",
+       "a": [
+        "Yes. Many partners collaborate with us quarterly or seasonally. We’ll create a roadmap that fits your training calendar and athlete needs."
+       ]
+      },
+      {
+       "q": "How do we get started?",
+       "a": [
+        "Fill out the onboarding form. Once reviewed, we’ll contact you to schedule a discovery call. From there, we’ll build a partnership plan that matches your goals and community impact strategy."
+       ]
+      },
+      {
+       "q": "What do you expect from us?",
+       "a": [
+        "Openness, communication, and collaboration. We’re not asking for your space—we’re asking to build something in it with you. If you believe in supporting athletes beyond just performance, we’ll work well together."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "leagues-social-clubs",
+     "label": "Leagues & Social Clubs",
+     "items": [
+      {
+       "q": "What is CLP and how can it support our league or club?",
+       "a": [
+        "CLP is a performance-driven platform offering on-the-ground content, activations, and branded partnerships that meet athletes, teams, and sports communities where they are. We help amplify your league, spotlight your participants, and enhance your brand’s visibility with elite-level creative and support."
+       ]
+      },
+      {
+       "q": "What types of leagues or clubs do you work with?",
+       "a": [
+        "We work with:",
+        "• Youth sports leagues (rec and elite)",
+        "• High school or AAU-level competition",
+        "• College club leagues",
+        "• Adult rec leagues and competitive city leagues",
+        "• Social or fitness-based sports communities",
+        "If you gather people to play and build culture, we want to collaborate."
+       ]
+      },
+      {
+       "q": "What does a partnership look like in practice?",
+       "a": [
+        "We might:",
+        "• Produce highlight reels of your top games or seasons",
+        "• Interview or feature your standout players or teams",
+        "• Host pop-ups with gear try-ons and giveaways",
+        "• Run “train like a pro” workshops with coaches or trainers",
+        "• Help co-promote your league through social media collabs",
+        "• Deliver NIL support or media training for athletes",
+        "We’re flexible to what adds value to your players and brand."
+       ]
+      },
+      {
+       "q": "Do we need to pay for these services?",
+       "a": [
+        "No — we work through sponsorships, merchandise, and co-branded campaigns so there’s no upfront cost for the league. We may share revenue or collaborate on fundraising where needed."
+       ]
+      },
+      {
+       "q": "What if our athletes are youth — are there media consent concerns?",
+       "a": [
+        "Yes — and we take that seriously. We provide all required forms and work with you to ensure that only athletes with approved media consent are featured. No footage is published without verification."
+       ]
+      },
+      {
+       "q": "Can CLP help promote our team/league or grow registration?",
+       "a": [
+        "Absolutely. Through videos, reels, testimonials, and activation coverage, we create compelling content that leagues can use to drive interest and recruit more players or partners."
+       ]
+      },
+      {
+       "q": "Can we do one event or pop-up first before a full partnership?",
+       "a": [
+        "Yes! We often start with a single showcase, try-on day, or highlight shoot and grow the partnership organically. No long-term commitments required upfront."
+       ]
+      },
+      {
+       "q": "Can coaches or players get involved with CLP beyond the league?",
+       "a": [
+        "Definitely. We create pathways for standout players or leaders to be featured in content, merch campaigns, interviews, and even work with brands or get training support."
+       ]
+      },
+      {
+       "q": "What are the benefits of partnering with CLP over another brand or videography team?",
+       "a": [
+        "We bring:",
+        "• Brand equity (nationally recognized)",
+        "• Flexible media teams with mobile capability",
+        "• Athlete development at the core — not just content for hype",
+        "• A network of nutritionists, trainers, and creators to support your league",
+        "• Real tools to grow your community — not just a post and go"
+       ]
+      },
+      {
+       "q": "What happens next if we’re interested?",
+       "a": [
+        "Fill out the onboarding form. We’ll review it and schedule a quick intro call. From there, we’ll map out what activation, content, or partnership makes sense for your season or club calendar."
+       ]
+      },
+      {
+       "q": "What if we don’t have our own facility or staff — can we still partner?",
+       "a": [
+        "Yes! Many leagues rent spaces or rely on volunteers. We work around your resources and can even help source partners in your area if needed (e.g., gyms, trainers, brands)."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "nutritionist",
+     "label": "Nutritionists",
+     "items": [
+      {
+       "q": "What is Compete Like Pros (CLP)?",
+       "a": [
+        "CLP is a mobile and digital platform built to elevate athletes through high-performance training, content, experiences, and partnerships. We help athletes—from youth to pros—access the tools, support, and exposure they need to grow."
+       ]
+      },
+      {
+       "q": "What role do sports nutritionists play in CLP?",
+       "a": [
+        "Nutritionists are critical to our holistic approach to athlete development. You’ll help educate, guide, and support athletes in fueling correctly to reach performance goals safely and sustainably—whether through content, consultations, or activations."
+       ]
+      },
+      {
+       "q": "Will I be compensated for my time or appearances?",
+       "a": [
+        "Yes. Compensation is determined per engagement and scope. We offer paid opportunities for live events, content creation, consulting, branded content, or educational programming. No unpaid use of your time or expertise will occur without prior agreement."
+       ]
+      },
+      {
+       "q": "Will I be required to travel?",
+       "a": [
+        "Travel is not required unless explicitly agreed upon. Many opportunities can be done virtually or pre-recorded. For in-person events, we cover travel, accommodations, and meals when applicable, as long as terms are confirmed in advance."
+       ]
+      },
+      {
+       "q": "Can I bring my own products or supplements?",
+       "a": [
+        "Yes, if it aligns with CLP’s health and safety standards. We encourage partners to share trusted tools or products they use with athletes, but we require transparency and proper certifications for anything distributed or promoted."
+       ]
+      },
+      {
+       "q": "Will I have creative input into the content we collaborate on?",
+       "a": [
+        "Absolutely. We want your expertise and voice to shine. You’ll approve any final versions of video, quotes, articles, or guides before publication. We’ll collaborate on structure, tone, and delivery to make sure it represents you well."
+       ]
+      },
+      {
+       "q": "What type of athletes will I be working with?",
+       "a": [
+        "Our athlete community includes youth (ages 8+), high school teams, college players, and sometimes professionals. Based on your experience, we’ll align you with the best fit—whether that’s young athletes, elite performers, or their parents/coaches."
+       ]
+      },
+      {
+       "q": "Do I need to be licensed or certified to partner with CLP?",
+       "a": [
+        "Yes. You must have relevant certifications, credentials, or verifiable experience in sports nutrition, dietetics, or performance fueling. We prioritize RDs, CNSs, or performance nutritionists with youth or team experience."
+       ]
+      },
+      {
+       "q": "Will CLP promote my personal brand or business?",
+       "a": [
+        "Yes, where relevant. We highlight our expert partners through co-branded content, spotlights, and social features. We’re happy to promote your consulting services, speaking engagements, and public events—especially if they serve our athlete base."
+       ]
+      },
+      {
+       "q": "How do you handle liability or health disclaimers?",
+       "a": [
+        "We require that all nutrition guidance follows current best practices, is evidence-based, and includes appropriate disclaimers. If working directly with athletes, liability insurance and consent protocols will be discussed before any engagement."
+       ]
+      },
+      {
+       "q": "Can I share CLP content on my own social media or site?",
+       "a": [
+        "Yes. Once we finalize and publish branded content, you’re encouraged to share it across your platforms. We’ll provide copies or co-branded versions of reels, posts, or graphics for your use—with proper credit and tagging."
+       ]
+      },
+      {
+       "q": "What kinds of content do you want from me?",
+       "a": [
+        "Think short, powerful, and athlete-focused:",
+        "• Pre-game meal prep ideas",
+        "• Recovery snack recommendations",
+        "• Hydration tips",
+        "• “What’s in my bag” supplement talk",
+        "• Myth-busting (e.g., protein timing, sugar, creatine)",
+        "• Advice for high-performance school days (especially for teens)",
+        "We’re also open to full-length articles, workshop slides, or athlete Q&A sessions."
+       ]
+      },
+      {
+       "q": "Is this a one-time or ongoing partnership?",
+       "a": [
+        "That depends on fit and mutual interest. We offer one-time collaborations (content or event) as well as long-term contributor or brand ambassador roles. Our goal is to build authentic, recurring relationships with experts who care about athlete impact."
+       ]
+      },
+      {
+       "q": "Will I work directly with athletes, or only behind the scenes?",
+       "a": [
+        "Both are possible. You may speak at events, lead virtual Q&As, create content series, or develop guides used by our partner coaches. Based on your goals, we’ll match you with the right format and involvement level."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "photo-videographers",
+     "label": "Photo & Videographers",
+     "items": [
+      {
+       "q": "What does CLP/Soxcessful® expect from content creators?",
+       "a": [
+        "We expect reliability, professionalism, strong communication, and the ability to tell compelling athlete-first stories in a fast-paced, sports-centric environment. We value creators who can capture energy, motion, personality, and detail across all types of settings."
+       ]
+      },
+      {
+       "q": "Who owns the content we capture?",
+       "a": [
+        "CLP operates under a work-for-hire model — which means all final footage, raw files, and media captured are owned by Compete Like Pros (Powered by Soxcessful®) and our clients/partners unless otherwise agreed in writing. We may still tag and spotlight you for promotion and visibility."
+       ]
+      },
+      {
+       "q": "Can I use the content for my personal portfolio or social media?",
+       "a": [
+        "Yes — once content is published by CLP, we encourage creators to repost and credit it as part of their body of work. Please don’t release unreleased or sensitive content prior to official launch."
+       ]
+      },
+      {
+       "q": "Do I have to attend every event in person?",
+       "a": [
+        "No. Some creators are hired just to edit remotely. Others are on the ground with the team. If you travel with us or attend events, we’ll cover mileage, hotel, or meals based on pre-approved budget and terms."
+       ]
+      },
+      {
+       "q": "What kind of content do you regularly produce?",
+       "a": [
+        "CLP/Soxcessful® content includes:",
+        "• Athlete highlight reels",
+        "• Game day recaps",
+        "• “Train like a pro” sessions",
+        "• Gear/product drops",
+        "• Social-first mini-docs",
+        "• Behind-the-scenes stories",
+        "• Interviews and testimonials",
+        "• Sponsored content for brand partners"
+       ]
+      },
+      {
+       "q": "How fast is the turnaround time?",
+       "a": [
+        "For same-day coverage (event reels, try-on edits), we prefer 6–12 hour turnaround. For recap videos, 48–72 hours is ideal. Longer projects or documentaries will have custom timelines. We’ll always communicate clearly."
+       ]
+      },
+      {
+       "q": "Do I need to show up with a full gear setup?",
+       "a": [
+        "We prefer creators who can bring their own tools (camera, mics, gimbal, SD cards, etc.), but if you’re paired with our team, we may supply extras. Drone pilots must be certified and follow FAA/local regulations."
+       ]
+      },
+      {
+       "q": "Will I be credited publicly?",
+       "a": [
+        "Yes! We tag creators, share BTS, and encourage networking. You’ll also be prioritized for repeat gigs based on consistency and delivery."
+       ]
+      },
+      {
+       "q": "Can I work under my own brand name?",
+       "a": [
+        "Yes. You’re a creator — we respect that. Just know that projects are presented under the CLP/Soxcessful® brand umbrella. We’ll gladly mention or feature your business in select cases (IG, reels, blog write-ups)."
+       ]
+      },
+      {
+       "q": "How do I apply or get started?",
+       "a": [
+        "Fill out the onboarding form, send your best work, and we’ll review and follow up with opportunities based on fit, location, and availability."
+       ]
+      },
+      {
+       "q": "What makes a good CLP/Soxcessful® content creator?",
+       "a": [
+        "• Fast but clean editor",
+        "• Can work with minimal direction",
+        "• Understands sports energy",
+        "• Captures emotion and moments",
+        "• Respects the athletes, coaches, and brand",
+        "• Delivers when it counts"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "physical-therapy-rehab",
+     "label": "Physical Therapy & Rehab",
+     "items": [
+      {
+       "q": "What is CLP and how do PT & Rehab providers fit in?",
+       "a": [
+        "CLP is a performance and recovery platform that brings high-level training, content, and resources directly to athletes. Physical therapists and rehab partners play a critical role in educating athletes, accelerating recovery, and reducing long-term injury risks. You’re not just a vendor — you’re part of the athlete development ecosystem."
+       ]
+      },
+      {
+       "q": "What does a partnership typically include?",
+       "a": [
+        "We offer:",
+        "• Branded recovery zone experiences at events",
+        "• Educational video content (stretching, recovery tips, injury risk awareness)",
+        "• Feature reels of your facility, team, or success stories",
+        "• Co-hosted pop-ups or athlete-focused wellness days",
+        "• Digital courses or prevention series in partnership with coaches/teams",
+        "• Integration into CLP content for rehab storytelling or testimonials"
+       ]
+      },
+      {
+       "q": "Will I be compensated?",
+       "a": [
+        "Yes. Payment depends on scope (in-person, virtual, sponsored content, etc.). We also offer bartered services (e.g., media exposure or access to athletes in exchange for activation support) depending on mutual benefit and project type."
+       ]
+      },
+      {
+       "q": "Do I have to be on camera?",
+       "a": [
+        "Not unless you want to. We have multiple partnership models—some involve behind-the-scenes consulting, some are media-forward. Your comfort level defines your visibility."
+       ]
+      },
+      {
+       "q": "What kind of athletes will I be working with?",
+       "a": [
+        "Depending on your expertise, you may be matched with:",
+        "• Individual youth or high school athletes",
+        "• College or semi-pro players",
+        "• Entire teams or clubs needing seasonal support",
+        "• Athletes returning from injury or needing prehab tips"
+       ]
+      },
+      {
+       "q": "What kind of content would I be expected to create?",
+       "a": [
+        "Examples:",
+        "• “Top 3 Mobility Moves Before Training”",
+        "• “How to Recover Fast After a Weekend Tournament”",
+        "• “Signs You’re Rushing Return to Play”",
+        "• “ACL Prevention Protocol for Female Athletes”",
+        "We’ll guide you on formats, tone, and how to make it athlete-friendly and short-form where possible."
+       ]
+      },
+      {
+       "q": "Can I promote my clinic or private practice?",
+       "a": [
+        "Absolutely. We believe in supporting our partners. We’ll include co-branding, business tags, or even a spotlight feature about your work. It’s all about authentic collaboration that helps you grow while serving athletes."
+       ]
+      },
+      {
+       "q": "Do I need a facility or can I operate mobile or virtual only?",
+       "a": [
+        "All are welcome. Whether you have a full rehab space, work out of gyms, or provide remote programs — we’re flexible and build partnerships based on your model."
+       ]
+      },
+      {
+       "q": "Can I sponsor recovery zones or on-site support at events?",
+       "a": [
+        "Yes. This is one of our most popular collaboration formats. You provide light service (stretching, taping, activation), and we feature your brand. You may also sponsor product sampling or integrate with one of our training partners."
+       ]
+      },
+      {
+       "q": "Can I collaborate on team-specific rehab protocols or return-to-play education?",
+       "a": [
+        "Yes. We work with teams and leagues that want to implement better injury recovery planning and education. You can be the go-to specialist for that sport or age group."
+       ]
+      },
+      {
+       "q": "Do you offer exclusivity by region or city?",
+       "a": [
+        "For recurring partners and sponsors, yes. If you’re featured heavily in a region, we typically won’t partner with your competitors. We’ll discuss exclusivity rights based on scope and impact."
+       ]
+      },
+      {
+       "q": "Who provides the legal forms, waivers, and release docs?",
+       "a": [
+        "CLP handles the legal side for any media, event, or partnership use. You’ll receive proper consent templates and insurance clarifications based on the event type or activation."
+       ]
+      },
+      {
+       "q": "What’s the first step if I’m interested?",
+       "a": [
+        "Complete the onboarding form, and our partnership team will reach out to schedule a call. From there, we can design a collaboration tailored to your services, goals, and preferred level of involvement."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "strength-conditioning",
+     "label": "Strength & Conditioning",
+     "items": [
+      {
+       "q": "What is CLP, and how do coaches fit into it?",
+       "a": [
+        "Compete Like Pros Powered By Soxcessful is a performance-focused brand that brings elite-level resources to youth, school, and aspiring athletes through mobile experiences and digital access. Coaches like you help us build the bridge between grassroots effort and pro-level training."
+       ]
+      },
+      {
+       "q": "What types of opportunities are available for me?",
+       "a": [
+        "You may be invited to:",
+        "• Coach live at pop-up events or camps",
+        "• Create content or digital workouts",
+        "• Be featured in highlight reels or tutorials",
+        "• Lead team warm-ups or recovery sessions",
+        "• Review gear or partner with brands via CLP"
+       ]
+      },
+      {
+       "q": "Do I get paid for working with CLP?",
+       "a": [
+        "Yes. All activations and partnerships are scoped with clear compensation. Payment varies by content, in-person involvement, or ongoing series work."
+       ]
+      },
+      {
+       "q": "Do I have to travel?",
+       "a": [
+        "Not unless you want to. Some events are local. Others are travel-based and include covered lodging, meals, and compensation. Virtual options are also available."
+       ]
+      },
+      {
+       "q": "Can I keep my coaching brand or facility while working with CLP?",
+       "a": [
+        "Yes. We love to support entrepreneurial coaches. We’ll co-brand where needed and elevate your identity — no exclusivity required unless you’re leading sponsored campaigns."
+       ]
+      },
+      {
+       "q": "What kinds of athletes would I work with?",
+       "a": [
+        "Mostly youth (ages 8–18), high school teams, college athletes, and occasionally pros. We match based on your specialties and age group experience."
+       ]
+      },
+      {
+       "q": "Will I be expected to create social media content?",
+       "a": [
+        "Only if you’re interested. We do offer opportunities for coaches to be featured in tutorials, mindset talks, workout reels, or gear reviews. We’ll collaborate on messaging and visual style."
+       ]
+      },
+      {
+       "q": "Can I recommend my own drills or methodology?",
+       "a": [
+        "100%. We want your coaching style, cues, and philosophy. We’ll guide the tone and branding, but you drive the substance."
+       ]
+      },
+      {
+       "q": "Is CLP focused on a specific sport?",
+       "a": [
+        "No. We serve multi-sport athletes — base/softball, basketball, eSports, Futbol(soccer), golf, pickleball and more. If you specialize in a specific sport, we’ll connect you with relevant teams or events."
+       ]
+      },
+      {
+       "q": "Can I use CLP footage to market myself?",
+       "a": [
+        "Yes. Once approved, you’re free to repost or share your featured content with proper CLP credit and hashtags. We want you to grow, too."
+       ]
+      },
+      {
+       "q": "Will I have to wear CLP gear or branding?",
+       "a": [
+        "Only at events where we’re producing branded content. Otherwise, you can wear your own or co-branded gear. We’ll send you apparel or discuss wardrobe when needed."
+       ]
+      },
+      {
+       "q": "What’s the difference between CLP and other coaching networks?",
+       "a": [
+        "We’re not a coaching marketplace or directory. CLP is an ecosystem. You’re not just listed — you’re featured, amplified, and embedded in real programming, branded media, and impact events."
+       ]
+      },
+      {
+       "q": "What’s the next step if I want to be involved?",
+       "a": [
+        "Fill out the onboarding questionnaire and our team will review your fit for current or future opportunities. We’ll reach out to schedule a call or invite you to an upcoming activation."
+       ]
+      },
+      {
+       "q": "What if I don’t want to be on camera or in the spotlight?",
+       "a": [
+        "That’s okay. We also need off-camera coaches for program development, athlete screening, private consults, or on-site support."
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "resources",
+   "label": "Resources",
+   "sub": "Nutrition, recovery, mental health and conditioning resources, by sport.",
+   "subs": [
+    {
+     "id": "baseball",
+     "label": "Baseball & Softball",
+     "items": [
+      {
+       "q": "Copy What ages are your baseball experiences suitable for?",
+       "a": [
+        "Baseball experiences are tailored to participants of all ages, including youth players, adults, and families. The activities and coaching we offer are age-appropriate to ensure that all age groups have a positive and enjoyable experience."
+       ]
+      },
+      {
+       "q": "Copy Are your baseball experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for players of all skill levels, from beginners to advanced. To ensure a rewarding experience for everyone, we tailor our sessions and activities to suit different skill levels."
+       ]
+      },
+      {
+       "q": "Copy What types of baseball experiences do you offer?",
+       "a": [
+        "Training camps, skills clinics, coaching sessions, friendly games, tournaments, and baseball-themed trips to iconic stadiums and cities are just some of the baseball experiences we offer."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own baseball gear?",
+       "a": [
+        "We provide some basic equipment, such as baseballs and bats, but we recommend that participants bring their own equipment, including gloves, cleats, helmets, and appropriate attire."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "basketball",
+     "label": "Basketball",
+     "items": [
+      {
+       "q": "Copy What ages are your basketball experiences suitable for?",
+       "a": [
+        "Basketball experiences are designed for players of all ages, including youth players, adults, and families. Age-appropriate activities and coaching ensure a positive and enjoyable experience for all ages."
+       ]
+      },
+      {
+       "q": "Copy Are your basketball experiences suitable for all skill levels?",
+       "a": [
+        "Players of all skill levels are welcome to participate in our experiences. Regardless of skill level, our activities and sessions are tailored to suit everyone’s needs."
+       ]
+      },
+      {
+       "q": "Copy What types of basketball experiences do you offer?",
+       "a": [
+        "We offer a variety of basketball experiences, including skills clinics, training camps, coaching sessions, pick-up games, tournaments, and basketball-themed trips to iconic courts and cities."
+       ]
+      },
+      {
+       "q": "Do I need to bring my own basketball gear?",
+       "a": [
+        "Although we provide some basic equipment, such as balls and cones, we recommend that participants bring their own basketball gear, such as shoes, shorts, shirts, and appropriate attire for training and games."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "esports",
+     "label": "Esports",
+     "items": [
+      {
+       "q": "Do I need to bring my own gaming equipment?",
+       "a": [
+        "While our facilities provide gaming equipment, like gaming PCs, consoles, and peripherals, participants may bring their own gaming gear in some cases. This includes gaming mice, keyboards, controllers, and headsets."
+       ]
+      },
+      {
+       "q": "What ages are your eSports experiences suitable for?",
+       "a": [
+        "Participants of all ages can participate in our esports experiences, including juniors, adults, and competitive gamers. Our age-appropriate activities and coaching ensure that all participants have an enjoyable and rewarding experience."
+       ]
+      },
+      {
+       "q": "Are your esports experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for gamers at all skill levels, from beginners to experts. Through our eSports partners, you’ll have the chance to learn, practice, and compete with other eSports enthusiasts."
+       ]
+      },
+      {
+       "q": "What types of eSports experiences do you offer?",
+       "a": [
+        "Esports experiences include tournaments, gaming clinics, coaching sessions, esports camps, and esports-themed events."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "futbol",
+     "label": "Fútbol (Soccer)",
+     "items": [
+      {
+       "q": "Do I need to bring my own soccer gear?",
+       "a": [
+        "Participants should bring their own soccer gear, including cleats, shin guards, and appropriate attire for training or matches. We provide some basic equipment, such as balls and cones."
+       ]
+      },
+      {
+       "q": "What ages are your soccer experiences suitable for?",
+       "a": [
+        "Our soccer experiences are designed for participants of various ages, including youth players, adults, and even families. We offer age-appropriate activities and coaching to ensure a positive and enjoyable experience for all age groups."
+       ]
+      },
+      {
+       "q": "Are your soccer experiences suitable for all skill levels?",
+       "a": [
+        "We offer experiences for players of all skill levels, from beginners to advanced. Sessions and activities are tailored to accommodate different skill levels and ensure that everyone has a rewarding experience."
+       ]
+      },
+      {
+       "q": "What types of soccer experiences do you offer?",
+       "a": [
+        "As a soccer experience provider, we offer a variety of soccer-related activities, such as training camps, coaching clinics, friendly matches, tournaments, and trips to iconic soccer stadiums."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "golfing",
+     "label": "Golfing",
+     "items": [
+      {
+       "q": "Do I need to bring my own golf equipment?",
+       "a": [
+        "While we provide basic golf equipment, such as clubs and balls, we recommend that players bring their own clubs, gloves, golf shoes, and appropriate attire to the course/experience."
+       ]
+      },
+      {
+       "q": "What ages are your golfing experiences suitable for?",
+       "a": [
+        "Participants of all ages are welcome to take part in our golfing experiences, from juniors to seniors. Our programs create an enjoyable and inclusive environment for all ages with age-appropriate instruction and activities."
+       ]
+      },
+      {
+       "q": "Are your golfing experiences suitable for all skill levels?",
+       "a": [
+        "Yes, our experiences are suitable for all levels of golfers. Each participant’s needs are met through personalized activities and coaching, ensuring that everyone has a rewarding experience."
+       ]
+      },
+      {
+       "q": "What types of golfing experiences do you offer?",
+       "a": [
+        "Our golfing experiences include clinics, training sessions, tournaments, golfing getaways, and golf-themed trips to renowned courses and destinations."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "pickleball",
+     "label": "Pickleball",
+     "items": [
+      {
+       "q": "Do I need to bring my own pickleball equipment?",
+       "a": [
+        "While we provide pickleball equipment at our experiences, such as paddles, balls, and nets, participants are welcome to bring their own equipment. In this category, you will find pickleball shoes, apparel, and accessories."
+       ]
+      },
+      {
+       "q": "What ages are your pickleball experiences suitable for?",
+       "a": [
+        "Participants of various ages can enjoy pickleball with us, including youth players, adults, and seniors. To ensure that all age groups have a rewarding and enjoyable experience, we offer age-appropriate activities and coaching."
+       ]
+      },
+      {
+       "q": "Are your pickleball experiences suitable for all skill levels?",
+       "a": [
+        "Pickleball players of all skill levels are welcome at our experiences. Our program provides participants with opportunities for skill development, friendly matches, and competitive play tailored to their needs."
+       ]
+      },
+      {
+       "q": "What types of pickleball experiences do you offer?",
+       "a": [
+        "Our pickleball experiences include clinics, training sessions, social play events, tournaments, and excursions themed around pickleball."
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expectations-commitments",
+   "label": "Expectations & Commitments",
+   "sub": "What we expect from everyone in the CLP community, and what you can expect from us.",
+   "subs": [
+    {
+     "id": "athletes",
+     "label": "Athletes",
+     "items": [
+      {
+       "q": "What opportunities does CLP offer for athletes to engage with their communities and make a positive impact?",
+       "a": [
+        "CLP facilitates community engagement initiatives and partnerships for athletes to give back, support charitable causes, and inspire the next generation of athletes through mentorship and outreach programs.",
+        "For Parents:"
+       ]
+      },
+      {
+       "q": "How does CLP support athletes’ career transitions and post-athletic endeavors?",
+       "a": [
+        "CLP provides guidance and resources to athletes as they transition into post-athletic careers, including education and vocational opportunities, financial planning, and personal development programs."
+       ]
+      },
+      {
+       "q": "What can I expect from CLP as an athlete?",
+       "a": [
+        "CLP is committed to providing comprehensive representation and support for athletes, including contract negotiations, endorsement deals, brand management, career guidance, and access to resources for training and development."
+       ]
+      },
+      {
+       "q": "How does CLP help athletes achieve their goals?",
+       "a": [
+        "CLP works closely with athletes to develop personalized strategies for success, leveraging their network, expertise, and industry insights to create opportunities for growth, recognition, and long-term success in their respective sports."
+       ]
+      },
+      {
+       "q": "What does CLP expect from athletes on and off the field?",
+       "a": [
+        "• Show respect to coaches, teammates, opponents, and officials.",
+        "• Bring consistent effort, accountability, and a growth mindset.",
+        "• Compete with humility in victory and dignity in defeat.",
+        "• Prioritize mental and physical wellness.",
+        "• Be a leader, even without the title.",
+        "• Take responsibility for preparation and recovery.",
+        "• Practice good sportsmanship, win or lose.",
+        "• Support team culture and contribute to a positive locker room.",
+        "• Stay off social media drama — let performance speak.",
+        "• Respect all travel, facility, and equipment guidelines."
+       ]
+      },
+      {
+       "q": "How should athletes respond to mistakes or losses?",
+       "a": [
+        "• Own your errors and bounce back with resilience.",
+        "• Focus on learning and growth rather than blame."
+       ]
+      },
+      {
+       "q": "What does leadership look like in a CLP athlete?",
+       "a": [
+        "Supporting teammates, leading by example, and being a positive influence."
+       ]
+      },
+      {
+       "q": "What’s expected when representing CLP during travel or tournaments?",
+       "a": [
+        "Represent the brand with pride, dress appropriately, follow instructions, and respect all accommodations."
+       ]
+      },
+      {
+       "q": "How should athletes manage their time and commitments?",
+       "a": [
+        "Stay organized, communicate proactively, and avoid scheduling conflicts."
+       ]
+      },
+      {
+       "q": "What behavior is not tolerated from athletes?",
+       "a": [
+        "• Bullying, harassment, or discriminatory language",
+        "• Cheating, fighting, or unsportsmanlike conduct",
+        "• Disrespect toward staff, referees, or other participants",
+        "• Vandalism or destruction of property",
+        "• Dismissive behavior toward teammates or coaching input",
+        "• Use of drugs, alcohol, or performance-enhancing substances",
+        "• Skipping sessions or violating attendance expectations",
+        "• Social media abuse or trolling opponents"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "parents",
+     "label": "Parents, Guardians & Family",
+     "items": [
+      {
+       "q": "What resources does CLP provide to help parents navigate the complexities of the sports industry and support their child’s development?",
+       "a": [
+        "CLP offers educational resources, workshops, and access to experts in sports psychology, nutrition, injury prevention, and academic support to empower parents in their role as advocates and caregivers for young athletes."
+       ]
+      },
+      {
+       "q": "How does CLP ensure transparency and open communication with parents regarding their child’s athletic journey?",
+       "a": [
+        "CLP maintains open channels of communication with parents, providing regular updates, progress reports, and opportunities for parent-athlete consultations to ensure alignment with goals and expectations."
+       ]
+      },
+      {
+       "q": "How does CLP ensure the well-being and success of young athletes?",
+       "a": [
+        "CLP prioritizes the holistic development and welfare of young athletes, providing guidance on balancing academics, training, and competitions. They also promote ethical practices, compliance with regulations, and support systems for mental and physical well-being."
+       ]
+      },
+      {
+       "q": "What role does CLP play in my child’s athletic career?",
+       "a": [
+        "CLP serves as a valuable partner for parents, offering professional guidance, mentorship, and advocacy for young athletes. They assist in navigating the complexities of the sports industry, fostering opportunities for skill development, exposure, and advancement."
+       ]
+      },
+      {
+       "q": "What is the time commitment to participate?",
+       "a": [
+        "Schedules vary from league to league, but most leagues have one practice and one game per week. Leagues will not practice more than twice a week."
+       ]
+      },
+      {
+       "q": "What equipment do I need to participate?",
+       "a": [
+        "During signup, all items will be shared. Our partners also provide discounts"
+       ]
+      },
+      {
+       "q": "What seasons are CLP Experiences played?",
+       "a": [
+        "Each location will have its own exact dates and timelines for the seasons."
+       ]
+      },
+      {
+       "q": "How much does it cost to participate?",
+       "a": [
+        "Depending on the type of experience and how long it lasts, the cost will vary. Families and athletes of all backgrounds are encouraged to participate in CLP Experiences because the program is affordable and accessible."
+       ]
+      },
+      {
+       "q": "What benefits do I get for participating in a league?",
+       "a": [
+        "CLP Experiences provides a safe and fun environment for all types of athletes. Strategis partnerships enable us to expand access while making it more inclusive."
+       ]
+      },
+      {
+       "q": "What ages are allowed to play?",
+       "a": [
+        "There are CLP Experiences for every age group."
+       ]
+      },
+      {
+       "q": "Why should my child participate in a CLP Experiences league?",
+       "a": [
+        "CLP Experience allows children and adults to develop a lifelong love of sports. Taking health and wellness to the next level is what CLP Experiences is all about.",
+        "We provide high-quality, branded uniforms and equipment, along with training guides and on/off-field resources."
+       ]
+      },
+      {
+       "q": "How can parents best support their athletes during their CLP experience?",
+       "a": [
+        "• Cheer positively and let coaches coach.",
+        "• Foster an uplifting and encouraging sideline environment.",
+        "• Communicate respectfully with staff and trust the process.",
+        "• Be timely with drop-offs, pickups, and confirmations.",
+        "• Encourage your athlete’s independence and leadership.",
+        "• Celebrate effort, not just results.",
+        "• Emphasize team-first values over individual stats.",
+        "• Ask questions constructively and stay engaged.",
+        "• Stay informed about schedules, travel, and expectations.",
+        "• Model emotional control and positivity during competition."
+       ]
+      },
+      {
+       "q": "What’s the best way to communicate concerns with CLP staff?",
+       "a": [
+        "Email or schedule a meeting, and approach conversations constructively."
+       ]
+      },
+      {
+       "q": "How involved should parents be in athlete performance discussions?",
+       "a": [
+        "Let the athlete take ownership. Be encouraging, but allow coaches and trainers to lead."
+       ]
+      },
+      {
+       "q": "What values does CLP encourage parents to model?",
+       "a": [
+        "Positivity, patience, humility, and emotional control during high-pressure moments."
+       ]
+      },
+      {
+       "q": "Can parents volunteer or contribute to team operations?",
+       "a": [
+        "Yes! Reach out to our staff for structured volunteer roles or support opportunities."
+       ]
+      },
+      {
+       "q": "What parent behaviors are unacceptable?",
+       "a": [
+        "• Sideline coaching or undermining coaches’ authority",
+        "• Verbal abuse of referees, staff, or players",
+        "• Disruptive or disrespectful conduct that impacts team morale",
+        "• Confronting athletes, refs, or coaches during/after games",
+        "• Gossiping or spreading misinformation within team channels",
+        "• Ignoring health or injury protocols",
+        "• Pushing your athlete toward burnout or pressure"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "fans-spectators",
+     "label": "Fans & Spectators",
+     "items": [
+      {
+       "q": "What role do fans play at CLP events and why does it matter?",
+       "a": [
+        "• Support all athletes positively and fairly.",
+        "• Promote a welcoming, inclusive, and spirited environment.",
+        "• Respect officials and coaches regardless of game outcome.",
+        "• Applaud hustle, not just highlights.",
+        "• Stay off the field/court unless authorized.",
+        "• Encourage players from both teams.",
+        "• Follow all posted facility and event rules.",
+        "• De-escalate conflict or report it to staff.",
+        "• Set a positive example for youth athletes."
+       ]
+      },
+      {
+       "q": "What should fans do if they witness inappropriate conduct?",
+       "a": [
+        "Alert a CLP staff member or official immediately."
+       ]
+      },
+      {
+       "q": "Are there rules around photography or video at events?",
+       "a": [
+        "Yes. Always ask permission before filming players, especially minors."
+       ]
+      },
+      {
+       "q": "Can fans bring banners, signs, or instruments?",
+       "a": [
+        "Fan gear is encouraged if positive and non-disruptive. CLP reserves the right to limit items."
+       ]
+      },
+      {
+       "q": "How can fans help uphold the CLP mission?",
+       "a": [
+        "Cheer with class, respect all, and set the tone for community excellence."
+       ]
+      },
+      {
+       "q": "What fan conduct is not allowed?",
+       "a": [
+        "• Hate speech, harassment, or aggressive outbursts",
+        "• Intoxication, threats, or disruptive behavior",
+        "• Any action that compromises safety or the event experience",
+        "• Confronting referees, players, or parents",
+        "• Throwing objects or damaging property",
+        "• Excessive profanity or inappropriate gestures",
+        "• Filming minors or athletes without consent"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "operational-partners",
+     "label": "Operational Partners",
+     "items": [
+      {
+       "q": "What support does CLP provide to operators in terms of talent acquisition, retention, and development?",
+       "a": [
+        "CLP offers talent scouting services, talent management strategies, coach development programs, and access to performance analytics tools to help operators identify, nurture, and retain top talent within their organizations."
+       ]
+      },
+      {
+       "q": "How does CLP collaborate with operators to create innovative and engaging experiences for athletes and fans?",
+       "a": [
+        "CLP works closely with operators to develop and implement creative initiatives, such as fan engagement strategies, digital content platforms, experiential marketing campaigns, and innovative event concepts."
+       ]
+      },
+      {
+       "q": "How does CLP contribute to the success of sports organizations?",
+       "a": [
+        "CLP brings expertise in areas such as event management, talent scouting, marketing, sponsorships, and operational efficiency, helping organizations optimize their resources, attract top talent, engage fans, and achieve their strategic objectives."
+       ]
+      },
+      {
+       "q": "What can operators expect when partnering with CLP?",
+       "a": [
+        "Operators can expect a collaborative partnership with CLP focused on enhancing the overall experience for athletes, coaches, and stakeholders. This includes access to professional services, strategic planning, marketing support, and opportunities for growth and sustainability."
+       ]
+      },
+      {
+       "q": "How do I become an approved operator, and what do I need to do?",
+       "a": [
+        "Before becoming a league, a few steps must be taken. The following is a general outline of what needs to be done:",
+        "• Fill out the interest form on our website",
+        "• Get in touch with a CLP Experiences representative today",
+        "• Submit an official application with additional information, including the location of your operation(s)",
+        "• If applicable, provide a plan of action for review",
+        "• Conduct a background check and receive SafeSport training",
+        "• Provide a Certificate of Insurance in accordance with CLP Experiences standards"
+       ]
+      },
+      {
+       "q": "How long is a typical CLP Experiences season?",
+       "a": [
+        "A typical season should run approximately 6 – 12 weeks."
+       ]
+      },
+      {
+       "q": "How much does it cost to become a CLP Experiences operator?",
+       "a": [
+        "Operators of CLP Experiences do not have to pay any up-front fees. After becoming a partner, you pay a fee per trainer and/or participant transaction",
+        "Mentors, trainers, and operators are required to undergo background checks and obtain certificates of insurance. Additionally, the organization or business must be in good standing with their local government and maintain it."
+       ]
+      },
+      {
+       "q": "I already run a successful program – why should I join CLP Experiences?",
+       "a": [
+        "Joining CLP Experiences gives our partners access to exclusive discounts and services. Furthermore, you will receive high-quality branded uniforms and equipment, along with a suite of operational resources."
+       ]
+      },
+      {
+       "q": "Who do you partner with?",
+       "a": [
+        "Partner operators who share our mission of increasing physical activity and wellness are welcome to participate in our programs."
+       ]
+      },
+      {
+       "q": "What are CLP’s expectations for partners involved in our programs and events?",
+       "a": [
+        "• Act with professionalism, reliability, and safety-first awareness.",
+        "• Elevate the athlete and family experience.",
+        "• Operate transparently and honor commitments.",
+        "• Support inclusion and fair access across all athletes.",
+        "• Maintain safe, clean, and accessible environments.",
+        "• Communicate delays or issues proactively.",
+        "• Be mindful of image rights and privacy concerns.",
+        "• Represent your brand with integrity.",
+        "• Build trust with teams and families."
+       ]
+      },
+      {
+       "q": "How should partners address safety and liability concerns?",
+       "a": [
+        "All services must follow CLP safety protocols, waivers, and insurance coverage."
+       ]
+      },
+      {
+       "q": "What makes a great CLP partner?",
+       "a": [
+        "Proactive communication, flexibility, ethical conduct, and passion for youth sports."
+       ]
+      },
+      {
+       "q": "Can partners promote their services through CLP?",
+       "a": [
+        "With approval, yes. We offer brand alignment packages and event integration options."
+       ]
+      },
+      {
+       "q": "How are conflicts or complaints handled?",
+       "a": [
+        "Through open dialogue, documentation, and solution-first approaches involving CLP leadership."
+       ]
+      },
+      {
+       "q": "What won’t CLP tolerate from partners?",
+       "a": [
+        "• Conflicts of interest, misrepresentation, or dishonesty",
+        "• Unsafe working conditions or service gaps",
+        "• Any behavior that risks brand integrity or athlete trust",
+        "• Exploitative media or commercial activity",
+        "• Failure to follow safety, waiver, or content guidelines",
+        "• Ignoring legal, insurance, or partnership terms",
+        "• Disrespect toward event staff, coaches, or guests",
+        "• Lack of support for diversity or inclusion principles"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "our-services",
+   "label": "Our Services",
+   "sub": "Brand development, content, events, fundraising, logistics, recovery and sports tourism.",
+   "subs": [
+    {
+     "id": "brand-product-development",
+     "label": "Brand & Product Development",
+     "items": [
+      {
+       "q": "How can I engage your brand and product development services for my organization?",
+       "a": [
+        "Our website, email, and phone are all ways to contact us for brand and product development services. We will work with you to understand your brand and product goals, develop customized strategies, and guide you through the development process."
+       ]
+      },
+      {
+       "q": "Can you help with product lifecycle management and optimization?",
+       "a": [
+        "As part of our product lifecycle management services, we update, enhance, extend, and retire products to maximize their value."
+       ]
+      },
+      {
+       "q": "Do you conduct market research and competitive analysis for product development?",
+       "a": [
+        "As part of our product development strategy, we conduct market research, competitive analysis, consumer insights, trend analysis, and market segmentation."
+       ]
+      },
+      {
+       "q": "Can you assist with product branding and packaging design?",
+       "a": [
+        "For enhanced product appeal and marketability, we provide product branding, packaging design, labeling, messaging, and visual merchandising services."
+       ]
+      },
+      {
+       "q": "What services do you offer for product development?",
+       "a": [
+        "Our end-to-end product development services include ideation, concept development, market research, prototyping, testing, manufacturing, and launch planning."
+       ]
+      },
+      {
+       "q": "Do you specialize in visual brand identity design?",
+       "a": [
+        "Our team specializes in designing visual brand identities, including logos, color palettes, typography, imagery, and brand style guides."
+       ]
+      },
+      {
+       "q": "Can you assist with brand naming and tagline creation?",
+       "a": [
+        "Brand naming, tagline creation, and messaging development are all services we offer."
+       ]
+      },
+      {
+       "q": "Do you provide brand audit and analysis services?",
+       "a": [
+        "We conduct brand audits and analyses to assess your current brand perception, market positioning, and competitive landscape."
+       ]
+      },
+      {
+       "q": "Can you help with defining brand values and mission?",
+       "a": [
+        "Creating a strong brand identity starts with defining your brand’s core values, mission statement, vision, and unique selling proposition."
+       ]
+      },
+      {
+       "q": "What services do you offer for brand development?",
+       "a": [
+        "Our brand development services include brand strategy, brand identity design, brand messaging, brand positioning, and brand experience design."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "content-creation-licensing",
+     "label": "Content Creation & Licensing",
+     "items": [
+      {
+       "q": "How can I engage your content creation and licensing services for my organization?",
+       "a": [
+        "To engage our content creation and licensing services, please use our website, email, or phone number. We will work with you to understand your content needs, create compelling content, ensure legal compliance, and maximize the impact of your content strategy."
+       ]
+      },
+      {
+       "q": "Do you offer content performance analytics and reporting?",
+       "a": [
+        "Content performance analytics and reporting are available to track engagement metrics, audience feedback, content effectiveness, and ROI."
+       ]
+      },
+      {
+       "q": "Can you help with content monetization strategies?",
+       "a": [
+        "Content monetization strategies, such as subscription models, pay-per-view options, sponsorship opportunities, and affiliate marketing programs, can be developed."
+       ]
+      },
+      {
+       "q": "Do you assist with copyright and legal compliance for content?",
+       "a": [
+        "Our team ensures that all content created or licensed is compliant with copyright laws, and we provide guidance on intellectual property rights and licensing agreements."
+       ]
+      },
+      {
+       "q": "What licensing services do you offer?",
+       "a": [
+        "Our licensing services include image licensing, video licensing, and intellectual property management."
+       ]
+      },
+      {
+       "q": "Can you handle content distribution and promotion?",
+       "a": [
+        "Content distribution strategies can include social media promotion, email marketing, influencer collaborations, and content syndication."
+       ]
+      },
+      {
+       "q": "Do you provide content localization and adaptation services?",
+       "a": [
+        "To meet the needs of different languages, regions, and cultural contexts, we offer content localization and adaptation services."
+       ]
+      },
+      {
+       "q": "Can you assist with content strategy and planning?",
+       "a": [
+        "We can develop content strategies and plans aligned with your brand’s objectives, target audience, and marketing objectives"
+       ]
+      },
+      {
+       "q": "Do you specialize in specific types of content creation?",
+       "a": [
+        "There are many types of content that we can create, including promotional materials, marketing collateral, brand storytelling, educational content, and multimedia presentations."
+       ]
+      },
+      {
+       "q": "What content creation services do you offer?",
+       "a": [
+        "Copywriting, graphic design, video production, photography, social media content, and blog/article writing are all services we provide."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "event-project-management",
+     "label": "Event & Project Management",
+     "items": [
+      {
+       "q": "How can I engage your event and project management services for my organization?",
+       "a": [
+        "Contact us through our website, email, or phone to engage our event and project management services. Our team will work closely with you to develop customized solutions and ensure successful event and project execution."
+       ]
+      },
+      {
+       "q": "Do you offer risk management and contingency planning for projects and events?",
+       "a": [
+        "Yes, we provide risk management and contingency planning services to identify risks, mitigate risks, and prepare for unforeseen events."
+       ]
+      },
+      {
+       "q": "Can you assist with budgeting and financial management for projects?",
+       "a": [
+        "As part of our project management services, we provide budgeting and financial management services, such as estimating cost, creating budgets, tracking expenses, and allocating resources."
+       ]
+      },
+      {
+       "q": "Do you use project management software for project tracking and collaboration?",
+       "a": [
+        "Our project management software tracks project progress, manages tasks and timelines, collaborates with team members, and ensures project milestones are met."
+       ]
+      },
+      {
+       "q": "What project management services do you offer?",
+       "a": [
+        "Our project management services include event planning, marketing campaigns, product launches, and organizational initiatives."
+       ]
+      },
+      {
+       "q": "Can you handle event registration and attendee management?",
+       "a": [
+        "You can count on us for event registration, ticketing, RSVP management, attendee communication, and participant logistics coordination."
+       ]
+      },
+      {
+       "q": "Do you provide event marketing and promotion services?",
+       "a": [
+        "Marketing and promotion services include social media management, email marketing, media relations, and press releases."
+       ]
+      },
+      {
+       "q": "Can you assist with venue selection and negotiation?",
+       "a": [
+        "As part of our venue selection and negotiation services, we ensure that the chosen venue meets the event’s objectives, budget, and logistical requirements"
+       ]
+      },
+      {
+       "q": "What types of events do you specialize in managing?",
+       "a": [
+        "Corporate events, conferences, trade shows, product launches, gala dinners, weddings, and community events are among the types of events we manage."
+       ]
+      },
+      {
+       "q": "What event management services do you offer?",
+       "a": [
+        "Our event management services include event planning, logistics coordination, vendor management, budgeting, marketing, and on-site execution."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "fundraising-retailing",
+     "label": "Fundraising & Retailing",
+     "items": [
+      {
+       "q": "How can I engage your fundraising and retailing services for my organization?",
+       "a": [
+        "If you are interested in our fundraising or retailing services, please contact us through our website, email, or phone. We will work with you to understand your needs, develop customized solutions, and support your fundraising and retailing efforts."
+       ]
+      },
+      {
+       "q": "Do you offer retail consulting services for business optimization?",
+       "a": [
+        "We help businesses achieve sustainable growth by optimizing retail operations, improving sales performance, and improving customer experience."
+       ]
+      },
+      {
+       "q": "Can you help with retail store design and layout?",
+       "a": [
+        "Creating appealing retail environments includes space planning, interior design, fixture selection, and visual merchandising services."
+       ]
+      },
+      {
+       "q": "Do you assist with setting up and managing online retail platforms?",
+       "a": [
+        "We can assist you in setting up and managing online retail platforms, including e-commerce websites, digital marketing, order fulfillment, and customer experience optimization."
+       ]
+      },
+      {
+       "q": "What retailing services do you offer?",
+       "a": [
+        "Our retailing services include sourcing and procurement of products, inventory management, pricing strategies, merchandising, and sales optimization."
+       ]
+      },
+      {
+       "q": "Can you help with donor management and relationship building?",
+       "a": [
+        "To build strong relationships with supporters, we offer donor management services such as database management, donor segmentation, and personalized communication."
+       ]
+      },
+      {
+       "q": "Do you provide support for grant applications and proposals?",
+       "a": [
+        "We can help you write and submit grant proposals to foundations, governmental agencies, and other funding sources."
+       ]
+      },
+      {
+       "q": "Can you assist with creating fundraising strategies for nonprofits?",
+       "a": [
+        "Certainly, we can assist nonprofits in creating fundraising strategies that are tailored to their mission, goals, and donor base. In addition to strategic planning and goal setting, we also develop fundraising campaigns."
+       ]
+      },
+      {
+       "q": "Do you specialize in specific types of fundraising campaigns?",
+       "a": [
+        "Capital campaigns, annual giving, major gifts, corporate partnerships, and online fundraising initiatives are some of the types of campaigns we specialize in."
+       ]
+      },
+      {
+       "q": "What fundraising services do you offer?",
+       "a": [
+        "Our fundraising services include campaign planning and management, donor outreach and engagement, grant writing, event fundraising, and donor stewardship."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "procurement-logistics",
+     "label": "Procurement & Logistics",
+     "items": [
+      {
+       "q": "How can I use your procurement and logistics services for my business?",
+       "a": [
+        "Reach out to us via our website, email, or phone to engage our procurement and logistics services. We will assess your needs, provide tailored solutions, and ensure seamless procurement and logistics operations."
+       ]
+      },
+      {
+       "q": "Are your procurement and logistics services scalable for businesses of all sizes?",
+       "a": [
+        "From startups to large corporations, we offer procurement and logistics services that are scalable and can be customized."
+       ]
+      },
+      {
+       "q": "Do you provide procurement consulting services?",
+       "a": [
+        "Our procurement consulting services help our clients reduce costs, enhance supplier relationships, optimize procurement processes, and increase supply chain efficiency."
+       ]
+      },
+      {
+       "q": "Can you help with warehousing and distribution services?",
+       "a": [
+        "Certainly, we offer warehouse and distribution services, including storage, inventory management, order fulfillment, and last-mile delivery."
+       ]
+      },
+      {
+       "q": "What technology tools do you use for procurement and logistics management?",
+       "a": [
+        "Procurement and logistics are managed via advanced technology tools, including inventory tracking systems, supply chain management software, and real-time tracking of shipments."
+       ]
+      },
+      {
+       "q": "Do you have partnerships with suppliers and carriers?",
+       "a": [
+        "We have established partnerships with a network of reputable manufacturers, suppliers, and carriers. With these partnerships, we are able to provide our clients with competitive pricing, reliable transportation, and timely delivery."
+       ]
+      },
+      {
+       "q": "Can you handle both raw material procurement and finished product logistics?",
+       "a": [
+        "Our logistics team is capable of handling both raw material procurement and finished product logistics. As a full-service provider, our services include raw material sourcing, product fulfillment, and customer service."
+       ]
+      },
+      {
+       "q": "Do you offer global procurement and logistics solutions?",
+       "a": [
+        "As part of our global procurement and logistics services, we provide international sourcing, import/export services, customs clearance, and distribution services."
+       ]
+      },
+      {
+       "q": "Which industries do you specialize in for procurement and logistics?",
+       "a": [
+        "We specialize in sports and wellness, but our mother company, Soxcessful supports a variety of industries, including retail, manufacturing, healthcare, technology, and more. Depending on the industry, we tailor our services to meet its specific needs."
+       ]
+      },
+      {
+       "q": "What procurement and logistics services do you offer?",
+       "a": [
+        "Our procurement and logistics services include sourcing and purchasing goods, shipping and transportation management, inventory control, and supply chain optimization."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "recovery-performance",
+     "label": "Recovery & Performance",
+     "items": [
+      {
+       "q": "How can I engage your sports performance and recovery services for my athletic needs?",
+       "a": [
+        "Using our website, email, or phone, you can contact us for our sports performance and recovery services. In collaboration with our partners, we will assess your performance goals, create personalized plans, and support your recovery journey."
+       ]
+      },
+      {
+       "q": "Do you offer recovery modalities like massage therapy or cryotherapy?",
+       "a": [
+        "For optimal recovery and fatigue reduction, we offer recovery modalities such as massage, cryotherapy, hydrotherapy, compression therapy and recovery nutrition plans through our partnerships."
+       ]
+      },
+      {
+       "q": "Can you assist with sports technology integration for performance monitoring?",
+       "a": [
+        "We integrate sports technology tools for performance monitoring, like wearable devices, performance analytics platforms, biofeedback systems, and training software."
+       ]
+      },
+      {
+       "q": "Do you provide performance analysis and feedback?",
+       "a": [
+        "We evaluate progress, identify areas for improvement, and adjust training plans through performance analysis, video analysis, data tracking, and feedback sessions."
+       ]
+      },
+      {
+       "q": "Can you help with sports nutrition planning and guidance?",
+       "a": [
+        "Certainly, we offer sports nutrition planning, diet assessments, meal planning, supplement guidance, hydration strategies, and nutrition education through our partnerships."
+       ]
+      },
+      {
+       "q": "Do you offer recovery and recovery strategies?",
+       "a": [
+        "We provide recovery strategies through our partnerships, including post-training recovery protocols, injury recovery programs, massage therapy, cryotherapy, and recovery nutrition."
+       ]
+      },
+      {
+       "q": "Can you assist with mental performance coaching and mindset training?",
+       "a": [
+        "We provide peak performance strategies through our partnerships, including mental performance coaching, mindset training, visualization techniques, goal setting, and stress management strategies."
+       ]
+      },
+      {
+       "q": "Do you offer sports-specific training programs?",
+       "a": [
+        "Yes, we provide sports-specific training programs designed for individual athletes and teams, with a focus on game strategies, performance optimization, and skill development."
+       ]
+      },
+      {
+       "q": "Can you help with injury prevention and rehabilitation?",
+       "a": [
+        "Certainly, we offer injury prevention strategies, injury assessments, rehabilitation programs, physical therapy, and sports medicine consultations through our partnerships."
+       ]
+      },
+      {
+       "q": "What services do you offer for sports performance enhancement?",
+       "a": [
+        "Personalized training programs, strength and conditioning coaching, performance testing, and nutrition counseling are all available through our partnerships."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "sports-tourism",
+     "label": "Sports Tourism",
+     "items": [
+      {
+       "q": "How can I book sports tourism services with your company?",
+       "a": [
+        "If you are interested in booking our sports tourism services, you can contact us directly through our website, email, or telephone. During the booking process, our team will ensure that your sports tourism experience runs smoothly and is enjoyable."
+       ]
+      },
+      {
+       "q": "Are your sports tourism services customizable?",
+       "a": [
+        "We offer a wide range of sports tourism services that can be customized to meet your needs. As part of our service, we work closely with clients to understand their specific needs and preferences. This allows us to create a truly memorable experience."
+       ]
+      },
+      {
+       "q": "Do you provide on-site support during sports events?",
+       "a": [
+        "Our on-site support services include event coordination, logistics management, and assistance for teams and participants during sports events."
+       ]
+      },
+      {
+       "q": "Can you help with event marketing and promotion for sports tournaments?",
+       "a": [
+        "To attract participants and spectators to sports tournaments, we provide marketing and promotion services, including social media campaigns, advertising, and media outreach."
+       ]
+      },
+      {
+       "q": "What accommodations do you offer for sports teams?",
+       "a": [
+        "Accommodations for sports teams include hotels with team-friendly amenities, training facilities, and meal arrangements tailored to athletes’ dietary requirements."
+       ]
+      },
+      {
+       "q": "Do you provide transportation services for sports tourism?",
+       "a": [
+        "Our transportation services include airport transfers, ground transportation to and from venues, and shuttle services for teams and fans."
+       ]
+      },
+      {
+       "q": "Can you arrange tickets to major sporting events?",
+       "a": [
+        "Tickets can be arranged for major sporting events, including championship games, tournaments, and other high-profile matches. We can secure tickets for our clients through connections with event organizers."
+       ]
+      },
+      {
+       "q": "Do you offer packages for individual travelers or just for teams?",
+       "a": [
+        "Both individuals and teams can take advantage of our packages. We can assist you whether you’re traveling as a solo traveler or as part of a team seeking comprehensive travel arrangements."
+       ]
+      },
+      {
+       "q": "Which sports do you specialize in for sports tourism?",
+       "a": [
+        "We specialize in all sorts of sports, including soccer, basketball, baseball, golf, tennis, and more. In order to accommodate different sports and events, we can customize our services."
+       ]
+      },
+      {
+       "q": "What types of sports tourism services do you offer?",
+       "a": [
+        "With our sports tourism offerings, we coordinate travel and accommodations for teams and fans, select and manage venues, and offer customized sports experiences."
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

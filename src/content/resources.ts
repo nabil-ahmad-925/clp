@@ -70,6 +70,6 @@ export const resourcesIndex: SportsIndexPage = {
           'Use “Run a Program?” at the bottom of any resources category to claim your free Community listing, sponsor a listing or apply to become a CLP Partner.',
       },
     ],
-    viewAll: { label: 'VIEW ALL', href: 'https://faq.competelikepros.com/', newTab: true },
+    viewAll: { label: 'VIEW ALL', href: '/faq/resources/' },
   },
 };

@@ -199,7 +199,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/brand-product-development/"
+        href: "/faq/our-services/brand-product-development/"
       }
     }
   },
@@ -400,7 +400,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/content-creation-licensing/"
+        href: "/faq/our-services/content-creation-licensing/"
       }
     }
   },
@@ -599,7 +599,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/event-project-management/"
+        href: "/faq/our-services/event-project-management/"
       }
     }
   },
@@ -799,7 +799,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/fundraising-retailing/"
+        href: "/faq/our-services/fundraising-retailing/"
       }
     }
   },
@@ -1000,7 +1000,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/recovery-performance/"
+        href: "/faq/our-services/recovery-performance/"
       }
     }
   },
@@ -1201,7 +1201,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/procurement-logistics/"
+        href: "/faq/our-services/procurement-logistics/"
       }
     }
   },
@@ -1400,7 +1400,7 @@ export const servicePages: ServicePage[] = [
       ],
       viewAll: {
         label: "VIEW ALL",
-        href: "https://faq.competelikepros.com/our-services/sports-tourism/"
+        href: "/faq/our-services/sports-tourism/"
       }
     }
   }

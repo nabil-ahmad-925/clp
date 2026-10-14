@@ -1,0 +1,39 @@
+{
+  "types": [
+    { "id": "full-time", "label": "Full-time" },
+    { "id": "part-time", "label": "Part-time" },
+    { "id": "internship", "label": "Internship" },
+    { "id": "seasonal", "label": "Seasonal" },
+    { "id": "contract", "label": "Contract" },
+    { "id": "volunteer", "label": "Volunteer" }
+  ],
+  "workplaces": [
+    { "id": "on-site", "label": "On-site" },
+    { "id": "hybrid", "label": "Hybrid" },
+    { "id": "remote", "label": "Remote" }
+  ],
+  "categories": [
+    { "id": "coaching", "label": "Coaching & Training" },
+    { "id": "health", "label": "Health & Performance" },
+    { "id": "events", "label": "Events & Operations" },
+    { "id": "media", "label": "Media & Content" },
+    { "id": "marketing", "label": "Marketing & Partnerships" },
+    { "id": "facilities", "label": "Facilities & Venues" },
+    { "id": "admin", "label": "Administration" }
+  ],
+  "payUnits": [
+    { "id": "hour", "label": "hour" },
+    { "id": "session", "label": "session" },
+    { "id": "week", "label": "week" },
+    { "id": "month", "label": "month" },
+    { "id": "year", "label": "year" },
+    { "id": "season", "label": "season" }
+  ],
+  "statuses": [
+    { "id": "draft", "label": "Draft" },
+    { "id": "review", "label": "In review" },
+    { "id": "live", "label": "Live" },
+    { "id": "rejected", "label": "Not approved" },
+    { "id": "closed", "label": "Closed" }
+  ]
+}

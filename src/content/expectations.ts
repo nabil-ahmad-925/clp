@@ -83,5 +83,5 @@ export const expectationsFaq: FaqData = {
         'Operators can expect a collaborative partnership with CLP focused on enhancing the overall experience for athletes, coaches, and stakeholders. This includes access to professional services, strategic planning, marketing support, and opportunities for growth and sustainability.',
     },
   ],
-  viewAll: { label: 'VIEW ALL', href: 'https://faq.competelikepros.com/expectations-commitments/' },
+  viewAll: { label: 'VIEW ALL', href: '/faq/expectations-commitments/' },
 };
