@@ -53,8 +53,8 @@ const ORDER: Record<PartnerSort, (a: PartnerCardData, b: PartnerCardData) => num
 
 /**
  * A partner category's listing (/portfolio/<category>-partners/), in the experiences listing design: the search bar on
- * the heading's edge (name, place), Sport and Type filters (?sport=<id> picks the sport, as the listing pages' "View All
- * Partners" do), the partners' cards (each opening the partner's page) and the pager. The last page ends with "Your Brand
+ * the heading's edge (name, place), Sport and Type filters (?sport=<id> and ?type=<id> pick them, as the listing pages'
+ * "View All Partners" do), the partners' cards (each opening the partner's page) and the pager. The last page ends with "Your Brand
  * Should Be Here" (becoming a partner).
  */
 export default function PartnerDirectory(props: { category: string; label: string }) {
@@ -83,10 +83,15 @@ function Directory({ category, label }: { category: string; label: string }) {
   const shared = useSharedSearch();
   const search = shared?.search ?? NO_SEARCH;
   const [items, setItems] = useState<PartnerCardData[] | null>(null);
-  const [filters, setFilters] = useState<Filters>(() => ({ sports: params.getAll('sport').filter((s) => PARTNER_SPORTS.some((x) => x.id === s)), types: [] }));
+  const [filters, setFilters] = useState<Filters>(() => ({
+    sports: params.getAll('sport').filter((s) => PARTNER_SPORTS.some((x) => x.id === s)),
+    types: params.getAll('type').filter((ty) => PARTNER_TYPES.some((x) => x.id === ty)),
+  }));
   const [open, setOpen] = useState<string | null>(null);
   const [size, setSize] = useState(PAGE_SIZES[0]);
-  const [sort, setSort] = useState<PartnerSort>(() => (SORTS.some((o) => o.value === params.get('sort')) ? (params.get('sort') as PartnerSort) : 'recommended'));
+  const [sort, setSort] = useState<PartnerSort>(() =>
+    SORTS.some((o) => o.value === params.get('sort')) ? (params.get('sort') as PartnerSort) : 'recommended',
+  );
   const [page, setPage] = useState({ key: '', index: 0 });
   const top = useRef<HTMLDivElement>(null);
 
@@ -115,10 +120,12 @@ function Directory({ category, label }: { category: string; label: string }) {
   const apply = (next: Filters) => {
     setFilters(next);
     setOpen(null);
-    // The sport stays in the address, to share or come back to.
+    // The sport and types stay in the address, to share or come back to.
     const url = new URL(window.location.href);
     url.searchParams.delete('sport');
+    url.searchParams.delete('type');
     next.sports.forEach((s) => url.searchParams.append('sport', s));
+    next.types.forEach((ty) => url.searchParams.append('type', ty));
     window.history.replaceState(null, '', url);
   };
   const chooseSort = (next: PartnerSort) => {
@@ -147,11 +154,13 @@ function Directory({ category, label }: { category: string; label: string }) {
   };
 
   const sportOptions = PARTNER_SPORTS.map((s) => ({ value: s.id, label: s.label, count: count({ ...filters, sports: [s.id] }) }));
-  const typeOptions = PARTNER_TYPES.filter((ty) => items.some((p) => p.type === ty.id)).map((ty) => ({
+  // The category's partner types (and any chosen one), the filter shown when there is a choice or one is applied.
+  const typeOptions = PARTNER_TYPES.filter((ty) => items.some((p) => p.type === ty.id) || filters.types.includes(ty.id)).map((ty) => ({
     value: ty.id,
     label: ty.label,
     count: count({ ...filters, types: [ty.id] }),
   }));
+  const typeFilter = typeOptions.length > 1 || filters.types.length > 0;
   const lastPage = index === pageCount - 1;
 
   return (
@@ -170,7 +179,7 @@ function Directory({ category, label }: { category: string; label: string }) {
               resultsFor={(draft) => count({ ...filters, sports: draft })}
               onApply={(sports) => apply({ ...filters, sports })}
             />
-            {typeOptions.length > 1 && (
+            {typeFilter && (
               <FilterChip
                 name="All Partners"
                 heading="Partner Type"
@@ -201,7 +210,7 @@ function Directory({ category, label }: { category: string; label: string }) {
             <MobileFilters
               sections={[
                 { id: 'sport', heading: 'Sport', options: sportOptions, value: filters.sports },
-                ...(typeOptions.length > 1 ? [{ id: 'type', heading: 'Partner Type', options: typeOptions, value: filters.types }] : []),
+                ...(typeFilter ? [{ id: 'type', heading: 'Partner Type', options: typeOptions, value: filters.types }] : []),
               ]}
               applied={(filters.sports.length > 0 ? 1 : 0) + (filters.types.length > 0 ? 1 : 0)}
               sort={{ value: sort, options: SORTS }}

@@ -7,7 +7,15 @@ import { useCallback, useEffect, useState } from 'react';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import BecomePartner from '@/components/partners/BecomePartner';
 import type { SpotlightPartner } from '@/content/listings';
-import { PARTNER_CATEGORIES, PARTNER_SPORTS, loadLivePartners, partnerCategoryHref, partnerHref } from '@/content/partnerPages';
+import {
+  PARTNER_CATEGORIES,
+  PARTNER_SPORTS,
+  PARTNER_TYPES,
+  loadLivePartners,
+  partnerCategoryHref,
+  partnerHref,
+  type PartnerCardData,
+} from '@/content/partnerPages';
 import styles from './PartnerSpotlight.module.css';
 
 /** Initials for a partner without a photo ("Boston Athletic Training" -> "BAT"). */
@@ -22,7 +30,7 @@ const initials = (name: string) =>
 type Props = {
   section: 'experiences' | 'resources' | 'facilities';
   /** The page's partner category: its CLP Partners are the cards (none yet: a note and "Become a Partner"), and "View
-   *  All Partners" opens its partner listing. No category: no band. */
+   *  All Partners" opens its partner listing, filtered to the partner types shown. No category: no band. */
   category?: string;
   /** The page's sport: only its partners (and those listing no sport), and the partner listing opens on it. */
   sport?: string;
@@ -35,32 +43,31 @@ type Props = {
  */
 export default function PartnerSpotlight({ section, category, sport }: Props) {
   // The CLP Partners of the page's category and sport, each opening their page (null: still loading).
-  const [live, setLive] = useState<SpotlightPartner[] | null>(null);
+  const [live, setLive] = useState<PartnerCardData[] | null>(null);
   useEffect(() => {
     if (!category) return;
     let active = true;
     loadLivePartners().then((items) => {
-      if (!active) return;
-      setLive(
-        items
-          .filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport)))
-          .map((p) => ({
-            name: p.name,
-            href: partnerHref(p.slug),
-            image: p.hero || p.logo,
-            excerpt: [p.category, p.area].filter(Boolean).join(' · '),
-            rating: p.rating != null && p.reviewCount ? `★ ${p.rating.toFixed(1)} · ${p.reviewCount} review${p.reviewCount === 1 ? '' : 's'}` : undefined,
-          })),
-      );
+      if (active) setLive(items.filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport))));
     });
     return () => {
       active = false;
     };
   }, [category, sport]);
-  const partners = live ?? [];
+  const partners: SpotlightPartner[] = (live ?? []).map((p) => ({
+    name: p.name,
+    href: partnerHref(p.slug),
+    image: p.hero || p.logo,
+    excerpt: [p.category, p.area].filter(Boolean).join(' · '),
+    rating: p.rating != null && p.reviewCount ? `★ ${p.rating.toFixed(1)} · ${p.reviewCount} review${p.reviewCount === 1 ? '' : 's'}` : undefined,
+  }));
   const empty = live?.length === 0;
+  // "View All Partners": the category's listing filtered as this band is, by the page's sport and the partner types shown.
+  const all = new URLSearchParams();
+  if (sport) all.append('sport', sport);
+  PARTNER_TYPES.filter((ty) => live?.some((p) => p.type === ty.id)).forEach((ty) => all.append('type', ty.id));
   const categoryHref = partnerCategoryHref(category);
-  const allHref = categoryHref ? `${categoryHref}${sport ? `?sport=${sport}` : ''}` : '/clp-partners/';
+  const allHref = categoryHref ? `${categoryHref}${all.size ? `?${all}` : ''}` : '/clp-partners/';
   const [emblaRef, embla] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps', slidesToScroll: 'auto' });
   // The carousel's pages (one per dot), the one shown and whether there is more either way.
   const [pages, setPages] = useState(0);
@@ -88,7 +95,9 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
   const copy = {
     eyebrow: 'CLP PARTNERS',
     title: resources ? 'Experts We Back' : 'Train With the People We Back',
-    sub: resources ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.' : 'Verified programs that book, pay and check in through CLP.',
+    sub: resources
+      ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.'
+      : 'Verified programs that book, pay and check in through CLP.',
     more: 'View Partner',
     all: 'View All Partners',
   };
@@ -131,40 +140,40 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
           </div>
         ) : (
           <div className={styles.carousel} role="region" aria-roledescription="carousel" aria-label="CLP partners">
-          <div className={styles.viewport} ref={emblaRef}>
-            <ul className={styles.track}>
-              {partners.map((p, i) => (
-                <li key={p.href} className={styles.slide} aria-roledescription="slide" aria-label={`${i + 1} of ${partners.length}`}>
-                  <Link className={styles.partner} href={p.href}>
-                    {card(p)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {pages > 1 && (
-            <div className={styles.controls}>
-              <button type="button" className={styles.arrow} onClick={prev} disabled={!edges.prev} aria-label="Previous partners">
-                <LuChevronLeft aria-hidden />
-              </button>
-              <div className={styles.dots}>
-                {Array.from({ length: pages }, (_, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    className={`${styles.dot} ${i === selected ? styles.dotOn : ''}`}
-                    onClick={() => embla?.scrollTo(i)}
-                    aria-label={`Partners page ${i + 1} of ${pages}`}
-                    aria-current={i === selected ? 'true' : undefined}
-                  />
+            <div className={styles.viewport} ref={emblaRef}>
+              <ul className={styles.track}>
+                {partners.map((p, i) => (
+                  <li key={p.href} className={styles.slide} aria-roledescription="slide" aria-label={`${i + 1} of ${partners.length}`}>
+                    <Link className={styles.partner} href={p.href}>
+                      {card(p)}
+                    </Link>
+                  </li>
                 ))}
-              </div>
-              <button type="button" className={styles.arrow} onClick={next} disabled={!edges.next} aria-label="More partners">
-                <LuChevronRight aria-hidden />
-              </button>
+              </ul>
             </div>
-          )}
-        </div>
+            {pages > 1 && (
+              <div className={styles.controls}>
+                <button type="button" className={styles.arrow} onClick={prev} disabled={!edges.prev} aria-label="Previous partners">
+                  <LuChevronLeft aria-hidden />
+                </button>
+                <div className={styles.dots}>
+                  {Array.from({ length: pages }, (_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`${styles.dot} ${i === selected ? styles.dotOn : ''}`}
+                      onClick={() => embla?.scrollTo(i)}
+                      aria-label={`Partners page ${i + 1} of ${pages}`}
+                      aria-current={i === selected ? 'true' : undefined}
+                    />
+                  ))}
+                </div>
+                <button type="button" className={styles.arrow} onClick={next} disabled={!edges.next} aria-label="More partners">
+                  <LuChevronRight aria-hidden />
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {/* No partners yet: nothing to view all of. */}
         {!empty && (
