@@ -18,6 +18,7 @@ import {
   type PartnerReviewData,
 } from '@/content/partnerPages';
 import type { DirectoryItem } from '@/content/types';
+import { setHeaderBrand } from '@/components/layout/headerBrand';
 import s from './partnerPage.module.css';
 
 type Experience = PartnerPageResponse['experiences'][number];
@@ -176,6 +177,12 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState<CartLine[]>(readCart);
   const mine = cart.filter((l) => l.slug === page.slug);
+  const cartCount = mine.reduce((n, l) => n + l.qty, 0);
+  // The site header, co-branded as the design's ("CLP │ × AFC"), with this page's cart beside the menu.
+  useEffect(() => {
+    setHeaderBrand({ label: page.short, cartCount, onCart: () => setCartOpen(true) });
+  }, [page.short, cartCount]);
+  useEffect(() => () => setHeaderBrand(null), []);
   const saveCart = (lines: CartLine[]) => {
     setCart(lines);
     writeCart(lines);
@@ -284,11 +291,6 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         {tab === 'shop' && <Shop page={page} products={products} onOpen={setProduct} />}
       </div>
 
-      {mine.length > 0 && (
-        <button type="button" className={s.floatCart} onClick={() => setCartOpen(true)}>
-          Cart · {mine.reduce((n, l) => n + l.qty, 0)}
-        </button>
-      )}
 
       {dialog === 'reviews' && <ReviewsDialog page={page} reviews={reviews} onClose={() => setDialog(null)} />}
       {dialog === 'work' && <WorkDialog slug={page.slug} short={page.short} onClose={() => setDialog(null)} />}
@@ -356,7 +358,7 @@ function About({
   listingsLabel: string;
 }) {
   const { page } = data;
-  const [openFaq, setOpenFaq] = useState(0);
+  const [openFaq, setOpenFaq] = useState(-1);
   const stats = [
     ...(upcoming
       ? [
@@ -767,7 +769,8 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
       ].sort((a, b) => (b.date || '').localeCompare(a.date || '')),
     [articles, page.press],
   );
-  const top = posts.find((p) => p.kind === 'updates');
+  // The featured post: their newest update, else the newest press mention.
+  const top = posts.find((p) => p.kind === 'updates') ?? posts[0];
   const rest = posts.filter((p) => p !== top && (filter === 'all' || p.kind === filter));
   const date = (d: string) => (d ? parts(d.slice(0, 10)).short : '');
   if (!posts.length) {
@@ -780,17 +783,17 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
   return (
     <section className={`${s.wrap} ${s.section}`} style={{ gap: 72 }}>
       {top && (
-        <a className={s.topPost} href={top.href}>
+        <a className={s.topPost} href={top.href} target={top.kind === 'press' ? '_blank' : undefined} rel="noopener noreferrer">
           {top.image ? <img src={top.image} alt="" /> : <span className={s.topPostBlank} />}
           <span className={s.topPostText}>
             <span className={s.postTags}>
-              <span style={{ color: 'var(--accent)' }}>UPDATE</span>
+              <span style={{ color: top.kind === 'press' ? '#111' : 'var(--accent)' }}>{top.label}</span>
               <span>{date(top.date)}</span>
             </span>
             <span className={s.topPostTitle}>{top.title}</span>
             {top.excerpt && <span className={s.topPostExcerpt}>{top.excerpt}</span>}
             <span className={`${s.btn} ${s.btnDark}`} style={{ alignSelf: 'flex-start', marginTop: 8 }}>
-              Read the update
+              {top.kind === 'press' ? `Read it on ${top.source || 'the site'}` : 'Read the update'}
             </span>
           </span>
         </a>
@@ -854,7 +857,10 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
 function Shop({ page, products, onOpen }: { page: PartnerPageResponse['page']; products: PartnerProduct[]; onOpen: (p: PartnerProduct) => void }) {
   const collections = [...new Set(products.map((p) => p.collection))];
   const [col, setCol] = useState('');
-  const shown = products.filter((p) => !col || p.collection === col);
+  const [all, setAll] = useState(false);
+  const matching = products.filter((p) => !col || p.collection === col);
+  // The first row, then "View all" (a collection shows all of its own).
+  const shown = all || col ? matching : matching.slice(0, 4);
   return (
     <section className={`${s.wrap} ${s.section}`} style={{ alignItems: 'center', gap: 48, paddingTop: 72 }}>
       <div className={s.shopHead}>
@@ -884,6 +890,11 @@ function Shop({ page, products, onOpen }: { page: PartnerPageResponse['page']; p
         </div>
       ) : (
         <p className={s.empty}>The store opens soon.</p>
+      )}
+      {shown.length < matching.length && (
+        <button type="button" className={`${s.btn} ${s.btnDark}`} onClick={() => setAll(true)}>
+          View all {matching.length} products
+        </button>
       )}
     </section>
   );

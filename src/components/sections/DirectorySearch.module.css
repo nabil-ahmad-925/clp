@@ -342,3 +342,20 @@
     display: inline;
   }
 }
+
+/* "Use my location", first in the list, in the site's gold. */
+.nearMe {
+  color: #8a6f33;
+  font-weight: 700;
+}
+
+.nearMe .suggestionIcon {
+  color: #8a6f33;
+}
+
+.geoError {
+  padding: 4px 10px 8px;
+  color: #b03a2e;
+  font-size: 13px;
+  line-height: 1.4;
+}

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { site } from '@/content/site';
 import type { HeaderTone } from '@/content/types';
 import FullscreenMenu from './FullscreenMenu';
+import { useHeaderBrand } from './headerBrand';
 import styles from './SiteHeader.module.css';
 
 // Pages without a hero get a solid black header instead of the transparent one.
@@ -25,9 +26,13 @@ function toneBehindHeader(header: HTMLElement): HeaderTone {
 
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const brand = useHeaderBrand();
   const [tone, setTone] = useState<HeaderTone>('light');
   const pathname = usePathname();
-  const variant = SOLID_HEADER_PATHS.has(pathname) || pathname.startsWith('/category/') || pathname.startsWith('/author/') || pathname.startsWith('/clp-partners/') ? 'solid' : 'transparent';
+  const variant =
+    SOLID_HEADER_PATHS.has(pathname) || pathname.startsWith('/category/') || pathname.startsWith('/author/') || pathname.startsWith('/clp-partners/')
+      ? 'solid'
+      : 'transparent';
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
@@ -58,41 +63,72 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header
-        id="site-header"
-        className={[styles.header, styles[variant], dark && styles.dark, menuOpen && styles.menuOpen].filter(Boolean).join(' ')}
-      >
+      <header id="site-header" className={[styles.header, styles[variant], dark && styles.dark, menuOpen && styles.menuOpen].filter(Boolean).join(' ')}>
         <div className={styles.inner}>
-          <Link href="/" className={styles.logo} aria-label={site.name}>
-            {variant === 'solid' ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={site.logo.light}
-                srcSet={`${site.logo.light} 1x, ${site.logo.dark} 2x`}
-                width={site.logo.width}
-                height={site.logo.height}
-                alt={site.name}
-              />
-            ) : (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className={styles.logoLight} src={site.logo.light} width={site.logo.width} height={site.logo.height} alt={site.name} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className={styles.logoDark} src={site.logo.dark} width={site.logo.width} height={site.logo.height} alt="" aria-hidden />
-              </>
+          <div className={styles.brandGroup}>
+            <Link href="/" className={styles.logo} aria-label={site.name}>
+              {variant === 'solid' ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={site.logo.light}
+                  srcSet={`${site.logo.light} 1x, ${site.logo.dark} 2x`}
+                  width={site.logo.width}
+                  height={site.logo.height}
+                  alt={site.name}
+                />
+              ) : (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className={styles.logoLight} src={site.logo.light} width={site.logo.width} height={site.logo.height} alt={site.name} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className={styles.logoDark} src={site.logo.dark} width={site.logo.width} height={site.logo.height} alt="" aria-hidden />
+                </>
+              )}
+            </Link>
+            {/* A partner's page: co-branded, "CLP │ × AFC". */}
+            {brand && !menuOpen && (
+              <span className={styles.cobrand}>
+                <span className={styles.cobrandRule} aria-hidden />× {brand.label}
+              </span>
             )}
-          </Link>
+          </div>
 
-          <button
-            type="button"
-            className={styles.toggle}
-            aria-label={menuOpen ? 'Close Menu' : 'Navigation Menu'}
-            aria-expanded={menuOpen}
-            aria-controls="fullscreen-menu"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span className={styles.lines} aria-hidden />
-          </button>
+          <div className={styles.actions}>
+            {brand && !menuOpen && (
+              <button
+                type="button"
+                className={styles.cart}
+                aria-label={`Cart, ${brand.cartCount} item${brand.cartCount === 1 ? '' : 's'}`}
+                onClick={brand.onCart}
+              >
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M6 7h12l-1.2 13H7.2L6 7Z" />
+                  <path d="M9 7a3 3 0 0 1 6 0" />
+                </svg>
+                {brand.cartCount > 0 && <span className={styles.cartCount}>{brand.cartCount}</span>}
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles.toggle}
+              aria-label={menuOpen ? 'Close Menu' : 'Navigation Menu'}
+              aria-expanded={menuOpen}
+              aria-controls="fullscreen-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span className={styles.lines} aria-hidden />
+            </button>
+          </div>
         </div>
       </header>
 

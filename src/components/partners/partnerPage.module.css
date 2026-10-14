@@ -50,15 +50,18 @@
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.75) 100%);
 }
 
+/* The design's hero: 680px tall, the name at the bottom under the (co-branded) header. */
 .heroInner {
   position: relative;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-end;
   align-items: flex-end;
   gap: 28px;
-  min-height: 420px;
-  padding-top: calc(var(--header-height) + 120px);
-  padding-bottom: 48px;
+  box-sizing: border-box;
+  min-height: 680px;
+  padding-top: calc(var(--header-height) + 40px);
+  padding-bottom: 56px;
 }
 
 .logo {
@@ -1502,25 +1505,6 @@ textarea.input {
   border-top: 1px solid #ededea;
 }
 
-.floatCart {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 50;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 52px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: 26px;
-  background: #111;
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-}
 
 .lightbox {
   max-width: min(1100px, 92vw);
@@ -1578,8 +1562,9 @@ textarea.input {
   }
 
   .heroInner {
-    min-height: 0;
-    padding-top: calc(var(--header-height) + 80px);
+    min-height: 520px;
+    padding-top: calc(var(--header-height) + 40px);
+    padding-bottom: 40px;
   }
 
   .logo {
@@ -1592,9 +1577,32 @@ textarea.input {
     font-size: 40px;
   }
 
+  /* One row of tabs that scrolls sideways; Share and Subscribe on the row under it. */
   .tabs {
+    flex-wrap: nowrap;
+    width: 100%;
     gap: 24px;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabs .tab {
+    flex: none;
+    min-height: 56px;
+    white-space: nowrap;
+  }
+
+  .tabBarInner {
+    gap: 0;
+  }
+
+  .tabActions {
+    width: 100%;
+    padding: 4px 0 12px;
   }
 
   .tab {

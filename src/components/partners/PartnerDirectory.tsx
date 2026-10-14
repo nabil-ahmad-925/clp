@@ -4,11 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { LuBadgeCheck, LuMapPin, LuSearch, LuShapes, LuStar, LuVolleyball } from 'react-icons/lu';
+import { LuArrowUpDown, LuBadgeCheck, LuMapPin, LuSearch, LuShapes, LuStar, LuVolleyball } from 'react-icons/lu';
 import { NO_SEARCH, fold, useSharedSearch, type Search } from '@/components/sections/DirectorySearch';
 import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import MobileFilters from '@/components/ui/MobileFilters';
+import PillSelect from '@/components/ui/PillSelect';
 import Pager from '@/components/ui/Pager';
 import { PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, type PartnerCardData } from '@/content/partnerPages';
 import t from '@/components/sections/TeamDirectory.module.css';
@@ -39,6 +40,16 @@ const matches = (p: PartnerCardData, f: Filters, search: Search) => {
 
 /** Top rated first (more reviews breaking ties), then A to Z. */
 const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
+const byName = (a: PartnerCardData, b: PartnerCardData) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+
+/** The sort menu (the listing pages' "Recommended" pill): top rated first, or by name. */
+const SORTS = [
+  { value: 'recommended', label: 'Recommended' },
+  { value: 'az', label: 'Name: A to Z' },
+  { value: 'za', label: 'Name: Z to A' },
+] as const;
+type PartnerSort = (typeof SORTS)[number]['value'];
+const ORDER: Record<PartnerSort, (a: PartnerCardData, b: PartnerCardData) => number> = { recommended: byRating, az: byName, za: (a, b) => byName(b, a) };
 
 /**
  * A partner category's listing (/portfolio/<category>-partners/), in the experiences listing design: the search bar on
@@ -75,6 +86,7 @@ function Directory({ category, label }: { category: string; label: string }) {
   const [filters, setFilters] = useState<Filters>(() => ({ sports: params.getAll('sport').filter((s) => PARTNER_SPORTS.some((x) => x.id === s)), types: [] }));
   const [open, setOpen] = useState<string | null>(null);
   const [size, setSize] = useState(PAGE_SIZES[0]);
+  const [sort, setSort] = useState<PartnerSort>(() => (SORTS.some((o) => o.value === params.get('sort')) ? (params.get('sort') as PartnerSort) : 'recommended'));
   const [page, setPage] = useState({ key: '', index: 0 });
   const top = useRef<HTMLDivElement>(null);
 
@@ -83,7 +95,7 @@ function Directory({ category, label }: { category: string; label: string }) {
     let active = true;
     loadLivePartners().then((all) => {
       if (!active) return;
-      const mine = all.filter((p) => p.partnerCategories.includes(category)).sort(byRating);
+      const mine = all.filter((p) => p.partnerCategories.includes(category));
       setItems(mine);
       // The location field suggests the partners' areas.
       const areas = new Map<string, number>();
@@ -109,11 +121,18 @@ function Directory({ category, label }: { category: string; label: string }) {
     next.sports.forEach((s) => url.searchParams.append('sport', s));
     window.history.replaceState(null, '', url);
   };
+  const chooseSort = (next: PartnerSort) => {
+    setSort(next);
+    const url = new URL(window.location.href);
+    if (next === 'recommended') url.searchParams.delete('sort');
+    else url.searchParams.set('sort', next);
+    window.history.replaceState(null, '', url);
+  };
 
   if (!items) return <Skeleton />;
-  const shown = items.filter((p) => matches(p, filters, search));
+  const shown = items.filter((p) => matches(p, filters, search)).sort(ORDER[sort]);
   const count = (f: Filters) => items.filter((p) => matches(p, f, search)).length;
-  const key = JSON.stringify([filters, search, size]);
+  const key = JSON.stringify([filters, search, size, sort]);
   const pageCount = Math.max(1, Math.ceil(shown.length / size));
   const index = page.key === key ? Math.min(page.index, pageCount - 1) : 0;
   const pageItems = shown.slice(index * size, (index + 1) * size);
@@ -173,6 +192,11 @@ function Directory({ category, label }: { category: string; label: string }) {
               </button>
             )}
           </div>
+          <div className={t.sortSlot}>
+            <span className={t.sortDesktop}>
+              <PillSelect value={sort} options={SORTS} onChange={chooseSort} label="Sort partners" icon={<LuArrowUpDown />} />
+            </span>
+          </div>
           <div className={t.mobileFilters}>
             <MobileFilters
               sections={[
@@ -180,8 +204,12 @@ function Directory({ category, label }: { category: string; label: string }) {
                 ...(typeOptions.length > 1 ? [{ id: 'type', heading: 'Partner Type', options: typeOptions, value: filters.types }] : []),
               ]}
               applied={(filters.sports.length > 0 ? 1 : 0) + (filters.types.length > 0 ? 1 : 0)}
+              sort={{ value: sort, options: SORTS }}
               countFor={(draft) => count({ sports: draft.sport ?? [], types: draft.type ?? [] })}
-              onApply={(draft) => apply({ sports: draft.sport ?? [], types: draft.type ?? [] })}
+              onApply={(draft, nextSort) => {
+                apply({ sports: draft.sport ?? [], types: draft.type ?? [] });
+                if (nextSort && nextSort !== sort) chooseSort(nextSort as PartnerSort);
+              }}
             />
           </div>
         </div>

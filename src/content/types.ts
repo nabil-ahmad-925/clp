@@ -45,6 +45,12 @@ export type FacilityCard = {
 export type DirectoryItem = FacilityCard & {
   id: string;
   tags: string[];
+  /** What its price is for ("athlete": "$20 / athlete"; listingDisplay.json). */
+  priceUnit?: string;
+  /** The tag on its photo ("special-event"; listingDisplay.json). */
+  cornerTag?: string;
+  /** A CLP Partner's listing: the partner, whose name is the card's provider line. */
+  partner?: { name: string; slug: string };
   /** Its price in dollars (listings from the admin): the same in both for a single price, 0 for free. */
   priceMin?: number;
   priceMax?: number;

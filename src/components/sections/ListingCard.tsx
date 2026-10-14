@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { agePolicy, cornerTagLabel } from '@/content/listings';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './ListingCard.module.css';
@@ -119,9 +120,10 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         )}
         <span className={styles.shade} aria-hidden />
         <ProviderBadge provider={card.provider} />
+        <CornerTags card={card} />
       </div>
       <div className={styles.body}>
-        {card.subtitle && <span className={styles.provider}>{card.subtitle}</span>}
+        {(card.partner?.name || card.subtitle) && <span className={styles.provider}>{card.partner?.name || card.subtitle}</span>}
         <h3 className={styles.title}>{card.title}</h3>
         {(facts.months || facts.city) && (
           <div className={styles.facts}>
@@ -159,7 +161,14 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
           <>
             {facts.ages && <span className={styles.ages}>{facts.ages}</span>}
             <div className={styles.footer}>
-              {facts.price ? <span className={styles.price}>{facts.price}</span> : <span className={styles.noPrice}>Contact for pricing</span>}
+              {facts.price ? (
+                <span className={styles.price}>
+                  {facts.price}
+                  {facts.unit && <span className={styles.unit}> / {facts.unit}</span>}
+                </span>
+              ) : (
+                <span className={styles.noPrice}>Contact for pricing</span>
+              )}
               {learnMore}
             </div>
           </>
@@ -222,7 +231,7 @@ export function SponsoredStrip({ items, factsOf, onOpen }: StripProps) {
             )}
             <span className={styles.stripBody}>
               <span className={`${styles.badge} ${styles.badgeStrip}`}>SPONSORED</span>
-              {item.subtitle && <span className={styles.stripProvider}>{item.subtitle}</span>}
+              {(item.partner?.name || item.subtitle) && <span className={styles.stripProvider}>{item.partner?.name || item.subtitle}</span>}
               <span className={styles.stripTitle}>{item.title}</span>
               <span className={styles.stripFoot}>
                 <span>{when}</span>
@@ -233,5 +242,19 @@ export function SponsoredStrip({ items, factsOf, onOpen }: StripProps) {
         );
       })}
     </div>
+  );
+}
+
+/** The tags on the top right of a card's photo: its own ("Special event") and its age rule ("21+"), as the design's. */
+function CornerTags({ card }: { card: DirectoryItem }) {
+  const label = card.cornerTag ? cornerTagLabel(card.cornerTag) : '';
+  const policy = agePolicy(card.tags);
+  const age = policy.kind === 'adult' ? `${policy.minAge}+` : '';
+  if (!label && !age) return null;
+  return (
+    <span className={styles.corner}>
+      {label && <span className={styles.cornerTag}>{label}</span>}
+      {age && <span className={styles.cornerTag}>{age}</span>}
+    </span>
   );
 }

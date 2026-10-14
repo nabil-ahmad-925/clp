@@ -290,3 +290,10 @@
     transform: none;
   }
 }
+
+/* What the price is for ("/ athlete"), smaller and grey beside it. */
+.unit {
+  color: #777;
+  font-size: 13px;
+  font-weight: 500;
+}

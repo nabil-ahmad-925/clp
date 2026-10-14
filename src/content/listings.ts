@@ -1,4 +1,5 @@
 import type { Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
+import display from './data/listingDisplay.json';
 
 /**
  * Directory cards added from the admin (clp-admin), stored in DynamoDB and served by the listings read API
@@ -125,7 +126,7 @@ export const isListingWidget = (widgetId: number | undefined): widgetId is numbe
 export const isFacilitiesWidget = (widgetId: number | undefined): widgetId is number => widgetId != null && WIDGET_TYPES[widgetId] === 'facilities';
 
 /** A CLP partner in a listing page's spotlight (from the partner directory). */
-export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string };
+export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string; /** Their rating ("★ 4.5 · 2 reviews"), if reviewed. */ rating?: string };
 
 /**
  * What a listing page's directory shows besides its cards: its design (an Experiences or Resources category, or a
@@ -169,7 +170,14 @@ const typeParam = (widgetId: number) => (WIDGET_TYPES[widgetId] ? `&type=${WIDGE
 
 export type Listing = {
   id: string;
+  /** Its category's widget (the API's answers have it). */
+  widgetId?: string;
   provider?: Provider;
+  /** What the price is for ("athlete": "$20 / athlete"), and the tag on its photo ("special-event"). */
+  priceUnit?: string;
+  cornerTag?: string;
+  /** A CLP Partner's listing: the partner (their live page). */
+  partner?: { name: string; slug: string };
   /** The built-in card this listing replaces (listings imported from the site's own data). */
   sourceId?: string;
   title: string;
@@ -273,6 +281,10 @@ export type AddedItem = DirectoryItem & { sourceId?: string; fallbackImage?: str
 export const toItem = (l: Listing): AddedItem => ({
   id: l.id,
   provider: l.provider,
+  // Without a unit of its own, the price is for its category's usual one.
+  priceUnit: l.priceUnit ?? (l.widgetId ? unitsFor(l.widgetId)[0] : undefined),
+  cornerTag: l.cornerTag,
+  partner: l.partner,
   sourceId: l.sourceId,
   tags: l.tags,
   priceMin: l.priceMin,
@@ -428,6 +440,14 @@ export async function moreListings(
 
 /** Whether a listing is booked on CLP ("Book Now"): CLP's own and its partners' listings. Others link out. */
 export const isBookable = (item: { provider?: Provider }) => item.provider === 'partner' || item.provider === 'clp';
+
+/**
+ * What a card shows besides the listing's fields (listingDisplay.json, shared with the admin and the API): the units a
+ * category's prices are for (its first the usual one) and the tags a listing may show on its photo.
+ */
+export const unitsFor = (widgetId: string | number): string[] => (display.unitsByWidget as Record<string, string[]>)[String(widgetId)] ?? display.otherUnits;
+export const unitLabel = (id: string) => display.priceUnits.find((u) => u.id === id)?.label ?? id;
+export const cornerTagLabel = (id: string) => display.cornerTags.find((t) => t.id === id)?.label ?? '';
 
 /** A listing's age rule from its Age tags, as the bookings API reads it: adults only (18+ / 21+), kids only, or all. */
 export type AgePolicy = { kind: 'adult'; minAge: number } | { kind: 'youth' } | { kind: 'all' };

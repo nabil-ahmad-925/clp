@@ -26,7 +26,7 @@ import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/Price
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
-import { FIRST_LOAD_TIMEOUT_MS, SPORT_FILTER, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
+import { FIRST_LOAD_TIMEOUT_MS, SPORT_FILTER, unitLabel, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout, Provider } from '@/content/types';
 import BioModal from './BioModal';
@@ -184,6 +184,8 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
       max === 0 ? 'Free' : !Number.isFinite(max) ? `${dollars(min)}+` : min === max ? dollars(min) : `${dollars(min)} – ${dollars(max)}`;
   }
   return {
+    // What the price is for ("$20 / athlete"), unless it's free.
+    unit: price && price !== 'Free' && item.priceUnit ? unitLabel(item.priceUnit) : undefined,
     city: firstOf([...new Set(labelsOf((k) => LOCATION_KEYS.includes(k)))]),
     ages: firstOf(labelsOf((k) => k === 'age' || k === 'age-group')),
     // The Accessibility filter's labels (Open Access, Members Only…), shown on the facilities' cards.

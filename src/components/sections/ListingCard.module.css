@@ -421,3 +421,36 @@
     transform: none;
   }
 }
+
+/* What the price is for ("/ athlete"), smaller and grey beside it. */
+.unit {
+  color: #777;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* The tags on the top right of the photo: its own ("Special event") and its age rule ("21+"). */
+.corner {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: 55%;
+}
+
+.cornerTag {
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgba(17, 17, 17, 0.88);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}

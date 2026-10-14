@@ -55,7 +55,8 @@ export function ProgramPlans({ category, section }: { category?: string; section
   return (
     <section className={styles.plans} data-header-tone="dark">
       <div className={styles.plansHead}>
-        <h2 className={`${styles.plansTitle} ${styles.plansTitleBold}`}>Run a Program? Get in Front of More Athletes</h2>
+        <span className={styles.eyebrowDark}>RUN A PROGRAM?</span>
+        <h2 className={`${styles.plansTitle} ${styles.plansTitleBold}`}>Get in Front of More Athletes</h2>
       </div>
       <div className={styles.planGrid}>
         {PLANS.map((p) => (

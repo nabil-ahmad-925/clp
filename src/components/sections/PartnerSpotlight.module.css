@@ -338,3 +338,10 @@
     flex-basis: 85%;
   }
 }
+
+/* A reviewed partner's rating ("★ 4.5 · 2 reviews"), as the design's partner cards. */
+.rating {
+  color: #dcbd7d;
+  font-size: 13px;
+  font-weight: 700;
+}

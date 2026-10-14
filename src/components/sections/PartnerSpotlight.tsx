@@ -44,7 +44,13 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
       setLive(
         items
           .filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport)))
-          .map((p) => ({ name: p.name, href: partnerHref(p.slug), image: p.hero || p.logo, excerpt: [p.category, p.area].filter(Boolean).join(' · ') })),
+          .map((p) => ({
+            name: p.name,
+            href: partnerHref(p.slug),
+            image: p.hero || p.logo,
+            excerpt: [p.category, p.area].filter(Boolean).join(' · '),
+            rating: p.rating != null && p.reviewCount ? `★ ${p.rating.toFixed(1)} · ${p.reviewCount} review${p.reviewCount === 1 ? '' : 's'}` : undefined,
+          })),
       );
     });
     return () => {
@@ -97,6 +103,7 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
       <span className={styles.body}>
         <span className={styles.name}>{p.name}</span>
         {p.excerpt && <span className={styles.meta}>{p.excerpt}</span>}
+        {p.rating && <span className={styles.rating}>{p.rating}</span>}
         <span className={styles.more}>
           {copy.more}
           <span className="glyph" aria-hidden>

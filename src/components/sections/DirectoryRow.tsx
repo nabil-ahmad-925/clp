@@ -7,7 +7,7 @@ import type { DirectoryItem } from '@/content/types';
 import styles from './DirectoryRow.module.css';
 
 /** What the row shows besides the card itself, read from its filter tags (see TeamDirectory). */
-export type RowFacts = { city?: string; ages?: string; months?: string; price?: string; access?: string[] };
+export type RowFacts = { city?: string; ages?: string; months?: string; price?: string; unit?: string; access?: string[] };
 
 type Props = {
   card: DirectoryItem;
@@ -68,7 +68,7 @@ export default function DirectoryRow({ card, facts, onOpen, fallbackImage, eager
       </div>
 
       <div className={styles.body}>
-        {card.subtitle && <div className={styles.meta}>{card.subtitle}</div>}
+        {(card.partner?.name || card.subtitle) && <div className={styles.meta}>{card.partner?.name || card.subtitle}</div>}
         <h3 className={styles.title}>{card.title}</h3>
         {card.excerpt && <p className={styles.excerpt}>{card.excerpt}</p>}
         {details.length > 0 && (
@@ -86,7 +86,14 @@ export default function DirectoryRow({ card, facts, onOpen, fallbackImage, eager
       </div>
 
       <div className={styles.aside}>
-        {facts.price ? <span className={styles.price}>{facts.price}</span> : <span className={styles.noPrice}>Contact for pricing</span>}
+        {facts.price ? (
+          <span className={styles.price}>
+            {facts.price}
+            {facts.unit && <span className={styles.unit}> / {facts.unit}</span>}
+          </span>
+        ) : (
+          <span className={styles.noPrice}>Contact for pricing</span>
+        )}
         <span className={styles.cta}>
           View details <LuArrowRight className={styles.ctaArrow} aria-hidden />
         </span>

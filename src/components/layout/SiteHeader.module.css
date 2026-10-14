@@ -55,6 +55,93 @@
   opacity: 1;
 }
 
+/* ---- A partner's page: the co-brand beside the logo and the cart beside the menu (the design's header) ---- */
+
+.brandGroup,
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.brandGroup {
+  gap: 20px;
+}
+
+.actions {
+  gap: 12px;
+}
+
+.cobrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  color: var(--white);
+  font-family: var(--font-instrument), 'Instrument Sans', var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.4s;
+}
+
+.cobrandRule {
+  width: 1px;
+  height: 40px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color 0.4s;
+}
+
+.cart:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.cartCount {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--gold);
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+/* Over a light section, as the logo and the menu lines. */
+.dark .cobrand,
+.dark .cart {
+  color: #111;
+}
+
+@media (max-width: 480px) {
+  .cobrand {
+    display: none;
+  }
+}
+
 /* ---- Hamburger / close toggle (Salient "x2" animation) ---- */
 
 .toggle {

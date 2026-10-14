@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { LuChevronDown, LuMapPin, LuSearch } from 'react-icons/lu';
+import { LuChevronDown, LuLocateFixed, LuMapPin, LuSearch } from 'react-icons/lu';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import styles from './DirectorySearch.module.css';
 
@@ -43,6 +43,9 @@ export default function DirectorySearch({ query, location, places = [], onSearch
   const [loc, setLoc] = useState(location);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  // "Use my location": finding it, or why it failed.
+  const [locating, setLocating] = useState(false);
+  const [geoError, setGeoError] = useState('');
   const locRef = useRef<HTMLDivElement>(null);
   const locInput = useRef<HTMLInputElement>(null);
   const qId = useId();
@@ -61,7 +64,8 @@ export default function DirectorySearch({ query, location, places = [], onSearch
   // applied place).
   const typed = fold(loc);
   const suggestions = places.filter((p) => !typed || typed === fold(location) || fold(p.label).includes(typed)).slice(0, 8);
-  const shown = open && suggestions.length > 0;
+  // Open: "Use my location" first, then the places.
+  const shown = open;
 
   useEffect(() => {
     if (!open) return;
@@ -81,6 +85,39 @@ export default function DirectorySearch({ query, location, places = [], onSearch
     setLoc(p.label);
     setOpen(false);
     onSearch(q.trim(), p.label);
+  };
+  /**
+   * The visitor's city (the browser asks them first), applied as the location. The coordinates are turned into a city
+   * name by BigDataCloud's free client-side lookup, only when they ask.
+   */
+  const nearMe = () => {
+    setGeoError('');
+    if (!('geolocation' in navigator)) return setGeoError('Your browser can’t share your location.');
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.latitude}&longitude=${coords.longitude}&localityLanguage=en`,
+          );
+          const place = await res.json();
+          const city = String(place.city || place.locality || '').trim();
+          if (!city) throw new Error('no city');
+          setLoc(city);
+          setOpen(false);
+          onSearch(q.trim(), city);
+        } catch {
+          setGeoError('Couldn’t find your city. Type it instead.');
+        } finally {
+          setLocating(false);
+        }
+      },
+      (err) => {
+        setLocating(false);
+        setGeoError(err.code === err.PERMISSION_DENIED ? 'Location is blocked for this site in your browser.' : 'Couldn’t get your location. Type your city instead.');
+      },
+      { timeout: 10000, maximumAge: 600000 },
+    );
   };
 
   return (
@@ -146,6 +183,15 @@ export default function DirectorySearch({ query, location, places = [], onSearch
           </button>
           {shown && (
             <ul id={listId} className={styles.suggestions} role="listbox" aria-label="Locations">
+              <li role="option" aria-selected={false} className={`${styles.suggestion} ${styles.nearMe}`} onMouseDown={(e) => e.preventDefault()} onClick={nearMe}>
+                <LuLocateFixed className={styles.suggestionIcon} aria-hidden />
+                <span className={styles.suggestionLabel}>{locating ? 'Finding your location…' : 'Use my location'}</span>
+              </li>
+              {geoError && (
+                <li role="presentation" className={styles.geoError}>
+                  {geoError}
+                </li>
+              )}
               {suggestions.map((p, i) => (
                 <li
                   key={p.value}
