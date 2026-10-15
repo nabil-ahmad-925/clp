@@ -1452,40 +1452,148 @@ button.stat {
   opacity: 0.4;
 }
 
-/* ---- A product's dialog: its photos (thumbnails under the main one) and description ---- */
+/* ---- A product's dialog: its photos (a carousel filling the left half: arrows, swipe, ← →) and the details ---- */
+.dialog:has(> .productDialog) {
+  max-width: 1040px;
+}
+
 .productDialogMedia {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
   min-width: 0;
-}
-
-.productThumbs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 0 0 10px 10px;
-}
-
-.productThumb {
-  width: 56px;
-  height: 56px;
-  padding: 0;
+  min-height: min(440px, calc(100dvh - 48px));
   overflow: hidden;
-  border: 2px solid transparent;
-  border-radius: 6px;
   background: #f2f1ee;
-  cursor: pointer;
 }
 
-.productThumb img {
+.productTrack {
+  display: flex;
+  width: 100%;
+  transition: transform 0.35s ease;
+}
+
+.productTrack img {
+  flex: 0 0 100%;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  user-select: none;
 }
 
-.productThumbOn {
-  border-color: #111;
+.productNoImage {
+  margin: auto;
+  color: #999;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.productArrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.productArrow:hover {
+  background: #fff;
+}
+
+.productArrow:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.productArrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.productArrowPrev {
+  left: 16px;
+}
+
+.productArrowNext {
+  right: 16px;
+}
+
+.productCounter {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.7);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  transform: translateX(-50%);
+}
+
+.productTitle {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.productPrice {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.productDialog .field {
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.productDialog .size {
+  min-width: 48px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.productDialog .qty {
+  align-self: flex-start;
+}
+
+.productDialog .qty button {
+  width: 44px;
+  height: 42px;
+}
+
+.productDialog .qty span {
+  min-width: 36px;
+  font-size: 15px;
+}
+
+.productAdd {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.productDialog .dialogBody {
+  gap: 12px;
+  padding: 44px 40px 36px;
 }
 
 .productDescription {
@@ -1644,22 +1752,9 @@ textarea.input {
 .productDialog {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  min-height: 0;
 }
 
-.productDialogImage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 420px;
-  background: #f2f1ee;
-  color: #999;
-}
-
-.productDialogImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
 .sizes {
   display: flex;
@@ -1946,9 +2041,20 @@ textarea.input {
 
   .productDialog {
     grid-template-columns: minmax(0, 1fr);
+    overflow-y: auto;
   }
 
-  .productDialogImage {
-    min-height: 260px;
+  .productDialogMedia {
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .productDialog .dialogBody {
+    padding: 28px 20px;
+    overflow: visible;
+  }
+
+  .productTitle {
+    font-size: 26px;
   }
 }

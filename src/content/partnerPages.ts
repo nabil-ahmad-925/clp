@@ -62,9 +62,8 @@ export type PartnerProduct = {
   title: string;
   category: string;
   description: string;
-  /** What the options are ("Sizes", "Colors"…), and the options (none: one size). */
-  optionLabel: string;
-  options: string[];
+  /** Its option groups ("Sizes", "Colors"), each with its own values; the shopper picks one in each (none: one size). */
+  optionGroups: { kind: string; values: string[] }[];
   price: number;
   collection: string;
   /** The first photo (the card), and all of them. */

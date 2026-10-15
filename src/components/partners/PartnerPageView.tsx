@@ -1625,52 +1625,87 @@ function ProductDialog({
   onClose: () => void;
   onAdd: (option: string, qty: number) => void;
 }) {
-  const [option, setOption] = useState(product.options[0] ?? '');
+  const [choices, setChoices] = useState<Record<string, string>>(() => Object.fromEntries(product.optionGroups.map((g) => [g.kind, g.values[0]])));
+  const option = product.optionGroups.map((g) => choices[g.kind]).join(' / ');
   const [qty, setQty] = useState(1);
   const [photo, setPhoto] = useState(0);
   const images = product.images.length ? product.images : product.image ? [product.image] : [];
+  const [swipe, setSwipe] = useState<number | null>(null);
+  // The carousel wraps around: past the last photo comes the first.
+  const go = (step: number) => setPhoto((i) => (i + step + images.length) % images.length);
+  useEffect(() => {
+    if (images.length < 2) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') setPhoto((i) => (i - 1 + images.length) % images.length);
+      if (e.key === 'ArrowRight') setPhoto((i) => (i + 1) % images.length);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [images.length]);
   return (
     <Overlay onClose={onClose} wide>
       <div className={s.productDialog}>
         <div className={s.productDialogMedia}>
-          <div className={s.productDialogImage}>
-            {images[photo] ? <img src={images[photo]} alt={product.title} /> : product.category.toUpperCase()}
-          </div>
-          {images.length > 1 && (
-            <div className={s.productThumbs}>
+          {images.length ? (
+            <div
+              className={s.productTrack}
+              style={{ transform: `translateX(-${photo * 100}%)` }}
+              onTouchStart={(e) => setSwipe(e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                const dx = swipe === null ? 0 : e.changedTouches[0].clientX - swipe;
+                if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+                setSwipe(null);
+              }}
+            >
               {images.map((src, i) => (
-                <button
-                  key={src}
-                  type="button"
-                  className={`${s.productThumb} ${photo === i ? s.productThumbOn : ''}`}
-                  aria-label={`Photo ${i + 1}`}
-                  onClick={() => setPhoto(i)}
-                >
-                  <img src={src} alt="" />
-                </button>
+                <img key={src} src={src} alt={i === 0 ? product.title : ''} aria-hidden={i !== photo} draggable={false} />
               ))}
             </div>
+          ) : (
+            <span className={s.productNoImage}>{product.category.toUpperCase()}</span>
+          )}
+          {images.length > 1 && (
+            <>
+              <button type="button" className={`${s.productArrow} ${s.productArrowPrev}`} aria-label="Previous photo" onClick={() => go(-1)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M15 5l-7 7 7 7" />
+                </svg>
+              </button>
+              <button type="button" className={`${s.productArrow} ${s.productArrowNext}`} aria-label="Next photo" onClick={() => go(1)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <span className={s.productCounter}>
+                {photo + 1} / {images.length}
+              </span>
+            </>
           )}
         </div>
         <div className={s.dialogBody}>
           <span className={s.productCat}>
             {short.toUpperCase()} · {product.category.toUpperCase()}
           </span>
-          <h3 className={`${s.display} ${s.dialogTitle}`}>{product.title}</h3>
-          <span style={{ fontSize: 22, fontWeight: 700 }}>{dollars(product.price)}</span>
+          <h3 className={s.productTitle}>{product.title}</h3>
+          <span className={s.productPrice}>{dollars(product.price)}</span>
           {product.description && <p className={s.productDescription}>{product.description}</p>}
-          {product.options.length > 0 && (
-            <div className={s.field}>
-              {product.optionLabel}
+          {product.optionGroups.map((g) => (
+            <div key={g.kind} className={s.field}>
+              {g.kind.replace(/s$/, '')}
               <div className={s.sizes}>
-                {product.options.map((o) => (
-                  <button key={o} type="button" className={`${s.size} ${option === o ? s.sizeOn : ''}`} onClick={() => setOption(o)}>
+                {g.values.map((o) => (
+                  <button
+                    key={o}
+                    type="button"
+                    className={`${s.size} ${choices[g.kind] === o ? s.sizeOn : ''}`}
+                    onClick={() => setChoices({ ...choices, [g.kind]: o })}
+                  >
                     {o}
                   </button>
                 ))}
               </div>
             </div>
-          )}
+          ))}
           <div className={s.field}>
             Quantity
             <span className={s.qty}>
@@ -1683,7 +1718,7 @@ function ProductDialog({
               </button>
             </span>
           </div>
-          <button type="button" className={`${s.btn} ${s.btnAccent} ${s.btnLg}`} onClick={() => onAdd(option, qty)}>
+          <button type="button" className={`${s.btn} ${s.btnAccent} ${s.productAdd}`} onClick={() => onAdd(option, qty)}>
             Add to cart · {dollars(product.price * qty)}
           </button>
           <span className={s.muted} style={{ fontSize: 13 }}>
