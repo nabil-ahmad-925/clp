@@ -75,7 +75,8 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
     <>
       {page.hero &&
         (listing ? (
-          <ListingHero title={listingTitleLines(page.hero.title)} blurb={listing.blurb} />
+          // A service's heading keeps its own two lines ("Brand & Product" / "Development Services").
+          <ListingHero title={listing.section === 'services' ? page.hero.title : listingTitleLines(page.hero.title)} blurb={listing.blurb} />
         ) : articleList ? (
           <ListingHero title={[page.hero.title.join(' ')]} blurb={articleList.blurb} back={articleList.back} />
         ) : (
@@ -88,7 +89,7 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
           <Row key={i} row={row} listing={setup} />
         ))}
         {listing &&
-          (listing.kind === 'facilities' ? <HostCta /> : <ProgramPlans category={listing.category} section={listing.section === 'resources' ? 'resources' : 'experiences'} />)}
+          (listing.kind === 'facilities' ? <HostCta /> : <ProgramPlans category={listing.category} section={listing.section === 'facilities' ? 'experiences' : listing.section} />)}
       </div>
       {page.portfolioNav && <PortfolioNav links={page.portfolioNav} />}
     </>

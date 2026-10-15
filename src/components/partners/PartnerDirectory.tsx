@@ -41,9 +41,16 @@ const matches = (p: PartnerCardData, f: Filters, search: Search) => {
 /** Top rated first (more reviews breaking ties), then A to Z. */
 const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
 const byName = (a: PartnerCardData, b: PartnerCardData) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
-/** The positions CLP set for the category (the admin's Partnerships page) first, position 1 at the top; the rest top rated first. */
+/** Whether CLP features the partner on the category's listing (the admin's Partnerships page). */
+export const isFeatured = (p: PartnerCardData, category: string) => Boolean(p.featured?.includes(category));
+/**
+ * CLP's order for the category (the admin's Partnerships page): its featured partners first, then the positions it set
+ * (position 1 at the top), the rest top rated first.
+ */
 const byPosition = (category: string) => (a: PartnerCardData, b: PartnerCardData) =>
-  (a.positions?.[category] ?? Infinity) - (b.positions?.[category] ?? Infinity) || byRating(a, b);
+  Number(isFeatured(b, category)) - Number(isFeatured(a, category)) ||
+  (a.positions?.[category] ?? Infinity) - (b.positions?.[category] ?? Infinity) ||
+  byRating(a, b);
 
 /** The sort menu (the listing pages' "Recommended" pill): CLP's order, or by name. */
 const SORTS = [
@@ -238,7 +245,7 @@ function Directory({ category, label }: { category: string; label: string }) {
         ) : (
           <div className={t.listingGrid}>
             {pageItems.map((p, i) => (
-              <PartnerCard key={p.slug} partner={p} eager={i < 4} />
+              <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={isFeatured(p, category)} />
             ))}
             {lastPage && (
               <BecomePartner className={c.join}>
@@ -282,11 +289,11 @@ function Directory({ category, label }: { category: string; label: string }) {
 }
 
 /** A partner's card (the listing card's design): their photo with their logo and the CLP Partner badge, then who they are. */
-function PartnerCard({ partner: p, eager }: { partner: PartnerCardData; eager: boolean }) {
+function PartnerCard({ partner: p, eager, featured }: { partner: PartnerCardData; eager: boolean; featured: boolean }) {
   const type = partnerType(p.type);
   const color = p.color || type.color;
   return (
-    <Link href={partnerHref(p.slug)} className={c.card}>
+    <Link href={partnerHref(p.slug)} className={`${c.card} ${featured ? c.cardFeatured : ''}`}>
       <span className={c.media} style={{ background: color }}>
         {p.hero ? (
           <Image className={c.image} src={p.hero} alt="" fill sizes="(max-width: 860px) 50vw, 300px" loading={eager ? 'eager' : 'lazy'} />
@@ -296,6 +303,7 @@ function PartnerCard({ partner: p, eager }: { partner: PartnerCardData; eager: b
         <span className={c.badge}>
           <LuBadgeCheck aria-hidden /> CLP Partner
         </span>
+        {featured && <span className={c.featuredTag}>Featured</span>}
         <span className={c.logo} style={{ background: color }}>
           {p.logo ? <Image src={p.logo} alt="" width={56} height={56} /> : p.mono}
         </span>

@@ -43,7 +43,7 @@ const FORMS: Record<
   sponsored: {
     kicker: 'SPONSORED PLACEMENT · PAID',
     title: 'Sponsor a Listing',
-    text: 'Boost a camp, clinic or league to the top of category pages, in the featured strip and the results. Tell us what to promote and where; CLP replies with dates and pricing.',
+    text: 'Boost a camp, clinic or league to the top of category pages, in the featured strip and the results. Tell us what to promote and where, and CLP replies with dates and pricing.',
     message: 'Anything else we should know? (optional)',
     authorize: 'I’m authorized to promote this program on behalf of the organization.',
     submit: 'Request Sponsorship',
@@ -55,7 +55,7 @@ const FORMS: Record<
   partner: {
     kicker: 'CLP PARTNER · BY INVITATION',
     title: 'Apply to Partner',
-    text: 'A full partner page, with bookings, check-in and payments through CLP. Tell us about your program; CLP reviews every application and invites its partners.',
+    text: 'A full partner page, with bookings, check-in and payments through CLP. Tell us about your program. CLP reviews every application and invites its partners.',
     message: 'Why do you want to partner with CLP? (optional)',
     authorize: 'I’m authorized to apply on behalf of the organization.',
     submit: 'Submit Application',

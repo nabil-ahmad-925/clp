@@ -113,14 +113,21 @@ const WIDGET_BLURBS: Record<number, string> = {
   44: 'Fields, courts and indoor spaces to book.',
   43: 'Courses, ranges and clubs to play and practice.',
   42: 'Gaming centers, arenas and venues to play and compete.',
+  101: 'Branding, marketing and sales, product development and websites for teams, clubs and sports brands.',
+  102: 'Copywriting, graphic design, photography and video for athletes, teams and brands.',
+  103: 'Event management, budgets, housing and sponsor coordination for tournaments and events.',
+  104: 'Pop-up shops, direct mail, social media and earned-income campaigns that raise funds.',
+  105: 'Nutrition counseling, performance testing, strength and conditioning and training programs.',
+  106: 'Sourcing and purchasing, inventory, shipping and supply chain support for sports programs.',
+  107: 'Hotels and logistics, venues, activities and dining for teams and fans on the road.',
 };
 
 /** A listing category's line under the page heading. */
 export const categoryBlurb = (widgetId: number | undefined) => (widgetId != null ? WIDGET_BLURBS[widgetId] : undefined);
 
-/** Whether a directory widget is an Experiences or Resources category: its page uses the listing-page design. */
+/** Whether a directory widget is an Experiences, Resources or Services category: its page uses the listing-page design. */
 export const isListingWidget = (widgetId: number | undefined): widgetId is number =>
-  widgetId != null && (WIDGET_TYPES[widgetId] === 'experiences' || WIDGET_TYPES[widgetId] === 'resources');
+  widgetId != null && (WIDGET_TYPES[widgetId] === 'experiences' || WIDGET_TYPES[widgetId] === 'resources' || WIDGET_TYPES[widgetId] === 'services');
 
 /** Whether a directory widget is a sport's facilities: its page uses the facilities design (Volunteering & Open Play). */
 export const isFacilitiesWidget = (widgetId: number | undefined): widgetId is number => widgetId != null && WIDGET_TYPES[widgetId] === 'facilities';
@@ -134,7 +141,7 @@ export type SpotlightPartner = { name: string; href: string; image?: string; exc
  */
 export type ListingSetup = {
   kind: 'listing' | 'facilities';
-  section: 'experiences' | 'resources' | 'facilities';
+  section: 'experiences' | 'resources' | 'services' | 'facilities';
   category: string;
   /** Its related partner category (see partnerCategoryOf). */
   partnerCategory?: string;

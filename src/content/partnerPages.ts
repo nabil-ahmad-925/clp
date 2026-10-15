@@ -38,6 +38,8 @@ export type PartnerCardData = {
   reviewCount: number;
   /** Where CLP put it on its categories' listings ({ <category>: 1… }, position 1 first); others follow. */
   positions?: Record<string, number>;
+  /** The categories CLP features it on: first on those listings, marked "Featured". */
+  featured?: string[];
 };
 
 export type PartnerPageData = PartnerCardData & {
@@ -93,7 +95,7 @@ export class PartnerApiError extends Error {
   }
 }
 
-async function call<T>(path: string, init?: RequestInit): Promise<T> {
+export async function call<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) throw new PartnerApiError(0, 'Partner pages aren’t available right now.');
   let res: Response;
   try {
@@ -110,7 +112,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 const BUSY_RETRIES_MS = [400, 1000, 2000];
 
 /** A read, retried while the API is busy. */
-async function read<T>(path: string): Promise<T> {
+export async function read<T>(path: string): Promise<T> {
   for (const wait of BUSY_RETRIES_MS) {
     try {
       return await call<T>(path);

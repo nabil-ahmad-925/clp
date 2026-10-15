@@ -626,7 +626,7 @@ export const sportPages: SportPage[] = [
         author: "- CONRAD ROTH (TOMB RAIDER)"
       },
       {
-        text: "\"I Don't Need a Weapon; My Friends Are My Power!\"",
+        text: "\"I Don't Need a Weapon, My Friends Are My Power!\"",
         author: "- SORA (KINGDOM HEARTS)"
       },
       {
@@ -1200,11 +1200,11 @@ export const sportPages: SportPage[] = [
         author: "- ARNOLD PALMER"
       },
       {
-        text: "“The value of routine; trusting your swing.”",
+        text: "“The value of routine: trusting your swing.”",
         author: "- LORII MYERS"
       },
       {
-        text: "“Achievements on the golf course are not what matter; decency and honesty are what matter.”",
+        text: "“Achievements on the golf course are not what matter. Decency and honesty are what matter.”",
         author: "- TIGER WOODS"
       },
       {
@@ -1786,7 +1786,7 @@ export const sportPages: SportPage[] = [
         author: "- CONRAD ROTH (TOMB RAIDER)"
       },
       {
-        text: "\"I Don't Need a Weapon; My Friends Are My Power!\"",
+        text: "\"I Don't Need a Weapon, My Friends Are My Power!\"",
         author: "- SORA (KINGDOM HEARTS)"
       },
       {
@@ -2055,11 +2055,11 @@ export const sportPages: SportPage[] = [
         author: "- ARNOLD PALMER"
       },
       {
-        text: "“The value of routine; trusting your swing.”",
+        text: "“The value of routine: trusting your swing.”",
         author: "- LORII MYERS"
       },
       {
-        text: "“Achievements on the golf course are not what matter; decency and honesty are what matter.”",
+        text: "“Achievements on the golf course are not what matter. Decency and honesty are what matter.”",
         author: "- TIGER WOODS"
       },
       {

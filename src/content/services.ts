@@ -291,7 +291,7 @@ export const servicePages: ServicePage[] = [
           subtitle: "PHOTOGRAPHY",
           title: "Services",
           excerpt: "Photography captures moments, emotions, and stories, bringing life to your memories. With an eye for detail and a passion for storytelling, we deliver visuals that resonate with your audience and leave a lasting impression.",
-          bio: "Our photography services go beyond just clicking pictures; we tell stories through every frame. Each project is approached with creativity and precision, whether it is capturing the love and laughter of a wedding, the excitement of a corporate event, or the essence of a product.\n\nOur team of experienced photographers understands the power of images to convey messages, emotions, and stories. Every shot we take is captured using advanced equipment and techniques.",
+          bio: "Our photography services go beyond just clicking pictures. We tell stories through every frame. Each project is approached with creativity and precision, whether it is capturing the love and laughter of a wedding, the excitement of a corporate event, or the essence of a product.\n\nOur team of experienced photographers understands the power of images to convey messages, emotions, and stories. Every shot we take is captured using advanced equipment and techniques.",
           bioItalic: true,
           cta: {
             label: "Start a Project",
@@ -321,7 +321,7 @@ export const servicePages: ServicePage[] = [
           subtitle: "VIDEO PHOTOGRAPHY",
           title: "Services",
           excerpt: "Our video production services elevate your message and engage your audience through captivating visuals. To produce compelling videos that leave a lasting impression, we combine creativity and expertise.",
-          bio: "We offer more than just video production services; we are storytellers who weave narratives through moving images. The production of corporate videos, promotional campaigns, or creative projects is what we do best.\n\nWith cutting-edge technology and innovative techniques, our talented videographers and editors deliver high-quality videos that resonate with viewers. Each aspect of your video will be meticulously crafted to convey your message effectively, from scripting and storyboarding to filming and post-production.",
+          bio: "We offer more than just video production services. We are storytellers who weave narratives through moving images. The production of corporate videos, promotional campaigns, or creative projects is what we do best.\n\nWith cutting-edge technology and innovative techniques, our talented videographers and editors deliver high-quality videos that resonate with viewers. Each aspect of your video will be meticulously crafted to convey your message effectively, from scripting and storyboarding to filming and post-production.",
           cta: {
             label: "Start a Project",
             href: "/content-creation-licensing/inquiry/"
@@ -629,7 +629,7 @@ export const servicePages: ServicePage[] = [
           image: upload('/2024/05/Direct-Mail.png'),
           subtitle: "Direct Mailing",
           title: "Campaigns",
-          excerpt: "In direct marketing, prospects are viewed through a statistical lens, and fundraising considers them as individuals with varying needs; Research suggests that interests influence values and preferences.",
+          excerpt: "In direct marketing, prospects are viewed through a statistical lens, and fundraising considers them as individuals with varying needs. Research suggests that interests influence values and preferences.",
           bio: "A direct mail campaign involves a top-level executive writing a letter to a prospect, donor, or member of the organization. This method of fundraising is much more effective than email fundraising. Donors receive a more personal touch when they receive direct mail, and they can make donations easily through online fundraising. Communication via direct mail should closely follow communication via the internet and e-mail.",
           cta: {
             label: "Start a Project",

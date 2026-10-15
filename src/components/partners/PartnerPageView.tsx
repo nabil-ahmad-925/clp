@@ -1,12 +1,21 @@
-'use client';
+"use client";
 /* eslint-disable @next/next/no-img-element -- the partner's photos are their own uploads (the media bucket), shown as they are. */
 
-import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react';
-import { createPortal } from 'react-dom';
-import BookingModal from '@/components/sections/BookingModal';
-import BioModal from '@/components/sections/BioModal';
-import type { RowFacts } from '@/components/sections/DirectoryRow';
-import { isBookable, toItem } from '@/content/listings';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+} from "react";
+import { createPortal } from "react-dom";
+import BookingModal from "@/components/sections/BookingModal";
+import BioModal from "@/components/sections/BioModal";
+import type { RowFacts } from "@/components/sections/DirectoryRow";
+import { isBookable, toItem } from "@/content/listings";
 import {
   COLLAB_TYPES,
   collabLabel,
@@ -16,64 +25,53 @@ import {
   type PartnerPageResponse,
   type PartnerProduct,
   type PartnerReviewData,
-} from '@/content/partnerPages';
-import type { DirectoryItem } from '@/content/types';
-import { setHeaderBrand } from '@/components/layout/headerBrand';
-import s from './partnerPage.module.css';
+} from "@/content/partnerPages";
+import type { DirectoryItem } from "@/content/types";
+import { setHeaderBrand } from "@/components/layout/headerBrand";
+import {
+  CART_EVENT,
+  addToCart,
+  cartChanged,
+  checkoutHref,
+  getCart,
+  removeLine,
+  setLineQty,
+  type Cart,
+} from "@/content/cart";
+import s from "./partnerPage.module.css";
 
-type Experience = PartnerPageResponse['experiences'][number];
-type CartLine = {
-  key: string;
-  slug: string;
-  productId: string;
-  title: string;
-  option: string;
-  qty: number;
-  price: number;
-  image: string;
-};
-
-const CART_KEY = 'clp-partner-cart';
-const readCart = (): CartLine[] => {
-  try {
-    const v = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
-    return Array.isArray(v) ? v : [];
-  } catch {
-    return [];
-  }
-};
-const writeCart = (lines: CartLine[]) => {
-  try {
-    localStorage.setItem(CART_KEY, JSON.stringify(lines));
-  } catch {}
-};
-
-const dollars = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+type Experience = PartnerPageResponse["experiences"][number];
+const dollars = (n: number) =>
+  `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 const parts = (day: string) => {
   const d = new Date(`${day}T00:00:00Z`);
   return {
-    dow: d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }).toUpperCase(),
-    mon: d.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase(),
+    dow: d
+      .toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" })
+      .toUpperCase(),
+    mon: d
+      .toLocaleDateString("en-US", { month: "short", timeZone: "UTC" })
+      .toUpperCase(),
     day: d.getUTCDate(),
     short: d
-      .toLocaleDateString('en-US', {
-        month: 'short',
-        year: 'numeric',
-        timeZone: 'UTC',
+      .toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
       })
       .toUpperCase(),
   };
 };
 const clock = (t?: string) => {
-  if (!t) return '';
-  const [h, m] = t.split(':').map(Number);
-  return `${h % 12 || 12}${m ? `:${String(m).padStart(2, '0')}` : ''} ${h < 12 ? 'am' : 'pm'}`;
+  if (!t) return "";
+  const [h, m] = t.split(":").map(Number);
+  return `${h % 12 || 12}${m ? `:${String(m).padStart(2, "0")}` : ""} ${h < 12 ? "am" : "pm"}`;
 };
 const priceText = (l: { priceMin?: number; priceMax?: number }) =>
   l.priceMin == null
-    ? ''
+    ? ""
     : (l.priceMax ?? l.priceMin) === 0
-      ? 'Free'
+      ? "Free"
       : l.priceMin === (l.priceMax ?? l.priceMin)
         ? dollars(l.priceMin)
         : `${dollars(l.priceMin)}+`;
@@ -83,9 +81,15 @@ const initials = (name: string) =>
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
-    .join('');
+    .join("");
 
-const Star = ({ size = 16, fill = 'currentColor' }: { size?: number; fill?: string }) => (
+const Star = ({
+  size = 16,
+  fill = "currentColor",
+}: {
+  size?: number;
+  fill?: string;
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} aria-hidden>
     <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" />
   </svg>
@@ -98,7 +102,9 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
       <path d="M17.5 6.5h.01" />
     </>
   ),
-  facebook: <path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2z" />,
+  facebook: (
+    <path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2z" />
+  ),
   linkedin: (
     <>
       <rect x="3" y="3" width="18" height="18" rx="3" />
@@ -129,9 +135,12 @@ const SOCIAL_ICONS: Record<string, React.ReactNode> = {
 /** The facts the booking popup shows of a listing (its dates, times and price). */
 const factsOf = (l: Experience): RowFacts => ({
   months: l.startDate
-    ? [`${parts(l.startDate).mon} ${parts(l.startDate).day}`, [clock(l.startTime), clock(l.endTime)].filter(Boolean).join(' – ')]
+    ? [
+        `${parts(l.startDate).mon} ${parts(l.startDate).day}`,
+        [clock(l.startTime), clock(l.endTime)].filter(Boolean).join(" – "),
+      ]
         .filter(Boolean)
-        .join(', ')
+        .join(", ")
     : undefined,
   price: priceText(l) || undefined,
 });
@@ -141,33 +150,50 @@ const factsOf = (l: Experience): RowFacts => ({
  * the tabs they show in their order (About, Partnerships, their listings, Updates & News, Shop), Share and Subscribe,
  * the reviews, the "Work with us" form and the store's cart.
  */
-export default function PartnerPageView({ data }: { data: PartnerPageResponse }) {
+export default function PartnerPageView({
+  data,
+}: {
+  data: PartnerPageResponse;
+}) {
   const { page, collabs, products, reviews, experiences, articles } = data;
   const type = partnerType(page.type);
   const accent = page.color || type.color;
-  const tabs = page.sections.filter((x) => x.on && ['about', 'partnerships', 'experiences', 'news', 'shop'].includes(x.id));
+  const tabs = page.sections.filter(
+    (x) =>
+      x.on &&
+      ["about", "partnerships", "experiences", "news", "shop"].includes(x.id),
+  );
   const tabLabel = (id: string) =>
     ({
-      about: 'About',
-      partnerships: 'Partnerships',
+      about: "About",
+      partnerships: "Partnerships",
       experiences: type.listings,
-      news: 'Updates & News',
-      shop: 'Shop',
+      news: "Updates & News",
+      shop: "Shop",
     })[id] ?? id;
-  const showPhotos = page.sections.find((x) => x.id === 'photos')?.on !== false;
-  const showReviews = page.sections.find((x) => x.id === 'reviews')?.on !== false;
+  const showPhotos = page.sections.find((x) => x.id === "photos")?.on !== false;
+  const showReviews =
+    page.sections.find((x) => x.id === "reviews")?.on !== false;
 
   // The tab in the address (#shop: "View store" links). The page renders only in the browser, once its data loaded.
   const [tab, setTab] = useState(() => {
     const fromHash = window.location.hash.slice(1);
-    return tabs.some((t) => t.id === fromHash) ? fromHash : (tabs[0]?.id ?? 'about');
+    return tabs.some((t) => t.id === fromHash)
+      ? fromHash
+      : (tabs[0]?.id ?? "about");
   });
   const pick = (id: string) => {
     setTab(id);
-    history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${id}`);
+    history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${window.location.search}#${id}`,
+    );
   };
 
-  const [dialog, setDialog] = useState<'reviews' | 'work' | 'subscribe' | 'share' | null>(null);
+  const [dialog, setDialog] = useState<
+    "reviews" | "work" | "subscribe" | "share" | null
+  >(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [booking, setBooking] = useState<{
     item: DirectoryItem;
@@ -176,18 +202,32 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   } | null>(null);
   const [details, setDetails] = useState<DirectoryItem | null>(null);
   const [product, setProduct] = useState<PartnerProduct | null>(null);
-  const [shop, setShop] = useState<ShopView>({ all: false, collection: '' });
+  const [shop, setShop] = useState<ShopView>({ all: false, collection: "" });
   /** "View all" (of a collection, or every product) from the Shop tab or the About tab's store. */
   const openShop = (collection: string) => {
     setShop({ all: true, collection });
-    pick('shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    pick("shop");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const hasShop = tabs.some((t) => t.id === 'shop');
+  const hasShop = tabs.some((t) => t.id === "shop");
   const [cartOpen, setCartOpen] = useState(false);
-  const [cart, setCart] = useState<CartLine[]>(readCart);
-  const mine = cart.filter((l) => l.slug === page.slug);
-  const cartCount = mine.reduce((n, l) => n + l.qty, 0);
+  // This store's part of the shopper's cart (kept by the API; any change on the page updates it everywhere).
+  const [cart, setCart] = useState<Cart | null>(null);
+  useEffect(() => {
+    if (page.preview) return;
+    let live = true;
+    getCart(page.slug).then(
+      (c) => live && setCart(c),
+      () => {},
+    );
+    const onChange = (e: Event) => setCart((e as CustomEvent<Cart>).detail);
+    window.addEventListener(CART_EVENT, onChange);
+    return () => {
+      live = false;
+      window.removeEventListener(CART_EVENT, onChange);
+    };
+  }, [page.slug, page.preview]);
+  const cartCount = cart?.count ?? 0;
   // The site header, co-branded as the design's ("CLP │ × AFC"), with this page's cart beside the menu.
   useEffect(() => {
     setHeaderBrand({
@@ -197,42 +237,57 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
     });
   }, [page.short, cartCount]);
   useEffect(() => () => setHeaderBrand(null), []);
-  const saveCart = (lines: CartLine[]) => {
-    setCart(lines);
-    writeCart(lines);
-  };
 
   const open = (l: Experience) => {
     const item = toItem(l);
-    if (isBookable(item)) setBooking({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
+    if (isBookable(item))
+      setBooking({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
     else setDetails(item);
   };
 
-  const socials = [...page.socials, ...(page.website ? [{ network: 'website', href: page.website }] : [])];
+  const socials = [
+    ...page.socials,
+    ...(page.website ? [{ network: "website", href: page.website }] : []),
+  ];
 
   return (
     <AccentContext.Provider value={accent}>
-      <div className={s.page} style={{ '--accent': accent } as CSSProperties}>
+      <div className={s.page} style={{ "--accent": accent } as CSSProperties}>
         {page.preview && (
-          <div className={s.previewBar}>Preview: this page isn’t public yet. CLP reviews new partner pages before they go live.</div>
+          <div className={s.previewBar}>
+            Preview: this page isn’t public yet. CLP reviews new partner pages
+            before they go live.
+          </div>
         )}
 
         <section className={s.hero} data-header-tone="light" data-page-hero>
           {page.hero && <img className={s.heroImage} src={page.hero} alt="" />}
           <span className={s.heroShade} aria-hidden />
           <div className={`${s.wrap} ${s.heroInner}`}>
-            <span className={s.logo}>{page.logo ? <img src={page.logo} alt={`${page.name} logo`} /> : page.mono}</span>
+            <span className={s.logo}>
+              {page.logo ? (
+                <img src={page.logo} alt={`${page.name} logo`} />
+              ) : (
+                page.mono
+              )}
+            </span>
             <div className={s.heroText}>
               <h1 className={s.name}>{page.name}</h1>
               <span className={s.heroLine}>
-                {[page.category || type.label, page.area].filter(Boolean).join('  ·  ')}
+                {[page.category || type.label, page.area]
+                  .filter(Boolean)
+                  .join("  ·  ")}
                 {showReviews && page.rating != null && (
-                  <button type="button" className={s.heroRating} onClick={() => setDialog('reviews')}>
+                  <button
+                    type="button"
+                    className={s.heroRating}
+                    onClick={() => setDialog("reviews")}
+                  >
                     <Star fill="#FFFFFF" />
                     <strong>{page.rating}</strong>
                     <span className={s.underline}>
                       {page.reviewCount} review
-                      {page.reviewCount === 1 ? '' : 's'}
+                      {page.reviewCount === 1 ? "" : "s"}
                     </span>
                   </button>
                 )}
@@ -248,11 +303,12 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                 <button
                   key={t.id}
                   type="button"
-                  className={`${s.tab} ${tab === t.id ? s.tabOn : ''}`}
-                  aria-current={tab === t.id ? 'page' : undefined}
+                  className={`${s.tab} ${tab === t.id ? s.tabOn : ""}`}
+                  aria-current={tab === t.id ? "page" : undefined}
                   onClick={() => {
                     // The Shop tab opens on its featured products.
-                    if (t.id === 'shop') setShop({ all: false, collection: '' });
+                    if (t.id === "shop")
+                      setShop({ all: false, collection: "" });
                     pick(t.id);
                   }}
                 >
@@ -292,10 +348,18 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                   <span className={s.divider} />
                 </>
               )}
-              <button type="button" className={s.btn} onClick={() => setDialog('share')}>
+              <button
+                type="button"
+                className={s.btn}
+                onClick={() => setDialog("share")}
+              >
                 Share
               </button>
-              <button type="button" className={`${s.btn} ${s.btnAccent}`} onClick={() => setDialog('subscribe')}>
+              <button
+                type="button"
+                className={`${s.btn} ${s.btnAccent}`}
+                onClick={() => setDialog("subscribe")}
+              >
                 Subscribe
               </button>
             </div>
@@ -303,45 +367,88 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         </div>
 
         <div data-header-tone="dark">
-          {tab === 'about' && (
+          {tab === "about" && (
             <About
               data={data}
               showPhotos={showPhotos}
               showReviews={showReviews}
-              onReviews={() => setDialog('reviews')}
+              onReviews={() => setDialog("reviews")}
               onPhoto={setPhoto}
               upcoming={experiences.length}
               listingsLabel={type.listings}
             />
           )}
           {/* The store on the About tab too (when the page shows its Shop and it has products). */}
-          {tab === 'about' && hasShop && products.length > 0 && (
-            <ShopFeatured page={page} products={products} onOpen={setProduct} onAll={openShop} />
+          {tab === "about" && hasShop && products.length > 0 && (
+            <ShopFeatured
+              page={page}
+              products={products}
+              onOpen={setProduct}
+              onAll={openShop}
+            />
           )}
-          {tab === 'partnerships' && <Partnerships page={page} collabs={collabs} onWork={() => setDialog('work')} />}
-          {tab === 'experiences' && <Experiences items={experiences} label={type.listings} onOpen={open} />}
-          {tab === 'news' && <News page={page} articles={articles} />}
-          {tab === 'shop' &&
+          {tab === "partnerships" && (
+            <Partnerships
+              page={page}
+              collabs={collabs}
+              onWork={() => setDialog("work")}
+            />
+          )}
+          {tab === "experiences" && (
+            <Experiences
+              items={experiences}
+              label={type.listings}
+              onOpen={open}
+            />
+          )}
+          {tab === "news" && <News page={page} articles={articles} />}
+          {tab === "shop" &&
             (shop.all ? (
               <ShopAll
                 page={page}
                 products={products}
                 collection={shop.collection}
-                onCollection={(collection) => setShop({ all: true, collection })}
-                onBack={() => setShop({ all: false, collection: '' })}
+                onCollection={(collection) =>
+                  setShop({ all: true, collection })
+                }
+                onBack={() => setShop({ all: false, collection: "" })}
                 onOpen={setProduct}
               />
             ) : (
-              <ShopFeatured page={page} products={products} onOpen={setProduct} onAll={openShop} />
+              <ShopFeatured
+                page={page}
+                products={products}
+                onOpen={setProduct}
+                onAll={openShop}
+              />
             ))}
         </div>
 
-        {dialog === 'reviews' && <ReviewsDialog page={page} reviews={reviews} onClose={() => setDialog(null)} />}
-        {dialog === 'work' && <WorkDialog slug={page.slug} short={page.short} onClose={() => setDialog(null)} />}
-        {dialog === 'subscribe' && (
-          <SubscribeDialog slug={page.slug} name={page.name} preview={page.preview} onClose={() => setDialog(null)} />
+        {dialog === "reviews" && (
+          <ReviewsDialog
+            page={page}
+            reviews={reviews}
+            onClose={() => setDialog(null)}
+          />
         )}
-        {dialog === 'share' && <ShareDialog name={page.name} onClose={() => setDialog(null)} />}
+        {dialog === "work" && (
+          <WorkDialog
+            slug={page.slug}
+            short={page.short}
+            onClose={() => setDialog(null)}
+          />
+        )}
+        {dialog === "subscribe" && (
+          <SubscribeDialog
+            slug={page.slug}
+            name={page.name}
+            preview={page.preview}
+            onClose={() => setDialog(null)}
+          />
+        )}
+        {dialog === "share" && (
+          <ShareDialog name={page.name} onClose={() => setDialog(null)} />
+        )}
         {photo && (
           <Overlay onClose={() => setPhoto(null)}>
             <img src={photo} alt="" className={s.lightbox} />
@@ -350,38 +457,38 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         {product && (
           <ProductDialog
             product={product}
+            slug={page.slug}
             short={page.short}
+            preview={Boolean(page.preview)}
             onClose={() => setProduct(null)}
-            onAdd={(option, qty) => {
-              const key = `${page.slug}#${product.id}#${option}`;
-              const existing = cart.find((l) => l.key === key);
-              saveCart(
-                existing
-                  ? cart.map((l) => (l.key === key ? { ...l, qty: l.qty + qty } : l))
-                  : [
-                      ...cart,
-                      {
-                        key,
-                        slug: page.slug,
-                        productId: product.id,
-                        title: product.title,
-                        option,
-                        qty,
-                        price: product.price,
-                        image: product.image,
-                      },
-                    ],
-              );
+            onViewCart={() => {
               setProduct(null);
               setCartOpen(true);
             }}
           />
         )}
         {cartOpen && (
-          <CartDrawer lines={mine} onClose={() => setCartOpen(false)} onRemove={(key) => saveCart(cart.filter((l) => l.key !== key))} />
+          <CartDrawer
+            cart={cart}
+            slug={page.slug}
+            onClose={() => setCartOpen(false)}
+          />
         )}
-        {booking && <BookingModal item={booking.item} widgetId={booking.widgetId} facts={booking.facts} onClose={() => setBooking(null)} />}
-        {details && <BioModal card={details} variant="wps" onClose={() => setDetails(null)} />}
+        {booking && (
+          <BookingModal
+            item={booking.item}
+            widgetId={booking.widgetId}
+            facts={booking.facts}
+            onClose={() => setBooking(null)}
+          />
+        )}
+        {details && (
+          <BioModal
+            card={details}
+            variant="wps"
+            onClose={() => setDetails(null)}
+          />
+        )}
       </div>
     </AccentContext.Provider>
   );
@@ -429,7 +536,10 @@ function About({
             {page.short}
           </h2>
           <div className={s.aboutBody}>
-            <p className={s.aboutText}>{page.about || `${page.name} is a CLP Partner${page.area ? ` in ${page.area}` : ''}.`}</p>
+            <p className={s.aboutText}>
+              {page.about ||
+                `${page.name} is a CLP Partner${page.area ? ` in ${page.area}` : ""}.`}
+            </p>
             {page.highlights.length > 0 && (
               <div className={s.chips}>
                 {page.highlights.map((h) => (
@@ -451,11 +561,19 @@ function About({
                 <span className={s.statValue}>{page.rating}</span>
                 <span className={s.stars}>
                   {Array.from({ length: 5 }, (_, i) => (
-                    <Star key={i} size={14} fill={i < Math.round(page.rating!) ? 'currentColor' : '#DDDDDA'} />
+                    <Star
+                      key={i}
+                      size={14}
+                      fill={
+                        i < Math.round(page.rating!)
+                          ? "currentColor"
+                          : "#DDDDDA"
+                      }
+                    />
                   ))}
                 </span>
                 <span className={`${s.statLabel} ${s.underline}`}>
-                  {page.reviewCount} review{page.reviewCount === 1 ? '' : 's'}
+                  {page.reviewCount} review{page.reviewCount === 1 ? "" : "s"}
                 </span>
               </button>
             )}
@@ -476,8 +594,8 @@ function About({
               <button
                 key={`${i}-${ph.src}`}
                 type="button"
-                className={`${s.photo} ${i === 0 || i === 5 ? s.photoWide : ''}`}
-                aria-label={`Open photo${ph.caption ? `: ${ph.caption}` : ''}`}
+                className={`${s.photo} ${i === 0 || i === 5 ? s.photoWide : ""}`}
+                aria-label={`Open photo${ph.caption ? `: ${ph.caption}` : ""}`}
                 onClick={() => onPhoto(ph.src)}
               >
                 <img src={ph.src} alt={ph.caption} loading="lazy" />
@@ -493,7 +611,9 @@ function About({
           <div className={s.people}>
             {page.team.map((m) => (
               <div key={`${m.name}-${m.role}`} className={s.person}>
-                <span className={s.personMono}>{m.photo ? <img src={m.photo} alt="" /> : initials(m.name)}</span>
+                <span className={s.personMono}>
+                  {m.photo ? <img src={m.photo} alt="" /> : initials(m.name)}
+                </span>
                 <span className={s.personText}>
                   <span>{m.name}</span>
                   <span>{m.role}</span>
@@ -509,11 +629,11 @@ function About({
           <div className={s.faq}>
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
                 gap: 14,
-                textAlign: 'center',
+                textAlign: "center",
               }}
             >
               <span className={s.kicker}>FAQ</span>
@@ -524,10 +644,15 @@ function About({
             <div className={s.faqList}>
               {page.faq.map((q, i) => (
                 <div key={q.q} className={s.faqItem}>
-                  <button type="button" className={s.faqQ} aria-expanded={openFaq === i} onClick={() => setOpenFaq(openFaq === i ? -1 : i)}>
+                  <button
+                    type="button"
+                    className={s.faqQ}
+                    aria-expanded={openFaq === i}
+                    onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
+                  >
                     {q.q}
                     <span aria-hidden style={{ fontSize: 24, fontWeight: 400 }}>
-                      {openFaq === i ? '−' : '+'}
+                      {openFaq === i ? "−" : "+"}
                     </span>
                   </button>
                   {openFaq === i && <p className={s.faqA}>{q.a}</p>}
@@ -541,41 +666,89 @@ function About({
   );
 }
 
+/** Partnerships shown a page at a time (three rows of three). */
+const COLLABS_PAGE = 9;
+
 function Partnerships({
   page,
   collabs,
   onWork,
 }: {
-  page: PartnerPageResponse['page'];
-  collabs: PartnerPageResponse['collabs'];
+  page: PartnerPageResponse["page"];
+  collabs: PartnerPageResponse["collabs"];
   onWork: () => void;
 }) {
-  const [cat, setCat] = useState('all');
-  const [sort, setSort] = useState('new');
+  const [cat, setCat] = useState("all");
+  const [sort, setSort] = useState("new");
+  const [search, setSearch] = useState("");
+  const [pageIndex, setPageIndex] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
   const lead = collabs.find((c) => c.live);
+  const words = search.toLowerCase().split(/\s+/).filter(Boolean);
   const shown = collabs
-    .filter((c) => cat === 'all' || c.type === cat)
+    .filter((c) => cat === "all" || c.type === cat)
+    .filter((c) =>
+      words.every((w) =>
+        [c.title, c.brand, c.description, c.dates, collabLabel(c.type)]
+          .join(" ")
+          .toLowerCase()
+          .includes(w),
+      ),
+    )
     .sort((a, b) =>
-      sort === 'az'
+      sort === "az"
         ? a.title.localeCompare(b.title)
-        : sort === 'za'
+        : sort === "za"
           ? b.title.localeCompare(a.title)
           : b.createdAt.localeCompare(a.createdAt),
     );
   const used = COLLAB_TYPES.filter((t) => collabs.some((c) => c.type === t.id));
-  const card = (c: PartnerPageResponse['collabs'][number]) => {
+  // Nine cards a page (three rows); a new search, category or sort starts again at the first.
+  const pages = Math.max(1, Math.ceil(shown.length / COLLABS_PAGE));
+  const current = Math.min(pageIndex, pages - 1);
+  const pageItems = shown.slice(
+    current * COLLABS_PAGE,
+    (current + 1) * COLLABS_PAGE,
+  );
+  const reset =
+    <T,>(set: (v: T) => void) =>
+    (v: T) => {
+      set(v);
+      setPageIndex(0);
+    };
+  const goTo = (index: number) => {
+    setPageIndex(index);
+    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const card = (c: PartnerPageResponse["collabs"][number]) => {
     const inner = (
       <>
-        <span className={s.collabImage}>{c.image ? <img src={c.image} alt="" loading="lazy" /> : c.brand.toUpperCase()}</span>
+        <span className={s.collabImage}>
+          {c.image ? (
+            <img src={c.image} alt="" loading="lazy" />
+          ) : (
+            c.brand.toUpperCase()
+          )}
+        </span>
         <span className={s.collabText}>
           <span className={s.kicker}>{collabLabel(c.type).toUpperCase()}</span>
           <span className={`${s.display} ${s.collabTitle}`}>{c.title}</span>
-          {(c.description || c.dates) && <span className={s.muted}>{[c.description, c.dates].filter(Boolean).join(' · ')}</span>}
+          {(c.description || c.dates) && (
+            <span className={s.muted}>
+              {[c.description, c.dates].filter(Boolean).join(" · ")}
+            </span>
+          )}
         </span>
       </>
     );
     return c.link ? (
-      <a key={c.id} className={s.collab} href={c.link} target="_blank" rel="noopener noreferrer">
+      <a
+        key={c.id}
+        className={s.collab}
+        href={c.link}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {inner}
       </a>
     ) : (
@@ -587,7 +760,12 @@ function Partnerships({
   return (
     <section className={`${s.wrap} ${s.section}`}>
       {lead && (
-        <a className={s.lead} href={lead.link || undefined} target={lead.link ? '_blank' : undefined} rel="noopener noreferrer">
+        <a
+          className={s.lead}
+          href={lead.link || undefined}
+          target={lead.link ? "_blank" : undefined}
+          rel="noopener noreferrer"
+        >
           {lead.image && <img src={lead.image} alt="" />}
           <span className={s.leadShade} />
           <span className={s.leadText}>
@@ -596,13 +774,20 @@ function Partnerships({
               <span>{collabLabel(lead.type).toUpperCase()}</span>
             </span>
             <span className={`${s.display} ${s.leadTitle}`}>{lead.title}</span>
-            <span className={s.leadDesc}>{lead.description || `With ${lead.brand}${lead.dates ? ` · ${lead.dates}` : ''}`}</span>
+            <span className={s.leadDesc}>
+              {lead.description ||
+                `With ${lead.brand}${lead.dates ? ` · ${lead.dates}` : ""}`}
+            </span>
             {lead.link && <span className={s.leadCta}>View partnership</span>}
           </span>
         </a>
       )}
 
-      <div className={s.listHead} style={lead ? undefined : { paddingTop: 0 }}>
+      <div
+        ref={listRef}
+        className={s.listHead}
+        style={lead ? undefined : { paddingTop: 0 }}
+      >
         <span className={s.listTitle}>
           <span className={s.display}>All partnerships</span>
           <span className={s.count}>
@@ -611,8 +796,23 @@ function Partnerships({
         </span>
         <div className={s.selects}>
           <label className={s.selectLabel}>
+            SEARCH
+            <input
+              className={`${s.select} ${s.searchInput}`}
+              type="search"
+              placeholder="Brand, title or dates"
+              maxLength={80}
+              value={search}
+              onChange={(e) => reset(setSearch)(e.target.value)}
+            />
+          </label>
+          <label className={s.selectLabel}>
             CATEGORY
-            <select className={s.select} value={cat} onChange={(e) => setCat(e.target.value)}>
+            <select
+              className={s.select}
+              value={cat}
+              onChange={(e) => reset(setCat)(e.target.value)}
+            >
               <option value="all">All categories ({collabs.length})</option>
               {used.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -623,7 +823,12 @@ function Partnerships({
           </label>
           <label className={s.selectLabel}>
             SORT
-            <select className={s.select} style={{ minWidth: 140 }} value={sort} onChange={(e) => setSort(e.target.value)}>
+            <select
+              className={s.select}
+              style={{ minWidth: 140 }}
+              value={sort}
+              onChange={(e) => reset(setSort)(e.target.value)}
+            >
               <option value="new">Newest</option>
               <option value="az">A–Z</option>
               <option value="za">Z–A</option>
@@ -632,15 +837,49 @@ function Partnerships({
         </div>
       </div>
       {shown.length ? (
-        <div className={s.collabGrid}>{shown.map(card)}</div>
+        <div className={s.collabGrid}>{pageItems.map(card)}</div>
       ) : (
-        <p className={s.empty}>{collabs.length ? 'No partnerships in this category yet.' : 'Partnerships will show here.'}</p>
+        <p className={s.empty}>
+          {!collabs.length
+            ? `${page.short}’s brand partnerships and collabs will show here.`
+            : search
+              ? `No partnerships match “${search}”. Try another word or category.`
+              : "No partnerships in this category yet."}
+        </p>
+      )}
+      {pages > 1 && (
+        <nav className={s.pager} aria-label="Partnership pages">
+          <button
+            type="button"
+            className={s.btn}
+            disabled={current === 0}
+            onClick={() => goTo(current - 1)}
+          >
+            ← Previous
+          </button>
+          <span>
+            Page {current + 1} of {pages}
+          </span>
+          <button
+            type="button"
+            className={s.btn}
+            disabled={current >= pages - 1}
+            onClick={() => goTo(current + 1)}
+          >
+            Next →
+          </button>
+        </nav>
       )}
 
       <div className={s.workBand}>
-        <span className={s.kicker}>PARTNER WITH {page.short.toUpperCase()}</span>
+        <span className={s.kicker}>
+          PARTNER WITH {page.short.toUpperCase()}
+        </span>
         <h3 className={s.display}>Have an idea? Let’s build it.</h3>
-        <p>Brands and organizations, whether you’re on CLP or not, can tell us about a partnership, product drop or experience.</p>
+        <p>
+          Brands and organizations, whether you’re on CLP or not, can tell us
+          about a partnership, product drop or experience.
+        </p>
         <button
           type="button"
           className={`${s.btn} ${s.btnAccent} ${s.btnLg}`}
@@ -655,31 +894,53 @@ function Partnerships({
   );
 }
 
-function Experiences({ items, label, onOpen }: { items: Experience[]; label: string; onOpen: (l: Experience) => void }) {
-  const [view, setView] = useState<'list' | 'grid'>('list');
+function Experiences({
+  items,
+  label,
+  onOpen,
+}: {
+  items: Experience[];
+  label: string;
+  onOpen: (l: Experience) => void;
+}) {
+  const [view, setView] = useState<"list" | "grid">("list");
   const [all, setAll] = useState(false);
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState("");
   const today = new Date().toISOString().slice(0, 10);
   const dated = items.filter((l) => l.startDate);
   const featured = dated[0];
   const rest = (featured ? items.filter((l) => l !== featured) : items).filter(
-    (l) => !city || (l.subtitle ?? '').toLowerCase().includes(city.toLowerCase()) || l.tags.includes(city),
+    (l) =>
+      !city ||
+      (l.subtitle ?? "").toLowerCase().includes(city.toLowerCase()) ||
+      l.tags.includes(city),
   );
   const shown = all ? rest : rest.slice(0, 5);
   const when = (l: Experience) => {
-    if (!l.startDate) return 'ANYTIME';
+    if (!l.startDate) return "ANYTIME";
     const p = parts(l.startDate < today ? today : l.startDate);
     return `${p.dow} ${p.mon} ${p.day}`;
   };
   const meta = (l: Experience) =>
-    [[clock(l.startTime), clock(l.endTime)].filter(Boolean).join('–'), l.subtitle].filter(Boolean).join(' · ');
-  const cta = (l: Experience) => (isBookable(toItem(l)) ? 'Register' : 'Details');
-  const places = [...new Set(items.map((l) => l.subtitle).filter(Boolean))] as string[];
+    [
+      [clock(l.startTime), clock(l.endTime)].filter(Boolean).join("–"),
+      l.subtitle,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  const cta = (l: Experience) =>
+    isBookable(toItem(l)) ? "Register" : "Details";
+  const places = [
+    ...new Set(items.map((l) => l.subtitle).filter(Boolean)),
+  ] as string[];
 
   if (!items.length) {
     return (
       <section className={`${s.wrap} ${s.section}`}>
-        <p className={s.empty}>No upcoming {label.toLowerCase()} right now. Subscribe to hear about new dates.</p>
+        <p className={s.empty}>
+          No upcoming {label.toLowerCase()} right now. Subscribe to hear about
+          new dates.
+        </p>
       </section>
     );
   }
@@ -689,22 +950,40 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
         <div className={s.feat}>
           <div className={s.featDate}>
             <span className={s.kicker} style={{ fontSize: 14 }}>
-              {parts(featured.startDate! < today ? today : featured.startDate!).dow} ·{' '}
-              {parts(featured.startDate! < today ? today : featured.startDate!).mon}
+              {
+                parts(featured.startDate! < today ? today : featured.startDate!)
+                  .dow
+              }{" "}
+              ·{" "}
+              {
+                parts(featured.startDate! < today ? today : featured.startDate!)
+                  .mon
+              }
             </span>
-            <span className={s.featDay}>{parts(featured.startDate! < today ? today : featured.startDate!).day}</span>
+            <span className={s.featDay}>
+              {
+                parts(featured.startDate! < today ? today : featured.startDate!)
+                  .day
+              }
+            </span>
           </div>
           <div className={s.featText}>
             <span className={s.featKind}>FEATURED · {label.toUpperCase()}</span>
-            <span className={`${s.display} ${s.featTitle}`}>{featured.title}</span>
-            <span className={s.featMeta}>{[featured.excerpt, meta(featured)].filter(Boolean).join(' · ')}</span>
+            <span className={`${s.display} ${s.featTitle}`}>
+              {featured.title}
+            </span>
+            <span className={s.featMeta}>
+              {[featured.excerpt, meta(featured)].filter(Boolean).join(" · ")}
+            </span>
           </div>
           <div className={s.featBuy}>
-            {priceText(featured) && <span className={s.featPrice}>{priceText(featured)}</span>}
+            {priceText(featured) && (
+              <span className={s.featPrice}>{priceText(featured)}</span>
+            )}
             <button
               type="button"
               className={`${s.btn} ${s.btnAccent}`}
-              style={{ height: 56, padding: '0 32px' }}
+              style={{ height: 56, padding: "0 32px" }}
               onClick={() => onOpen(featured)}
             >
               {cta(featured)}
@@ -715,22 +994,32 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
 
       {(rest.length > 0 || all) && (
         <div className={s.expToolbar}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {all && (
-              <button type="button" className={s.back} onClick={() => setAll(false)}>
+              <button
+                type="button"
+                className={s.back}
+                onClick={() => setAll(false)}
+              >
                 ← Back
               </button>
             )}
             <span className={s.listTitle}>
-              <span className={s.display}>{all ? `All ${label.toLowerCase()}` : 'Coming up'}</span>
+              <span className={s.display}>
+                {all ? `All ${label.toLowerCase()}` : "Coming up"}
+              </span>
               {all && <span className={s.count}>{rest.length}</span>}
             </span>
           </div>
-          <div className={s.selects} style={{ alignItems: 'flex-end' }}>
+          <div className={s.selects} style={{ alignItems: "flex-end" }}>
             {all && places.length > 1 && (
               <label className={s.selectLabel}>
                 LOCATION
-                <select className={s.select} value={city} onChange={(e) => setCity(e.target.value)}>
+                <select
+                  className={s.select}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                >
                   <option value="">All locations</option>
                   {places.map((p) => (
                     <option key={p} value={p}>
@@ -743,17 +1032,17 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
             <div className={s.viewToggle} role="group" aria-label="View">
               <button
                 type="button"
-                className={view === 'list' ? s.viewOn : ''}
-                aria-pressed={view === 'list'}
-                onClick={() => setView('list')}
+                className={view === "list" ? s.viewOn : ""}
+                aria-pressed={view === "list"}
+                onClick={() => setView("list")}
               >
                 List
               </button>
               <button
                 type="button"
-                className={view === 'grid' ? s.viewOn : ''}
-                aria-pressed={view === 'grid'}
-                onClick={() => setView('grid')}
+                className={view === "grid" ? s.viewOn : ""}
+                aria-pressed={view === "grid"}
+                onClick={() => setView("grid")}
               >
                 Images
               </button>
@@ -766,7 +1055,7 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
         all ? (
           <p className={s.empty}>Nothing else coming up yet.</p>
         ) : null
-      ) : view === 'list' ? (
+      ) : view === "list" ? (
         <div className={s.expList}>
           {shown.map((l) => (
             <div key={l.id} className={s.expRow}>
@@ -776,7 +1065,11 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
                 <span className={s.expMeta}>{meta(l) || l.excerpt}</span>
               </div>
               <span className={s.expPrice}>{priceText(l)}</span>
-              <button type="button" className={`${s.btn} ${s.expCta} ${s.expCtaDark}`} onClick={() => onOpen(l)}>
+              <button
+                type="button"
+                className={`${s.btn} ${s.expCta} ${s.expCtaDark}`}
+                onClick={() => onOpen(l)}
+              >
                 {cta(l)}
               </button>
             </div>
@@ -785,7 +1078,9 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
       ) : (
         <div className={s.expGrid}>
           {shown.map((l) => {
-            const p = l.startDate ? parts(l.startDate < today ? today : l.startDate) : null;
+            const p = l.startDate
+              ? parts(l.startDate < today ? today : l.startDate)
+              : null;
             return (
               <article key={l.id} className={s.expCard}>
                 <div className={s.expMedia}>
@@ -797,16 +1092,28 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
                     </span>
                   )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 4 }}
+                >
                   <span className={s.featKind} style={{ letterSpacing: 2 }}>
-                    {p ? p.dow : 'ANYTIME'}
+                    {p ? p.dow : "ANYTIME"}
                   </span>
-                  <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.25 }}>{l.title}</span>
+                  <span
+                    style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.25 }}
+                  >
+                    {l.title}
+                  </span>
                   <span className={s.expMeta}>{meta(l)}</span>
                 </div>
                 <div className={s.expCardFoot}>
-                  <span style={{ fontSize: 18, fontWeight: 700 }}>{priceText(l)}</span>
-                  <button type="button" className={`${s.btn} ${s.expCta}`} onClick={() => onOpen(l)}>
+                  <span style={{ fontSize: 18, fontWeight: 700 }}>
+                    {priceText(l)}
+                  </span>
+                  <button
+                    type="button"
+                    className={`${s.btn} ${s.expCta}`}
+                    onClick={() => onOpen(l)}
+                  >
                     {cta(l)}
                   </button>
                 </div>
@@ -820,7 +1127,7 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
         <button
           type="button"
           className={`${s.btn} ${s.btnLg}`}
-          style={{ alignSelf: 'center', borderColor: '#111' }}
+          style={{ alignSelf: "center", borderColor: "#111" }}
           onClick={() => setAll(true)}
         >
           See all {items.length} {label.toLowerCase()}
@@ -830,40 +1137,48 @@ function Experiences({ items, label, onOpen }: { items: Experience[]; label: str
   );
 }
 
-function News({ page, articles }: { page: PartnerPageResponse['page']; articles: PartnerPageResponse['articles'] }) {
-  const [filter, setFilter] = useState<'all' | 'updates' | 'press'>('all');
+function News({
+  page,
+  articles,
+}: {
+  page: PartnerPageResponse["page"];
+  articles: PartnerPageResponse["articles"];
+}) {
+  const [filter, setFilter] = useState<"all" | "updates" | "press">("all");
   const posts = useMemo(
     () =>
       [
         ...articles.map((a) => ({
           key: a.slug,
-          kind: 'updates' as const,
-          label: 'UPDATE',
+          kind: "updates" as const,
+          label: "UPDATE",
           title: a.title,
           excerpt: a.excerpt,
           image: a.image,
           date: a.publishedAt,
           href: a.path,
-          source: '',
+          source: "",
         })),
         ...page.press.map((p, i) => ({
           key: `press-${i}`,
-          kind: 'press' as const,
-          label: 'IN THE NEWS',
+          kind: "press" as const,
+          label: "IN THE NEWS",
           title: p.title,
-          excerpt: '',
+          excerpt: "",
           image: p.image,
           date: p.date,
           href: p.href,
           source: p.source,
         })),
-      ].sort((a, b) => (b.date || '').localeCompare(a.date || '')),
+      ].sort((a, b) => (b.date || "").localeCompare(a.date || "")),
     [articles, page.press],
   );
   // The featured post: their newest update, else the newest press mention.
-  const top = posts.find((p) => p.kind === 'updates') ?? posts[0];
-  const rest = posts.filter((p) => p !== top && (filter === 'all' || p.kind === filter));
-  const date = (d: string) => (d ? parts(d.slice(0, 10)).short : '');
+  const top = posts.find((p) => p.kind === "updates") ?? posts[0];
+  const rest = posts.filter(
+    (p) => p !== top && (filter === "all" || p.kind === filter),
+  );
+  const date = (d: string) => (d ? parts(d.slice(0, 10)).short : "");
   if (!posts.length) {
     return (
       <section className={`${s.wrap} ${s.section}`}>
@@ -874,13 +1189,22 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
   return (
     <section className={`${s.wrap} ${s.section}`} style={{ gap: 72 }}>
       {top && (
-        <a className={s.topPost} href={top.href} target={top.kind === 'press' ? '_blank' : undefined} rel="noopener noreferrer">
-          {top.image ? <img src={top.image} alt="" /> : <span className={s.topPostBlank} />}
+        <a
+          className={s.topPost}
+          href={top.href}
+          target={top.kind === "press" ? "_blank" : undefined}
+          rel="noopener noreferrer"
+        >
+          {top.image ? (
+            <img src={top.image} alt="" />
+          ) : (
+            <span className={s.topPostBlank} />
+          )}
           <span className={s.topPostText}>
             <span className={s.postTags}>
               <span
                 style={{
-                  color: top.kind === 'press' ? '#111' : 'var(--accent)',
+                  color: top.kind === "press" ? "#111" : "var(--accent)",
                 }}
               >
                 {top.label}
@@ -888,39 +1212,49 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
               <span>{date(top.date)}</span>
             </span>
             <span className={s.topPostTitle}>{top.title}</span>
-            {top.excerpt && <span className={s.topPostExcerpt}>{top.excerpt}</span>}
-            <span className={`${s.btn} ${s.btnDark}`} style={{ alignSelf: 'flex-start', marginTop: 8 }}>
-              {top.kind === 'press' ? `Read it on ${top.source || 'the site'}` : 'Read the update'}
+            {top.excerpt && (
+              <span className={s.topPostExcerpt}>{top.excerpt}</span>
+            )}
+            <span
+              className={`${s.btn} ${s.btnDark}`}
+              style={{ alignSelf: "flex-start", marginTop: 8 }}
+            >
+              {top.kind === "press"
+                ? `Read it on ${top.source || "the site"}`
+                : "Read the update"}
             </span>
           </span>
         </a>
       )}
-      {rest.length > 0 || filter !== 'all' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {rest.length > 0 || filter !== "all" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           <div
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              alignItems: "center",
               gap: 16,
             }}
           >
-            <h3 className={s.sectionTitle} style={{ fontSize: 32, textAlign: 'left' }}>
+            <h3
+              className={s.sectionTitle}
+              style={{ fontSize: 32, textAlign: "left" }}
+            >
               Recent
             </h3>
             <div className={s.postFilters}>
               {(
                 [
-                  ['all', 'All'],
-                  ['updates', 'Updates'],
-                  ['press', 'In the news'],
+                  ["all", "All"],
+                  ["updates", "Updates"],
+                  ["press", "In the news"],
                 ] as const
               ).map(([f, l]) => (
                 <button
                   key={f}
                   type="button"
-                  className={`${s.postFilter} ${filter === f ? s.postFilterOn : ''}`}
+                  className={`${s.postFilter} ${filter === f ? s.postFilterOn : ""}`}
                   onClick={() => setFilter(f)}
                 >
                   {l}
@@ -935,14 +1269,20 @@ function News({ page, articles }: { page: PartnerPageResponse['page']; articles:
                   key={p.key}
                   className={s.post}
                   href={p.href || undefined}
-                  target={p.kind === 'press' ? '_blank' : undefined}
+                  target={p.kind === "press" ? "_blank" : undefined}
                   rel="noopener noreferrer"
                 >
-                  <span className={s.postImage}>{p.image ? <img src={p.image} alt="" loading="lazy" /> : p.source || page.short}</span>
+                  <span className={s.postImage}>
+                    {p.image ? (
+                      <img src={p.image} alt="" loading="lazy" />
+                    ) : (
+                      p.source || page.short
+                    )}
+                  </span>
                   <span className={s.postTags}>
                     <span
                       style={{
-                        color: p.kind === 'press' ? '#111' : 'var(--accent)',
+                        color: p.kind === "press" ? "#111" : "var(--accent)",
                       }}
                     >
                       {p.label}
@@ -975,23 +1315,40 @@ function ShopFeatured({
   onOpen,
   onAll,
 }: {
-  page: PartnerPageResponse['page'];
+  page: PartnerPageResponse["page"];
   products: PartnerProduct[];
   onOpen: (p: PartnerProduct) => void;
   onAll: (collection: string) => void;
 }) {
   const collections = [...new Set(products.map((p) => p.collection))];
   return (
-    <section className={`${s.wrap} ${s.section}`} style={{ alignItems: 'center', gap: 48, paddingTop: 72 }}>
+    <section
+      className={`${s.wrap} ${s.section}`}
+      style={{ alignItems: "center", gap: 48, paddingTop: 72 }}
+    >
       <div className={s.shopHead}>
-        <span className={s.kicker}>{page.type === 'brand' ? 'BRAND STORE' : 'TEAM STORE'}</span>
-        <h2 className={`${s.display} ${s.shopTitle}`}>{page.store.title || `Support ${page.short}`}</h2>
-        <p className={s.shopSub}>{page.store.sub || 'Merch and keepsakes from the store.'}</p>
+        <span className={s.kicker}>
+          {page.type === "brand" ? "BRAND STORE" : "TEAM STORE"}
+        </span>
+        <h2 className={`${s.display} ${s.shopTitle}`}>
+          {page.store.title || `Support ${page.short}`}
+        </h2>
+        <p className={s.shopSub}>
+          {page.store.sub || "Merch and keepsakes from the store."}
+        </p>
         {collections.length > 1 && (
           <div className={s.collections} style={{ marginTop: 10 }}>
             {collections.map((c) => (
-              <button key={c} type="button" className={s.collection} onClick={() => onAll(c)}>
-                {c} <span style={{ opacity: 0.6 }}>{products.filter((p) => p.collection === c).length}</span>
+              <button
+                key={c}
+                type="button"
+                className={s.collection}
+                onClick={() => onAll(c)}
+              >
+                {c}{" "}
+                <span style={{ opacity: 0.6 }}>
+                  {products.filter((p) => p.collection === c).length}
+                </span>
               </button>
             ))}
           </div>
@@ -1007,19 +1364,35 @@ function ShopFeatured({
         <p className={s.empty}>The store opens soon.</p>
       )}
       {products.length > 0 && (
-        <button type="button" className={`${s.btn} ${s.btnDark} ${s.btnLg}`} onClick={() => onAll('')}>
-          View all {products.length} product{products.length === 1 ? '' : 's'}
+        <button
+          type="button"
+          className={`${s.btn} ${s.btnDark} ${s.btnLg}`}
+          onClick={() => onAll("")}
+        >
+          View all {products.length} product{products.length === 1 ? "" : "s"}
         </button>
       )}
     </section>
   );
 }
 
-function ProductTile({ product: p, onOpen, tall }: { product: PartnerProduct; onOpen: (p: PartnerProduct) => void; tall?: boolean }) {
+function ProductTile({
+  product: p,
+  onOpen,
+  tall,
+}: {
+  product: PartnerProduct;
+  onOpen: (p: PartnerProduct) => void;
+  tall?: boolean;
+}) {
   return (
     <button type="button" className={s.product} onClick={() => onOpen(p)}>
-      <span className={`${s.productImage} ${tall ? s.productImageTall : ''}`}>
-        {p.image ? <img src={p.image} alt={p.title} loading="lazy" /> : '[PRODUCT PHOTO]'}
+      <span className={`${s.productImage} ${tall ? s.productImageTall : ""}`}>
+        {p.image ? (
+          <img src={p.image} alt={p.title} loading="lazy" />
+        ) : (
+          "[PRODUCT PHOTO]"
+        )}
       </span>
       <span className={s.productCat}>{p.category.toUpperCase()}</span>
       <span className={s.productName}>{p.title}</span>
@@ -1029,12 +1402,12 @@ function ProductTile({ product: p, onOpen, tall }: { product: PartnerProduct; on
 }
 
 const SORTS = [
-  { id: 'featured', label: 'Featured' },
-  { id: 'price-asc', label: 'Price: low to high' },
-  { id: 'price-desc', label: 'Price: high to low' },
-  { id: 'newest', label: 'Newest' },
+  { id: "featured", label: "Featured" },
+  { id: "price-asc", label: "Price: low to high" },
+  { id: "price-desc", label: "Price: high to low" },
+  { id: "newest", label: "Newest" },
 ] as const;
-type Sort = (typeof SORTS)[number]['id'];
+type Sort = (typeof SORTS)[number]["id"];
 const PAGE_SIZES = [20, 40, 60];
 
 /**
@@ -1049,29 +1422,33 @@ function ShopAll({
   onBack,
   onOpen,
 }: {
-  page: PartnerPageResponse['page'];
+  page: PartnerPageResponse["page"];
   products: PartnerProduct[];
   collection: string;
   onCollection: (c: string) => void;
   onBack: () => void;
   onOpen: (p: PartnerProduct) => void;
 }) {
-  const [category, setCategory] = useState('');
-  const [sort, setSort] = useState<Sort>('featured');
+  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState<Sort>("featured");
   const [size, setSize] = useState(PAGE_SIZES[0]);
   const [pageIndex, setPageIndex] = useState(0);
   const [open, setOpen] = useState({ collection: true, category: true });
   const collections = [...new Set(products.map((p) => p.collection))];
   const categories = [...new Set(products.map((p) => p.category))];
   const matching = products
-    .filter((p) => (!collection || p.collection === collection) && (!category || p.category === category))
+    .filter(
+      (p) =>
+        (!collection || p.collection === collection) &&
+        (!category || p.category === category),
+    )
     .sort((a, b) =>
-      sort === 'price-asc'
+      sort === "price-asc"
         ? a.price - b.price
-        : sort === 'price-desc'
+        : sort === "price-desc"
           ? b.price - a.price
-          : sort === 'newest'
-            ? (b.addedAt ?? '').localeCompare(a.addedAt ?? '')
+          : sort === "newest"
+            ? (b.addedAt ?? "").localeCompare(a.addedAt ?? "")
             : 0,
     );
   const pages = Math.max(1, Math.ceil(matching.length / size));
@@ -1088,18 +1465,18 @@ function ShopAll({
     ...(collection
       ? [
           {
-            label: 'Collection',
+            label: "Collection",
             value: collection,
-            clear: () => reset(onCollection)(''),
+            clear: () => reset(onCollection)(""),
           },
         ]
       : []),
     ...(category
       ? [
           {
-            label: 'Category',
+            label: "Category",
             value: category,
-            clear: () => reset(setCategory)(''),
+            clear: () => reset(setCategory)(""),
           },
         ]
       : []),
@@ -1108,27 +1485,30 @@ function ShopAll({
     ...(collections.length > 1
       ? [
           {
-            id: 'collection' as const,
-            label: 'COLLECTION',
+            id: "collection" as const,
+            label: "COLLECTION",
             options: collections,
             value: collection,
-            pick: (v: string) => reset(onCollection)(collection === v ? '' : v),
+            pick: (v: string) => reset(onCollection)(collection === v ? "" : v),
             of: (p: PartnerProduct) => p.collection,
           },
         ]
       : []),
     {
-      id: 'category' as const,
-      label: 'CATEGORY',
+      id: "category" as const,
+      label: "CATEGORY",
       options: categories,
       value: category,
-      pick: (v: string) => reset(setCategory)(category === v ? '' : v),
+      pick: (v: string) => reset(setCategory)(category === v ? "" : v),
       of: (p: PartnerProduct) => p.category,
     },
   ];
 
   return (
-    <section className={`${s.wrap} ${s.section}`} style={{ gap: 48, paddingTop: 48 }}>
+    <section
+      className={`${s.wrap} ${s.section}`}
+      style={{ gap: 48, paddingTop: 48 }}
+    >
       <div className={s.shopAllHead}>
         <div className={s.shopAllTitle}>
           <button type="button" className={s.back} onClick={onBack}>
@@ -1142,7 +1522,10 @@ function ShopAll({
           </span>
           <label>
             Sort by
-            <select value={sort} onChange={(e) => reset(setSort)(e.target.value as Sort)}>
+            <select
+              value={sort}
+              onChange={(e) => reset(setSort)(e.target.value as Sort)}
+            >
               {SORTS.map((o) => (
                 <option key={o.id} value={o.id}>
                   {o.label}
@@ -1152,7 +1535,10 @@ function ShopAll({
           </label>
           <label>
             Show
-            <select value={size} onChange={(e) => reset(setSize)(Number(e.target.value))}>
+            <select
+              value={size}
+              onChange={(e) => reset(setSize)(Number(e.target.value))}
+            >
               {PAGE_SIZES.map((n) => (
                 <option key={n} value={n}>
                   {n}
@@ -1197,8 +1583,8 @@ function ShopAll({
                   type="button"
                   className={s.clearAll}
                   onClick={() => {
-                    onCollection('');
-                    setCategory('');
+                    onCollection("");
+                    setCategory("");
                     setPageIndex(0);
                   }}
                 >
@@ -1210,7 +1596,10 @@ function ShopAll({
             )}
           </div>
           <div>
-            <span className={s.shopAsideLabel} style={{ display: 'block', paddingBottom: 12 }}>
+            <span
+              className={s.shopAsideLabel}
+              style={{ display: "block", paddingBottom: 12 }}
+            >
               SHOPPING OPTIONS
             </span>
             {groups.map((g) => (
@@ -1233,7 +1622,7 @@ function ShopAll({
                     strokeLinejoin="round"
                     aria-hidden
                   >
-                    <path d={open[g.id] ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} />
+                    <path d={open[g.id] ? "m6 15 6-6 6 6" : "m6 9 6 6 6-6"} />
                   </svg>
                 </button>
                 {open[g.id] && (
@@ -1244,7 +1633,7 @@ function ShopAll({
                         <button
                           key={o}
                           type="button"
-                          className={`${s.optionPick} ${on ? s.optionPickOn : ''}`}
+                          className={`${s.optionPick} ${on ? s.optionPickOn : ""}`}
                           aria-pressed={on}
                           onClick={() => g.pick(o)}
                         >
@@ -1265,7 +1654,9 @@ function ShopAll({
                             )}
                           </span>
                           {o}
-                          <span className={s.optionCount}>{products.filter((p) => g.of(p) === o).length}</span>
+                          <span className={s.optionCount}>
+                            {products.filter((p) => g.of(p) === o).length}
+                          </span>
                         </button>
                       );
                     })}
@@ -1284,17 +1675,29 @@ function ShopAll({
               ))}
             </div>
           ) : (
-            <p className={s.empty}>No products match. Clear a filter to see more.</p>
+            <p className={s.empty}>
+              No products match. Clear a filter to see more.
+            </p>
           )}
           {pages > 1 && (
             <nav className={s.pager} aria-label="Pages">
-              <button type="button" className={s.btn} disabled={current === 0} onClick={() => setPageIndex(current - 1)}>
+              <button
+                type="button"
+                className={s.btn}
+                disabled={current === 0}
+                onClick={() => setPageIndex(current - 1)}
+              >
                 ← Previous
               </button>
               <span>
                 Page {current + 1} of {pages}
               </span>
-              <button type="button" className={s.btn} disabled={current >= pages - 1} onClick={() => setPageIndex(current + 1)}>
+              <button
+                type="button"
+                className={s.btn}
+                disabled={current >= pages - 1}
+                onClick={() => setPageIndex(current + 1)}
+              >
                 Next →
               </button>
             </nav>
@@ -1308,31 +1711,52 @@ function ShopAll({
 // --- Dialogs ------------------------------------------------------------------------------------------------------------
 
 /** The partner's accent colour, for the popups: they render in a portal outside the page, where --accent isn't set. */
-const AccentContext = createContext('');
+const AccentContext = createContext("");
 
-function Overlay({ children, onClose, wide }: { children: React.ReactNode; onClose: () => void; wide?: boolean }) {
+function Overlay({
+  children,
+  onClose,
+  wide,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  wide?: boolean;
+}) {
   useEffect(() => {
-    document.body.classList.add('menu-open');
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
+    document.body.classList.add("menu-open");
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
     return () => {
-      document.body.classList.remove('menu-open');
-      window.removeEventListener('keydown', onKey);
+      document.body.classList.remove("menu-open");
+      window.removeEventListener("keydown", onKey);
     };
   }, [onClose]);
   const accent = useContext(AccentContext);
-  const isImage = !wide && typeof children === 'object' && children !== null && (children as { type?: unknown }).type === 'img';
+  const isImage =
+    !wide &&
+    typeof children === "object" &&
+    children !== null &&
+    (children as { type?: unknown }).type === "img";
   return createPortal(
     <div
       className={s.overlay}
-      style={accent ? ({ '--accent': accent } as CSSProperties) : undefined}
+      style={accent ? ({ "--accent": accent } as CSSProperties) : undefined}
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       {isImage ? (
         children
       ) : (
-        <div className={`${s.dialog} ${wide ? s.dialogWide : ''}`} role="dialog" aria-modal="true">
-          <button type="button" className={s.close} aria-label="Close" onClick={onClose}>
+        <div
+          className={`${s.dialog} ${wide ? s.dialogWide : ""}`}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className={s.close}
+            aria-label="Close"
+            onClick={onClose}
+          >
             ×
           </button>
           {children}
@@ -1348,7 +1772,7 @@ function ReviewsDialog({
   reviews,
   onClose,
 }: {
-  page: PartnerPageResponse['page'];
+  page: PartnerPageResponse["page"];
   reviews: PartnerReviewData[];
   onClose: () => void;
 }) {
@@ -1356,22 +1780,31 @@ function ReviewsDialog({
     <Overlay onClose={onClose}>
       <div className={s.dialogBody}>
         <div className={s.ratingBig}>
-          <strong>{page.rating ?? '—'}</strong>
+          <strong>{page.rating ?? "—"}</strong>
           <span>
             <span className={s.stars}>
               {Array.from({ length: 5 }, (_, i) => (
-                <Star key={i} size={18} fill={page.rating != null && i < Math.round(page.rating) ? 'currentColor' : '#DDDDDA'} />
+                <Star
+                  key={i}
+                  size={18}
+                  fill={
+                    page.rating != null && i < Math.round(page.rating)
+                      ? "currentColor"
+                      : "#DDDDDA"
+                  }
+                />
               ))}
             </span>
             <span className={s.muted}>
               {page.reviewCount} verified review
-              {page.reviewCount === 1 ? '' : 's'}
+              {page.reviewCount === 1 ? "" : "s"}
             </span>
           </span>
         </div>
         <div className={s.reviewRules}>
-          <strong>To keep reviews real</strong>, only people checked in at a session with {page.short} can leave one: they get the link with
-          their booking. Reading reviews is open to everyone.
+          <strong>To keep reviews real</strong>, only people checked in at a
+          session with {page.short} can leave one: they get the link with their
+          booking. Reading reviews is open to everyone.
         </div>
         {reviews.length === 0 ? (
           <p className={s.empty}>No reviews yet.</p>
@@ -1380,7 +1813,11 @@ function ReviewsDialog({
             <div key={r.id} className={s.review}>
               <span className={s.stars}>
                 {Array.from({ length: 5 }, (_, i) => (
-                  <Star key={i} size={14} fill={i < r.rating ? 'currentColor' : '#DDDDDA'} />
+                  <Star
+                    key={i}
+                    size={14}
+                    fill={i < r.rating ? "currentColor" : "#DDDDDA"}
+                  />
                 ))}
               </span>
               <span style={{ fontSize: 16 }}>{r.text}</span>
@@ -1400,30 +1837,46 @@ function ReviewsDialog({
   );
 }
 
-function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onClose: () => void }) {
+function WorkDialog({
+  slug,
+  short,
+  onClose,
+}: {
+  slug: string;
+  short: string;
+  onClose: () => void;
+}) {
   const [form, setForm] = useState({
-    name: '',
-    organization: '',
-    email: '',
+    name: "",
+    organization: "",
+    email: "",
     onClp: false,
-    collabType: '',
-    idea: '',
-    website: '',
+    collabType: "",
+    idea: "",
+    website: "",
   });
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.organization.trim() || !form.email.trim() || !form.collabType || !form.idea.trim())
-      return setError('Fill in every field, please.');
+    if (
+      !form.name.trim() ||
+      !form.organization.trim() ||
+      !form.email.trim() ||
+      !form.collabType ||
+      !form.idea.trim()
+    )
+      return setError("Fill in every field, please.");
     setBusy(true);
-    setError('');
+    setError("");
     try {
       await sendPartnerLead(slug, form);
       setSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not send. Try again.');
+      setError(
+        err instanceof Error ? err.message : "Could not send. Try again.",
+      );
     } finally {
       setBusy(false);
     }
@@ -1431,38 +1884,56 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
   return (
     <Overlay onClose={onClose}>
       {sent ? (
-        <div className={s.dialogBody} style={{ alignItems: 'center', textAlign: 'center' }}>
+        <div className={`${s.dialogBody} ${s.workForm} ${s.workDone}`}>
           <span className={s.kicker}>THANK YOU</span>
           <h3 className={`${s.display} ${s.dialogTitle}`}>We got your idea</h3>
-          <span className={s.muted}>The CLP and {short} teams will review it and reach out by email.</span>
-          <button type="button" className={`${s.btn} ${s.btnDark}`} onClick={onClose}>
+          <span className={s.muted}>
+            {short} will read it and reach out to you by email.
+          </span>
+          <button
+            type="button"
+            className={`${s.btn} ${s.btnDark}`}
+            onClick={onClose}
+          >
             Done
           </button>
         </div>
       ) : (
-        <form className={s.dialogBody} onSubmit={submit} noValidate>
-          <span className={s.kicker}>WORK WITH {short.toUpperCase()}</span>
-          <h3 className={`${s.display} ${s.dialogTitle}`}>Partnership interest form</h3>
-          <label className={s.field}>
-            Your name
-            <input
-              className={s.input}
-              maxLength={120}
-              autoComplete="name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </label>
-          <label className={s.field}>
-            Brand or organization
-            <input
-              className={s.input}
-              maxLength={120}
-              autoComplete="organization"
-              value={form.organization}
-              onChange={(e) => setForm({ ...form, organization: e.target.value })}
-            />
-          </label>
+        <form
+          className={`${s.dialogBody} ${s.workForm}`}
+          onSubmit={submit}
+          noValidate
+        >
+          <div className={s.workHead}>
+            <span className={s.kicker}>WORK WITH {short.toUpperCase()}</span>
+            <h3 className={`${s.display} ${s.dialogTitle}`}>
+              Partnership interest form
+            </h3>
+          </div>
+          <div className={s.workPair}>
+            <label className={s.field}>
+              Your name
+              <input
+                className={s.input}
+                maxLength={120}
+                autoComplete="name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </label>
+            <label className={s.field}>
+              Brand or organization
+              <input
+                className={s.input}
+                maxLength={120}
+                autoComplete="organization"
+                value={form.organization}
+                onChange={(e) =>
+                  setForm({ ...form, organization: e.target.value })
+                }
+              />
+            </label>
+          </div>
           <label className={s.field}>
             Work email
             <input
@@ -1476,13 +1947,17 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
           </label>
           <div className={s.field}>
             Are you already on CLP?
-            <div className={s.radios}>
-              <button type="button" className={`${s.size} ${form.onClp ? s.sizeOn : ''}`} onClick={() => setForm({ ...form, onClp: true })}>
+            <div className={s.workChoice}>
+              <button
+                type="button"
+                aria-pressed={form.onClp}
+                onClick={() => setForm({ ...form, onClp: true })}
+              >
                 Yes, we’re on CLP
               </button>
               <button
                 type="button"
-                className={`${s.size} ${!form.onClp ? s.sizeOn : ''}`}
+                aria-pressed={!form.onClp}
                 onClick={() => setForm({ ...form, onClp: false })}
               >
                 Not yet
@@ -1491,7 +1966,11 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
           </div>
           <label className={s.field}>
             Type of collab
-            <select className={s.input} value={form.collabType} onChange={(e) => setForm({ ...form, collabType: e.target.value })}>
+            <select
+              className={s.input}
+              value={form.collabType}
+              onChange={(e) => setForm({ ...form, collabType: e.target.value })}
+            >
               <option value="">Choose…</option>
               {COLLAB_TYPES.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -1503,7 +1982,12 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
           </label>
           <label className={s.field}>
             Tell us about the idea
-            <textarea className={s.input} maxLength={2000} value={form.idea} onChange={(e) => setForm({ ...form, idea: e.target.value })} />
+            <textarea
+              className={s.input}
+              maxLength={2000}
+              value={form.idea}
+              onChange={(e) => setForm({ ...form, idea: e.target.value })}
+            />
           </label>
           {/* A field people don't see: filled in, the request is a bot's. */}
           <input
@@ -1511,13 +1995,17 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
             tabIndex={-1}
             autoComplete="off"
             aria-hidden
-            style={{ position: 'absolute', left: -9999 }}
+            style={{ position: "absolute", left: -9999 }}
             value={form.website}
             onChange={(e) => setForm({ ...form, website: e.target.value })}
           />
           {error && <span className={s.formError}>{error}</span>}
-          <button type="submit" className={`${s.btn} ${s.btnAccent} ${s.btnLg}`} disabled={busy}>
-            {busy ? 'Sending…' : 'Send interest'}
+          <button
+            type="submit"
+            className={`${s.btn} ${s.btnAccent} ${s.workSend}`}
+            disabled={busy}
+          >
+            {busy ? "Sending…" : "Send interest"}
           </button>
         </form>
       )}
@@ -1525,20 +2013,30 @@ function WorkDialog({ slug, short, onClose }: { slug: string; short: string; onC
   );
 }
 
-function SubscribeDialog({ slug, name, preview, onClose }: { slug: string; name: string; preview: boolean; onClose: () => void }) {
-  const [email, setEmail] = useState('');
-  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
-  const [error, setError] = useState('');
+function SubscribeDialog({
+  slug,
+  name,
+  preview,
+  onClose,
+}: {
+  slug: string;
+  name: string;
+  preview: boolean;
+  onClose: () => void;
+}) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "busy" | "done">("idle");
+  const [error, setError] = useState("");
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    setState('busy');
-    setError('');
+    setState("busy");
+    setError("");
     try {
       await subscribeToPartner(slug, email.trim());
-      setState('done');
+      setState("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not subscribe.');
-      setState('idle');
+      setError(err instanceof Error ? err.message : "Could not subscribe.");
+      setState("idle");
     }
   };
   return (
@@ -1546,18 +2044,25 @@ function SubscribeDialog({ slug, name, preview, onClose }: { slug: string; name:
       <form className={s.dialogBody} onSubmit={submit}>
         <span className={s.kicker}>SUBSCRIBE</span>
         <h3 className={`${s.display} ${s.dialogTitle}`}>Follow {name}</h3>
-        {state === 'done' ? (
+        {state === "done" ? (
           <>
             <span className={s.muted}>
-              You’re subscribed. New dates, drops and updates from {name} come to {email}.
+              You’re subscribed. New dates, drops and updates from {name} come
+              to {email}.
             </span>
-            <button type="button" className={`${s.btn} ${s.btnDark}`} onClick={onClose}>
+            <button
+              type="button"
+              className={`${s.btn} ${s.btnDark}`}
+              onClick={onClose}
+            >
               Done
             </button>
           </>
         ) : (
           <>
-            <span className={s.muted}>New dates, drops and updates, by email. Unsubscribe anytime.</span>
+            <span className={s.muted}>
+              New dates, drops and updates, by email. Unsubscribe anytime.
+            </span>
             <input
               className={s.input}
               type="email"
@@ -1568,8 +2073,12 @@ function SubscribeDialog({ slug, name, preview, onClose }: { slug: string; name:
               aria-label="Email"
             />
             {error && <span className={s.formError}>{error}</span>}
-            <button type="submit" className={`${s.btn} ${s.btnAccent} ${s.btnLg}`} disabled={state === 'busy' || preview}>
-              {state === 'busy' ? 'Subscribing…' : 'Subscribe'}
+            <button
+              type="submit"
+              className={`${s.btn} ${s.btnAccent} ${s.btnLg}`}
+              disabled={state === "busy" || preview}
+            >
+              {state === "busy" ? "Subscribing…" : "Subscribe"}
             </button>
           </>
         )}
@@ -1580,15 +2089,24 @@ function SubscribeDialog({ slug, name, preview, onClose }: { slug: string; name:
 
 function ShareDialog({ name, onClose }: { name: string; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
-  const url = typeof window === 'undefined' ? '' : window.location.href.replace(/[?&]preview=[^&#]*/, '');
+  const url =
+    typeof window === "undefined"
+      ? ""
+      : window.location.href.replace(/[?&]preview=[^&#]*/, "");
   const enc = encodeURIComponent(url);
   return (
     <Overlay onClose={onClose}>
       <div className={s.dialogBody}>
         <span className={s.kicker}>SHARE</span>
         <h3 className={`${s.display} ${s.dialogTitle}`}>{name}</h3>
-        <input className={s.input} readOnly value={url} onFocus={(e) => e.currentTarget.select()} aria-label="Page link" />
-        <div className={s.radios} style={{ flexWrap: 'wrap' }}>
+        <input
+          className={s.input}
+          readOnly
+          value={url}
+          onFocus={(e) => e.currentTarget.select()}
+          aria-label="Page link"
+        />
+        <div className={s.radios} style={{ flexWrap: "wrap" }}>
           <button
             type="button"
             className={`${s.btn} ${s.btnDark}`}
@@ -1597,15 +2115,28 @@ function ShareDialog({ name, onClose }: { name: string; onClose: () => void }) {
               setCopied(true);
             }}
           >
-            {copied ? 'Link copied' : 'Copy link'}
+            {copied ? "Link copied" : "Copy link"}
           </button>
-          <a className={s.btn} href={`https://www.facebook.com/share.php?u=${enc}`} target="_blank" rel="noopener noreferrer">
+          <a
+            className={s.btn}
+            href={`https://www.facebook.com/share.php?u=${enc}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Facebook
           </a>
-          <a className={s.btn} href={`https://twitter.com/share?url=${enc}`} target="_blank" rel="noopener noreferrer">
+          <a
+            className={s.btn}
+            href={`https://twitter.com/share?url=${enc}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             X
           </a>
-          <a className={s.btn} href={`mailto:?subject=${encodeURIComponent(name)}&body=${enc}`}>
+          <a
+            className={s.btn}
+            href={`mailto:?subject=${encodeURIComponent(name)}&body=${enc}`}
+          >
             Email
           </a>
         </div>
@@ -1616,31 +2147,70 @@ function ShareDialog({ name, onClose }: { name: string; onClose: () => void }) {
 
 function ProductDialog({
   product,
+  slug,
   short,
+  preview,
   onClose,
-  onAdd,
+  onViewCart,
 }: {
   product: PartnerProduct;
+  slug: string;
   short: string;
+  /** A page not live yet (CLP's preview): nothing can be bought. */
+  preview: boolean;
   onClose: () => void;
-  onAdd: (option: string, qty: number) => void;
+  onViewCart: () => void;
 }) {
-  const [choices, setChoices] = useState<Record<string, string>>(() => Object.fromEntries(product.optionGroups.map((g) => [g.kind, g.values[0]])));
-  const option = product.optionGroups.map((g) => choices[g.kind]).join(' / ');
+  const [choices, setChoices] = useState<Record<string, string>>(() =>
+    Object.fromEntries(product.optionGroups.map((g) => [g.kind, g.values[0]])),
+  );
   const [qty, setQty] = useState(1);
+  // Added: the design's "Added to cart" panel (View cart / Keep shopping) takes the details' place.
+  const [added, setAdded] = useState<{ choices: string; qty: number } | null>(
+    null,
+  );
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState("");
+  const add = async () => {
+    setAdding(true);
+    setError("");
+    try {
+      cartChanged(await addToCart(slug, product.id, choices, qty));
+      setAdded({
+        choices: product.optionGroups
+          .map((g) => `${g.kind.replace(/s$/, "")} ${choices[g.kind]}`)
+          .join(" · "),
+        qty,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not add it. Please try again.",
+      );
+    } finally {
+      setAdding(false);
+    }
+  };
   const [photo, setPhoto] = useState(0);
-  const images = product.images.length ? product.images : product.image ? [product.image] : [];
+  const images = product.images.length
+    ? product.images
+    : product.image
+      ? [product.image]
+      : [];
   const [swipe, setSwipe] = useState<number | null>(null);
   // The carousel wraps around: past the last photo comes the first.
-  const go = (step: number) => setPhoto((i) => (i + step + images.length) % images.length);
+  const go = (step: number) =>
+    setPhoto((i) => (i + step + images.length) % images.length);
   useEffect(() => {
     if (images.length < 2) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') setPhoto((i) => (i - 1 + images.length) % images.length);
-      if (e.key === 'ArrowRight') setPhoto((i) => (i + 1) % images.length);
+      if (e.key === "ArrowLeft")
+        setPhoto((i) => (i - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight") setPhoto((i) => (i + 1) % images.length);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [images.length]);
   return (
     <Overlay onClose={onClose} wide>
@@ -1652,26 +2222,45 @@ function ProductDialog({
               style={{ transform: `translateX(-${photo * 100}%)` }}
               onTouchStart={(e) => setSwipe(e.touches[0].clientX)}
               onTouchEnd={(e) => {
-                const dx = swipe === null ? 0 : e.changedTouches[0].clientX - swipe;
+                const dx =
+                  swipe === null ? 0 : e.changedTouches[0].clientX - swipe;
                 if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
                 setSwipe(null);
               }}
             >
               {images.map((src, i) => (
-                <img key={src} src={src} alt={i === 0 ? product.title : ''} aria-hidden={i !== photo} draggable={false} />
+                <img
+                  key={src}
+                  src={src}
+                  alt={i === 0 ? product.title : ""}
+                  aria-hidden={i !== photo}
+                  draggable={false}
+                />
               ))}
             </div>
           ) : (
-            <span className={s.productNoImage}>{product.category.toUpperCase()}</span>
+            <span className={s.productNoImage}>
+              {product.category.toUpperCase()}
+            </span>
           )}
           {images.length > 1 && (
             <>
-              <button type="button" className={`${s.productArrow} ${s.productArrowPrev}`} aria-label="Previous photo" onClick={() => go(-1)}>
+              <button
+                type="button"
+                className={`${s.productArrow} ${s.productArrowPrev}`}
+                aria-label="Previous photo"
+                onClick={() => go(-1)}
+              >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M15 5l-7 7 7 7" />
                 </svg>
               </button>
-              <button type="button" className={`${s.productArrow} ${s.productArrowNext}`} aria-label="Next photo" onClick={() => go(1)}>
+              <button
+                type="button"
+                className={`${s.productArrow} ${s.productArrowNext}`}
+                aria-label="Next photo"
+                onClick={() => go(1)}
+              >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M9 5l7 7-7 7" />
                 </svg>
@@ -1682,121 +2271,255 @@ function ProductDialog({
             </>
           )}
         </div>
-        <div className={s.dialogBody}>
-          <span className={s.productCat}>
-            {short.toUpperCase()} · {product.category.toUpperCase()}
-          </span>
-          <h3 className={s.productTitle}>{product.title}</h3>
-          <span className={s.productPrice}>{dollars(product.price)}</span>
-          {product.description && <p className={s.productDescription}>{product.description}</p>}
-          {product.optionGroups.map((g) => (
-            <div key={g.kind} className={s.field}>
-              {g.kind.replace(/s$/, '')}
-              <div className={s.sizes}>
-                {g.values.map((o) => (
-                  <button
-                    key={o}
-                    type="button"
-                    className={`${s.size} ${choices[g.kind] === o ? s.sizeOn : ''}`}
-                    onClick={() => setChoices({ ...choices, [g.kind]: o })}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
+        {added ? (
+          <div className={`${s.dialogBody} ${s.addedPanel}`}>
+            <span className={s.addedKicker}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              ADDED TO CART
+            </span>
+            <span className={s.addedName}>{product.title}</span>
+            <span className={s.muted}>
+              {[added.choices, `Qty ${added.qty}`].filter(Boolean).join(" · ")}
+            </span>
+            <div className={s.addedActions}>
+              <button
+                type="button"
+                className={`${s.btn} ${s.btnAccent}`}
+                onClick={onViewCart}
+              >
+                View cart
+              </button>
+              <button
+                type="button"
+                className={`${s.btn} ${s.btnOutline}`}
+                onClick={onClose}
+              >
+                Keep shopping
+              </button>
             </div>
-          ))}
-          <div className={s.field}>
-            Quantity
-            <span className={s.qty}>
-              <button type="button" aria-label="Less" onClick={() => setQty(Math.max(1, qty - 1))}>
-                −
-              </button>
-              <span>{qty}</span>
-              <button type="button" aria-label="More" onClick={() => setQty(Math.min(20, qty + 1))}>
-                +
-              </button>
+          </div>
+        ) : (
+          <div className={s.dialogBody}>
+            <span className={s.productCat}>
+              {short.toUpperCase()} · {product.category.toUpperCase()}
+            </span>
+            <h3 className={s.productTitle}>{product.title}</h3>
+            <span className={s.productPrice}>{dollars(product.price)}</span>
+            {product.description && (
+              <p className={s.productDescription}>{product.description}</p>
+            )}
+            {product.optionGroups.map((g) => (
+              <div key={g.kind} className={s.field}>
+                {g.kind.replace(/s$/, "")}
+                <div className={s.sizes}>
+                  {g.values.map((o) => (
+                    <button
+                      key={o}
+                      type="button"
+                      className={`${s.size} ${choices[g.kind] === o ? s.sizeOn : ""}`}
+                      onClick={() => setChoices({ ...choices, [g.kind]: o })}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className={s.field}>
+              Quantity
+              <span className={s.qty}>
+                <button
+                  type="button"
+                  aria-label="Less"
+                  onClick={() => setQty(Math.max(1, qty - 1))}
+                >
+                  −
+                </button>
+                <span>{qty}</span>
+                <button
+                  type="button"
+                  aria-label="More"
+                  onClick={() => setQty(Math.min(20, qty + 1))}
+                >
+                  +
+                </button>
+              </span>
+            </div>
+            {error && <span className={s.formError}>{error}</span>}
+            <button
+              type="button"
+              className={`${s.btn} ${s.btnAccent} ${s.productAdd}`}
+              disabled={adding || preview}
+              onClick={add}
+            >
+              {preview
+                ? "Not on sale until the page is live"
+                : adding
+                  ? "Adding…"
+                  : `Add to cart · ${dollars(product.price * qty)}`}
+            </button>
+            <span className={s.muted} style={{ fontSize: 13 }}>
+              Ships from the partner store. Shipping &amp; returns details at
+              checkout.
             </span>
           </div>
-          <button type="button" className={`${s.btn} ${s.btnAccent} ${s.productAdd}`} onClick={() => onAdd(option, qty)}>
-            Add to cart · {dollars(product.price * qty)}
-          </button>
-          <span className={s.muted} style={{ fontSize: 13 }}>
-            Ships from the partner store. Shipping &amp; returns details at checkout.
-          </span>
-        </div>
+        )}
       </div>
     </Overlay>
   );
 }
 
-function CartDrawer({ lines, onClose, onRemove }: { lines: CartLine[]; onClose: () => void; onRemove: (key: string) => void }) {
-  const total = lines.reduce((n, l) => n + l.price * l.qty, 0);
-  const [note, setNote] = useState(false);
+function CartDrawer({
+  cart,
+  slug,
+  onClose,
+}: {
+  cart: Cart | null;
+  slug: string;
+  onClose: () => void;
+}) {
   const accent = useContext(AccentContext);
+  const [busy, setBusy] = useState("");
+  const [error, setError] = useState("");
+  const lines = cart?.lines ?? [];
+  const change = async (key: string, work: () => Promise<Cart>) => {
+    setBusy(key);
+    setError("");
+    try {
+      cartChanged(await work());
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not change your cart. Please try again.",
+      );
+    } finally {
+      setBusy("");
+    }
+  };
   return createPortal(
     <div
       style={{
-        display: 'contents',
-        ...(accent ? ({ '--accent': accent } as CSSProperties) : {}),
+        display: "contents",
+        ...(accent ? ({ "--accent": accent } as CSSProperties) : {}),
       }}
     >
-      <div className={s.overlay} style={{ background: 'rgba(10,10,10,.4)' }} onMouseDown={onClose} />
-      <aside className={s.drawer} role="dialog" aria-modal="true" aria-label="Your cart">
+      <div
+        className={s.overlay}
+        style={{ background: "rgba(10,10,10,.45)" }}
+        onMouseDown={onClose}
+      />
+      <aside
+        className={s.drawer}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Your cart"
+      >
         <div className={s.drawerHead}>
-          Your cart ({lines.reduce((n, l) => n + l.qty, 0)})
-          <button type="button" className={s.close} style={{ position: 'static' }} aria-label="Close" onClick={onClose}>
+          <span className={s.drawerTitle}>Your cart ({cart?.count ?? 0})</span>
+          <button
+            type="button"
+            className={s.close}
+            style={{ position: "static" }}
+            aria-label="Close cart"
+            onClick={onClose}
+          >
             ×
           </button>
         </div>
         <div className={s.drawerBody}>
-          {lines.length === 0 ? (
-            <span className={s.muted}>Your cart is empty.</span>
+          {!cart ? (
+            <span className={s.muted}>Loading your cart…</span>
+          ) : lines.length === 0 ? (
+            <p className={s.muted}>Your cart is empty.</p>
           ) : (
             lines.map((l) => (
-              <div key={l.key} className={s.cartLine}>
-                <span className={s.cartThumb}>{l.image && <img src={l.image} alt="" />}</span>
-                <span
-                  style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                  }}
-                >
+              <div
+                key={l.key}
+                className={s.cartLine}
+                aria-busy={busy === l.key}
+              >
+                <span className={s.cartThumb}>
+                  {l.image && <img src={l.image} alt="" />}
+                </span>
+                <span className={s.cartInfo}>
                   <strong>{l.title}</strong>
-                  <span className={s.muted} style={{ fontSize: 13 }}>
-                    {l.option} · Qty {l.qty}
+                  {l.option && <span className={s.muted}>{l.option}</span>}
+                  <span className={s.cartQty}>
+                    <span className={s.qty}>
+                      <button
+                        type="button"
+                        aria-label={`One less ${l.title}`}
+                        disabled={Boolean(busy)}
+                        onClick={() =>
+                          change(l.key, () =>
+                            setLineQty(l.key, l.qty - 1, slug),
+                          )
+                        }
+                      >
+                        −
+                      </button>
+                      <span>{l.qty}</span>
+                      <button
+                        type="button"
+                        aria-label={`One more ${l.title}`}
+                        disabled={Boolean(busy) || l.qty >= 20}
+                        onClick={() =>
+                          change(l.key, () =>
+                            setLineQty(l.key, l.qty + 1, slug),
+                          )
+                        }
+                      >
+                        +
+                      </button>
+                    </span>
+                    <button
+                      type="button"
+                      className={s.cartRemove}
+                      disabled={Boolean(busy)}
+                      onClick={() =>
+                        change(l.key, () => removeLine(l.key, slug))
+                      }
+                    >
+                      Remove
+                    </button>
                   </span>
-                  <button type="button" className={s.back} style={{ textDecoration: 'underline' }} onClick={() => onRemove(l.key)}>
-                    Remove
-                  </button>
                 </span>
                 <strong>{dollars(l.price * l.qty)}</strong>
               </div>
             ))
           )}
+          {cart?.removed ? (
+            <p className={s.muted}>
+              Something in your cart is no longer for sale, so it was taken out.
+            </p>
+          ) : null}
+          {error && <p className={s.formError}>{error}</p>}
         </div>
         <div className={s.drawerFoot}>
-          <span
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontWeight: 700,
-            }}
-          >
+          <span className={s.cartTotal}>
             <span>Subtotal</span>
-            <span>{dollars(total)}</span>
+            <span>{dollars(cart?.subtotal ?? 0)}</span>
           </span>
-          {note && (
-            <span className={s.muted} style={{ fontSize: 13 }}>
-              Online checkout opens soon: payments aren’t connected yet. Your cart is saved on this device.
-            </span>
+          {lines.length > 0 ? (
+            <a
+              className={`${s.btn} ${s.btnAccent} ${s.btnLg}`}
+              href={checkoutHref(slug)}
+            >
+              Checkout
+            </a>
+          ) : (
+            <button
+              type="button"
+              className={`${s.btn} ${s.btnAccent} ${s.btnLg}`}
+              disabled
+            >
+              Checkout
+            </button>
           )}
-          <button type="button" className={`${s.btn} ${s.btnDark} ${s.btnLg}`} disabled={!lines.length} onClick={() => setNote(true)}>
-            Checkout
-          </button>
-          <button type="button" className={s.btn} onClick={onClose}>
+          <button type="button" className={s.cartKeep} onClick={onClose}>
             Keep shopping
           </button>
         </div>

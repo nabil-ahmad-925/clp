@@ -1,0 +1,329 @@
+/* Checkout and the order confirmation: white cards on the listing pages' warm off-white, under the black heading (as the
+   guest's booking page). */
+
+.page {
+  position: relative;
+  padding: 0 16px 120px;
+  background: #f7f6f3;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.layout {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+  align-items: start;
+  gap: 24px;
+  max-width: 1080px;
+  margin: -48px auto 0;
+}
+
+.card,
+.summary {
+  position: relative;
+  z-index: 3;
+  padding: 32px;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.layout > .card {
+  margin: 0;
+}
+
+.page > .card {
+  max-width: 640px;
+  margin: -48px auto 0;
+}
+
+.narrow {
+  max-width: 640px;
+}
+
+.summary {
+  position: sticky;
+  top: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section {
+  margin: 0 0 14px;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.card .section:not(:first-child) {
+  margin-top: 28px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #d9d7d2;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: #111;
+  outline: none;
+}
+
+.fieldError {
+  color: #b03a2e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #ededea;
+}
+
+.thumb {
+  flex: 0 0 56px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #f2f1ee;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lineText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lineText .muted {
+  font-size: 13px;
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.totals > span,
+.total {
+  display: flex;
+  justify-content: space-between;
+}
+
+.total {
+  padding-top: 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.primary {
+  height: 56px;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back {
+  color: #555;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.small {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.muted {
+  margin: 0;
+  color: #666;
+}
+
+.error {
+  margin: 0;
+  color: #b03a2e;
+  font-weight: 600;
+}
+
+.notice {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fbf1dd;
+  color: #5c4a22;
+  font-size: 14px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+/* ---- The confirmation ---- */
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.stack > .secondary {
+  align-self: flex-start;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.paid {
+  background: #e6f2e9;
+  color: #1e5b33;
+}
+
+.waiting {
+  background: #fbf1dd;
+  color: #8a6f33;
+}
+
+.stopped {
+  background: #fbe9e7;
+  color: #b03a2e;
+}
+
+.neutral {
+  background: #f0eee9;
+  color: #111;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 16px;
+  border-radius: 10px;
+  background: #faf9f6;
+}
+
+.facts dt {
+  color: #777;
+  font-size: 13px;
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .summary {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .card,
+  .summary {
+    padding: 22px 18px;
+  }
+
+  .grid,
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

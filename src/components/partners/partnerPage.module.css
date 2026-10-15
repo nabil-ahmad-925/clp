@@ -3,11 +3,13 @@
   --accent: #7a1f2b;
   background: #fff;
   color: #111;
-  font-family: var(--font-instrument), 'Instrument Sans', var(--font-open-sans), system-ui, sans-serif;
+  font-family:
+    var(--font-instrument), "Instrument Sans", var(--font-open-sans), system-ui,
+    sans-serif;
 }
 
 .display {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-stretch: 118%;
   font-weight: 900;
   text-transform: uppercase;
@@ -47,7 +49,12 @@
 .heroShade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.75) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.1) 40%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
 }
 
 /* The design's hero: 680px tall, the name at the bottom under the (co-branded) header. */
@@ -75,7 +82,7 @@
   border-radius: 14px;
   background: var(--accent);
   color: #fff;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 28px;
   font-stretch: 110%;
   font-style: italic;
@@ -98,7 +105,7 @@
 .name {
   margin: 0;
   color: #fff;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 64px;
   font-stretch: 115%;
   font-weight: 900;
@@ -284,7 +291,7 @@
   margin: 0;
   padding-right: 56px;
   border-right: 1px solid #ddddda;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 52px;
   font-stretch: 112%;
   font-weight: 800;
@@ -356,7 +363,7 @@ button.stat {
 }
 
 .statValue {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 48px;
   font-stretch: 112%;
   font-weight: 900;
@@ -415,7 +422,7 @@ button.stat {
 
 .sectionTitle {
   margin: 0;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 40px;
   font-stretch: 118%;
   font-weight: 900;
@@ -452,7 +459,7 @@ button.stat {
   border-radius: 16px;
   background: #f2f1ee;
   color: #111;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 28px;
   font-stretch: 110%;
   font-weight: 900;
@@ -565,7 +572,12 @@ button.stat {
 .leadShade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.2) 60%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
 .leadText {
@@ -778,7 +790,7 @@ button.stat {
 }
 
 .featDay {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 160px;
   font-stretch: 115%;
   font-weight: 900;
@@ -982,7 +994,7 @@ button.stat {
 }
 
 .expBadge span + span {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 28px;
   font-stretch: 112%;
   font-weight: 900;
@@ -1042,7 +1054,7 @@ button.stat {
 }
 
 .topPostTitle {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 44px;
   font-stretch: 105%;
   font-weight: 800;
@@ -1104,7 +1116,7 @@ button.stat {
   border-radius: 10px;
   background: #111;
   color: #fff;
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 26px;
   font-stretch: 112%;
   font-weight: 900;
@@ -1694,6 +1706,82 @@ textarea.input {
   gap: 8px;
 }
 
+/* The Work with us form (the design's partnership interest form). */
+.dialog:has(> .workForm) {
+  max-width: 640px;
+  max-height: 90vh;
+}
+
+.workForm {
+  gap: 22px;
+  padding: 48px;
+}
+
+/* A scrolling column: its rows keep their height instead of squeezing to fit. */
+.workForm > * {
+  flex-shrink: 0;
+}
+
+.workForm .field {
+  font-weight: 600;
+}
+
+.workForm .input {
+  border-color: #ccc;
+}
+
+.workHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.workChoice {
+  display: flex;
+  gap: 10px;
+}
+
+.workChoice button {
+  flex: 1;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.workChoice button[aria-pressed="true"] {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.workForm .workSend {
+  width: 100%;
+  height: 52px;
+}
+
+.workDone {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.workDone .btn {
+  height: 48px;
+  margin-top: 8px;
+  padding: 0 24px;
+}
+
 .formError {
   color: #b03a2e;
   font-size: 14px;
@@ -1707,7 +1795,7 @@ textarea.input {
 }
 
 .ratingBig strong {
-  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-family: var(--font-archivo), "Archivo", sans-serif;
   font-size: 56px;
   font-stretch: 112%;
   font-weight: 900;
@@ -1754,7 +1842,6 @@ textarea.input {
   grid-template-columns: 1fr 1fr;
   min-height: 0;
 }
-
 
 .sizes {
   display: flex;
@@ -1811,7 +1898,7 @@ textarea.input {
   z-index: 10001;
   display: flex;
   flex-direction: column;
-  width: min(420px, 100vw);
+  width: min(440px, 100vw);
   background: #fff;
   box-shadow: -20px 0 60px rgba(0, 0, 0, 0.2);
 }
@@ -1820,32 +1907,112 @@ textarea.input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 24px 28px;
   border-bottom: 1px solid #ededea;
-  font-size: 18px;
-  font-weight: 700;
+}
+
+.drawerTitle {
+  font-family: var(--font-archivo), "Archivo", sans-serif;
+  font-size: 24px;
+  font-stretch: 115%;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .drawerBody {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px 24px;
+  padding: 8px 28px;
   overflow-y: auto;
+}
+
+.drawerBody > p {
+  margin: 0;
+  padding: 32px 0;
 }
 
 .cartLine {
   display: flex;
-  gap: 12px;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid #ededea;
+}
+
+.cartLine[aria-busy="true"] {
+  opacity: 0.55;
 }
 
 .cartThumb {
-  flex: 0 0 64px;
-  height: 80px;
+  display: flex;
+  flex: 0 0 88px;
+  align-items: center;
+  justify-content: center;
+  height: 104px;
   overflow: hidden;
   border-radius: 6px;
   background: #f2f1ee;
+}
+
+.cartInfo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 15px;
+}
+
+.cartInfo > .muted {
+  font-size: 13px;
+}
+
+.cartQty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.cartQty .qty button {
+  width: 36px;
+  height: 36px;
+}
+
+.cartQty .qty span {
+  min-width: 28px;
+}
+
+.cartRemove {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #555;
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cartTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cartKeep {
+  height: 44px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.drawerFoot .btnLg {
+  height: 56px;
+  font-size: 16px;
 }
 
 .cartThumb img {
@@ -1857,11 +2024,60 @@ textarea.input {
 .drawerFoot {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px 24px;
+  gap: 14px;
+  padding: 24px 28px;
   border-top: 1px solid #ededea;
 }
 
+/* ---- "Added to cart" (the product dialog after adding, as the design) ---- */
+.addedPanel {
+  justify-content: center;
+  gap: 16px;
+}
+
+.addedKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #1e5b33;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.addedKicker svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.addedName {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.addedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.addedActions .btn {
+  flex: 1;
+  height: 52px;
+}
+
+.btnOutline {
+  border-color: #111;
+  background: #fff;
+  color: #111;
+}
 
 .lightbox {
   max-width: min(1100px, 92vw);
@@ -2039,6 +2255,10 @@ textarea.input {
     padding: 28px 20px;
   }
 
+  .workPair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .productDialog {
     grid-template-columns: minmax(0, 1fr);
     overflow-y: auto;
@@ -2057,4 +2277,11 @@ textarea.input {
   .productTitle {
     font-size: 26px;
   }
+}
+
+/* The Partnerships tab's search box, in the row of its Category and Sort selects. */
+.searchInput {
+  min-width: 220px;
+  font-weight: 400;
+  cursor: text;
 }

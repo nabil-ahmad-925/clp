@@ -28,7 +28,7 @@ const initials = (name: string) =>
     .join('');
 
 type Props = {
-  section: 'experiences' | 'resources' | 'facilities';
+  section: 'experiences' | 'resources' | 'services' | 'facilities';
   /** The page's partner category: its CLP Partners are the cards (none yet: a note and "Become a Partner"), and "View
    *  All Partners" opens its partner listing, filtered to the partner types shown. No category: no band. */
   category?: string;
@@ -48,7 +48,10 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
     if (!category) return;
     let active = true;
     loadLivePartners().then((items) => {
-      if (active) setLive(items.filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport))));
+      if (!active) return;
+      const mine = items.filter((p) => p.partnerCategories.includes(category) && (!sport || p.sports.length === 0 || p.sports.includes(sport)));
+      // The ones CLP features on the category first (the admin's Partnerships page); the rest as they come.
+      setLive([...mine.filter((p) => p.featured?.includes(category)), ...mine.filter((p) => !p.featured?.includes(category))]);
     });
     return () => {
       active = false;
