@@ -241,6 +241,44 @@
   color: #111;
 }
 
+/* A card's foot (as the experiences card): the rating, then a full-width "View Partner". */
+.footerWide {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeeb;
+}
+
+.ctaWide {
+  justify-content: center;
+  height: 44px;
+  font-size: 15px;
+}
+
+/* List view: the photo on the left, 320px wide (the experiences row). */
+.list {
+  flex-direction: row;
+}
+
+.list .media {
+  flex: 0 0 320px;
+  aspect-ratio: 16 / 10;
+}
+
+@media (max-width: 767px) {
+  .list {
+    flex-direction: column;
+  }
+
+  .list .media {
+    flex: 0 0 auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
 /* The last card: becoming a partner (the original's "Your Brand Should Be Here"). */
 .join {
   display: flex;

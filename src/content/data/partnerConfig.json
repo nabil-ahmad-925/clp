@@ -225,14 +225,14 @@
     {
       "id": "seeding",
       "label": "Product seeding",
-      "review": false,
+      "review": true,
       "bg": "#E6F2E9",
       "fg": "#1E5B33"
     },
     {
       "id": "review",
       "label": "Product review",
-      "review": false,
+      "review": true,
       "bg": "#E8EEF7",
       "fg": "#1B4F8C"
     },
@@ -253,14 +253,14 @@
     {
       "id": "content",
       "label": "Content creation",
-      "review": false,
+      "review": true,
       "bg": "#E7F4F4",
       "fg": "#1D6363"
     },
     {
       "id": "events",
       "label": "Events & activations",
-      "review": false,
+      "review": true,
       "bg": "#FBE9E7",
       "fg": "#9A3324"
     }

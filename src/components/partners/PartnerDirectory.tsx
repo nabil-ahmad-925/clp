@@ -288,15 +288,26 @@ function Directory({ category, label }: { category: string; label: string }) {
   );
 }
 
-/** A partner's card (the listing card's design): their photo with their logo and the CLP Partner badge, then who they are. */
-function PartnerCard({ partner: p, eager, featured }: { partner: PartnerCardData; eager: boolean; featured: boolean }) {
+/**
+ * A partner's card (the listing card's design): their photo with their logo and the CLP Partner badge, then who they
+ * are. A card (grid) ends with the rating over a full-width "View Partner"; a row (list, photo on the left) with the
+ * rating and the button side by side, as the Experiences row.
+ */
+export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { partner: PartnerCardData; eager: boolean; featured: boolean; view?: 'grid' | 'list' }) {
   const type = partnerType(p.type);
   const color = p.color || type.color;
   return (
-    <Link href={partnerHref(p.slug)} className={`${c.card} ${featured ? c.cardFeatured : ''}`}>
+    <Link href={partnerHref(p.slug)} className={[c.card, featured && c.cardFeatured, view === 'list' && c.list].filter(Boolean).join(' ')}>
       <span className={c.media} style={{ background: color }}>
         {p.hero ? (
-          <Image className={c.image} src={p.hero} alt="" fill sizes="(max-width: 860px) 50vw, 300px" loading={eager ? 'eager' : 'lazy'} />
+          <Image
+            className={c.image}
+            src={p.hero}
+            alt=""
+            fill
+            sizes={view === 'list' ? '(max-width: 767px) 100vw, 320px' : '(max-width: 860px) 50vw, 300px'}
+            loading={eager ? 'eager' : 'lazy'}
+          />
         ) : (
           <span className={c.mono}>{p.mono}</span>
         )}
@@ -327,7 +338,7 @@ function PartnerCard({ partner: p, eager, featured }: { partner: PartnerCardData
             {p.sports.length > 3 && <span className={c.tag}>+{p.sports.length - 3}</span>}
           </span>
         )}
-        <span className={c.footer}>
+        <span className={view === 'list' ? c.footer : c.footerWide}>
           {p.rating != null && p.reviewCount > 0 ? (
             <span className={c.rating}>
               <LuStar aria-hidden /> {p.rating.toFixed(1)}{' '}
@@ -338,7 +349,7 @@ function PartnerCard({ partner: p, eager, featured }: { partner: PartnerCardData
           ) : (
             <span className={c.fresh}>New on CLP</span>
           )}
-          <span className={c.cta}>View Partner</span>
+          <span className={`${c.cta} ${view === 'list' ? '' : c.ctaWide}`}>View Partner</span>
         </span>
       </span>
     </Link>

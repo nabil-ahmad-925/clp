@@ -90,6 +90,12 @@
   flex: none;
 }
 
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .ages {
   align-self: flex-start;
   padding: 4px 8px;
@@ -270,10 +276,18 @@
   color: #111;
 }
 
-/* "From public info · Claim this listing" on community cards. */
+/* "From public info · Claim this listing" on community cards, centred under the card's button. */
 .claim {
+  align-self: center;
+  text-align: center;
   color: #888;
   font-size: 12px;
+}
+
+/* In a row (list view) it starts on the left, under the row's text. */
+.list .claim {
+  align-self: flex-start;
+  text-align: left;
 }
 
 /* Underlined, as the design's link. */

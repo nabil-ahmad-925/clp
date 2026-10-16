@@ -15,8 +15,9 @@ type Props = {
   /** Grid card (image on top) or list row (image on the left). */
   view: 'grid' | 'list';
   /**
-   * "listing": an Experiences or Resources card (price and "Learn More" side by side); "facility": the facilities'
-   * card (Volunteering & Open Play design: the price, a row of chips and a full-width "Learn More").
+   * "listing": an Experiences, Resources or Services listing (no price: "Contact for pricing"); "facility": a sport's
+   * facility (no price: none shown). Both are the facilities' card in grid view (Volunteering & Open Play design: the
+   * price, a row of chips and a full-width "Learn More") and the Experiences row in list view.
    */
   variant?: 'listing' | 'facility';
   onOpen: () => void;
@@ -80,9 +81,16 @@ function ProviderBadge({ provider }: { provider?: Provider }) {
 export default function ListingCard({ card, facts, view, variant = 'listing', onOpen, onBook, onClaim, fallbackImage, eager }: Props) {
   const [failed, setFailed] = useState(false);
   const src = (failed ? fallbackImage : card.image) || fallbackImage;
-  const facility = variant === 'facility';
-  // Facilities: the ages and the access options (Open Access, Members Only…), three at most.
+  const facility = view === 'grid';
+  // The ages and the access options (Open Access, Members Only…), three at most: chips on a card, pills on a row.
   const chips = [facts.ages, ...(facts.access ?? [])].filter((c): c is string => Boolean(c)).slice(0, 3);
+  const price = facts.price ? (
+    <>
+      {facts.price}
+      {facts.unit && <span className={styles.unit}> / {facts.unit}</span>}
+    </>
+  ) : undefined;
+  const noPrice = variant === 'listing' && <span className={styles.noPrice}>Contact for pricing</span>;
   // CLP's and its partners' listings are booked on CLP; the others' details link out.
   const book = Boolean(onBook) && (card.provider === 'partner' || card.provider === 'clp');
   const ctaLabel = book ? 'Book Now' : 'Learn More';
@@ -143,7 +151,7 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         )}
         {facility ? (
           <>
-            {facts.price && <span className={styles.bigPrice}>{facts.price}</span>}
+            {price ? <span className={styles.bigPrice}>{price}</span> : noPrice}
             <div className={styles.facilityFooter}>
               {chips.length > 0 && (
                 <span className={styles.chips}>
@@ -159,16 +167,17 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
           </>
         ) : (
           <>
-            {facts.ages && <span className={styles.ages}>{facts.ages}</span>}
+            {chips.length > 0 && (
+              <span className={styles.pills}>
+                {chips.map((p) => (
+                  <span key={p} className={styles.ages}>
+                    {p}
+                  </span>
+                ))}
+              </span>
+            )}
             <div className={styles.footer}>
-              {facts.price ? (
-                <span className={styles.price}>
-                  {facts.price}
-                  {facts.unit && <span className={styles.unit}> / {facts.unit}</span>}
-                </span>
-              ) : (
-                <span className={styles.noPrice}>Contact for pricing</span>
-              )}
+              {price ? <span className={styles.price}>{price}</span> : (noPrice || <span />)}
               {learnMore}
             </div>
           </>

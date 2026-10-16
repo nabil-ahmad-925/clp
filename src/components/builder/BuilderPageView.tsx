@@ -22,7 +22,7 @@ import styles from './BuilderPageView.module.css';
  * rows of columns, each holding blocks (text, spacers, directories, forms, galleries...).
  * An Experiences or Resources category (a listing page) has the new design's heading, search bar (on the heading's
  * edge, as on the other directories), results and "Run a program?" section around the same blocks; a sport's
- * facilities the same on white, ending with "Bring more people to the field" (Volunteering & Open Play design).
+ * facilities the same (on the same off-white page, with the same filters), ending with "Bring more people to the field".
  * A photo page (a sport's photos, or one of its albums) is the new design's photo experience (PhotoExplorer). A partner
  * category (/portfolio/<category>-partners/, its directory's preset) lists its CLP Partners in the listing design.
  */
@@ -82,7 +82,7 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
         ) : (
           <PageHero {...page.hero} compact={search} />
         ))}
-      <div className={`${styles.content} ${listing?.kind === 'listing' ? styles.listing : ''}`} data-header-tone="dark" data-listing={listing ? '' : undefined}>
+      <div className={`${styles.content} ${listing ? styles.listing : ''}`} data-header-tone="dark" data-listing={listing ? '' : undefined}>
         {!page.hero && <div className={styles.headerSpace} style={{ paddingTop: page.topSpacing }} aria-hidden />}
         {search && <DirectorySearchSlot />}
         {page.rows.map((row, i) => (

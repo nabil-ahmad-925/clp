@@ -1,0 +1,489 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { LuArrowUpDown, LuLayers, LuMapPin, LuSearch, LuShapes, LuVolleyball } from 'react-icons/lu';
+import { NO_SEARCH, fold, useSharedSearch, type Search } from '@/components/sections/DirectorySearch';
+import FilterChip from '@/components/ui/FilterChip';
+import { AppliedPill } from '@/components/ui/FilterPopover';
+import MobileFilters from '@/components/ui/MobileFilters';
+import PillSelect from '@/components/ui/PillSelect';
+import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
+import { PARTNER_CATEGORIES, PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, type PartnerCardData } from '@/content/partnerPages';
+import { partnerWays, partnershipsDisclaimer } from '@/content/partnerships';
+import t from '@/components/sections/TeamDirectory.module.css';
+import BecomePartner from './BecomePartner';
+import { PartnerCard } from './PartnerDirectory';
+import s from './partnerships.module.css';
+
+type Filters = { cats: string[]; types: string[]; sports: string[] };
+const NO_FILTERS: Filters = { cats: [], types: [], sports: [] };
+
+const catLabel = (id: string) => PARTNER_CATEGORIES.find((c) => c.id === id)?.label ?? id;
+const sportLabel = (id: string) => PARTNER_SPORTS.find((sp) => sp.id === id)?.label ?? id;
+
+/** A partner with no sports listed works with every sport. */
+const matches = (p: PartnerCardData, f: Filters, search: Search) => {
+  if (f.cats.length > 0 && !p.partnerCategories.some((c) => f.cats.includes(c))) return false;
+  if (f.types.length > 0 && !f.types.includes(p.type)) return false;
+  if (f.sports.length > 0 && p.sports.length > 0 && !p.sports.some((sp) => f.sports.includes(sp))) return false;
+  const text = fold([p.name, p.short, p.category, p.about, partnerType(p.type).label, ...p.partnerCategories.map(catLabel), ...p.sports.map(sportLabel)].join(' '));
+  if (
+    !fold(search.q)
+      .split(/\s+/)
+      .filter(Boolean)
+      .every((w) => text.includes(w))
+  )
+    return false;
+  return !search.loc || fold(p.area).includes(fold(search.loc));
+};
+
+const featuredAnywhere = (p: PartnerCardData) => (p.featured?.length ?? 0) > 0;
+const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
+const SORTS = [
+  { value: 'recommended', label: 'Recommended' },
+  { value: 'rating', label: 'Top rated' },
+  { value: 'az', label: 'A–Z' },
+] as const;
+type Sort = (typeof SORTS)[number]['value'];
+/** Recommended: CLP's featured partners first, then top rated. */
+const ORDER: Record<Sort, (a: PartnerCardData, b: PartnerCardData) => number> = {
+  recommended: (a, b) => Number(featuredAnywhere(b)) - Number(featuredAnywhere(a)) || byRating(a, b),
+  rating: byRating,
+  az: (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }),
+};
+
+/** How many featured partners the dark band shows. */
+const FEATURED_SHOWN = 3;
+
+/**
+ * The Partnerships page (/partnerships/, the "Partnerships · category directory" design): under the heading and its
+ * search bar, the filters, then the partner categories (each opening its listing, /portfolio/<category>-partners/)
+ * and CLP's featured partners. A search, a filter or "View All Partners" shows the matching partners instead, as cards or
+ * rows. Then the ways to partner with CLP and the gold "Want your page on CLP?" band.
+ */
+export default function PartnershipsView() {
+  const shared = useSharedSearch();
+  const search = shared?.search ?? NO_SEARCH;
+  const [items, setItems] = useState<PartnerCardData[] | null>(null);
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [all, setAll] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
+  const [sort, setSort] = useState<Sort>('recommended');
+  const [view, setView] = useState<ResultsView>('grid');
+  const results = useRef<HTMLDivElement>(null);
+  const toResults = () => setTimeout(() => results.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+
+  const setPlaces = shared?.setPlaces;
+  useEffect(() => {
+    let active = true;
+    loadLivePartners().then((list) => {
+      if (!active) return;
+      setItems(list);
+      // The location field suggests the partners' areas.
+      const areas = new Map<string, number>();
+      list.forEach((p) => p.area && areas.set(p.area, (areas.get(p.area) ?? 0) + 1));
+      setPlaces?.([...areas].map(([value, count]) => ({ value, label: value, count })));
+    });
+    return () => {
+      active = false;
+    };
+  }, [setPlaces]);
+
+  // The bar under the heading searches here, and brings the results into view.
+  const register = shared?.register;
+  const setSearch = shared?.setSearch;
+  useEffect(
+    () =>
+      register?.((next) => {
+        setSearch?.(next);
+        toResults();
+      }),
+    [register, setSearch],
+  );
+
+  const list = items ?? [];
+  const count = (f: Filters) => list.filter((p) => matches(p, f, search)).length;
+  const shown = list.filter((p) => matches(p, filters, search)).sort(ORDER[sort]);
+  const anyChosen = filters.cats.length + filters.types.length + filters.sports.length > 0 || Boolean(search.q || search.loc);
+  const listing = anyChosen || all;
+  const apply = (next: Filters) => {
+    setFilters(next);
+    setOpen(null);
+  };
+  const clearAll = () => {
+    setFilters(NO_FILTERS);
+    setAll(false);
+    if (search.q || search.loc) setSearch?.(NO_SEARCH);
+  };
+
+  const catOptions = PARTNER_CATEGORIES.map((c) => ({ value: c.id, label: c.label, count: items ? count({ ...filters, cats: [c.id] }) : undefined }));
+  const typeOptions = PARTNER_TYPES.filter((ty) => list.some((p) => p.type === ty.id) || filters.types.includes(ty.id)).map((ty) => ({
+    value: ty.id,
+    label: ty.label,
+    count: count({ ...filters, types: [ty.id] }),
+  }));
+  const sportOptions = PARTNER_SPORTS.map((sp) => ({ value: sp.id, label: sp.label, count: items ? count({ ...filters, sports: [sp.id] }) : undefined }));
+
+  const where = filters.cats.length === 1 ? `in ${catLabel(filters.cats[0])}` : filters.cats.length > 1 ? `in ${filters.cats.length} categories` : 'across all categories';
+  const summary = !items ? (
+    <>Loading partners…</>
+  ) : listing ? (
+    <>
+      <strong>
+        {shown.length} {shown.length === 1 ? 'result' : 'results'}
+      </strong>{' '}
+      {where}
+      {search.loc ? ` near ${search.loc}` : ''}
+    </>
+  ) : (
+    <>
+      <strong>
+        {list.length} {list.length === 1 ? 'partner' : 'partners'}
+      </strong>{' '}
+      in {PARTNER_CATEGORIES.length} categories · search or filter to see a list
+    </>
+  );
+
+  return (
+    <div className={s.page} data-listing="">
+      <section className={s.wrap} ref={results}>
+        <div className={`${t.bar} ${s.bar}`}>
+          <div className={t.barRow}>
+            <div className={`${t.filters} ${items ? '' : t.busy}`} inert={!items}>
+              <FilterChip
+                name="All categories"
+                heading="Category"
+                icon={<LuLayers />}
+                plural="categories"
+                options={catOptions}
+                value={filters.cats}
+                open={open === 'cat'}
+                onOpenChange={(o) => setOpen(o ? 'cat' : null)}
+                resultsFor={(draft) => count({ ...filters, cats: draft })}
+                onApply={(cats) => apply({ ...filters, cats })}
+              />
+              {typeOptions.length > 0 && (
+                <FilterChip
+                  name="Any partner type"
+                  heading="Partner Type"
+                  icon={<LuShapes />}
+                  plural="types"
+                  options={typeOptions}
+                  value={filters.types}
+                  open={open === 'type'}
+                  onOpenChange={(o) => setOpen(o ? 'type' : null)}
+                  resultsFor={(draft) => count({ ...filters, types: draft })}
+                  onApply={(types) => apply({ ...filters, types })}
+                />
+              )}
+              <FilterChip
+                name="Sport"
+                icon={<LuVolleyball />}
+                plural="sports"
+                options={sportOptions}
+                value={filters.sports}
+                open={open === 'sport'}
+                onOpenChange={(o) => setOpen(o ? 'sport' : null)}
+                resultsFor={(draft) => count({ ...filters, sports: draft })}
+                onApply={(sports) => apply({ ...filters, sports })}
+              />
+              {search.q && <AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => setSearch?.({ ...search, q: '' })} />}
+              {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => setSearch?.({ ...search, loc: '' })} />}
+              {listing && (
+                <button type="button" className={t.clearAll} onClick={clearAll}>
+                  Clear
+                </button>
+              )}
+            </div>
+            <div className={t.mobileFilters}>
+              <MobileFilters
+                sections={[
+                  { id: 'cat', heading: 'Category', options: catOptions, value: filters.cats },
+                  ...(typeOptions.length > 0 ? [{ id: 'type', heading: 'Partner Type', options: typeOptions, value: filters.types }] : []),
+                  { id: 'sport', heading: 'Sport', options: sportOptions, value: filters.sports },
+                ]}
+                applied={[filters.cats, filters.types, filters.sports].filter((v) => v.length > 0).length}
+                sort={{ value: sort, options: SORTS }}
+                countFor={(draft) => count({ cats: draft.cat ?? [], types: draft.type ?? [], sports: draft.sport ?? [] })}
+                onApply={(draft, nextSort) => {
+                  apply({ cats: draft.cat ?? [], types: draft.type ?? [], sports: draft.sport ?? [] });
+                  if (nextSort) setSort(nextSort as Sort);
+                }}
+              />
+            </div>
+            <div className={t.sortSlot}>
+              <span className={t.sortDesktop}>
+                <PillSelect value={sort} options={SORTS} onChange={setSort} label="Sort partners" icon={<LuArrowUpDown />} />
+              </span>
+              <ViewToggle value={view} onChange={setView} />
+            </div>
+          </div>
+        </div>
+        <div className={s.summary} role="status">
+          {summary}
+        </div>
+      </section>
+
+      {listing ? (
+        <section className={`${s.wrap} ${s.results}`}>
+          {!items ? (
+            <div className={view === 'list' ? t.listingList : t.listingGrid} aria-hidden>
+              {Array.from({ length: view === 'list' ? 4 : 8 }, (_, i) => (
+                <div key={i} className={`${t.skeleton} ${view === 'list' ? t.listingSkeletonRow : t.listingSkeleton}`} />
+              ))}
+            </div>
+          ) : shown.length === 0 ? (
+            <Empty category={filters.cats.length === 1 && !list.some((p) => p.partnerCategories.includes(filters.cats[0])) ? catLabel(filters.cats[0]) : undefined} onClear={clearAll} />
+          ) : (
+            // The partners' cards (or rows) as on the categories' listings and the experiences.
+            <div key={view} className={view === 'list' ? t.listingList : t.listingGrid}>
+              {shown.map((p, i) => (
+                <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={featuredAnywhere(p)} view={view} />
+              ))}
+            </div>
+          )}
+          <p className={s.disclaimer}>{partnershipsDisclaimer}</p>
+        </section>
+      ) : (
+        <>
+          <CategoryDirectory items={items} />
+          <FeaturedBand
+            items={list.filter(featuredAnywhere).sort(byRating).slice(0, FEATURED_SHOWN)}
+            onViewAll={() => {
+              setAll(true);
+              toResults();
+            }}
+          />
+        </>
+      )}
+
+      <WaysToPartner />
+
+      <section className={s.goldWrap} data-header-tone="dark">
+        <div className={s.gold}>
+          <h2 className={s.goldTitle}>Want your page on CLP?</h2>
+          <span className={s.goldText}>One short application for clubs, coaches, facilities, brands, athletes and organizations. We reply within 3 business days.</span>
+          <div className={s.goldActions}>
+            <BecomePartner className={s.btnDark}>Apply to be a partner</BecomePartner>
+            <Link href="/faq/partnerships/" className={s.btnOutline}>
+              Partnership FAQ
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/** A partner's logo tile: their logo, else their initials on their colour. */
+function Logo({ partner: p, className }: { partner: PartnerCardData; className: string }) {
+  return (
+    <span className={className} style={{ background: p.color || partnerType(p.type).color }} title={p.name}>
+      {p.logo ? <Image src={p.logo} alt="" width={96} height={96} /> : p.mono}
+    </span>
+  );
+}
+
+/** The partner's photo (their colour while they have none). */
+function Photo({ partner: p, eager, sizes }: { partner: PartnerCardData; eager: boolean; sizes: string }) {
+  return p.hero ? (
+    <Image className={s.photo} src={p.hero} alt="" fill sizes={sizes} loading={eager ? 'eager' : 'lazy'} />
+  ) : (
+    <span className={s.photoBlank} style={{ background: p.color || partnerType(p.type).color }} />
+  );
+}
+
+function Empty({ category, onClear }: { category?: string; onClear: () => void }) {
+  return (
+    <div className={s.empty} role="status">
+      <strong className={s.emptyTitle}>{category ? `No ${category} partners yet` : 'No partners match'}</strong>
+      <span className={s.emptyText}>
+        {category
+          ? `This category is open. If you work in ${category.toLowerCase()}, apply and your page could be the first one here.`
+          : 'Try another city or fewer filters.'}
+      </span>
+      <div className={s.emptyActions}>
+        <BecomePartner className={s.btnDark}>Apply to be a partner</BecomePartner>
+        <button type="button" className={s.btnLight} onClick={onClear}>
+          See all partners
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** "Browse partners by category": each category, its partners' logos and count, opening its listing. */
+function CategoryDirectory({ items }: { items: PartnerCardData[] | null }) {
+  return (
+    <section className={`${s.wrap} ${s.directory}`}>
+      <div className={s.head}>
+        <h2 className={s.headTitle}>Browse partners by category</h2>
+        <span className={s.headText}>Tap a category to see every partner in it.</span>
+      </div>
+      <div className={s.cats}>
+        {PARTNER_CATEGORIES.map((c) => {
+          const mine = items?.filter((p) => p.partnerCategories.includes(c.id)) ?? [];
+          const n = mine.length;
+          return (
+            <Link key={c.id} href={c.href} className={s.cat}>
+              <span className={s.catText}>
+                <strong className={s.catName}>{c.label}</strong>
+                <span className={s.catBlurb}>{c.blurb}</span>
+              </span>
+              <span className={s.catFoot}>
+                <span className={s.catWho}>
+                  {items &&
+                    (n > 0 ? (
+                      <>
+                        <span className={s.faces}>
+                          {mine.slice(0, 3).map((p) => (
+                            <Logo key={p.slug} partner={p} className={s.face} />
+                          ))}
+                        </span>
+                        <span className={s.catCount}>
+                          {n} {n === 1 ? 'partner' : 'partners'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className={s.faceOpen} aria-hidden>
+                          +
+                        </span>
+                        <span className={`${s.catCount} ${s.catCountOpen}`}>Open for partners</span>
+                      </>
+                    ))}
+                </span>
+                <span className={s.catGo}>{items && n === 0 ? 'Be the first →' : 'View all →'}</span>
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/** "Hand-picked by CLP": the partners CLP features (the admin's Partnerships page), on black. */
+function FeaturedBand({ items, onViewAll }: { items: PartnerCardData[]; onViewAll: () => void }) {
+  if (items.length === 0) return null;
+  return (
+    <section className={s.featured} data-header-tone="light">
+      <div className={s.featuredInner}>
+        <div className={s.head}>
+          <span className={s.eyebrow}>FEATURED PARTNERS</span>
+          <h2 className={s.featuredTitle}>Hand-picked by CLP</h2>
+          <span className={s.featuredText}>Partners our team recommends this month.</span>
+        </div>
+        <div className={s.featuredGrid} style={{ '--n': items.length } as CSSProperties}>
+          {items.map((p, i) => (
+            <Link key={p.slug} href={partnerHref(p.slug)} className={s.fcard} aria-label={`View ${p.name}`}>
+              <span className={s.fmedia}>
+                <Photo partner={p} eager={i === 0} sizes="(max-width: 999px) 100vw, 440px" />
+              </span>
+              <span className={s.fbody}>
+                <Logo partner={p} className={s.flogo} />
+                <strong className={s.fname}>{p.name}</strong>
+                <span className={s.fline}>{[p.category || partnerType(p.type).label, p.area].filter(Boolean).join(' · ')}</span>
+                {p.rating != null && p.reviewCount > 0 && (
+                  <span className={s.frating}>
+                    ★ {p.rating.toFixed(1)} · {p.reviewCount} {p.reviewCount === 1 ? 'review' : 'reviews'}
+                  </span>
+                )}
+                <span className={s.fgo}>
+                  <span>View Partner</span>
+                  <span className={s.farrow} aria-hidden>
+                    →
+                  </span>
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+        <button type="button" className={s.viewAll} onClick={onViewAll}>
+          View All Partners
+        </button>
+      </div>
+    </section>
+  );
+}
+
+/** "Ways to partner with CLP": who you are (the switch), its questions (one open at a time) and what you get. */
+function WaysToPartner() {
+  const [way, setWay] = useState(partnerWays[2].id);
+  const [openQ, setOpenQ] = useState(0);
+  const current = partnerWays.find((w) => w.id === way) ?? partnerWays[0];
+  return (
+    <section className={s.ways}>
+      <div className={s.head}>
+        <span className={s.eyebrowDeep}>BECOME A PARTNER</span>
+        <h2 className={s.headTitle}>Ways to partner with CLP</h2>
+        <span className={s.headText}>Pick what fits you. Every partner gets a page, bookings, a store and support from our team.</span>
+      </div>
+      <div className={s.switch} role="group" aria-label="Partner type">
+        {partnerWays.map((w) => (
+          <button
+            key={w.id}
+            type="button"
+            className={`${s.switchBtn} ${w.id === way ? s.switchOn : ''}`}
+            aria-pressed={w.id === way}
+            onClick={() => {
+              setWay(w.id);
+              setOpenQ(0);
+            }}
+          >
+            {w.label}
+          </button>
+        ))}
+      </div>
+      <div className={s.waysBody}>
+        <div className={s.qs}>
+          {current.questions.map((x, i) => (
+            <div key={x.q} className={s.q}>
+              <button type="button" className={s.qBtn} aria-expanded={i === openQ} onClick={() => setOpenQ(i === openQ ? -1 : i)}>
+                <span className={s.qText}>{x.q}</span>
+                <span className={s.qSign} aria-hidden>
+                  {i === openQ ? '−' : '+'}
+                </span>
+              </button>
+              {i === openQ && <div className={s.qAnswer}>{x.a}</div>}
+            </div>
+          ))}
+        </div>
+        <div className={s.perks}>
+          <span className={s.perksTitle}>WHAT YOU GET</span>
+          {current.perks.map((k) => (
+            <span key={k} className={s.perk}>
+              <span className={s.check} aria-hidden>
+                ✓
+              </span>
+              {k}
+            </span>
+          ))}
+          <BecomePartner className={`${s.btnDark} ${s.perksCta}`} type={current.partnerType}>
+            {current.cta}&nbsp;→
+          </BecomePartner>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The heading's line under the blurb: "8 partners · 12 categories" (the categories alone while the partners load). */
+export function PartnershipsMeta({ className }: { className?: string }) {
+  const [n, setN] = useState<number | null>(null);
+  useEffect(() => {
+    let active = true;
+    loadLivePartners().then((list) => active && setN(list.length));
+    return () => {
+      active = false;
+    };
+  }, []);
+  return (
+    <span className={className}>
+      {n ? `${n} ${n === 1 ? 'partner' : 'partners'} · ` : ''}
+      {PARTNER_CATEGORIES.length} categories
+    </span>
+  );
+}
