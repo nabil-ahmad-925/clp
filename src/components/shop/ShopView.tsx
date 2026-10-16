@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } 
 import { createPortal } from 'react-dom';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
 import Pager from '@/components/ui/Pager';
+import PillSelect from '@/components/ui/PillSelect';
+import { LuArrowUpDown } from 'react-icons/lu';
 import { BULK_CATEGORIES } from '@/content/bulk';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, money, removeLine, setLineQty, type Cart } from '@/content/cart';
 import { partnerHref, partnerType } from '@/content/partnerPages';
@@ -41,7 +43,7 @@ import {
 } from '@/content/storefront';
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
-import { Arrow, CategoryIcon, Chevron, LockIcon, SearchIcon, SortIcon } from './shopIcons';
+import { Arrow, CategoryIcon, Chevron, LockIcon, SearchIcon } from './shopIcons';
 import s from './shop.module.css';
 
 type Sort = 'featured' | 'newest' | 'price-asc' | 'price-desc';
@@ -414,18 +416,13 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
         <form className={s.search} role="search" onSubmit={search}>
           <input className={s.searchInput} value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search the shop" placeholder="Search products, athletes, clubs, schools…" />
           <span className={s.searchRule} aria-hidden />
-          <span className={s.searchSelect}>
-            <select value={group} onChange={(e) => setGroup(e.target.value)} aria-label="Store type">
-              <option value="">All stores</option>
-              {SHOP_GROUPS.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.label}
-                </option>
-              ))}
-              <option value="exclusives">CLP Exclusives</option>
-            </select>
-            <Chevron className={s.chevron} color="#666666" />
-          </span>
+          <PillSelect
+            className={s.searchPick}
+            label="Store type"
+            value={group}
+            options={[{ value: '', label: 'All stores' }, ...SHOP_GROUPS.map((g) => ({ value: g.id, label: g.label })), { value: 'exclusives', label: 'CLP Exclusives' }]}
+            onChange={setGroup}
+          />
           <button type="submit" className={s.searchBtn} aria-label="Search">
             <SearchIcon />
           </button>
@@ -569,6 +566,7 @@ function Directory({ data, group, go }: { data: ShopData; group: string; go: (hr
           </div>
         </div>
       </section>
+      <div className={s.listingBand} data-listing="">
       <section className={`${s.section} ${s.list}`}>
         <span className={s.count}>
           <strong>{countLabel(stores.length, 'store')}</strong>
@@ -602,6 +600,7 @@ function Directory({ data, group, go }: { data: ShopData; group: string; go: (hr
           </div>
         )}
       </section>
+      </div>
       <div className={s.bottomSpace} />
     </>
   );
@@ -645,6 +644,7 @@ function Products({ products, stores, head = '', title, id }: { products: ShopPr
   };
 
   return (
+    <div className={s.listingBand} data-listing="">
     <section ref={topRef} id={id} className={`${s.section} ${s.products} ${title ? s.productsHome : ''}`}>
       {title}
       <div className={s.toolbar}>
@@ -663,19 +663,7 @@ function Products({ products, stores, head = '', title, id }: { products: ShopPr
             </strong>{' '}
             {shown.length === 1 ? 'product' : 'products'}
           </span>
-          <span className={s.sort}>
-            <span className={s.sortIcon}>
-              <SortIcon />
-            </span>
-            <select value={sort} onChange={(e) => change({ sort: e.target.value as Sort })} aria-label="Sort">
-              {SORTS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <Chevron className={s.chevron} color="#666666" />
-          </span>
+          <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={SORTS} onChange={(v) => change({ sort: v })} />
         </div>
       </div>
       {shown.length === 0 ? (
@@ -700,6 +688,7 @@ function Products({ products, stores, head = '', title, id }: { products: ShopPr
         </>
       )}
     </section>
+    </div>
   );
 }
 

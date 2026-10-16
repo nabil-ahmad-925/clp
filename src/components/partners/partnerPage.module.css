@@ -500,7 +500,7 @@
 
 .main {
   padding: 48px 0 96px;
-  background: #f7f6f2;
+  background: #f7f6f3;
 }
 
 /* ---- Shared blocks ---- */
@@ -563,45 +563,8 @@
 .listTools {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 14px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #888;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1.8px;
-}
-
-.field input,
-.field select,
-.newsTools input,
-.newsTools select {
-  box-sizing: border-box;
-  height: 52px;
-  padding: 0 14px;
-  border: 1px solid #d9d7d2;
-  border-radius: 8px;
-  background: #fff;
-  color: #111;
-  font: inherit;
-  font-size: 15px;
-  letter-spacing: 0;
-}
-
-.field input {
-  width: 240px;
-}
-
-.field select,
-.newsTools select {
-  min-width: 170px;
-  font-weight: 700;
-  cursor: pointer;
+  align-items: center;
+  gap: 10px;
 }
 
 .tags {
@@ -706,14 +669,14 @@
 .viewToggle {
   display: flex;
   overflow: hidden;
-  border: 1px solid #d9d7d2;
-  border-radius: 10px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
   background: #fff;
 }
 
 .viewToggle button {
   height: 42px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: 0;
   background: #fff;
   color: #111;
@@ -723,18 +686,8 @@
   cursor: pointer;
 }
 
-.listTools .viewToggle {
-  height: 52px;
-  border-radius: 8px;
-}
-
-.listTools .viewToggle button {
-  height: 50px;
-  padding: 0 16px;
-  font-size: 14px;
-}
-
 .viewToggle .viewOn {
+  border-radius: 22px;
   background: #111;
   color: #fff;
 }
@@ -1081,39 +1034,45 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 14px;
-  border: 1px solid #e7e5e0;
-  border-radius: 14px;
-  background: #fff;
 }
 
-.filterSearch {
+/* A filter bar's search: the listings' 44px white pill with a magnifier. */
+.searchPill {
   box-sizing: border-box;
-  flex: 1 1 220px;
+  display: inline-flex;
+  flex: 1 1 240px;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
+  max-width: 360px;
   height: 44px;
-  padding: 0 14px;
-  border: 1px solid #d9d7d2;
-  border-radius: 10px;
-  font: inherit;
-  font-size: 14px;
+  padding: 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
+  background: #fff;
+  color: #666;
 }
 
-.filterSelect {
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #d9d7d2;
-  border-radius: 10px;
-  background: #fff;
+.searchPill:focus-within {
+  border-color: #111;
+}
+
+.searchPill svg {
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.searchPill input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
   color: #111;
   font: inherit;
   font-size: 14px;
-  cursor: pointer;
-}
-
-.filterOn {
-  border-color: var(--accent);
-  font-weight: 700;
 }
 
 .filterBar .textLink {
@@ -1793,17 +1752,6 @@ a.collab:hover .collabImage img {
   gap: 12px;
 }
 
-.sortSelect {
-  height: 42px;
-  padding: 0 12px;
-  border: 1px solid #d9d7d2;
-  border-radius: 10px;
-  background: #fff;
-  font: inherit;
-  font-size: 14px;
-  cursor: pointer;
-}
-
 .productGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2228,8 +2176,8 @@ a.collab:hover .collabImage img {
   gap: 14px;
 }
 
-.newsTools input {
-  flex: 1 1 260px;
+.newsTools .searchPill {
+  max-width: none;
 }
 
 .post {
@@ -2858,15 +2806,13 @@ a.collab:hover .collabImage img {
     font-size: 30px;
   }
 
-  .field input,
-  .field select {
+  .listTools {
     width: 100%;
-    min-width: 0;
   }
 
-  .listTools,
-  .field {
-    width: 100%;
+  .searchPill {
+    flex-basis: 100%;
+    max-width: none;
   }
 
   .storeBanner img {
@@ -2909,10 +2855,6 @@ a.collab:hover .collabImage img {
 
   .filterBar .viewToggle {
     margin-left: 0;
-  }
-
-  .filterSelect {
-    flex: 1 1 140px;
   }
 
   .expFoot {

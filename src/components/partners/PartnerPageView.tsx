@@ -8,6 +8,9 @@ import BookingModal from '@/components/sections/BookingModal';
 import BioModal from '@/components/sections/BioModal';
 import type { RowFacts } from '@/components/sections/DirectoryRow';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
+import FieldSelect from '@/components/ui/FieldSelect';
+import PillSelect from '@/components/ui/PillSelect';
+import { LuArrowUpDown, LuSearch } from 'react-icons/lu';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
@@ -362,7 +365,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           </div>
         </nav>
 
-        <main className={s.main} data-header-tone="dark">
+        <main className={s.main} data-header-tone="dark" data-listing="">
           <div className={s.wrap}>
             {shown === 'about' && <About page={page} experiences={exps} onOpen={open} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} />}
             {shown === 'content' && <Content page={page} onPhoto={setPhoto} onVideo={setVideo} />}
@@ -750,14 +753,7 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
   const any = Object.values(f).some(Boolean);
   const select = (key: keyof ExpFilters, label: string, options: [string, string][]) =>
     options.length > 0 && (
-      <select aria-label={label} className={`${s.filterSelect} ${f[key] ? s.filterOn : ''}`} value={f[key]} onChange={(e) => setF({ ...f, [key]: e.target.value })}>
-        <option value="">{label}</option>
-        {options.map(([v, l]) => (
-          <option key={v} value={v}>
-            {l}
-          </option>
-        ))}
-      </select>
+      <PillSelect variant="filter" label={label} value={f[key]} options={[{ value: '', label }, ...options.map(([value, l]) => ({ value, label: l }))]} onChange={(v) => setF({ ...f, [key]: v })} />
     );
   const badge = (l: Experience) => (l.cornerTag ? cornerTagLabel(l.cornerTag).toUpperCase() : '✓ CLP PARTNER');
   const unit = (l: Experience) => (l.priceUnit && priceOf(l) !== 'Free' ? `/ ${unitLabel(l.priceUnit)}` : '');
@@ -774,7 +770,7 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
 
       {exps.length > 0 && (
         <div className={s.filterBar}>
-          <input type="search" className={s.filterSearch} aria-label="Search experiences" placeholder={`Search ${page.short} experiences`} value={f.q} onChange={(e) => setF({ ...f, q: e.target.value })} />
+          <SearchPill label="Search experiences" placeholder={`Search ${page.short} experiences`} value={f.q} onChange={(q) => setF({ ...f, q })} />
           {select(
             'type',
             'All types',
@@ -907,6 +903,23 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
   );
 }
 
+/** A list's sorts: newest first (the default), oldest first, A to Z. */
+const NEWEST_FIRST = [
+  { value: 'new', label: 'Newest' },
+  { value: 'old', label: 'Oldest' },
+  { value: 'az', label: 'A–Z' },
+];
+
+/** A filter bar's search (the listings' pill, a magnifier in it). */
+function SearchPill({ label, placeholder, value, onChange }: { label: string; placeholder: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <span className={s.searchPill}>
+      <LuSearch aria-hidden />
+      <input type="search" aria-label={label} placeholder={placeholder} value={value} maxLength={80} onChange={(e) => onChange(e.target.value)} />
+    </span>
+  );
+}
+
 function ViewToggle({ view, onView }: { view: 'list' | 'grid'; onView: (v: 'list' | 'grid') => void }) {
   return (
     <span className={s.viewToggle} role="group" aria-label="View">
@@ -951,34 +964,15 @@ function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOp
           <span className={s.mutedText}>Work with {page.short}. Every role is also on CLP Jobs &amp; Internships.</span>
         </div>
         <div className={s.listTools}>
-          <label className={s.field}>
-            SEARCH
-            <input type="search" placeholder="Role or keyword" value={q} onChange={(e) => setQ(e.target.value)} />
-          </label>
-          <label className={s.field}>
-            TYPE
-            <select value={kind} onChange={(e) => setKind(e.target.value)}>
-              <option value="">All types ({jobs.length})</option>
-              {kinds.map((k) => (
-                <option key={k} value={k}>
-                  {jobTypeLabel(k)} ({jobs.filter((j) => j.type === k).length})
-                </option>
-              ))}
-            </select>
-          </label>
-          {places.length > 1 && (
-            <label className={s.field}>
-              LOCATION
-              <select value={loc} onChange={(e) => setLoc(e.target.value)}>
-                <option value="">All locations</option>
-                {places.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <SearchPill label="Search roles" placeholder="Role or keyword" value={q} onChange={setQ} />
+          <PillSelect
+            variant="filter"
+            label="Type"
+            value={kind}
+            options={[{ value: '', label: `All types (${jobs.length})` }, ...kinds.map((k) => ({ value: k, label: `${jobTypeLabel(k)} (${jobs.filter((j) => j.type === k).length})` }))]}
+            onChange={setKind}
+          />
+          {places.length > 1 && <PillSelect variant="filter" label="Location" value={loc} options={[{ value: '', label: 'All locations' }, ...places.map((p) => ({ value: p, label: p }))]} onChange={setLoc} />}
           <ViewToggle view={view} onView={setView} />
         </div>
       </div>
@@ -1144,29 +1138,15 @@ function Partnerships({ page, collabs, onWork }: { page: PartnerPageData; collab
           </button>
         </div>
         <div className={s.listTools}>
-          <label className={s.field}>
-            SEARCH
-            <input type="search" placeholder="Brand, title or dates" value={q} onChange={(e) => setQ(e.target.value)} />
-          </label>
-          <label className={s.field}>
-            CATEGORY
-            <select value={cat} onChange={(e) => setCat(e.target.value)}>
-              <option value="">All categories ({collabs.length})</option>
-              {cats.map((c) => (
-                <option key={c} value={c}>
-                  {collabLabel(c)} ({collabs.filter((x) => x.type === c).length})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={s.field}>
-            SORT
-            <select value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="new">Newest</option>
-              <option value="old">Oldest</option>
-              <option value="az">A–Z</option>
-            </select>
-          </label>
+          <SearchPill label="Search partnerships" placeholder="Brand, title or dates" value={q} onChange={setQ} />
+          <PillSelect
+            variant="filter"
+            label="Category"
+            value={cat}
+            options={[{ value: '', label: `All categories (${collabs.length})` }, ...cats.map((c) => ({ value: c, label: `${collabLabel(c)} (${collabs.filter((x) => x.type === c).length})` }))]}
+            onChange={setCat}
+          />
+          <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={NEWEST_FIRST} onChange={setSort} />
         </div>
       </div>
       {shown.length ? (
@@ -1316,13 +1296,7 @@ function Shop({ page, products, onOpen }: { page: PartnerPageData; products: Par
             </button>
           ))}
         </div>
-        <select aria-label="Sort" className={s.sortSelect} value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-          {SORTS.map(([id, label]) => (
-            <option key={id} value={id}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={SORTS.map(([value, label]) => ({ value, label }))} onChange={setSort} />
       </div>
       <div className={s.productGrid}>
         {shown.map((p) => (
@@ -1567,21 +1541,9 @@ function News({ page, posts }: { page: PartnerPageData; posts: Post[] }) {
             </div>
           </div>
           <div className={s.newsTools}>
-            <input type="search" aria-label="Search updates" placeholder="Search updates and news" value={q} onChange={(e) => setQ(e.target.value)} />
-            {years.length > 1 && (
-              <select aria-label="Year" value={year} onChange={(e) => setYear(e.target.value)}>
-                <option value="">Any year</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
-            )}
-            <select aria-label="Sort" value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="new">Newest</option>
-              <option value="old">Oldest</option>
-            </select>
+            <SearchPill label="Search updates" placeholder="Search updates and news" value={q} onChange={setQ} />
+            {years.length > 1 && <PillSelect variant="filter" label="Year" value={year} options={[{ value: '', label: 'Any year' }, ...years.map((y) => ({ value: y, label: y }))]} onChange={setYear} />}
+            <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={NEWEST_FIRST.slice(0, 2)} onChange={setSort} />
           </div>
           {shown.length ? (
             <div className={s.grid3} style={{ gap: 28 }}>
@@ -1823,14 +1785,10 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
               : `Ask about a session before you book. Already booked? Reply to your booking e-mail so ${page.short} has the details.`}
           </span>
           {intro && (
-            <label className={s.formField}>
+            <div className={s.formField}>
               What kind of partner are you?
-              <select value={form.partnerKind} onChange={set('partnerKind')}>
-                {PARTNER_KINDS.map((k) => (
-                  <option key={k}>{k}</option>
-                ))}
-              </select>
-            </label>
+              <FieldSelect label="What kind of partner are you?" value={form.partnerKind} options={PARTNER_KINDS.map((k) => ({ value: k, label: k }))} onChange={(partnerKind) => setForm({ ...form, partnerKind })} />
+            </div>
           )}
           <div className={s.twoCols}>
             <label className={s.formField}>

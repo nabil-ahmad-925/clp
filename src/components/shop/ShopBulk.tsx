@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import BecomePartner from '@/components/partners/BecomePartner';
+import PillSelect from '@/components/ui/PillSelect';
 import {
   BULK_CATEGORIES,
   BULK_ITEMS,
@@ -29,7 +30,7 @@ import { partnerSignOut, uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
-import { Chevron, LockIcon, SearchIcon } from './shopIcons';
+import { LockIcon, SearchIcon } from './shopIcons';
 import { useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
@@ -177,17 +178,7 @@ export default function ShopBulk() {
         <form className={s.search} role="search" onSubmit={(e) => e.preventDefault()}>
           <input className={s.searchInput} type="search" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search bulk items" placeholder="Search jerseys, socks, tents, medals…" />
           <span className={s.searchRule} aria-hidden />
-          <span className={s.searchSelect}>
-            <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Category">
-              <option value="">All categories</option>
-              {BULK_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-            <Chevron className={s.chevron} color="#666666" />
-          </span>
+          <PillSelect className={s.searchPick} label="Category" value={cat} options={[{ value: '', label: 'All categories' }, ...BULK_CATEGORIES.map((c) => ({ value: c.id, label: c.label }))]} onChange={setCat} />
           <button type="submit" className={s.searchBtn} aria-label="Search">
             <SearchIcon />
           </button>
@@ -195,22 +186,16 @@ export default function ShopBulk() {
 
         <div className={b.toolbar}>
           <div className={b.filters}>
-            {(Object.keys(FILTERS) as FilterKey[]).map((key) => {
-              const on = Boolean(filters[key]);
-              return (
-                <span key={key} className={b.pillSelect}>
-                  <select className={on ? b.pillOn : undefined} value={filters[key]} onChange={(e) => setFilters({ ...filters, [key]: e.target.value })} aria-label={FILTERS[key].label}>
-                    <option value="">{FILTERS[key].label}</option>
-                    {FILTERS[key].options.map(([v, l]) => (
-                      <option key={v} value={v}>
-                        {l}
-                      </option>
-                    ))}
-                  </select>
-                  <Chevron className={b.pillChevron} color={on ? '#FFFFFF' : '#666666'} />
-                </span>
-              );
-            })}
+            {(Object.keys(FILTERS) as FilterKey[]).map((key) => (
+              <PillSelect
+                key={key}
+                variant="filter"
+                label={FILTERS[key].label}
+                value={filters[key]}
+                options={[{ value: '', label: FILTERS[key].label }, ...FILTERS[key].options.map(([value, label]) => ({ value, label }))]}
+                onChange={(v) => setFilters({ ...filters, [key]: v })}
+              />
+            ))}
             {any && (
               <button type="button" className={b.clear} onClick={clear}>
                 Clear

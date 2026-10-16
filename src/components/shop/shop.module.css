@@ -2648,3 +2648,40 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---- Listings: the off-white band behind the product lists and the store directory (the Experiences listings'), and
+   the custom drop-downs (PillSelect) in the search bars ---- */
+.listingBand {
+  padding-bottom: 120px;
+  background: #f7f6f3;
+}
+
+.listingBand + .bottomSpace {
+  display: none;
+}
+
+.list {
+  padding-top: 40px;
+}
+
+/* A search bar's picker ("All stores", "All categories"): the bar's own text, no pill around it. */
+.searchPick {
+  align-self: center;
+}
+
+.searchPick > button {
+  height: 56px;
+  padding: 0 8px 0 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.searchPick > button:hover {
+  border: 0;
+  background: #f7f6f3;
+}

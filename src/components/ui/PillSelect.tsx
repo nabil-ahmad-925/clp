@@ -13,13 +13,20 @@ type Props<T extends string | number> = {
   icon?: ReactNode;
   /** 'up': the menu opens above the pill (one at the bottom of the page). */
   placement?: 'down' | 'up';
+  /**
+   * 'filter': one of a filter bar's drop-downs (a listing's 44px pill, its menu opening from the left), dark-edged
+   * while a choice other than the first ("All types") is on.
+   */
+  variant?: 'sort' | 'filter';
+  className?: string;
 };
 
 /**
  * The directory's drop-down (tenpo.com's select): a pill showing the chosen option, opening a menu of the others with
  * a check on the chosen one. Arrow keys, Home/End, Enter and Escape work as in a native select.
  */
-export default function PillSelect<T extends string | number>({ value, options, onChange, label, icon, placement = 'down' }: Props<T>) {
+export default function PillSelect<T extends string | number>({ value, options, onChange, label, icon, placement = 'down', variant = 'sort', className = '' }: Props<T>) {
+  const filter = variant === 'filter';
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -59,11 +66,11 @@ export default function PillSelect<T extends string | number>({ value, options, 
   };
 
   return (
-    <div ref={ref} className={`${styles.sortWrap} ${open ? styles.isOpen : ''}`}>
+    <div ref={ref} className={`${styles.sortWrap} ${open ? styles.isOpen : ''} ${className}`}>
       <button
         ref={triggerRef}
         type="button"
-        className={styles.sort}
+        className={`${styles.sort} ${filter ? styles.sortFilter : ''} ${filter && value !== options[0]?.value ? styles.sortFilterOn : ''}`}
         aria-label={`${label}: ${current?.label}`}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -88,7 +95,7 @@ export default function PillSelect<T extends string | number>({ value, options, 
         <div
           ref={listRef}
           id={listId}
-          className={`${styles.sortList} ${placement === 'up' ? styles.sortListUp : ''}`}
+          className={`${styles.sortList} ${placement === 'up' ? styles.sortListUp : ''} ${filter ? styles.sortListLeft : ''}`}
           role="listbox"
           aria-label={label}
           onKeyDown={onListKey}

@@ -58,7 +58,8 @@
 /* ---- The page under the heading ---- */
 .content {
   position: relative;
-  background: var(--white);
+  /* The listings' warm off-white (the Experiences listings'), the filters' white pills on it. */
+  background: #f7f6f3;
   color: #111;
 }
 

@@ -533,6 +533,42 @@
   color: #111;
 }
 
+/* A filter bar's drop-down (PillSelect variant "filter"): the listing filter chips' 44px white pill, its menu from the left. */
+.sortWrap:has(.sortFilter) {
+  --f-border: #ddddda;
+  font-family: var(--font-body);
+}
+
+.sort.sortFilter,
+[data-listing] .sortWrap .sort.sortFilter {
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sortFilter .sortChevron,
+[data-listing] .sortFilter .sortChevron {
+  font-size: 14px;
+  color: #111;
+  opacity: 1;
+}
+
+.sort.sortFilterOn,
+[data-listing] .sortWrap .sort.sortFilterOn {
+  border-color: #111;
+}
+
+.sortListLeft {
+  right: auto;
+  left: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  transform-origin: top left;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .panel,
   .sortList {
