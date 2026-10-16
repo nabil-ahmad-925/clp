@@ -1,47 +1,67 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- the partners' product photos (their own uploads), shown as they are. */
 
-import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { setHeaderBrand } from '@/components/layout/headerBrand';
 import { useEffect, useState } from 'react';
-import ListingHero from '@/components/sections/ListingHero';
-import { getOrder, money, type ShopOrder } from '@/content/cart';
-import { partnerHref } from '@/content/partnerPages';
+import { getCheckout, getOrder, money, type CheckoutInfo, type ShopOrder } from '@/content/cart';
+import { shopHref } from '@/content/storefront';
 import styles from './Checkout.module.css';
 
-const PAYMENT: Record<ShopOrder['paymentStatus'], { label: string; className: string; title: string; text: string }> = {
-  paid: { label: 'Paid', className: styles.paid, title: 'Thanks, your order is confirmed', text: 'Your payment went through. The store ships your order to the address below, and we e-mailed you a receipt.' },
-  pending: { label: 'Confirming payment', className: styles.waiting, title: 'Confirming your payment…', text: 'This takes a few seconds. You can keep this page open.' },
-  unpaid: { label: 'Awaiting payment', className: styles.waiting, title: 'Thanks, we got your order', text: 'Nothing was charged. Compete Like Pros will e-mail you to arrange payment, then the store ships your order.' },
-  expired: { label: 'Not paid', className: styles.stopped, title: 'Your payment wasn’t completed', text: 'Nothing was charged. Your cart is still on the store’s page if you’d like to try again.' },
-  refunded: { label: 'Refunded', className: styles.stopped, title: 'This order was refunded', text: 'The payment was refunded in full.' },
-};
 const FULFILMENT: Partial<Record<ShopOrder['status'], string>> = { shipped: 'Shipped', done: 'Delivered', cancelled: 'Cancelled' };
-/** While Stripe confirms a payment, the order is checked again this often, this many times. */
+/** While Stripe confirms a payment, the checkout is checked again this often, this many times. */
 const POLL_MS = 2500;
 const POLLS = 12;
 
+/** The page's heading and line for the checkout's payment. */
+function stateOf(orders: ShopOrder[]) {
+  const status = (s: ShopOrder['paymentStatus']) => orders.some((o) => o.paymentStatus === s);
+  const covered = orders.some((o) => o.claimant?.name);
+  if (status('pending')) return { title: 'Confirming your payment…', text: 'This takes a few seconds. You can keep this page open.', done: false };
+  if (status('expired')) return { title: 'Your payment wasn’t completed', text: 'Nothing was charged. Your cart is still here if you’d like to try again.', done: false };
+  if (status('refunded')) return { title: 'This order was refunded', text: 'The payment was refunded in full.', done: false };
+  if (status('unpaid'))
+    return { title: 'Thanks, we got your order', text: 'Nothing was charged. Compete Like Pros will e-mail you to arrange payment, then your order ships.', done: true };
+  return {
+    title: 'Order confirmed',
+    text: covered
+      ? 'Thanks! Your claim is logged with the team, and covered items go on the team account (organizer billing or team credits). We’ll email your receipt and tracking.'
+      : 'Thanks! We’ll email your receipt and tracking. Items from different stores may ship separately.',
+    done: true,
+  };
+}
+
 /**
- * The shopper's order (/checkout/done/?order=<id>&t=<token>): where Stripe sends them back after paying, and the link of
- * an offline order. A payment still being confirmed is checked again for a little while.
+ * The shopper's confirmation (/checkout/done/?checkout=<id>&t=<token>, or ?order=<id>&t=<token> for an order from
+ * before checkouts): where Stripe sends them back after paying, and the link of an offline order. A payment still being
+ * confirmed is checked again for a little while.
  */
 export default function OrderDone() {
   const params = useSearchParams();
-  const id = params.get('order') ?? '';
+  const router = useRouter();
+  useEffect(() => {
+    setHeaderBrand({ label: 'SHOP', shop: true, cartCount: 0, onCart: () => router.push(shopHref()) });
+    return () => setHeaderBrand(null);
+  }, [router]);
+  const checkoutId = params.get('checkout') ?? '';
+  const orderId = params.get('order') ?? '';
   const token = params.get('t') ?? '';
-  const [order, setOrder] = useState<ShopOrder | null>(null);
+  const [data, setData] = useState<{ checkout: CheckoutInfo | null; orders: ShopOrder[] } | null>(null);
   const [error, setError] = useState('');
   const [polls, setPolls] = useState(0);
 
   useEffect(() => {
-    if (!id || !token) return;
+    if ((!checkoutId && !orderId) || !token) return;
     let live = true;
+    const load = () => (checkoutId ? getCheckout(checkoutId, token) : getOrder(orderId, token).then((order) => ({ checkout: null, orders: [order] })));
     const timer = window.setTimeout(
       () =>
-        getOrder(id, token).then(
-          (o) => {
+        load().then(
+          (d) => {
             if (!live) return;
-            setOrder(o);
-            if (o.paymentStatus === 'pending' && polls < POLLS) setPolls((n) => n + 1);
+            setData(d);
+            if (d.orders.some((o) => o.paymentStatus === 'pending') && polls < POLLS) setPolls((n) => n + 1);
           },
           (err) => live && setError(err instanceof Error ? err.message : 'Could not load your order.'),
         ),
@@ -51,61 +71,82 @@ export default function OrderDone() {
       live = false;
       window.clearTimeout(timer);
     };
-  }, [id, token, polls]);
+  }, [checkoutId, orderId, token, polls]);
 
-  const state = order ? PAYMENT[order.paymentStatus] : null;
+  const orders = data?.orders ?? [];
+  const state = orders.length ? stateOf(orders) : null;
+  const number = data?.checkout?.number ?? orders[0]?.number ?? '';
+  const total = data?.checkout?.amounts.total ?? orders.reduce((n, o) => n + o.total, 0);
+
   return (
     <>
-      <ListingHero title={['Your order']} blurb={order ? order.partner.name : undefined} />
+      <section className={styles.band} data-header-tone="light" />
       <div className={styles.page} data-header-tone="dark">
-        <div className={`${styles.card} ${styles.narrow}`}>
-          {!id || !token ? (
+        {(!checkoutId && !orderId) || !token ? (
+          <div className={styles.card}>
             <p className={styles.muted}>This order link isn’t complete. Use the link in your order e-mail.</p>
-          ) : error ? (
+          </div>
+        ) : error ? (
+          <div className={styles.card}>
             <p className={styles.error}>{error}</p>
-          ) : !order || !state ? (
+          </div>
+        ) : !state ? (
+          <div className={styles.card}>
             <p className={styles.muted} role="status">
               Loading your order…
             </p>
-          ) : (
-            <div className={styles.stack}>
-              <span className={styles.badges}>
-                <span className={`${styles.badge} ${state.className}`}>{state.label}</span>
-                {FULFILMENT[order.status] && <span className={`${styles.badge} ${styles.neutral}`}>{FULFILMENT[order.status]}</span>}
-              </span>
-              <h2 className={styles.title}>{state.title}</h2>
-              <p className={styles.muted} role="status">
-                {order.paymentStatus === 'pending' && polls >= POLLS ? 'It’s taking longer than usual. We’ll e-mail you as soon as it’s confirmed.' : state.text}
-              </p>
-              <dl className={styles.facts}>
-                <dt>Order</dt>
-                <dd>{order.number}</dd>
-                <dt>Store</dt>
-                <dd>{order.partner.name}</dd>
-                <dt>Ship to</dt>
-                <dd>{[order.shipping.line1, order.shipping.line2, `${order.shipping.city}, ${order.shipping.state} ${order.shipping.postalCode}`].filter(Boolean).join(', ')}</dd>
-              </dl>
-              <div className={styles.lines}>
-                {order.lines.map((l, i) => (
-                  <div key={`${l.productId}-${i}`} className={styles.line}>
-                    <span className={styles.thumb}>{l.image && <img src={l.image} alt="" />}</span>
-                    <span className={styles.lineText}>
-                      <strong>{l.title}</strong>
-                      <span className={styles.muted}>{[l.option, `Qty ${l.qty}`].filter(Boolean).join(' · ')}</span>
+          </div>
+        ) : (
+          <section className={styles.done}>
+            <span className={`${styles.doneMark} ${state.done ? '' : styles.doneWait}`} aria-hidden>
+              {state.done ? '✓' : '…'}
+            </span>
+            <span className={styles.doneNumber}>ORDER #{number}</span>
+            <h1 className={styles.doneTitle}>{state.title}</h1>
+            <span className={styles.doneText} role="status">
+              {orders.some((o) => o.paymentStatus === 'pending') && polls >= POLLS ? 'It’s taking longer than usual. We’ll e-mail you as soon as it’s confirmed.' : state.text}
+            </span>
+            <strong className={styles.donePaid}>
+              {orders.every((o) => o.paymentStatus === 'paid') ? 'Total paid' : 'Total'}: {money(total)}
+            </strong>
+            <div className={styles.doneOrders}>
+              {orders.map((o) => (
+                <div key={o.id} className={styles.doneOrder}>
+                  <span className={styles.doneStore}>
+                    <strong>{o.partner.name}</strong>
+                    <span>
+                      {o.number}
+                      {FULFILMENT[o.status] ? ` · ${FULFILMENT[o.status]}` : ''}
                     </span>
-                    <strong>{money(l.price * l.qty)}</strong>
-                  </div>
-                ))}
-                <span className={`${styles.totals} ${styles.total}`}>
-                  Total <span>{money(order.total)}</span>
-                </span>
-              </div>
-              <a className={styles.secondary} href={partnerHref(order.partner.slug)}>
-                Back to {order.partner.name}
-              </a>
+                  </span>
+                  {o.lines.map((l, i) => (
+                    <div key={`${l.productId}-${i}`} className={styles.line}>
+                      <span className={styles.thumb}>
+                        {l.image && <img src={l.image} alt="" />}
+                        <span className={styles.qtyBadge}>{l.qty}</span>
+                      </span>
+                      <span className={styles.lineText}>
+                        <strong>{l.title}</strong>
+                        <span>{[l.option, l.coveredQty ? `${l.coveredQty} covered` : ''].filter(Boolean).join(' · ')}</span>
+                      </span>
+                      <strong className={styles.linePrice}>{money(l.price * l.qty)}</strong>
+                    </div>
+                  ))}
+                  <span className={styles.doneShip}>
+                    {o.delivery === 'pickup'
+                      ? `Pick up from ${o.partner.name}${o.pickupNote ? `: ${o.pickupNote}` : ''}`
+                      : o.shipping
+                        ? `Ships to ${[o.shipping.line1, o.shipping.line2, `${o.shipping.city}, ${o.shipping.state} ${o.shipping.postalCode}`].filter(Boolean).join(', ')}`
+                        : ''}
+                  </span>
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+            <Link className={styles.keep} href={shopHref()}>
+              Keep shopping
+            </Link>
+          </section>
+        )}
       </div>
     </>
   );

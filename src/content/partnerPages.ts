@@ -40,13 +40,25 @@ export type PartnerCardData = {
   positions?: Record<string, number>;
   /** The categories CLP features it on: first on those listings, marked "Featured". */
   featured?: string[];
+  /** CLP's Feature star: the shop's first row and the home page's featured spots. */
+  homeFeatured?: boolean;
 };
+
+/** Someone who runs the partner's sessions; CLP sets their checks (SafeSport, background check, CPR). */
+export type PartnerTeamMember = { name: string; role: string; photo: string; bio?: string; instagram?: string; runs?: string[]; checks?: ('safesport' | 'background' | 'cpr')[] };
+export const TEAM_CHECK_LABELS = { safesport: 'SafeSport trained', background: 'Background check', cpr: 'CPR & first aid' } as const;
+/** A video on the Content tab, and where it plays from. */
+export type PartnerVideo = { url: string; title: string; source: 'youtube' | 'instagram' | 'tiktok' | 'vimeo' | '' };
 
 export type PartnerPageData = PartnerCardData & {
   highlights: string[];
   stats: { value: string; label: string }[];
   photos: { src: string; caption: string }[];
-  team: { name: string; role: string; photo: string }[];
+  team: PartnerTeamMember[];
+  videos?: PartnerVideo[];
+  /** How much of the partner's colour the page uses ("off": CLP's black and gold), and their second colour. */
+  colorMode?: 'little' | 'off';
+  color2?: string;
   faq: { q: string; a: string }[];
   press: { title: string; source: string; date: string; href: string; image: string }[];
   store: { title: string; sub: string };
@@ -55,6 +67,8 @@ export type PartnerPageData = PartnerCardData & {
   sections: { id: string; on: boolean }[];
   /** Opened with a preview link before the page is live. */
   preview: boolean;
+  /** Its store on the shop: private (behind its password, until a date) or not. */
+  shop?: { private: boolean; until: string };
 };
 
 export type PartnerCollab = { id: string; title: string; brand: string; type: string; dates: string; description: string; image: string; link: string; live: boolean; createdAt: string };
@@ -99,7 +113,12 @@ export async function call<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) throw new PartnerApiError(0, 'Partner pages aren’t available right now.');
   let res: Response;
   try {
-    res = await fetch(`${API_URL}${path}`, { cache: 'no-store', signal: AbortSignal.timeout(15_000), ...init, headers: init?.body ? { 'content-type': 'application/json' } : undefined });
+    res = await fetch(`${API_URL}${path}`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15_000),
+      ...init,
+      headers: { ...(init?.body ? { 'content-type': 'application/json' } : {}), ...(init?.headers as Record<string, string> | undefined) },
+    });
   } catch {
     throw new PartnerApiError(0, 'Could not reach CLP. Check your connection and try again.');
   }

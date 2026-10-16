@@ -85,6 +85,20 @@
   transition: color 0.4s;
 }
 
+/* The shop's "SHOP", gold beside a darker rule. */
+.cobrandShop {
+  gap: 18px;
+  color: #dcbd7d;
+  font-family: var(--font-body);
+  letter-spacing: 4px;
+}
+
+.cobrandShop .cobrandRule {
+  height: 34px;
+  background: #3a3a3a;
+  opacity: 1;
+}
+
 .cobrandRule {
   width: 1px;
   height: 40px;

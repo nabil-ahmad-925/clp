@@ -1,0 +1,1466 @@
+{
+ "_comment": "Bulk & Operations catalog and the design studio library (the Shop design). Used by the site, the admin and clp-api.",
+ "categories": [
+  {
+   "id": "event",
+   "icon": "tent",
+   "label": "Event supplies",
+   "short": "Event supplies"
+  },
+  {
+   "id": "infl",
+   "icon": "arch",
+   "label": "Inflatables & structures",
+   "short": "Inflatables"
+  },
+  {
+   "id": "awards",
+   "icon": "medal",
+   "label": "Medals & awards",
+   "short": "Awards"
+  },
+  {
+   "id": "bibs",
+   "icon": "bib",
+   "label": "Pinnies & bibs",
+   "short": "Pinnies"
+  },
+  {
+   "id": "promo",
+   "icon": "gift",
+   "label": "Promo & giveaways",
+   "short": "Promo"
+  },
+  {
+   "id": "socks",
+   "icon": "sock",
+   "label": "Socks & sleeves",
+   "short": "Socks"
+  },
+  {
+   "id": "staff",
+   "icon": "staff",
+   "label": "Staff & volunteer apparel",
+   "short": "Staff gear"
+  },
+  {
+   "id": "kits",
+   "icon": "shirt",
+   "label": "Uniforms & kits",
+   "short": "Kits"
+  }
+ ],
+ "items": [
+  {
+   "id": "tent",
+   "category": "event",
+   "shape": "tent",
+   "name": "10×10 pop-up tent",
+   "description": "Custom printed canopy with optional walls for game day and activations.",
+   "material": "Steel or aluminum frame, 600D polyester",
+   "decoration": [
+    "Full-color dye sublimation"
+   ],
+   "sizes": "10×10, 10×15, 10×20",
+   "min": 1,
+   "unit": "unit",
+   "lead": "2–3 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "10×10",
+     "note": "Most popular · Min 1",
+     "min": 1
+    },
+    {
+     "name": "10×15",
+     "note": "Min 1",
+     "min": 1
+    },
+    {
+     "name": "10×20",
+     "note": "Min 1",
+     "min": 1
+    }
+   ]
+  },
+  {
+   "id": "pc54",
+   "category": "staff",
+   "shape": "tee",
+   "name": "Core cotton tee",
+   "description": "Everyday cotton tee for staff, volunteers and fans.",
+   "material": "5.4 oz 100% cotton",
+   "decoration": [
+    "Screen print",
+    "DTF print",
+    "Embroidery"
+   ],
+   "sizes": "XS – 6XL",
+   "min": 24,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "IN STOCK",
+   "stock": true,
+   "styles": [
+    {
+     "name": "Short sleeve",
+     "note": "Min 24",
+     "min": 24
+    },
+    {
+     "name": "Long sleeve",
+     "note": "Min 24",
+     "min": 24
+    }
+   ],
+   "colors": [
+    "#111111",
+    "#FFFFFF",
+    "#0B2A5B",
+    "#1B4F8C",
+    "#C8102E",
+    "#2E7D32",
+    "#A8A9AD",
+    "#E87722"
+   ]
+  },
+  {
+   "id": "cap",
+   "category": "staff",
+   "shape": "cap",
+   "name": "Custom caps",
+   "description": "Structured or dad-style caps with an embroidered front.",
+   "material": "Cotton twill, adjustable strap",
+   "decoration": [
+    "Embroidery",
+    "Woven patch"
+   ],
+   "sizes": "One size",
+   "min": 24,
+   "unit": "pcs",
+   "lead": "2–3 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Structured snapback",
+     "note": "Min 24",
+     "min": 24
+    },
+    {
+     "name": "Dad hat",
+     "note": "Unstructured · Min 24",
+     "min": 24
+    },
+    {
+     "name": "Trucker",
+     "note": "Mesh back · Min 24",
+     "min": 24
+    },
+    {
+     "name": "Beanie",
+     "note": "Knit · Min 24",
+     "min": 24
+    }
+   ]
+  },
+  {
+   "id": "crew",
+   "category": "socks",
+   "shape": "sock",
+   "name": "Custom knit crew socks",
+   "description": "Your design knit right into the sock, any colors. Made by Soxcessful®.",
+   "material": "Combed cotton blend, cushioned foot",
+   "decoration": [
+    "Knit-in design"
+   ],
+   "sizes": "Youth S – Adult XL",
+   "min": 50,
+   "unit": "pairs",
+   "lead": "3–5 weeks",
+   "badge": "SOXCESSFUL®",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Crew",
+     "note": "Mid-calf · Min 50 pairs",
+     "min": 50
+    },
+    {
+     "name": "Quarter",
+     "note": "Ankle height · Min 50 pairs",
+     "min": 50
+    },
+    {
+     "name": "Knee-high",
+     "note": "Game sock · Min 50 pairs",
+     "min": 50
+    },
+    {
+     "name": "No-show",
+     "note": "Low cut · Min 100 pairs",
+     "min": 100
+    }
+   ]
+  },
+  {
+   "id": "jersey",
+   "category": "kits",
+   "shape": "tee",
+   "name": "Custom match jersey",
+   "description": "Fully sublimated jerseys with your crest, sponsors, names and numbers.",
+   "material": "100% recycled polyester, moisture-wicking",
+   "decoration": [
+    "Full sublimation",
+    "Heat-press names & numbers"
+   ],
+   "sizes": "Youth S – Adult 3XL",
+   "min": 12,
+   "unit": "pcs",
+   "lead": "3–4 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Short sleeve",
+     "note": "Recycled poly · Min 12",
+     "min": 12
+    },
+    {
+     "name": "Long sleeve",
+     "note": "Recycled poly · Min 12",
+     "min": 12
+    },
+    {
+     "name": "Goalkeeper",
+     "note": "Padded elbows · Min 6",
+     "min": 6
+    },
+    {
+     "name": "Reversible training",
+     "note": "Two colors in one · Min 12",
+     "min": 12
+    }
+   ]
+  },
+  {
+   "id": "medal",
+   "category": "awards",
+   "shape": "medal",
+   "name": "Custom medals",
+   "description": "Die-cast medals with your logo and a printed ribbon.",
+   "material": "Zinc alloy, gold/silver/bronze finish",
+   "decoration": [
+    "Die-cast 3D",
+    "Printed ribbon"
+   ],
+   "sizes": "2 in, 2.5 in, 3 in",
+   "min": 25,
+   "unit": "pcs",
+   "lead": "2–3 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Medal",
+     "note": "Die-cast · Min 25",
+     "min": 25
+    },
+    {
+     "name": "Trophy",
+     "note": "Min 10",
+     "min": 10
+    },
+    {
+     "name": "Plaque",
+     "note": "Min 10",
+     "min": 10
+    }
+   ]
+  },
+  {
+   "id": "flag",
+   "category": "event",
+   "shape": "flag",
+   "name": "Feather flags & banners",
+   "description": "Feather flags, fence banners and step-and-repeats.",
+   "material": "Knit polyester, pole kit and base",
+   "decoration": [
+    "Full-color print"
+   ],
+   "sizes": "8 ft, 11 ft, 14 ft",
+   "min": 1,
+   "unit": "unit",
+   "lead": "1–2 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Feather flag",
+     "note": "8, 11 or 14 ft · Min 1",
+     "min": 1
+    },
+    {
+     "name": "Fence banner",
+     "note": "Grommets · Min 1",
+     "min": 1
+    },
+    {
+     "name": "Step-and-repeat",
+     "note": "With stand · Min 1",
+     "min": 1
+    }
+   ]
+  },
+  {
+   "id": "kit",
+   "category": "kits",
+   "shape": "tee",
+   "name": "Full kit · jersey, shorts & socks",
+   "description": "Matching jersey, shorts and knit socks, packed per player.",
+   "material": "Recycled poly jersey & shorts, knit socks",
+   "decoration": [
+    "Full sublimation",
+    "Knit-in socks"
+   ],
+   "sizes": "Youth S – Adult 3XL",
+   "min": 12,
+   "unit": "kits",
+   "lead": "4 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Field player kit",
+     "note": "Jersey, shorts, socks · Min 12",
+     "min": 12
+    },
+    {
+     "name": "Goalkeeper kit",
+     "note": "GK jersey, shorts, socks · Min 2",
+     "min": 2
+    }
+   ]
+  },
+  {
+   "id": "grip",
+   "category": "socks",
+   "shape": "sock",
+   "name": "Grip socks",
+   "description": "Anti-slip grip socks for training and match day.",
+   "material": "Poly blend with silicone grip sole",
+   "decoration": [
+    "Knit-in design",
+    "Printed grip pattern"
+   ],
+   "sizes": "S – XL",
+   "min": 100,
+   "unit": "pairs",
+   "lead": "4–5 weeks",
+   "badge": "SOXCESSFUL®",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Crew grip",
+     "note": "Silicone sole · Min 100 pairs",
+     "min": 100
+    },
+    {
+     "name": "Quarter grip",
+     "note": "Silicone sole · Min 100 pairs",
+     "min": 100
+    }
+   ]
+  },
+  {
+   "id": "arch",
+   "category": "infl",
+   "shape": "arch",
+   "name": "Inflatable arch",
+   "description": "Branded start, finish and entrance arches. Built in-house.",
+   "material": "Commercial-grade PVC/nylon, blower included",
+   "decoration": [
+    "Full-color print",
+    "Removable banners"
+   ],
+   "sizes": "20 ft, 30 ft or custom",
+   "min": 1,
+   "unit": "unit",
+   "lead": "4–6 weeks",
+   "badge": "BUILT IN-HOUSE",
+   "stock": false,
+   "styles": [
+    {
+     "name": "20 ft arch",
+     "note": "Blower included · Min 1",
+     "min": 1
+    },
+    {
+     "name": "30 ft arch",
+     "note": "Blower included · Min 1",
+     "min": 1
+    },
+    {
+     "name": "Custom shape",
+     "note": "Designed with you · Min 1",
+     "min": 1
+    }
+   ]
+  },
+  {
+   "id": "tunnel",
+   "category": "infl",
+   "shape": "arch",
+   "name": "Inflatable player tunnel",
+   "description": "Walk-out tunnels for match day and team entrances. Built in-house.",
+   "material": "Commercial-grade PVC/nylon, blower included",
+   "decoration": [
+    "Full-color print"
+   ],
+   "sizes": "Standard or custom length",
+   "min": 1,
+   "unit": "unit",
+   "lead": "4–6 weeks",
+   "badge": "BUILT IN-HOUSE",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Standard tunnel",
+     "note": "Min 1",
+     "min": 1
+    },
+    {
+     "name": "Extendable tunnel",
+     "note": "Min 1",
+     "min": 1
+    }
+   ]
+  },
+  {
+   "id": "sleeve",
+   "category": "socks",
+   "shape": "sock",
+   "name": "Leg sleeves",
+   "description": "Footless sleeves worn over grip socks, in club colors.",
+   "material": "Stretch knit",
+   "decoration": [
+    "Knit-in design",
+    "Sublimation"
+   ],
+   "sizes": "Youth / Adult",
+   "min": 50,
+   "unit": "pairs",
+   "lead": "3–4 weeks",
+   "badge": "SOXCESSFUL®",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Leg sleeve",
+     "note": "Over grip socks · Min 50 pairs",
+     "min": 50
+    },
+    {
+     "name": "Calf sleeve",
+     "note": "Compression · Min 50 pairs",
+     "min": 50
+    }
+   ]
+  },
+  {
+   "id": "st350",
+   "category": "kits",
+   "shape": "tee",
+   "name": "Performance competitor tee",
+   "description": "Moisture-wicking tee for training and game day.",
+   "material": "100% polyester, moisture-wicking",
+   "decoration": [
+    "Screen print",
+    "Heat transfer",
+    "Sublimation"
+   ],
+   "sizes": "XS – 4XL",
+   "min": 12,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "IN STOCK",
+   "stock": true,
+   "styles": [
+    {
+     "name": "Short sleeve",
+     "note": "Min 12",
+     "min": 12
+    },
+    {
+     "name": "Long sleeve",
+     "note": "Min 12",
+     "min": 12
+    }
+   ],
+   "colors": [
+    "#111111",
+    "#FFFFFF",
+    "#0B2A5B",
+    "#1B4F8C",
+    "#7A1F2B",
+    "#C8102E",
+    "#1D6363",
+    "#E4FF1A"
+   ]
+  },
+  {
+   "id": "smhood",
+   "category": "staff",
+   "shape": "jacket",
+   "name": "Pullover hoodie",
+   "description": "Midweight fleece hoodie for teams and fans.",
+   "material": "Cotton/poly fleece",
+   "decoration": [
+    "Screen print",
+    "Embroidery"
+   ],
+   "sizes": "XS – 4XL",
+   "min": 12,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "IN STOCK",
+   "stock": true,
+   "styles": [
+    {
+     "name": "Pullover hoodie",
+     "note": "Min 12",
+     "min": 12
+    }
+   ],
+   "colors": [
+    "#111111",
+    "#0B2A5B",
+    "#7A1F2B",
+    "#A8A9AD",
+    "#2E7D32",
+    "#FFFFFF"
+   ]
+  },
+  {
+   "id": "qz",
+   "category": "staff",
+   "shape": "jacket",
+   "name": "Quarter-zip pullover",
+   "description": "Embroidered quarter-zips for coaches, staff and sideline.",
+   "material": "Performance poly-spandex",
+   "decoration": [
+    "Embroidery"
+   ],
+   "sizes": "XS – 3XL",
+   "min": 12,
+   "unit": "pcs",
+   "lead": "2–3 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Quarter-zip",
+     "note": "Poly-spandex · Min 12",
+     "min": 12
+    },
+    {
+     "name": "Full-zip jacket",
+     "note": "Soft shell · Min 12",
+     "min": 12
+    },
+    {
+     "name": "Hoodie",
+     "note": "Fleece · Min 12",
+     "min": 12
+    }
+   ]
+  },
+  {
+   "id": "k500",
+   "category": "staff",
+   "shape": "tee",
+   "name": "Silk touch polo",
+   "description": "Classic polo for coaches, staff and events.",
+   "material": "Poly/cotton pique",
+   "decoration": [
+    "Embroidery"
+   ],
+   "sizes": "XS – 6XL",
+   "min": 12,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "IN STOCK",
+   "stock": true,
+   "styles": [
+    {
+     "name": "Men’s",
+     "note": "Min 12",
+     "min": 12
+    },
+    {
+     "name": "Women’s",
+     "note": "Min 12",
+     "min": 12
+    }
+   ],
+   "colors": [
+    "#111111",
+    "#FFFFFF",
+    "#0B2A5B",
+    "#7A1F2B",
+    "#2E7D32",
+    "#A8A9AD"
+   ]
+  },
+  {
+   "id": "stee",
+   "category": "staff",
+   "shape": "tee",
+   "name": "Staff & volunteer tees",
+   "description": "Bright, easy-to-spot tees for crews, coaches and volunteers.",
+   "material": "Ring-spun cotton or performance blend",
+   "decoration": [
+    "Screen print",
+    "DTF print"
+   ],
+   "sizes": "XS – 4XL",
+   "min": 24,
+   "unit": "pcs",
+   "lead": "2 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Cotton tee",
+     "note": "Ring-spun · Min 24",
+     "min": 24
+    },
+    {
+     "name": "Performance tee",
+     "note": "Moisture-wicking · Min 24",
+     "min": 24
+    },
+    {
+     "name": "Long sleeve tee",
+     "note": "Cotton or performance · Min 24",
+     "min": 24
+    }
+   ]
+  },
+  {
+   "id": "smcap",
+   "category": "staff",
+   "shape": "cap",
+   "name": "Structured snapback cap",
+   "description": "Structured cap for teams and staff.",
+   "material": "Cotton twill",
+   "decoration": [
+    "Embroidery"
+   ],
+   "sizes": "One size",
+   "min": 24,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "IN STOCK",
+   "stock": true,
+   "styles": [
+    {
+     "name": "Snapback",
+     "note": "Min 24",
+     "min": 24
+    }
+   ],
+   "colors": [
+    "#111111",
+    "#0B2A5B",
+    "#7A1F2B",
+    "#FFFFFF",
+    "#A8A9AD"
+   ]
+  },
+  {
+   "id": "tote",
+   "category": "promo",
+   "shape": "tote",
+   "name": "Tote & drawstring bags",
+   "description": "Reusable bags for welcome kits, swag and events.",
+   "material": "Cotton canvas or poly",
+   "decoration": [
+    "Screen print"
+   ],
+   "sizes": "Tote or drawstring",
+   "min": 100,
+   "unit": "pcs",
+   "lead": "2 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Canvas tote",
+     "note": "Min 100",
+     "min": 100
+    },
+    {
+     "name": "Drawstring bag",
+     "note": "Min 100",
+     "min": 100
+    }
+   ]
+  },
+  {
+   "id": "pinnie",
+   "category": "bibs",
+   "shape": "bib",
+   "name": "Training pinnies",
+   "description": "Numbered, color-coded mesh bibs for sessions and events.",
+   "material": "Lightweight mesh",
+   "decoration": [
+    "Screen print",
+    "Numbers front & back"
+   ],
+   "sizes": "Youth / Adult",
+   "min": 24,
+   "unit": "pcs",
+   "lead": "1–2 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Mesh pinnie",
+     "note": "Numbered · Min 24",
+     "min": 24
+    },
+    {
+     "name": "Reversible pinnie",
+     "note": "Two colors · Min 24",
+     "min": 24
+    }
+   ]
+  },
+  {
+   "id": "bottle",
+   "category": "promo",
+   "shape": "bottle",
+   "name": "Water bottles",
+   "description": "Squeeze or insulated bottles for players, fans and giveaways.",
+   "material": "BPA-free plastic or stainless steel",
+   "decoration": [
+    "Screen print",
+    "Laser engrave"
+   ],
+   "sizes": "24 oz, 32 oz",
+   "min": 100,
+   "unit": "pcs",
+   "lead": "2–3 weeks",
+   "badge": "",
+   "stock": false,
+   "styles": [
+    {
+     "name": "Squeeze bottle",
+     "note": "24 or 32 oz · Min 100",
+     "min": 100
+    },
+    {
+     "name": "Insulated bottle",
+     "note": "Stainless · Min 50",
+     "min": 50
+    }
+   ]
+  }
+ ],
+ "custom": {
+  "id": "custom",
+  "category": "promo",
+  "shape": "spark",
+  "name": "Fully custom product",
+  "description": "Tell us what you want to make. Our design team works directly with our factories to create it from scratch.",
+  "material": "Your choice",
+  "decoration": [
+   "Any"
+  ],
+  "sizes": "Any",
+  "min": 1,
+  "unit": "units",
+  "lead": "Depends on product",
+  "badge": "",
+  "stock": false,
+  "styles": []
+ },
+ "decorations": [
+  {
+   "id": "embroider",
+   "label": "Embroidery"
+  },
+  {
+   "id": "full-color",
+   "label": "Full-color print"
+  },
+  {
+   "id": "knit",
+   "label": "Knit-in"
+  },
+  {
+   "id": "laser",
+   "label": "Laser engrave"
+  },
+  {
+   "id": "screen",
+   "label": "Screen print"
+  },
+  {
+   "id": "sublimation",
+   "label": "Sublimation"
+  }
+ ],
+ "priorities": [
+  {
+   "id": "value",
+   "label": "Best value"
+  },
+  {
+   "id": "balanced",
+   "label": "Balanced"
+  },
+  {
+   "id": "premium",
+   "label": "Premium quality"
+  },
+  {
+   "id": "fast",
+   "label": "Fastest turnaround"
+  }
+ ],
+ "views": {
+  "tee": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ],
+   [
+    "left",
+    "Left sleeve"
+   ],
+   [
+    "right",
+    "Right sleeve"
+   ]
+  ],
+  "jacket": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ],
+   [
+    "left",
+    "Left sleeve"
+   ],
+   [
+    "right",
+    "Right sleeve"
+   ]
+  ],
+  "sock": [
+   [
+    "front",
+    "Outer side"
+   ],
+   [
+    "back",
+    "Inner side"
+   ]
+  ],
+  "cap": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "left",
+    "Left side"
+   ],
+   [
+    "right",
+    "Right side"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "tent": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "side",
+    "Side wall"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "bib": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "flag": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "arch": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "medal": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "bottle": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "tote": [
+   [
+    "front",
+    "Front"
+   ],
+   [
+    "back",
+    "Back"
+   ]
+  ],
+  "spark": [
+   [
+    "front",
+    "Front"
+   ]
+  ]
+ },
+ "locations": {
+  "tee": [
+   [
+    "left",
+    "Left sleeve logo"
+   ],
+   [
+    "right",
+    "Right sleeve logo"
+   ]
+  ],
+  "jacket": [
+   [
+    "left",
+    "Left sleeve logo"
+   ],
+   [
+    "right",
+    "Right sleeve logo"
+   ]
+  ],
+  "cap": [
+   [
+    "left",
+    "Left side logo"
+   ],
+   [
+    "right",
+    "Right side logo"
+   ],
+   [
+    "back",
+    "Back text"
+   ]
+  ],
+  "sock": [
+   [
+    "back",
+    "Inner side logo"
+   ]
+  ],
+  "tent": [
+   [
+    "side",
+    "Side wall logo"
+   ],
+   [
+    "back",
+    "Back of canopy"
+   ]
+  ],
+  "bib": [
+   [
+    "back",
+    "Back logo"
+   ]
+  ],
+  "flag": [
+   [
+    "back",
+    "Print the back too"
+   ]
+  ],
+  "arch": [
+   [
+    "back",
+    "Back logo"
+   ]
+  ],
+  "medal": [
+   [
+    "back",
+    "Back engraving"
+   ]
+  ],
+  "bottle": [
+   [
+    "back",
+    "Back logo"
+   ]
+  ],
+  "tote": [
+   [
+    "back",
+    "Back logo"
+   ]
+  ],
+  "spark": []
+ },
+ "addons": {
+  "tee": [
+   [
+    "names",
+    "Names & numbers",
+    "/ea"
+   ],
+   [
+    "bag",
+    "Individual bagging & labels",
+    "/ea"
+   ],
+   [
+    "rush",
+    "Rush production",
+    ""
+   ]
+  ],
+  "jacket": [
+   [
+    "names",
+    "Personalized names",
+    "/ea"
+   ],
+   [
+    "bag",
+    "Individual bagging & labels",
+    "/ea"
+   ],
+   [
+    "rush",
+    "Rush production",
+    ""
+   ]
+  ],
+  "cap": [
+   [
+    "puff",
+    "3D puff embroidery",
+    "/ea"
+   ],
+   [
+    "rush",
+    "Rush production",
+    ""
+   ]
+  ],
+  "sock": [
+   [
+    "pack",
+    "Custom packaging & header card",
+    "/pr"
+   ],
+   [
+    "rush",
+    "Rush production",
+    ""
+   ]
+  ],
+  "bib": [
+   [
+    "nums",
+    "Numbers front & back",
+    "/ea"
+   ]
+  ],
+  "tent": [
+   [
+    "walls",
+    "Printed side walls",
+    "/set"
+   ],
+   [
+    "weights",
+    "Weight bags",
+    "/set"
+   ]
+  ],
+  "flag": [
+   [
+    "base",
+    "Ground spike or cross base",
+    "/ea"
+   ]
+  ],
+  "arch": [
+   [
+    "blower",
+    "Spare blower",
+    ""
+   ],
+   [
+    "bag",
+    "Carry bag",
+    ""
+   ]
+  ],
+  "medal": [
+   [
+    "engr",
+    "Back engraving",
+    "/ea"
+   ],
+   [
+    "box",
+    "Presentation box",
+    "/ea"
+   ]
+  ],
+  "bottle": [
+   [
+    "pack",
+    "Individual packaging",
+    "/ea"
+   ]
+  ]
+ },
+ "templates": [
+  {
+   "label": "Classic",
+   "base": "#0B2A5B",
+   "accent": "#DCBD7D",
+   "pattern": "none",
+   "shapes": "all"
+  },
+  {
+   "label": "Hoops",
+   "base": "#111111",
+   "accent": "#FFFFFF",
+   "pattern": "hoops",
+   "shapes": [
+    "tee",
+    "jacket",
+    "sock",
+    "bib"
+   ]
+  },
+  {
+   "label": "Pinstripe",
+   "base": "#FFFFFF",
+   "accent": "#0B2A5B",
+   "pattern": "pin",
+   "shapes": [
+    "tee",
+    "jacket",
+    "bib",
+    "cap"
+   ]
+  },
+  {
+   "label": "Sash",
+   "base": "#7A1F2B",
+   "accent": "#FFFFFF",
+   "pattern": "sash",
+   "shapes": [
+    "tee",
+    "jacket",
+    "bib",
+    "flag"
+   ]
+  },
+  {
+   "label": "Gold fade",
+   "base": "#111111",
+   "accent": "#DCBD7D",
+   "pattern": "fade",
+   "shapes": "all"
+  },
+  {
+   "label": "Chest band",
+   "base": "#1D6363",
+   "accent": "#F2EAD8",
+   "pattern": "chest",
+   "shapes": [
+    "tee",
+    "jacket",
+    "bib",
+    "bottle",
+    "tote"
+   ]
+  },
+  {
+   "label": "Split",
+   "base": "#FFFFFF",
+   "accent": "#C8102E",
+   "pattern": "split",
+   "shapes": [
+    "tee",
+    "jacket",
+    "flag",
+    "tent",
+    "arch",
+    "bib"
+   ]
+  },
+  {
+   "label": "Stadium",
+   "base": "#C8102E",
+   "accent": "#FFFFFF",
+   "pattern": "stripes",
+   "shapes": [
+    "tee",
+    "sock",
+    "tote",
+    "flag"
+   ]
+  },
+  {
+   "label": "Midnight",
+   "base": "#111111",
+   "accent": "#B8963F",
+   "pattern": "pin",
+   "shapes": [
+    "tee",
+    "jacket",
+    "cap"
+   ]
+  },
+  {
+   "label": "Clubhouse",
+   "base": "#0B3B2C",
+   "accent": "#F2EAD8",
+   "pattern": "hoops",
+   "shapes": [
+    "sock",
+    "tee",
+    "bottle"
+   ]
+  },
+  {
+   "label": "Sunset",
+   "base": "#E87722",
+   "accent": "#6B2A7A",
+   "pattern": "fade",
+   "shapes": "all"
+  },
+  {
+   "label": "Ice",
+   "base": "#FFFFFF",
+   "accent": "#1B4F8C",
+   "pattern": "split",
+   "shapes": "all"
+  }
+ ],
+ "patterns": [
+  {
+   "id": "none",
+   "label": "Solid"
+  },
+  {
+   "id": "stripes",
+   "label": "Stripes"
+  },
+  {
+   "id": "pin",
+   "label": "Pinstripe"
+  },
+  {
+   "id": "hoops",
+   "label": "Hoops"
+  },
+  {
+   "id": "sash",
+   "label": "Sash"
+  },
+  {
+   "id": "split",
+   "label": "Split"
+  },
+  {
+   "id": "fade",
+   "label": "Fade"
+  },
+  {
+   "id": "chest",
+   "label": "Chest band"
+  }
+ ],
+ "places": [
+  {
+   "id": "chest",
+   "label": "Left chest"
+  },
+  {
+   "id": "center",
+   "label": "Center"
+  },
+  {
+   "id": "full",
+   "label": "Large"
+  }
+ ],
+ "fonts": [
+  {
+   "id": "mont",
+   "label": "Bold",
+   "kind": "SPORT"
+  },
+  {
+   "id": "block",
+   "label": "Block",
+   "kind": "SPORT"
+  },
+  {
+   "id": "college",
+   "label": "College",
+   "kind": "COLLEGIATE"
+  },
+  {
+   "id": "condensed",
+   "label": "Condensed",
+   "kind": "MODERN"
+  },
+  {
+   "id": "serif",
+   "label": "Classic",
+   "kind": "SERIF"
+  },
+  {
+   "id": "script",
+   "label": "Script",
+   "kind": "SCRIPT"
+  },
+  {
+   "id": "brush",
+   "label": "Brush",
+   "kind": "HANDWRITTEN"
+  }
+ ],
+ "palette": [
+  "#111111",
+  "#FFFFFF",
+  "#0B2A5B",
+  "#1B4F8C",
+  "#7A1F2B",
+  "#C8102E",
+  "#E87722",
+  "#DCBD7D",
+  "#F2EAD8",
+  "#1D6363",
+  "#2E7D32",
+  "#6B2A7A"
+ ],
+ "specialty": [
+  [
+   "#E4FF1A",
+   "Neon yellow"
+  ],
+  [
+   "#FF3EA5",
+   "Neon pink"
+  ],
+  [
+   "#39FF14",
+   "Neon green"
+  ],
+  [
+   "#B8963F",
+   "Metallic gold"
+  ],
+  [
+   "#A8A9AD",
+   "Metallic silver"
+  ],
+  [
+   "#8C6A4F",
+   "Bronze"
+  ]
+ ],
+ "pms": {
+  "186": "#C8102E",
+  "281": "#00205B",
+  "7406": "#F1C400",
+  "347": "#009A44",
+  "2685": "#330072",
+  "021": "#FE5000",
+  "872": "#8B6F4E",
+  "429": "#A2AAAD"
+ },
+ "colorNames": {
+  "#111111": "Black",
+  "#FFFFFF": "White",
+  "#7A1F2B": "Maroon",
+  "#1B4F8C": "Royal",
+  "#F2EAD8": "Cream",
+  "#DCBD7D": "Gold",
+  "#0B2A5B": "Navy",
+  "#1D6363": "Teal",
+  "#6B2A7A": "Purple",
+  "#0B3B2C": "Forest",
+  "#C8102E": "Red",
+  "#E87722": "Orange",
+  "#2E7D32": "Green",
+  "#A8A9AD": "Heather gray",
+  "#B8963F": "Metallic gold",
+  "#E4FF1A": "Neon yellow"
+ }
+}

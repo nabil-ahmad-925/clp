@@ -65,7 +65,8 @@ export const mainNav: NavItem[] = [
       'For Pickleball': 'pickleball',
     }),
   },
-  { label: 'SHOP', href: 'https://www.soxcessful.com/Competelikepros', external: true },
+  // The partners' stores (the Shop design).
+  { label: 'SHOP', href: '/shop/' },
   { label: 'UPDATES & NEWS', href: '/updates/' },
   // NextGEN photo-store cart (the checkout lives on the original site).
   { label: 'Cart', href: '/shopping-cart/', icon: 'cart' },

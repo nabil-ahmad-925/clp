@@ -10,7 +10,8 @@ import { useHeaderBrand } from './headerBrand';
 import styles from './SiteHeader.module.css';
 
 // Pages without a hero get a solid black header instead of the transparent one.
-const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/', '/shopping-cart/']);
+// A CLP Partner's page (/partner/) too: the handoff's black header band, with the page's tabs sticking under it.
+const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/', '/shopping-cart/', '/partner/']);
 
 /** Finds the tone of the section currently behind the header (sections opt in with data-header-tone). */
 function toneBehindHeader(header: HTMLElement): HeaderTone {
@@ -85,10 +86,11 @@ export default function SiteHeader() {
                 </>
               )}
             </Link>
-            {/* A partner's page: co-branded, "CLP │ × AFC". */}
+            {/* A partner's page: co-branded, "CLP │ × AFC" (the shop: "CLP │ SHOP"). */}
             {brand && !menuOpen && (
-              <span className={styles.cobrand}>
-                <span className={styles.cobrandRule} aria-hidden />× {brand.label}
+              <span className={`${styles.cobrand} ${brand.shop ? styles.cobrandShop : ''}`}>
+                <span className={styles.cobrandRule} aria-hidden />
+                {brand.shop ? brand.label : `× ${brand.label}`}
               </span>
             )}
           </div>

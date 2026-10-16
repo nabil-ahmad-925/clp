@@ -5,19 +5,52 @@ import { call, read } from './partnerPages';
  * bits, the only key to it), and every line comes back priced by the store. Paying goes through Stripe's checkout
  * (CLP's account) once online payment is on; until then an order is placed unpaid and CLP arranges the payment.
  */
-export type CartLine = { key: string; slug: string; productId: string; title: string; option: string; qty: number; price: number; image: string };
-export type Cart = { lines: CartLine[]; count: number; subtotal: number; payments: 'online' | 'offline'; removed?: number };
+export type CartLine = { key: string; slug: string; productId: string; title: string; option: string; qty: number; price: number; image: string; coveredQty?: number; unitCharge?: number };
+export type Amounts = { subtotal: number; covered: number; discount: number; shipping: number; tax: number; total: number };
+export type AppliedCode = { code: string; kind: 'percent' | 'team'; label: string; slug: string; team: string };
+export type Cart = {
+  lines: CartLine[];
+  count: number;
+  subtotal: number;
+  /** With the codes and delivery asked for (see getCart). */
+  totals?: Amounts;
+  stores?: { slug: string; name: string; amounts: Amounts; pickupNote: string }[];
+  allCovered?: boolean;
+  codes?: AppliedCode[];
+  badCodes?: string[];
+  /** Every store in the cart offers pick-up. */
+  pickup?: boolean;
+  payments: 'online' | 'offline';
+  removed?: number;
+};
 export type ShippingAddress = { line1: string; line2?: string; city: string; state: string; postalCode: string; country?: string };
-export type CheckoutInput = { slug: string; name: string; email: string; phone?: string; note?: string; shipping: ShippingAddress };
+export type Delivery = 'ship' | 'pickup';
+export type CheckoutInput = {
+  slug?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  note?: string;
+  delivery: Delivery;
+  shipping?: ShippingAddress;
+  codes?: string[];
+  claimant?: { name: string; role: string };
+  marketing?: boolean;
+};
 export type ShopOrder = {
   id: string;
   number: string;
   status: 'new' | 'shipped' | 'done' | 'cancelled';
   paymentStatus: 'unpaid' | 'pending' | 'paid' | 'refunded' | 'expired';
   partner: { name: string; slug: string };
-  lines: { productId: string; title: string; option: string; qty: number; price: number; image: string }[];
+  lines: { productId: string; title: string; option: string; qty: number; price: number; image: string; coveredQty?: number }[];
   total: number;
-  shipping: ShippingAddress;
+  amounts?: Amounts;
+  delivery?: Delivery;
+  pickupNote?: string;
+  codes?: AppliedCode[];
+  claimant?: { name: string; role: string };
+  shipping: ShippingAddress | null;
   createdAt: string;
   paidAt?: string;
 };
@@ -43,22 +76,54 @@ let sessionId: string | undefined;
 const path = (rest = '') => `/cart/${cartId()}${rest}`;
 const slugQuery = (slug?: string) => (slug ? `?slug=${encodeURIComponent(slug)}` : '');
 
-export const getCart = (slug?: string) => read<{ cart: Cart }>(path(slugQuery(slug))).then((r) => r.cart);
-export const addToCart = (slug: string, productId: string, choices: Record<string, string>, qty: number) =>
-  call<{ cart: Cart }>(path(`/items${slugQuery(slug)}`), { method: 'POST', body: JSON.stringify({ slug, productId, choices, qty }) }).then((r) => r.cart);
+/** Pricing the cart: the codes typed and the delivery (pick-up when every store offers it). */
+export type Pricing = { codes?: string[]; delivery?: Delivery };
+const pricingQuery = (slug?: string, p: Pricing = {}) => {
+  const qs = new URLSearchParams({ ...(slug ? { slug } : {}), ...(p.codes?.length ? { codes: p.codes.join(',') } : {}), ...(p.delivery === 'pickup' ? { delivery: 'pickup' } : {}) }).toString();
+  return qs ? `?${qs}` : '';
+};
+
+/** The codes the shopper applied, kept for this visit (a partner page's cart and the checkout share them). */
+const CODES_KEY = 'clp-cart-codes';
+export const readCodes = (): string[] => {
+  try {
+    const codes: unknown = JSON.parse(sessionStorage.getItem(CODES_KEY) ?? '[]');
+    return Array.isArray(codes) ? codes.filter((c): c is string => typeof c === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+export const keepCodes = (codes: string[]) => {
+  try {
+    sessionStorage.setItem(CODES_KEY, JSON.stringify(codes));
+  } catch {
+    // Storage blocked: the codes last as long as this page.
+  }
+};
+
+export const getCart = (slug?: string, pricing?: Pricing) => read<{ cart: Cart }>(path(pricingQuery(slug, pricing))).then((r) => r.cart);
+/** Adds a product (a private store's needs the invite key the shop got when it was unlocked). */
+export const addToCart = (slug: string, productId: string, choices: Record<string, string>, qty: number, key?: string) =>
+  call<{ cart: Cart }>(path(`/items${slugQuery(slug)}`), { method: 'POST', body: JSON.stringify({ slug, productId, choices, qty, ...(key ? { key } : {}) }) }).then((r) => r.cart);
 export const setLineQty = (key: string, qty: number, slug?: string) =>
   call<{ cart: Cart }>(path(`/items/${encodeURIComponent(key)}${slugQuery(slug)}`), { method: 'PATCH', body: JSON.stringify({ qty }) }).then((r) => r.cart);
 export const removeLine = (key: string, slug?: string) => call<{ cart: Cart }>(path(`/items/${encodeURIComponent(key)}${slugQuery(slug)}`), { method: 'DELETE' }).then((r) => r.cart);
+export type CheckoutInfo = { id: string; number: string; amounts: Amounts; createdAt: string };
+/** Submits the cart (or one store's part): one order per store, paid together. */
 export const checkout = (input: CheckoutInput) =>
-  call<{ order: ShopOrder; token: string; payUrl: string | null; cart: Cart }>(path('/checkout'), { method: 'POST', body: JSON.stringify(input) });
+  call<{ checkout: CheckoutInfo; orders: ShopOrder[]; token: string; payUrl: string | null; cart: Cart }>(path('/checkout'), { method: 'POST', body: JSON.stringify(input) });
 export const getOrder = (id: string, token: string) => read<{ order: ShopOrder }>(`/orders/${encodeURIComponent(id)}?t=${encodeURIComponent(token)}`).then((r) => r.order);
+export const getCheckout = (id: string, token: string) =>
+  read<{ checkout: CheckoutInfo; orders: ShopOrder[] }>(`/checkouts/${encodeURIComponent(id)}?t=${encodeURIComponent(token)}`);
 
 export const money = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`;
 
-/** The order confirmation page of an order (its secret link). */
+/** The confirmation page of a checkout (its secret link). */
+export const checkoutDoneHref = (id: string, token: string) => `/checkout/done/?checkout=${encodeURIComponent(id)}&t=${encodeURIComponent(token)}`;
+/** The order confirmation page of an order from before checkouts (its secret link). */
 export const orderHref = (id: string, token: string) => `/checkout/done/?order=${encodeURIComponent(id)}&t=${encodeURIComponent(token)}`;
-/** The checkout page of a store's cart. */
-export const checkoutHref = (slug: string) => `/checkout/?store=${encodeURIComponent(slug)}`;
+/** The checkout page: the whole cart, or one store's part. */
+export const checkoutHref = (slug?: string) => (slug ? `/checkout/?store=${encodeURIComponent(slug)}` : '/checkout/');
 
 /** Tells every cart badge on the page that the cart changed. */
 export const CART_EVENT = 'clp-cart-changed';

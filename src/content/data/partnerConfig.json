@@ -190,6 +190,12 @@
       "tab": true
     },
     {
+      "id": "jobs",
+      "label": "Jobs",
+      "meta": "Open roles · hidden when none",
+      "tab": true
+    },
+    {
       "id": "news",
       "label": "Updates & News",
       "meta": "Your articles and press",
@@ -203,14 +209,14 @@
     },
     {
       "id": "photos",
-      "label": "Photos",
-      "meta": "Photos in About",
+      "label": "Content",
+      "meta": "Photos & videos tab",
       "tab": false
     },
     {
       "id": "reviews",
       "label": "Reviews",
-      "meta": "Verified reviews",
+      "meta": "Reviews tab",
       "tab": false
     }
   ],
