@@ -84,11 +84,11 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
   const facility = view === 'grid';
   // The ages and the access options (Open Access, Members Only…), three at most: chips on a card, pills on a row.
   const chips = [facts.ages, ...(facts.access ?? [])].filter((c): c is string => Boolean(c)).slice(0, 3);
-  // The listing's rating (its reviews' average), beside the ages, as a partner card shows one. Every card has it: only CLP
-  // Partners' listings collect reviews (a checked-in booking's), so the others say so.
+  // The listing's rating (its reviews' average), beside the ages, as a partner card shows one. Every card but a
+  // facility's has it: only CLP Partners' listings collect reviews (a checked-in booking's), so the others say so.
   const reviews = card.reviewCount ?? 0;
   const rating =
-    card.rating != null && reviews > 0 ? (
+    variant === 'facility' ? null : card.rating != null && reviews > 0 ? (
       <span className={styles.rating}>
         <span className={styles.star} aria-hidden>
           ★
