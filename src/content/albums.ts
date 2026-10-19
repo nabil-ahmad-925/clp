@@ -37,6 +37,8 @@ export type LiveAlbum = {
   /** "Photos by …". */
   by: string;
   ownerName: string;
+  /** The slug of the owner's live partner page (a partner's album): "Photographed by" links to it. */
+  partner?: string;
   access: 'public' | 'code' | 'family' | 'client';
   /** An open client gallery's client ("Client gallery for …"). */
   clientName?: string;
@@ -49,7 +51,20 @@ export type LiveAlbum = {
   preview: string;
 };
 
-export type LivePhoto = { id: string; width: number; height: number; thumb: string; web: string; print: boolean; download?: string; takenAt?: string };
+export type LivePhoto = { id: string; width: number; height: number; thumb: string; web: string; print: boolean; download?: string; takenAt?: string; description?: string };
+
+/** The photo tabs of an album page (the API's `show`). */
+export type PhotoShow = 'all' | 'free' | 'paid' | 'prints';
+/** Photos a page of an album offers. */
+export const PHOTO_PAGE_SIZES = [24, 48, 96] as const;
+/** What a page of photos asks for: its number (1 first), its size and tab; `at`: the page with that photo instead. */
+export type PhotoQuery = { page: number; limit: number; show: PhotoShow; at?: string };
+/** One page of an album's photos and its place among them. */
+export type PhotoPage = { photos: LivePhoto[]; page: number; limit: number; total: number; pages: number };
+/** The first page an album opens on. */
+export const FIRST_PAGE: PhotoQuery = { page: 1, limit: PHOTO_PAGE_SIZES[0], show: 'all' };
+const pageQuery = (q: PhotoQuery) =>
+  new URLSearchParams({ page: String(q.page), limit: String(q.limit), show: q.show, ...(q.at ? { at: q.at } : {}) }).toString();
 
 export class AlbumError extends Error {
   constructor(
@@ -105,22 +120,30 @@ const keepToken = (id: string, token: string, expiresAt: string) => {
  * a client gallery without a signed-in photo login, or with one that wasn't added to it: `notAdded`), or missing.
  */
 export type AlbumResult =
-  | { status: 'open'; item: LiveAlbum; photos: LivePhoto[] }
+  | ({ status: 'open'; item: LiveAlbum } & PhotoPage)
   | { status: 'locked'; item: LiveAlbum; notAdded?: boolean }
   | { status: 'missing' };
 
-/** An album and its photos (a families-only album or a client gallery through the signed-in photo login). */
-export async function fetchAlbum(id: string): Promise<AlbumResult> {
-  const token = albumToken(id);
+/** The address of a page of an album's photos: the public one (a private album's with its token), or the photo login's. */
+const albumPath = (id: string, q: PhotoQuery, viewer: boolean) => {
+  const token = viewer ? undefined : albumToken(id);
+  return `${viewer ? '/viewer' : ''}/albums/${encodeURIComponent(id)}?${pageQuery(q)}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
+};
+
+/**
+ * An album and the page of its photos `q` asks for (a families-only album or a client gallery through the signed-in
+ * photo login).
+ */
+export async function fetchAlbum(id: string, q: PhotoQuery = FIRST_PAGE): Promise<AlbumResult> {
   try {
-    const r = await call<{ item: LiveAlbum; photos: LivePhoto[] }>(`/albums/${encodeURIComponent(id)}${token ? `?token=${encodeURIComponent(token)}` : ''}`);
+    const r = await call<{ item: LiveAlbum } & PhotoPage>(albumPath(id, q, false));
     return { status: 'open', ...r };
   } catch (err) {
     if (err instanceof AlbumError && err.code === 'LOCKED' && err.item) return { status: 'locked', item: err.item };
     if (err instanceof AlbumError && err.code === 'SIGN_IN' && err.item) {
       if (!readLogin()) return { status: 'locked', item: err.item };
       try {
-        const r = await viewerCall<{ item: LiveAlbum; photos: LivePhoto[] }>(`/viewer/albums/${encodeURIComponent(id)}`);
+        const r = await viewerCall<{ item: LiveAlbum } & PhotoPage>(albumPath(id, q, true));
         return { status: 'open', ...r };
       } catch (inner) {
         if (inner instanceof AlbumError && inner.code === 'NOT_ADDED' && inner.item) return { status: 'locked', item: inner.item, notAdded: true };
@@ -133,6 +156,13 @@ export async function fetchAlbum(id: string): Promise<AlbumResult> {
     if (err instanceof AlbumError && err.code === 'NOT_FOUND') return { status: 'missing' };
     throw err;
   }
+}
+
+/** Another page of an open album's photos (through the photo login for a families-only album or a client gallery). */
+export async function fetchPhotoPage(album: Pick<LiveAlbum, 'id' | 'access'>, q: PhotoQuery): Promise<PhotoPage> {
+  const viewer = album.access === 'family' || album.access === 'client';
+  const r = await (viewer ? viewerCall<PhotoPage>(albumPath(album.id, q, true)) : call<PhotoPage>(albumPath(album.id, q, false)));
+  return { photos: r.photos, page: r.page, limit: r.limit, total: r.total, pages: r.pages };
 }
 
 /** Opens the private album of a code (for the rest of this visit); throws with a message to show. */
@@ -288,6 +318,8 @@ export const toGalleryImage = (album: LiveAlbum, p: LivePhoto, i: number): Galle
   downloadUrl: p.download,
   noDownload: !p.download,
   printable: p.print,
+  takenAt: p.takenAt,
+  description: p.description,
   // Why it can't be printed: the album isn't for sale, or the photo is under 12 MP (download-only).
   ...(p.print
     ? {}

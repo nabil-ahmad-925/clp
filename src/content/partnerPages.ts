@@ -62,7 +62,8 @@ export type PartnerPageData = PartnerCardData & {
   colorMode?: 'little' | 'off';
   color2?: string;
   faq: { q: string; a: string }[];
-  press: { title: string; source: string; date: string; href: string; image: string }[];
+  /** Press about them; one that is a CLP article carries its reading time (minutes). */
+  press: { title: string; source: string; date: string; href: string; image: string; readingTime?: number }[];
   store: { title: string; sub: string };
   socials: { network: string; href: string }[];
   website: string;
@@ -71,8 +72,8 @@ export type PartnerPageData = PartnerCardData & {
   followers: number;
   /** Opened with a preview link before the page is live. */
   preview: boolean;
-  /** Its store on the shop: private (behind its password, until a date) or not. */
-  shop?: { private: boolean; until: string };
+  /** Its store on the shop: private (behind its password, until a date) or not, pick-up, and CLP's own (exclusive). */
+  shop?: { private: boolean; until: string; pickup?: boolean; pickupNote?: string; exclusive?: boolean };
 };
 
 export type PartnerCollab = { id: string; title: string; brand: string; type: string; dates: string; description: string; image: string; link: string; live: boolean; createdAt: string };

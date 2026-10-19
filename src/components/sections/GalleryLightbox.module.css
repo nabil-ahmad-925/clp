@@ -170,6 +170,13 @@
   letter-spacing: 1.5px;
 }
 
+/* The album's eyebrow under the title (as the site's gold eyebrows). */
+.kicker {
+  margin-top: 4px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
 .label {
   color: #888;
 }
@@ -183,6 +190,30 @@
 .by {
   color: #666;
   font-size: 14px;
+}
+
+.byLink {
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.byLink:hover {
+  color: #8a6f33;
+}
+
+.byLink:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.description {
+  margin: 4px 0 0;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-line;
 }
 
 .sideBody {
@@ -269,7 +300,9 @@
 .share {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
+  text-align: center;
   padding-top: 18px;
   border-top: 1px solid #eeeeeb;
 }
@@ -285,6 +318,7 @@
 
 .shareLinks {
   display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -444,6 +478,107 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ---- A product's back ---- */
+.backCanvas,
+.backMetal,
+.backFrame {
+  position: relative;
+}
+
+/* Raw canvas over wooden stretcher bars (thicker for the deeper canvas). */
+.backCanvas {
+  background: #ece5d4;
+}
+
+.stretcher {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: 0 solid #c9a46b;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* Brushed aluminum with its float mount (a block that holds it off the wall) or its easel leg. */
+.backMetal {
+  background: linear-gradient(135deg, #e1e4e7, #b4b9bf);
+}
+
+.floatMount {
+  position: absolute;
+  inset: 24%;
+  border-radius: 2px;
+  background: #2b2b2b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.easel {
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  width: 18%;
+  height: 58%;
+  transform: translateX(-50%);
+  background: #2b2b2b;
+  clip-path: polygon(35% 0, 65% 0, 100% 100%, 0 100%);
+}
+
+/* Kraft backing inside the frame, with its hanging wire. */
+.backFrame {
+  background: #b98d5c;
+}
+
+.wire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wire path {
+  fill: none;
+  stroke: #6d6d6d;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.wire circle {
+  fill: #8a8a8a;
+}
+
+/* A product's front and back, side by side in the preview, each with its label under it. */
+.sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+}
+
+.sideView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+}
+
+.sideFrame {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.sideView figcaption {
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
 /* ---- Configurator ---- */

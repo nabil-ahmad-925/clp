@@ -46,6 +46,8 @@ export type PrintProduct = {
   ratio?: string;
   radius: string;
   frame?: boolean;
+  /** What its back looks like (the configurator's Back view): stretcher bars, the metal's mount, or the frame's backing. */
+  back?: 'canvas' | 'metal' | 'frame';
   ships: string;
   options: PrintOption[];
 };
@@ -65,6 +67,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     name: 'Canvas',
     desc: 'Gallery-wrapped canvas, ready to hang.',
     radius: '2px',
+    back: 'canvas',
     ships: '3–5 business days',
     options: [
       sizes([['8 × 10', 39], ['11 × 14', 49], ['16 × 20', 69], ['20 × 30', 99], ['24 × 36', 129], ['30 × 40', 169], ['40 × 60', 249]]),
@@ -78,6 +81,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     name: 'Metal print',
     desc: 'Dye-infused aluminum. Vivid color, waterproof.',
     radius: '4px',
+    back: 'metal',
     ships: '5–7 business days',
     options: [
       sizes([['8 × 12', 45], ['12 × 18', 69], ['16 × 24', 99], ['20 × 30', 139], ['24 × 36', 179], ['30 × 45', 259]]),
@@ -92,6 +96,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     desc: 'Archival print in a wood frame.',
     radius: '0',
     frame: true,
+    back: 'frame',
     ships: '4–6 business days',
     options: [
       sizes([['8 × 10', 49], ['11 × 14', 69], ['16 × 20', 99], ['18 × 24', 129], ['24 × 36', 189]]),

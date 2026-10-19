@@ -443,11 +443,11 @@ function DateBadge({ post }: { post: FilterPost }) {
 /**
  * An article in the results: its photo with the date, the title, then the reading time and the writer on one line
  * ("20 min read | By Nabil"); the whole card opens it, its text centred. The list view (`row`) lays the same out in a
- * row, left-aligned.
+ * row, left-aligned. `external`: another site's piece (press), opened in a new tab.
  */
-export function ArticleCard({ post, eager, row }: { post: FilterPost; eager: boolean; row?: boolean }) {
+export function ArticleCard({ post, eager, row, external }: { post: FilterPost; eager: boolean; row?: boolean; external?: boolean }) {
   return (
-    <a href={post.href} className={row ? styles.row : styles.card}>
+    <a href={post.href} className={row ? styles.row : styles.card} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
       <span className={styles.thumb}>
         {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
         {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}

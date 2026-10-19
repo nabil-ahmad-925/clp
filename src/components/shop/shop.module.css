@@ -77,6 +77,27 @@
   outline-offset: 2px;
 }
 
+/* The tabs under each view's heading: the site header's room over the heading instead, black room under the tabs for
+   a search bar's top half (home, bulk). */
+.headerRoom {
+  height: var(--header-height);
+  background: #0a0a0a;
+}
+
+.topUnder {
+  padding-top: 0;
+}
+
+.heroFirst .heroInner {
+  padding-top: 48px;
+  padding-bottom: 24px;
+}
+
+.navGap {
+  height: 64px;
+  background: #0a0a0a;
+}
+
 /* "Shop by Partner": the stores by group and CLP's exclusives, under the tabs. */
 .mega {
   position: absolute;
@@ -186,7 +207,6 @@
 /* ---- Logos: the store's image, else its initials (italic) on its colour ---- */
 .megaLogo,
 .partnerTileLogo,
-.storeCardLogo,
 .storeLogo,
 .profileLogo,
 .buyStoreLogo {
@@ -204,7 +224,6 @@
 
 .megaLogo img,
 .partnerTileLogo img,
-.storeCardLogo img,
 .storeLogo img,
 .profileLogo img,
 .buyStoreLogo img {
@@ -478,13 +497,6 @@
   font-size: 18px;
 }
 
-.searchWrap {
-  box-sizing: border-box;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 48px;
-}
-
 .search {
   position: relative;
   display: flex;
@@ -652,10 +664,18 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
+/* Square, as the partner cards' logos. */
 .partnerTileLogo {
   width: 96px;
   height: 96px;
+  border-radius: 16px;
   font-size: 24px;
+}
+
+.partnerTileLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .partnerTileText {
@@ -936,7 +956,16 @@
 }
 
 .bandList {
-  padding: 24px 48px 72px;
+  padding: 24px 48px 32px;
+}
+
+/* The directory's heading over the tabs, its group tabs and search under them. */
+.bandAbove {
+  padding-bottom: 24px;
+}
+
+.bandBelow {
+  padding-top: 32px;
 }
 
 .crumbs {
@@ -1025,43 +1054,19 @@
   padding-top: 40px;
 }
 
-.storeCard {
+/* The store count, and the grid / list switch on the right. */
+.listHead {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #e5e5e2;
-  border-radius: 14px;
-  background: var(--white);
-  text-decoration: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.storeCard:hover {
-  border-color: #dcbd7d;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.storeCover {
-  position: relative;
-  display: block;
-  height: 150px;
-}
-
-.storeCover > img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .privateTag {
   position: absolute;
   top: 12px;
   right: 12px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1072,52 +1077,6 @@
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1px;
-}
-
-.storeCardLogo {
-  position: absolute;
-  bottom: -36px;
-  left: 20px;
-  width: 76px;
-  height: 76px;
-  box-shadow: 0 0 0 4px var(--white);
-  font-size: 18px;
-}
-
-.storeCardBody {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-  padding: 48px 20px 20px;
-}
-
-.storeCardBody strong {
-  font-size: 17px;
-  line-height: 1.3;
-}
-
-.storeMeta {
-  color: #777;
-  font-size: 13px;
-}
-
-.storeFoot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding-top: 14px;
-  border-top: 1px solid #f0eee9;
-  color: #555;
-  font-size: 13px;
-}
-
-.storeCta {
-  color: #111;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: underline;
 }
 
 /* ---- A private store's gate ---- */
@@ -2501,7 +2460,6 @@
   }
 
   .section,
-  .searchWrap,
   .bandInner,
   .storeHeroInner,
   .factsInner,

@@ -2,13 +2,16 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Fragment, useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import {
   albumDates,
   albumsEnabled,
   categoryOfSlug,
+  FIRST_PAGE,
+  PHOTO_PAGE_SIZES,
   fetchAlbum,
   fetchMyAlbums,
+  fetchPhotoPage,
   fetchSportAlbums,
   liveAlbumHref,
   signOut,
@@ -16,13 +19,17 @@ import {
   toGalleryImage,
   type AlbumResult,
   type LiveAlbum,
+  type PhotoPage,
+  type PhotoQuery,
 } from '@/content/albums';
 import { ACCESS, PHOTOS_BLURB, dollars, type AlbumAccess } from '@/content/gallery';
+import { partnerHref } from '@/content/partnerPages';
 import type { PhotoAlbumRef, PhotoSection } from '@/content/photos';
 import type { GalleryImage } from '@/content/types';
 import GalleryCart from '@/components/sections/GalleryCart';
 import GalleryLightbox from '@/components/sections/GalleryLightbox';
 import PhotoGate from '@/components/sections/PhotoGate';
+import Pager from '@/components/ui/Pager';
 import usePhotoLogin from './usePhotoLogin';
 import styles from './Photos.module.css';
 
@@ -59,7 +66,7 @@ const GATE_COPY: Record<Exclude<AlbumAccess, 'public'>, { title: string; album: 
 /** The photo filter of an album: every photo, the free or paid downloads, or those that can be printed. */
 type PhotoFilter = 'all' | 'free' | 'paid' | 'prints';
 const FILTERS: { id: PhotoFilter; label: string }[] = [
-  { id: 'all', label: 'All' },
+  { id: 'all', label: 'All Photos' },
   { id: 'free', label: 'Free Download' },
   { id: 'paid', label: 'Paid Download' },
   { id: 'prints', label: 'Prints & Products' },
@@ -69,6 +76,10 @@ const isPaid = (image: GalleryImage) => image.download != null;
 const isFree = (image: GalleryImage) => !isPaid(image) && !image.noDownload;
 /** Every built-in photo can be printed; an admin album's only when it is for sale (and the photo is print-quality). */
 const isPrintable = (image: GalleryImage) => image.printable !== false;
+/** An album made in the admin has no built-in photos (its pages come from the API). */
+const NO_IMAGES: GalleryImage[] = [];
+const matchesFilter = (image: GalleryImage, filter: PhotoFilter) =>
+  filter === 'all' || (filter === 'prints' ? isPrintable(image) : filter === 'paid' ? isPaid(image) : isFree(image));
 
 const Camera = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -154,6 +165,15 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
   }, [liveId, attempt, login]);
   const liveNow = liveState && liveState.id === liveId ? liveState : null;
   const liveItem = liveNow?.result && liveNow.result.status !== 'missing' ? liveNow.result.item : undefined;
+  // An open album made in the admin: its card and the first page of its photos (the album fetches the others).
+  const liveResult = liveNow?.result;
+  const liveOpen = useMemo(
+    () =>
+      liveResult?.status === 'open'
+        ? { item: liveResult.item, first: { photos: liveResult.photos, page: liveResult.page, limit: liveResult.limit, total: liveResult.total, pages: liveResult.pages } }
+        : undefined,
+    [liveResult],
+  );
   /** The built-in category album of a photo category (its tile, and the category view's address). */
   const staticOf = (cat: string) => albums.find((a) => categoryOfSlug(a.slug) === cat);
 
@@ -161,7 +181,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
   const hero =
     view.kind === 'live'
       ? liveItem
-        ? { title: liveItem.name, line: [albumDates(liveItem), liveItem.city, plural(liveItem.count, 'photo')].filter(Boolean).join(' · ') }
+        ? { title: liveItem.name, line: [albumDates(liveItem), liveItem.city].filter(Boolean).join(' · ') }
         : { title: sport.title, line: liveNow ? 'This album isn’t available.' : 'Loading the album…' }
       : view.kind === 'album' && album
       ? { title: album.title, line: '' }
@@ -288,9 +308,11 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
                 <PhotoGate key={liveId} kind={liveNow.result.item.access === 'client' ? 'client' : 'family'} notAdded={liveNow.result.notAdded} />
               )}
             </section>
-          ) : liveNow.result?.status === 'open' ? (
+          ) : liveNow.result?.status === 'open' && liveOpen ? (
             <Album
+              key={liveOpen.item.id}
               sport={sport}
+              live={liveOpen}
               unlocked
               login={liveNow.result.item.access === 'family' || liveNow.result.item.access === 'client' ? login : null}
               banner={
@@ -308,7 +330,8 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
                 category: liveNow.result.item.categoryName,
                 access: liveNow.result.item.access,
                 by: liveNow.result.item.by,
-                images: liveNow.result.photos.map((p, i) => toGalleryImage((liveNow.result as { item: LiveAlbum }).item, p, i)),
+                byHref: liveNow.result.item.partner ? partnerHref(liveNow.result.item.partner) : undefined,
+                images: NO_IMAGES,
               }}
             />
           ) : null)}
@@ -644,16 +667,24 @@ export function MyAlbums({ kind }: { kind?: 'family' | 'client' }) {
   );
 }
 
-/** An album: its heading and photo filter, then its photos (or its gate), the viewer and the cart. */
+/**
+ * An album: its photo tabs, then a page of its photos and the pager, the viewer and the cart. A built-in album pages
+ * through its photos here; an album made in the admin (`live`) asks the API for each page (its tab, page and size), and
+ * the viewer steps on to the next or previous page at a page's ends. A locked one: its heading and its gate.
+ */
 function Album({
   sport,
   album,
+  live,
   unlocked,
   login,
   banner,
 }: {
   sport: PhotoSection['sport'];
-  album: NonNullable<PhotoSection['album']> & { by?: string };
+  /** `byHref`: the photographer's partner page. */
+  album: NonNullable<PhotoSection['album']> & { by?: string; byHref?: string };
+  /** An album made in the admin: its card and the first page of its photos (`album.images` is then unused). */
+  live?: { item: LiveAlbum; first: PhotoPage };
   /** A private album opened by its code, or a families-only one or a client gallery by a photo login (made in the admin). */
   unlocked?: boolean;
   /** The photo login it was opened with (shown, with signing out). */
@@ -662,76 +693,175 @@ function Album({
   banner?: ReactNode;
 }) {
   const [filter, setFilter] = useState<PhotoFilter>('all');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(PHOTO_PAGE_SIZES[0]);
   const [open, setOpen] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const top = useRef<HTMLDivElement>(null);
   const locked = album.access !== 'public' && !unlocked;
-  const shown = useMemo(
-    () =>
-      album.images.filter(
-        (image) => filter === 'all' || (filter === 'prints' ? isPrintable(image) : filter === 'paid' ? isPaid(image) : isFree(image)),
-      ),
-    [album.images, filter],
+
+  // An album made in the admin: the page shown, the one being fetched and whether that failed.
+  const [livePage, setLivePage] = useState<PhotoPage | null>(live?.first ?? null);
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState<PhotoQuery | null>(null);
+  const asked = useRef(0);
+  /** Fetches a page (the latest asked wins); `then` gets it once shown (the viewer's photo on it). */
+  const load = useCallback(
+    (q: PhotoQuery, then?: (p: PhotoPage) => void) => {
+      if (!live) return;
+      const n = ++asked.current;
+      setLoading(true);
+      setFailed(null);
+      fetchPhotoPage(live.item, q).then(
+        (p) => {
+          if (n !== asked.current) return;
+          setLivePage(p);
+          setLoading(false);
+          then?.(p);
+        },
+        () => {
+          if (n !== asked.current) return;
+          setLoading(false);
+          setFailed(q);
+        },
+      );
+    },
+    [live],
   );
 
-  // The open photo is kept in the URL (#gallery/<id>/<photo id>): a link to it opens it.
+  // A built-in album's photos of the tab, and the page of them shown.
+  const shown = useMemo(() => album.images.filter((image) => matchesFilter(image, filter)), [album.images, filter]);
+  const total = live ? (livePage?.total ?? 0) : shown.length;
+  const size = live ? (livePage?.limit ?? pageSize) : pageSize;
+  const pageCount = live ? (livePage?.pages ?? 1) : Math.max(1, Math.ceil(shown.length / pageSize));
+  const current = live ? (livePage?.page ?? 1) - 1 : Math.min(page, pageCount - 1);
+  const offset = current * size;
+  const pagePhotos = useMemo(
+    () => (live ? (livePage?.photos ?? []).map((p, i) => toGalleryImage(live.item, p, offset + i)) : shown.slice(offset, offset + pageSize)),
+    [live, livePage, shown, offset, pageSize],
+  );
+  // What the viewer steps through: a built-in album's whole tab, an admin album's page.
+  const viewing = live ? pagePhotos : shown;
+
+  const scrollUp = () => top.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const pick = (f: PhotoFilter) => {
+    setFilter(f);
+    setPage(0);
+    if (live) load({ page: 1, limit: size, show: f });
+  };
+  const goTo = (n: number) => {
+    if (live) load({ page: n + 1, limit: size, show: filter }, scrollUp);
+    else {
+      setPage(n);
+      scrollUp();
+    }
+  };
+  const resize = (n: number) => {
+    setPageSize(n);
+    setPage(0);
+    if (live) load({ page: 1, limit: n, show: filter }, scrollUp);
+    else scrollUp();
+  };
+  const clear = () => pick('all');
+
+  // The open photo is kept in the URL (#gallery/<id>/<photo id>): a link to it opens it (an admin album's on its page).
   useEffect(() => {
     const match = window.location.hash.match(/^#gallery\/([^/]+)\/([^/]+)/);
     if (!match || match[1] !== album.id || locked) return;
-    const index = album.images.findIndex((image) => image.id === match[2]);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- opening the photo named in the URL on arrival
+    const photoId = match[2];
+    if (live) {
+      const at = live.first.photos.findIndex((p) => p.id === photoId);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- opening the photo named in the URL on arrival
+      if (at >= 0) setOpen(at);
+      else
+        load({ ...FIRST_PAGE, limit: live.first.limit, at: photoId }, (p) => {
+          const i = p.photos.findIndex((x) => x.id === photoId);
+          if (i >= 0) setOpen(i);
+        });
+      return;
+    }
+    const index = album.images.findIndex((image) => image.id === photoId);
     if (index >= 0) setOpen(index);
-  }, [album.id, album.images, locked]);
+  }, [album.id, album.images, locked, live, load]);
+
+  const mark = (photoId: string) => window.history.replaceState(null, '', `#gallery/${album.id}/${photoId}`);
   const show = useCallback(
     (index: number) => {
       setOpen(index);
-      window.history.replaceState(null, '', `#gallery/${album.id}/${shown[index].id}`);
+      // A built-in album's grid follows the viewer to the photo's page.
+      if (!live) setPage(Math.floor(index / pageSize));
+      const photo = viewing[index];
+      if (photo) window.history.replaceState(null, '', `#gallery/${album.id}/${photo.id}`);
     },
-    [album.id, shown],
+    [album.id, viewing, pageSize, live],
   );
+  /** The viewer past the first or last photo of an admin album's page: the page before or after (round to the other end). */
+  const edge = (step: 1 | -1) => {
+    if (!livePage) return;
+    const next = step === 1 ? (livePage.page % livePage.pages) + 1 : ((livePage.page - 2 + livePage.pages) % livePage.pages) + 1;
+    load({ page: next, limit: livePage.limit, show: filter }, (p) => {
+      const i = step === 1 ? 0 : p.photos.length - 1;
+      setOpen(i);
+      if (p.photos[i]) mark(p.photos[i].id);
+    });
+  };
   const close = useCallback(() => {
     setOpen(null);
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
   }, []);
   const closeCart = useCallback(() => setCartOpen(false), []);
 
-  return (
-    <section className={styles.album}>
-      <AlbumHead access={album.access} title={album.title} line={`${plural(album.images.length, 'photo')} · ${sport.title} · Photos by ${album.by ?? 'Compete Like Pros'}`}>
-        {!locked && (
-          <div className={styles.photoFilter} role="group" aria-label="Show">
-            {FILTERS.map((f) => (
-              <button key={f.id} type="button" className={`${styles.photoTab} ${filter === f.id ? styles.photoTabOn : ''}`} aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
-                {f.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </AlbumHead>
-      {login && <SignedInLine email={login} />}
-      {!locked && banner}
-
-      {locked ? (
+  if (locked) {
+    return (
+      <section className={styles.album}>
+        <AlbumHead access={album.access} title={album.title} line={`${sport.title} · Photos by ${album.by ?? 'Compete Like Pros'}`} />
         <PhotoGate kind={album.access as Exclude<AlbumAccess, 'public'>} />
-      ) : shown.length === 0 ? (
+      </section>
+    );
+  }
+
+  return (
+    <section ref={top} className={styles.album}>
+      <div className={styles.photoFilters}>
+        <div className={styles.photoFilter} role="group" aria-label="Show">
+          {FILTERS.map((f) => (
+            <button key={f.id} type="button" className={`${styles.photoTab} ${filter === f.id ? styles.photoTabOn : ''}`} aria-pressed={filter === f.id} onClick={() => pick(f.id)}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {login && <SignedInLine email={login} />}
+      {banner}
+
+      {failed ? (
+        <div className={styles.empty}>
+          These photos couldn&rsquo;t be loaded.{' '}
+          <button type="button" className={styles.clear} onClick={() => load(failed)}>
+            Try Again
+          </button>
+        </div>
+      ) : total === 0 && !loading ? (
         <div className={styles.empty}>
           No photos match this filter.{' '}
-          <button type="button" className={styles.clear} onClick={() => setFilter('all')}>
+          <button type="button" className={styles.clear} onClick={clear}>
             Show All
           </button>
         </div>
       ) : (
-        <div className={styles.masonry} aria-label={`${album.title} photos`}>
-          {shown.map((image, i) => {
+        <div className={`${styles.masonry} ${loading ? styles.masonryBusy : ''}`} aria-label={`${album.title} photos`} aria-busy={loading}>
+          {pagePhotos.map((image, i) => {
             const paid = isPaid(image);
+            const at = offset + i;
             return (
               <a
                 key={image.id}
                 href={image.full}
                 className={styles.photo}
-                aria-label={`Open photo ${i + 1} of ${shown.length}`}
+                aria-label={`Open photo ${at + 1} of ${total}`}
                 onClick={(e) => {
                   e.preventDefault();
-                  show(i);
+                  show(live ? i : at);
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- the original 400px-high gallery file */}
@@ -744,19 +874,24 @@ function Album({
           })}
         </div>
       )}
+      {!failed && total > PHOTO_PAGE_SIZES[0] && (
+        <Pager page={current} pageCount={pageCount} total={total} shown={pagePhotos.length} pageSize={size} sizes={PHOTO_PAGE_SIZES} onPage={goTo} onPageSize={resize} />
+      )}
 
-      {open !== null && shown[open] && (
+      {open !== null && viewing[open] && (
         <GalleryLightbox
           galleryId={album.id}
           albumTitle={album.title}
           shareable={album.access === 'public'}
           by={album.by}
-          images={shown}
+          byHref={album.byHref}
+          images={viewing}
           index={open}
           startTab={filter === 'prints' ? 'print' : 'digital'}
           onIndex={show}
           onClose={close}
           onOpenCart={() => setCartOpen(true)}
+          paged={live && livePage ? { offset, total, onEdge: edge } : undefined}
         />
       )}
       {cartOpen && <GalleryCart onClose={closeCart} />}

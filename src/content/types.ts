@@ -231,6 +231,10 @@ export type GalleryImage = {
   printable?: boolean;
   /** Why a photo that isn't `printable` can't be printed (shown in the viewer's Prints & products tab). */
   printNote?: string;
+  /** When it was taken (ISO; an admin album's photo, from its camera): the album's date filter. */
+  takenAt?: string;
+  /** Its description, shown in the viewer when it has one. */
+  description?: string;
 };
 
 export type BuilderRow = {

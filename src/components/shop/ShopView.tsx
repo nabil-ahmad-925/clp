@@ -6,8 +6,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
+import { PartnerCard } from '@/components/partners/PartnerDirectory';
+import { DirectorySearchProvider, DirectorySearchSlot, useSharedSearch } from '@/components/sections/DirectorySearch';
+import t from '@/components/sections/TeamDirectory.module.css';
 import Pager from '@/components/ui/Pager';
 import PillSelect from '@/components/ui/PillSelect';
+import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
 import { LuArrowUpDown } from 'react-icons/lu';
 import { BULK_CATEGORIES } from '@/content/bulk';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, money, removeLine, setLineQty, type Cart } from '@/content/cart';
@@ -43,6 +47,7 @@ import {
 } from '@/content/storefront';
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
+import ShopTabs, { ShopTabsContext } from './shopTabs';
 import { Arrow, CategoryIcon, Chevron, LockIcon, SearchIcon } from './shopIcons';
 import s from './shop.module.css';
 
@@ -62,6 +67,8 @@ const HOME_ROW = 4;
 const MENU_STORES = 3;
 /** Products per page in a list (rows of four), and the sizes a shopper can pick. */
 const PAGE_SIZES = [12, 24, 48] as const;
+/** The "Shop by partner" tabs: the store groups A to Z. */
+const GROUP_TABS = [...SHOP_GROUPS].sort((a, b) => a.label.localeCompare(b.label));
 
 const fold = (v: string) =>
   v
@@ -157,6 +164,35 @@ export default function ShopView() {
           ? ''
           : 'home';
 
+  // The tabs sit under each view's heading; on top only where there is none (a product, a message, the design studio).
+  const tabsBelow = !failed && view !== 'studio' && !productId && !(slug && data && !store);
+  const tabs: { id: Nav; label: string; href?: string }[] = [
+    { id: 'home', label: 'Shop', href: shopHref() },
+    { id: 'partners', label: 'Shop by Partner' },
+    { id: 'exclusives', label: 'CLP Exclusives', href: shopHref({ view: 'exclusives' }) },
+    { id: 'new', label: 'New Arrivals', href: shopHref({ view: 'new' }) },
+    { id: 'bulk', label: 'Bulk & Operations', href: shopHref({ view: 'bulk' }) },
+  ];
+  const nav = (
+    <section className={`${s.top} ${tabsBelow ? s.topUnder : ''}`} data-header-tone="light" ref={megaRef}>
+      <nav className={s.nav} aria-label="Shop">
+        {tabs.map((tab) =>
+          tab.href ? (
+            <Link key={tab.id} href={tab.href} className={`${s.navLink} ${active === tab.id && !mega ? s.navOn : ''}`}>
+              {tab.label}
+            </Link>
+          ) : (
+            <button key={tab.id} type="button" className={`${s.navLink} ${active === tab.id || mega ? s.navOn : ''}`} aria-expanded={mega} onClick={() => setMega(!mega)}>
+              {tab.label}
+              <Chevron />
+            </button>
+          ),
+        )}
+      </nav>
+      {mega && data && <MegaMenu data={data} go={go} />}
+    </section>
+  );
+
   let body;
   if (view === 'bulk') body = <ShopBulk />;
   else if (view === 'studio') body = <ShopStudio key={params.get('item') ?? ''} />;
@@ -169,34 +205,10 @@ export default function ShopView() {
   else if (view === 'new' || view === 'search') body = <Collection key={where} data={data} view={view} q={params.get('q') ?? ''} group={params.get('group') ?? ''} />;
   else body = <Home data={data} go={go} />;
 
-  const tabs: { id: Nav; label: string; href?: string }[] = [
-    { id: 'home', label: 'Shop', href: shopHref() },
-    { id: 'partners', label: 'Shop by Partner' },
-    { id: 'exclusives', label: 'CLP Exclusives', href: shopHref({ view: 'exclusives' }) },
-    { id: 'new', label: 'New Arrivals', href: shopHref({ view: 'new' }) },
-    { id: 'bulk', label: 'Bulk & Operations', href: shopHref({ view: 'bulk' }) },
-  ];
-
   return (
     <div className={s.shop}>
-      <section className={s.top} data-header-tone="light" ref={megaRef}>
-        <nav className={s.nav} aria-label="Shop">
-          {tabs.map((t) =>
-            t.href ? (
-              <Link key={t.id} href={t.href} className={`${s.navLink} ${active === t.id && !mega ? s.navOn : ''}`}>
-                {t.label}
-              </Link>
-            ) : (
-              <button key={t.id} type="button" className={`${s.navLink} ${active === t.id || mega ? s.navOn : ''}`} aria-expanded={mega} onClick={() => setMega(!mega)}>
-                {t.label}
-                <Chevron />
-              </button>
-            ),
-          )}
-        </nav>
-        {mega && data && <MegaMenu data={data} go={go} />}
-      </section>
-      {body}
+      {tabsBelow ? <div className={s.headerRoom} data-header-tone="light" /> : nav}
+      <ShopTabsContext.Provider value={tabsBelow ? nav : null}>{body}</ShopTabsContext.Provider>
       {cartOpen && <CartDrawer cart={cart} stores={data?.stores ?? []} onClose={() => setCartOpen(false)} />}
     </div>
   );
@@ -207,11 +219,12 @@ export default function ShopView() {
 function Loading() {
   return (
     <>
-      <section className={s.hero}>
+      <section className={`${s.hero} ${s.heroFirst}`}>
         <div className={s.heroInner}>
           <span className={`${s.skeleton} ${s.skeletonTitle}`} />
         </div>
       </section>
+      <ShopTabs />
       <div className={`${s.section} ${s.spaced}`}>
         <div className={s.grid4} aria-hidden>
           {Array.from({ length: 8 }, (_, i) => (
@@ -242,7 +255,7 @@ function Notice({ text, back }: { text: string; back?: ShopStore }) {
 }
 
 /** A store's round logo: its image, else its initials (italic, the design's) on its colour. */
-function StoreLogo({ store, className }: { store: ShopStore; className: string }) {
+function StoreLogo({ store, className }: { store: Pick<ShopStore, 'color' | 'type' | 'logo' | 'mono'>; className: string }) {
   return (
     <span className={className} style={{ background: store.color || partnerType(store.type).color }}>
       {store.logo ? <img src={store.logo} alt="" /> : store.mono}
@@ -369,7 +382,7 @@ function MegaMenu({ data, go }: { data: ShopData; go: (href: string) => void }) 
 function GroupChips({ value, onPick, dark }: { value: string; onPick: (group: string) => void; dark?: boolean }) {
   return (
     <div className={s.chips}>
-      {[{ id: '', label: 'All' }, ...SHOP_GROUPS].map((g) => (
+      {[{ id: '', label: 'All' }, ...GROUP_TABS].map((g) => (
         <button key={g.id} type="button" className={`${s.chip} ${dark ? s.chipDark : ''} ${value === g.id ? s.chipOn : ''}`} aria-pressed={value === g.id} onClick={() => onPick(g.id)}>
           {g.label}
         </button>
@@ -389,15 +402,15 @@ function mixStores(products: ShopProduct[]) {
   return Array.from({ length: most }, (_, i) => lists.map((l) => l[i]).filter(Boolean)).flat();
 }
 
+/** The home's search bar (the experiences' bar, straddling the heading's edge): a search of every store. */
+function HomeSearch({ go }: { go: (href: string) => void }) {
+  const ctx = useSharedSearch();
+  useEffect(() => ctx?.register((next) => go(shopHref({ view: 'search', q: next.q }))), [ctx, go]);
+  return <DirectorySearchSlot />;
+}
+
 function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
-  const [q, setQ] = useState('');
-  const [group, setGroup] = useState('');
   const [chip, setChip] = useState('');
-  const search = (e: FormEvent) => {
-    e.preventDefault();
-    if (group === 'exclusives') go(shopHref({ view: 'exclusives', q: q.trim() }));
-    else go(shopHref({ view: 'search', q: q.trim(), group }));
-  };
   const tiles = storesIn(data.stores, chip).slice(0, HOME_STORES);
   const publicSlugs = new Set(data.stores.filter((x) => !x.shop.private).map((x) => x.slug));
   const fresh = data.products.filter((p) => publicSlugs.has(p.slug) && !isExclusive(p, data.stores));
@@ -406,28 +419,17 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
   const everything = mixStores(data.products.filter((p) => publicSlugs.has(p.slug)));
   return (
     <>
-      <section className={s.hero}>
+      <section className={`${s.hero} ${s.heroFirst}`}>
         <div className={s.heroInner}>
           <h1 className={s.heroTitle}>Shop the CLP community</h1>
           <p className={s.heroText}>Official gear from our athletes, clubs, schools and organizations, plus exclusives you can only get from CLP.</p>
         </div>
       </section>
-      <div className={s.searchWrap}>
-        <form className={s.search} role="search" onSubmit={search}>
-          <input className={s.searchInput} value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search the shop" placeholder="Search products, athletes, clubs, schools…" />
-          <span className={s.searchRule} aria-hidden />
-          <PillSelect
-            className={s.searchPick}
-            label="Store type"
-            value={group}
-            options={[{ value: '', label: 'All stores' }, ...SHOP_GROUPS.map((g) => ({ value: g.id, label: g.label })), { value: 'exclusives', label: 'CLP Exclusives' }]}
-            onChange={setGroup}
-          />
-          <button type="submit" className={s.searchBtn} aria-label="Search">
-            <SearchIcon />
-          </button>
-        </form>
-      </div>
+      <ShopTabs />
+      <div className={s.navGap} />
+      <DirectorySearchProvider placeholder="Search products, athletes, clubs, schools…" label="Products or stores" withLocation={false}>
+        <HomeSearch go={go} />
+      </DirectorySearchProvider>
 
       <section className={`${s.section} ${s.byPartner}`}>
         <div className={s.headCenter}>
@@ -533,6 +535,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
 
 function Directory({ data, group, go }: { data: ShopData; group: string; go: (href: string) => void }) {
   const [q, setQ] = useState('');
+  const [cards, setCards] = useState<ResultsView>('grid');
   const g = groupById(group);
   const words = fold(q).split(/\s+/).filter(Boolean);
   const stores = storesIn(data.stores, g ? group : '').filter((x) => words.every((w) => fold([x.name, x.short, x.category, x.area, typeLabel(x.type)].join(' ')).includes(w)));
@@ -540,7 +543,7 @@ function Directory({ data, group, go }: { data: ShopData; group: string; go: (hr
   return (
     <>
       <section className={s.band}>
-        <div className={s.bandInner}>
+        <div className={`${s.bandInner} ${s.bandAbove}`}>
           <nav className={s.crumbs} aria-label="Breadcrumb">
             <Link href={shopHref()}>Shop</Link>
             {'  ›  '}Shop by Partner{'  ›  '}
@@ -551,9 +554,14 @@ function Directory({ data, group, go }: { data: ShopData; group: string; go: (hr
             <h1 className={s.bandTitle}>{name}</h1>
             <span className={s.bandSub}>{g ? 'Pick a store to shop their official gear. Every order supports them.' : 'Every official store on CLP. Every order supports them.'}</span>
           </div>
+        </div>
+      </section>
+      <ShopTabs />
+      <section className={s.band}>
+        <div className={`${s.bandInner} ${s.bandBelow}`}>
           <div className={s.bandTools}>
             <div className={s.chips}>
-              {[{ id: '', label: 'All' }, ...SHOP_GROUPS].map((x) => (
+              {[{ id: '', label: 'All' }, ...GROUP_TABS].map((x) => (
                 <button key={x.id} type="button" className={`${s.chip} ${s.tabDark} ${group === x.id ? s.tabDarkOn : ''}`} aria-pressed={group === x.id} onClick={() => go(shopHref({ view: 'partners', group: x.id }))}>
                   {x.label}
                 </button>
@@ -568,34 +576,36 @@ function Directory({ data, group, go }: { data: ShopData; group: string; go: (hr
       </section>
       <div className={s.listingBand} data-listing="">
       <section className={`${s.section} ${s.list}`}>
-        <span className={s.count}>
-          <strong>{countLabel(stores.length, 'store')}</strong>
-        </span>
+        <div className={s.listHead}>
+          <span className={s.count}>
+            <strong>{countLabel(stores.length, 'store')}</strong>
+          </span>
+          <ViewToggle value={cards} onChange={setCards} />
+        </div>
         {stores.length === 0 ? (
           <p className={s.empty}>No stores match your search.</p>
         ) : (
-          <div className={s.grid4}>
-            {stores.map((x) => (
-              <Link key={x.slug} href={storeHref(x.slug)} className={s.storeCard}>
-                <span className={s.storeCover} style={{ background: x.color || partnerType(x.type).color }}>
-                  {x.hero && <img src={x.hero} alt="" loading="lazy" />}
-                  {x.shop.private && (
+          // The site's partner cards (the partner listings'), leading to the store.
+          <div key={cards} className={cards === 'list' ? t.listingList : t.listingGrid}>
+            {stores.map((x, i) => (
+              <PartnerCard
+                key={x.slug}
+                partner={x}
+                eager={i < 4}
+                featured={false}
+                view={cards}
+                href={storeHref(x.slug)}
+                cta={x.shop.private && !storeKey(x.slug) ? 'Enter Password' : 'Visit Store'}
+                stat={`${x.productCount} ${x.productCount === 1 ? 'Product' : 'Products'}`}
+                tag={
+                  x.shop.private ? (
                     <span className={s.privateTag}>
                       <LockIcon />
-                      PRIVATE
+                      PRIVATE{x.shop.until ? ` · UNTIL ${shortDate(x.shop.until).toUpperCase()}` : ''}
                     </span>
-                  )}
-                  <StoreLogo store={x} className={s.storeCardLogo} />
-                </span>
-                <span className={s.storeCardBody}>
-                  <strong>{x.name}</strong>
-                  <span className={s.storeMeta}>{x.shop.private ? `Private drop${x.shop.until ? ` · open until ${shortDate(x.shop.until)}` : ''}` : storeLine(x)}</span>
-                  <span className={s.storeFoot}>
-                    <span>{countLabel(x.productCount, 'product')}</span>
-                    <span className={s.storeCta}>{x.shop.private && !storeKey(x.slug) ? 'Enter password' : 'Shop store'}</span>
-                  </span>
-                </span>
-              </Link>
+                  ) : undefined
+                }
+              />
             ))}
           </div>
         )}
@@ -695,22 +705,25 @@ function Products({ products, stores, head = '', title, id }: { products: ShopPr
 /** A list's black heading (new arrivals, a search, CLP Exclusives): breadcrumb, kicker, Playfair title and line. */
 function ListBand({ crumb, name, kicker, sub }: { crumb: string; name: string; kicker: string; sub: string }) {
   return (
-    <section className={s.band}>
-      <div className={`${s.bandInner} ${s.bandList}`}>
-        <nav className={s.crumbs} aria-label="Breadcrumb">
-          <Link href={shopHref()}>Shop</Link>
-          {'  ›  '}
-          {crumb}
-          {'  ›  '}
-          {name}
-        </nav>
-        <div className={s.headCenter}>
-          <span className={s.kicker}>{kicker}</span>
-          <h1 className={s.listTitle}>{name}</h1>
-          <p className={s.heroText}>{sub}</p>
+    <>
+      <section className={s.band}>
+        <div className={`${s.bandInner} ${s.bandList}`}>
+          <nav className={s.crumbs} aria-label="Breadcrumb">
+            <Link href={shopHref()}>Shop</Link>
+            {'  ›  '}
+            {crumb}
+            {'  ›  '}
+            {name}
+          </nav>
+          <div className={s.headCenter}>
+            <span className={s.kicker}>{kicker}</span>
+            <h1 className={s.listTitle}>{name}</h1>
+            <p className={s.heroText}>{sub}</p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <ShopTabs />
+    </>
   );
 }
 
@@ -819,10 +832,11 @@ function Exclusives({ data, sport, drop, go }: { data: ShopData; sport: string; 
 /* ---------------------------------------------------------------- a store (and its products) */
 
 /** "Copy link" for the page: "Link copied ✓" for a moment. */
-function useShare() {
+/** Copies the page's link (or `path`'s, a product's on the shop), never a private store's invite key. */
+function useShare(path?: string) {
   const [copied, setCopied] = useState(false);
   const share = async () => {
-    const url = window.location.href.replace(/([?&])key=[^&]*&?/, '$1').replace(/[?&]$/, '');
+    const url = path ? new URL(path, window.location.origin).href : window.location.href.replace(/([?&])key=[^&]*&?/, '$1').replace(/[?&]$/, '');
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -896,6 +910,7 @@ function Gate({ store, onOpen }: { store: ShopStore; onOpen: (products: ShopProd
     }
   };
   return (
+    <>
     <section className={s.gate}>
       {store.hero && <img className={s.gateCover} src={store.hero} alt="" />}
       <div className={s.gateInner}>
@@ -930,6 +945,8 @@ function Gate({ store, onOpen }: { store: ShopStore; onOpen: (products: ShopProd
         </form>
       </div>
     </section>
+    <ShopTabs />
+    </>
   );
 }
 
@@ -982,6 +999,7 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
           </div>
         </div>
       </section>
+      <ShopTabs />
       <section className={s.facts}>
         <div className={s.factsInner}>
           <span>
@@ -1069,7 +1087,57 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
 
 /* ---------------------------------------------------------------- a product */
 
+/** What the product detail needs of its store: the shop's store, or a partner page's own. */
+export type DetailStore = Pick<ShopStore, 'slug' | 'name' | 'short' | 'color' | 'type' | 'logo' | 'mono'> & { shop: Pick<ShopStore['shop'], 'exclusive' | 'private' | 'pickup' | 'pickupNote'> };
+
 function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data: ShopData; store: ShopStore; product: ShopProduct; storeKey: string; onViewCart: () => void }) {
+  const more = store.products.filter((p) => p.id !== product.id).slice(0, HOME_ROW);
+  return (
+    <>
+      <section className={s.thinBand} />
+      <section className={`${s.section} ${s.productSection}`}>
+        <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
+          <Link href={shopHref()}>Shop</Link>
+          {'  ›  '}
+          <Link href={storeHref(store.slug)}>{store.name}</Link>
+          {'  ›  '}
+          {product.title}
+        </nav>
+        <ProductDetail store={store} product={product} storeKey={key} onViewCart={onViewCart} />
+      </section>
+      {more.length > 0 && (
+        <section className={`${s.section} ${s.spaced}`}>
+          <div className={s.headRow}>
+            <h2 className={s.moreTitle}>More from {store.name}</h2>
+          </div>
+          <ProductGrid products={more} stores={[...data.stores.filter((x) => x.slug !== store.slug), store]} />
+        </section>
+      )}
+      <div className={s.bottomSpace} />
+    </>
+  );
+}
+
+/**
+ * A product's photos and its buy column (store, name, price, colour and size, quantity, Add to cart and Buy now, the
+ * shipping, returns and impact lines, Details and Shipping & returns): the shop's product page, and a partner page's
+ * Shop tab (`onStore` back to its products in place of the store link, `disabled` while the page is a preview).
+ */
+export function ProductDetail({
+  store,
+  product,
+  storeKey: key,
+  onViewCart,
+  onStore,
+  disabled = false,
+}: {
+  store: DetailStore;
+  product: ShopProduct;
+  storeKey?: string;
+  onViewCart: () => void;
+  onStore?: () => void;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const images = product.images.length ? product.images : product.image ? [product.image] : [];
   const [photo, setPhoto] = useState(0);
@@ -1080,7 +1148,7 @@ function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data
   const [added, setAdded] = useState(false);
   const [error, setError] = useState('');
   const [open, setOpen] = useState<Record<string, boolean>>({ details: true });
-  const { copied, share } = useShare();
+  const { copied, share } = useShare(productHref(store.slug, product.id));
   const exclusive = store.shop.exclusive;
   const short = store.short || store.name;
   const color = exclusive ? '#0A0A0A' : store.color || partnerType(store.type).color;
@@ -1098,7 +1166,6 @@ function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data
       setBusy('');
     }
   };
-  const more = store.products.filter((p) => p.id !== product.id).slice(0, HOME_ROW);
   const colorGroup = product.optionGroups.find((g) => g.kind === 'Colors');
   const otherGroups = product.optionGroups.filter((g) => g.kind !== 'Colors');
   const swatch = Boolean(colorGroup && colorGroup.values.every(canPaint));
@@ -1112,177 +1179,167 @@ function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data
   ];
   const blurb = product.description || (exclusive ? `Made by Compete Like Pros. ${product.collection || 'Only on CLP'}.` : `Official ${store.name} gear, sold on CLP. Every order supports ${short}.`);
 
+  const storeChip = (
+    <>
+      <StoreLogo store={store} className={s.buyStoreLogo} />
+      <span className={s.buyStoreText}>
+        <strong>{store.name}</strong>
+        <span>Visit store</span>
+      </span>
+    </>
+  );
+
   return (
     <>
-      <section className={s.thinBand} />
-      <section className={`${s.section} ${s.productSection}`}>
-        <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
-          <Link href={shopHref()}>Shop</Link>
-          {'  ›  '}
-          <Link href={storeHref(store.slug)}>{store.name}</Link>
-          {'  ›  '}
-          {product.title}
-        </nav>
-        <div className={s.productLayout}>
-          <div className={s.gallery}>
-            <div className={s.thumbs}>
-              {(images.length ? images : ['']).map((src, i) => (
-                <button key={`${src}-${i}`} type="button" className={`${s.thumb} ${i === photo ? s.thumbOn : ''}`} aria-label={`Photo ${i + 1}`} onClick={() => setPhoto(i)} style={{ background: src ? '#EEEEEB' : color }}>
-                  {src && <img src={src} alt="" />}
-                </button>
-              ))}
-            </div>
-            <div className={s.mainPhoto} style={{ background: images.length ? '#EEEEEB' : color }}>
-              {images.length > 0 ? (
-                <>
-                  <img src={images[photo]} alt={product.title} />
-                  <button type="button" className={s.zoomHit} aria-label="View larger" onClick={() => setZoom(true)} />
-                  <span className={s.zoomTag} aria-hidden>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                    </svg>
-                    View larger
-                  </span>
-                </>
-              ) : (
-                <span className={s.tileBlank}>
-                  <img src={site.logo.light} alt="" style={{ opacity: exclusive ? 1 : 0.35 }} />
-                </span>
-              )}
-              <span className={s.photoTags}>
-                {isNewProduct(product) && <span className={s.tag}>NEW</span>}
-                {exclusive && <span className={`${s.tag} ${s.tagGold}`}>CLP EXCLUSIVE</span>}
-              </span>
-            </div>
-          </div>
-
-          <div className={s.buy}>
-            <Link href={storeHref(store.slug)} className={s.buyStore}>
-              <StoreLogo store={store} className={s.buyStoreLogo} />
-              <span className={s.buyStoreText}>
-                <strong>{store.name}</strong>
-                <span>Visit store</span>
-              </span>
-            </Link>
-            <div className={s.buyHead}>
-              <h1 className={s.productName}>{product.title}</h1>
-              <strong className={s.productPrice}>{money(product.price)}</strong>
-              <span className={s.productText}>{blurb}</span>
-            </div>
-            {colorGroup && (
-              <div className={s.option}>
-                <span className={s.optionLabel}>
-                  <strong>Color</strong> <span>· {choices.Colors}</span>
-                </span>
-                <div className={s.optionValues} role="radiogroup" aria-label="Color">
-                  {colorGroup.values.map((v) =>
-                    swatch ? (
-                      <button
-                        key={v}
-                        type="button"
-                        role="radio"
-                        aria-checked={choices.Colors === v}
-                        aria-label={v}
-                        className={`${s.swatch} ${choices.Colors === v ? s.swatchOn : ''}`}
-                        style={{ background: paint(v) }}
-                        onClick={() => setChoices({ ...choices, Colors: v })}
-                      />
-                    ) : (
-                      <button key={v} type="button" role="radio" aria-checked={choices.Colors === v} className={`${s.size} ${choices.Colors === v ? s.sizeOn : ''}`} onClick={() => setChoices({ ...choices, Colors: v })}>
-                        {v}
-                      </button>
-                    ),
-                  )}
-                </div>
-              </div>
-            )}
-            {otherGroups.map((g) => (
-              <div key={g.kind} className={s.option}>
-                <span className={s.optionLabel}>
-                  <strong>{g.kind === 'Sizes' ? 'Size' : g.kind}</strong>
-                </span>
-                <div className={s.optionValues} role="radiogroup" aria-label={g.kind}>
-                  {g.values.map((v) => (
-                    <button key={v} type="button" role="radio" aria-checked={choices[g.kind] === v} className={`${s.size} ${choices[g.kind] === v ? s.sizeOn : ''}`} onClick={() => setChoices({ ...choices, [g.kind]: v })}>
-                      {v}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-            <div className={s.addRow}>
-              <span className={s.qty}>
-                <button type="button" aria-label="Fewer" disabled={qty <= 1} onClick={() => setQty(qty - 1)}>
-                  −
-                </button>
-                <span>{qty}</span>
-                <button type="button" aria-label="More" disabled={qty >= 20} onClick={() => setQty(qty + 1)}>
-                  +
-                </button>
-              </span>
-              <button type="button" className={s.addBtn} disabled={Boolean(busy)} onClick={() => (added ? onViewCart() : add(false))}>
-                {busy === 'add' ? 'Adding…' : added ? 'Added ✓ · View cart' : 'Add to cart'}
-              </button>
-            </div>
-            <button type="button" className={s.buyNow} disabled={Boolean(busy)} onClick={() => add(true)}>
-              {busy === 'buy' ? 'Opening checkout…' : 'Buy now · one-step checkout'}
+    <div className={s.productLayout}>
+      <div className={s.gallery}>
+        <div className={s.thumbs}>
+          {(images.length ? images : ['']).map((src, i) => (
+            <button key={`${src}-${i}`} type="button" className={`${s.thumb} ${i === photo ? s.thumbOn : ''}`} aria-label={`Photo ${i + 1}`} onClick={() => setPhoto(i)} style={{ background: src ? '#EEEEEB' : color }}>
+              {src && <img src={src} alt="" />}
             </button>
-            {error && (
-              <p className={s.error} role="alert">
-                {error}
-              </p>
-            )}
-            <div className={s.infoBox}>
-              <span>
-                <strong>Shipping</strong>
-                <span>{store.shop.pickup ? `Ships from ${store.name}, or pick it up${store.shop.pickupNote ? ` (${store.shop.pickupNote})` : ''}.` : `Made for you and shipped by ${exclusive ? 'CLP' : store.name}.`}</span>
-              </span>
-              <span>
-                <strong>Returns</strong>
-                <span>Contact CLP within 30 days of delivery about an unworn item.</span>
-              </span>
-              <span>
-                <strong>Impact</strong>
-                <span>{exclusive ? 'Supports CLP community programs.' : `Every order supports ${short}.`}</span>
-              </span>
-            </div>
-            <div className={s.accordions}>
-              {accordions.map((a) => (
-                <div key={a.id} className={s.accordion}>
-                  <button type="button" aria-expanded={Boolean(open[a.id])} onClick={() => setOpen({ ...open, [a.id]: !open[a.id] })}>
-                    {a.t}
-                    <span className={s.accSign} aria-hidden>
-                      {open[a.id] ? '−' : '+'}
-                    </span>
-                  </button>
-                  {open[a.id] && (
-                    <ul>
-                      {a.lines.map((l) => (
-                        <li key={l}>{l}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-            <button type="button" className={s.shareLink} onClick={share}>
-              {copied ? 'Link copied ✓' : 'Share this product'}
-            </button>
-          </div>
+          ))}
         </div>
-      </section>
-      {more.length > 0 && (
-        <section className={`${s.section} ${s.spaced}`}>
-          <div className={s.headRow}>
-            <h2 className={s.moreTitle}>More from {store.name}</h2>
-            <Link href={storeHref(store.slug)} className={s.textLink}>
-              View store
-            </Link>
+        <div className={s.mainPhoto} style={{ background: images.length ? '#EEEEEB' : color }}>
+          {images.length > 0 ? (
+            <>
+              <img src={images[photo]} alt={product.title} />
+              <button type="button" className={s.zoomHit} aria-label="View larger" onClick={() => setZoom(true)} />
+              <span className={s.zoomTag} aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                </svg>
+                View larger
+              </span>
+            </>
+          ) : (
+            <span className={s.tileBlank}>
+              <img src={site.logo.light} alt="" style={{ opacity: exclusive ? 1 : 0.35 }} />
+            </span>
+          )}
+          <span className={s.photoTags}>
+            {isNewProduct(product) && <span className={s.tag}>NEW</span>}
+            {exclusive && <span className={`${s.tag} ${s.tagGold}`}>CLP EXCLUSIVE</span>}
+          </span>
+        </div>
+      </div>
+
+      <div className={s.buy}>
+        {onStore ? (
+          <button type="button" className={s.buyStore} onClick={onStore}>
+            {storeChip}
+          </button>
+        ) : (
+          <Link href={storeHref(store.slug)} className={s.buyStore}>
+            {storeChip}
+          </Link>
+        )}
+        <div className={s.buyHead}>
+          <h1 className={s.productName}>{product.title}</h1>
+          <strong className={s.productPrice}>{money(product.price)}</strong>
+          <span className={s.productText}>{blurb}</span>
+        </div>
+        {colorGroup && (
+          <div className={s.option}>
+            <span className={s.optionLabel}>
+              <strong>Color</strong> <span>· {choices.Colors}</span>
+            </span>
+            <div className={s.optionValues} role="radiogroup" aria-label="Color">
+              {colorGroup.values.map((v) =>
+                swatch ? (
+                  <button
+                    key={v}
+                    type="button"
+                    role="radio"
+                    aria-checked={choices.Colors === v}
+                    aria-label={v}
+                    className={`${s.swatch} ${choices.Colors === v ? s.swatchOn : ''}`}
+                    style={{ background: paint(v) }}
+                    onClick={() => setChoices({ ...choices, Colors: v })}
+                  />
+                ) : (
+                  <button key={v} type="button" role="radio" aria-checked={choices.Colors === v} className={`${s.size} ${choices.Colors === v ? s.sizeOn : ''}`} onClick={() => setChoices({ ...choices, Colors: v })}>
+                    {v}
+                  </button>
+                ),
+              )}
+            </div>
           </div>
-          <ProductGrid products={more} stores={[...data.stores.filter((x) => x.slug !== store.slug), store]} />
-        </section>
-      )}
-      <div className={s.bottomSpace} />
+        )}
+        {otherGroups.map((g) => (
+          <div key={g.kind} className={s.option}>
+            <span className={s.optionLabel}>
+              <strong>{g.kind === 'Sizes' ? 'Size' : g.kind}</strong>
+            </span>
+            <div className={s.optionValues} role="radiogroup" aria-label={g.kind}>
+              {g.values.map((v) => (
+                <button key={v} type="button" role="radio" aria-checked={choices[g.kind] === v} className={`${s.size} ${choices[g.kind] === v ? s.sizeOn : ''}`} onClick={() => setChoices({ ...choices, [g.kind]: v })}>
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div className={s.addRow}>
+          <span className={s.qty}>
+            <button type="button" aria-label="Fewer" disabled={qty <= 1} onClick={() => setQty(qty - 1)}>
+              −
+            </button>
+            <span>{qty}</span>
+            <button type="button" aria-label="More" disabled={qty >= 20} onClick={() => setQty(qty + 1)}>
+              +
+            </button>
+          </span>
+          <button type="button" className={s.addBtn} disabled={Boolean(busy) || disabled} onClick={() => (added ? onViewCart() : add(false))}>
+            {busy === 'add' ? 'Adding…' : added ? 'Added ✓ · View cart' : 'Add to cart'}
+          </button>
+        </div>
+        <button type="button" className={s.buyNow} disabled={Boolean(busy) || disabled} onClick={() => add(true)}>
+          {busy === 'buy' ? 'Opening checkout…' : 'Buy now · one-step checkout'}
+        </button>
+        {error && (
+          <p className={s.error} role="alert">
+            {error}
+          </p>
+        )}
+        <div className={s.infoBox}>
+          <span>
+            <strong>Shipping</strong>
+            <span>{store.shop.pickup ? `Ships from ${store.name}, or pick it up${store.shop.pickupNote ? ` (${store.shop.pickupNote})` : ''}.` : `Made for you and shipped by ${exclusive ? 'CLP' : store.name}.`}</span>
+          </span>
+          <span>
+            <strong>Returns</strong>
+            <span>Contact CLP within 30 days of delivery about an unworn item.</span>
+          </span>
+          <span>
+            <strong>Impact</strong>
+            <span>{exclusive ? 'Supports CLP community programs.' : `Every order supports ${short}.`}</span>
+          </span>
+        </div>
+        <div className={s.accordions}>
+          {accordions.map((a) => (
+            <div key={a.id} className={s.accordion}>
+              <button type="button" aria-expanded={Boolean(open[a.id])} onClick={() => setOpen({ ...open, [a.id]: !open[a.id] })}>
+                {a.t}
+                <span className={s.accSign} aria-hidden>
+                  {open[a.id] ? '−' : '+'}
+                </span>
+              </button>
+              {open[a.id] && (
+                <ul>
+                  {a.lines.map((l) => (
+                    <li key={l}>{l}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+        <button type="button" className={s.shareLink} onClick={share}>
+          {copied ? 'Link copied ✓' : 'Share this product'}
+        </button>
+      </div>
+    </div>
       {zoom && images.length > 0 && <Lightbox images={images} start={photo} title={product.title} onClose={() => setZoom(false)} />}
     </>
   );

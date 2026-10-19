@@ -30,6 +30,7 @@ import { partnerSignOut, uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
+import ShopTabs from './shopTabs';
 import { LockIcon, SearchIcon } from './shopIcons';
 import { useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
@@ -173,6 +174,8 @@ export default function ShopBulk() {
           </div>
         </div>
       </section>
+      <ShopTabs />
+      <div className={s.navGap} />
 
       <section className={b.wrap}>
         <form className={s.search} role="search" onSubmit={(e) => e.preventDefault()}>

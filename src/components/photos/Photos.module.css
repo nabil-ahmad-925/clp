@@ -201,7 +201,7 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0;
-  text-transform: none;
+  text-transform: uppercase;
 }
 
 .grid {
@@ -504,6 +504,15 @@
   font-size: 15px;
 }
 
+/* An album's photo tabs on the left, its date filter on the right. */
+.photoFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
 .photoFilter {
   display: flex;
   flex-wrap: wrap;
@@ -548,6 +557,13 @@
 .masonry {
   columns: 4 280px;
   column-gap: 12px;
+}
+
+/* The next page of photos on its way: the current one dimmed. */
+.masonryBusy {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
 }
 
 .photo {

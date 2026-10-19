@@ -10,12 +10,22 @@ import type { RowFacts } from '@/components/sections/DirectoryRow';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
 import FieldSelect from '@/components/ui/FieldSelect';
 import PillSelect from '@/components/ui/PillSelect';
-import { LuArrowUpDown, LuSearch } from 'react-icons/lu';
-import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
+import type { IconType } from 'react-icons';
+import { FaFacebookF, FaGlobe, FaInstagram, FaLinkedinIn, FaTiktok, FaYoutube } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import { LuArrowUpDown, LuBriefcase, LuCalendar, LuMapPin, LuSearch, LuShapes, LuUsers } from 'react-icons/lu';
+import FilterChip from '@/components/ui/FilterChip';
+import ListingCard from '@/components/sections/ListingCard';
+import { ArticleCard } from '@/components/sections/PostFilter';
+import { listingFacts } from '@/components/sections/TeamDirectory';
+import ResultsToggle, { type ResultsView } from '@/components/ui/ViewToggle';
+import { ProductDetail, type DetailStore } from '@/components/shop/ShopView';
+import { articleDate, storyCard } from '@/content/articles';
+import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
-import { agePolicy, categoryName, cornerTagLabel, isBookable, toItem, unitLabel } from '@/content/listings';
+import { categoryName, isBookable, toItem } from '@/content/listings';
 import {
   collabLabel,
   partnerType,
@@ -30,8 +40,11 @@ import {
   type PartnerReviewData,
 } from '@/content/partnerPages';
 import { askQuestion, saveConversation, sendIntro, sitePath } from '@/content/messages';
-import { canPaint, paint, storeHref } from '@/content/storefront';
+import { storeHref } from '@/content/storefront';
 import type { DirectoryItem } from '@/content/types';
+import lc from '@/components/sections/ListingCard.module.css';
+import t from '@/components/sections/TeamDirectory.module.css';
+import pf from '@/components/sections/PostFilter.module.css';
 import s from './partnerPage.module.css';
 
 type Experience = PartnerPageResponse['experiences'][number];
@@ -45,7 +58,6 @@ const plural = (n: number, word: string) => `${n} ${n === 1 ? word : `${word}s`}
 const utc = (day: string) => new Date(`${day.slice(0, 10)}T00:00:00Z`);
 const monthOf = (day: string) => utc(day).toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase();
 const dateText = (day: string) => utc(day).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-const monthYear = (day: string) => utc(day).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 const clock = (t?: string) => {
   if (!t) return '';
   const [h, m] = t.split(':').map(Number);
@@ -105,53 +117,17 @@ const PaletteContext = createContext<CSSProperties>({});
 
 // --- Icons --------------------------------------------------------------------------------------------------------------
 
-const SOCIAL_ICONS: Record<string, ReactNode> = {
-  instagram: (
-    <>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-    </>
-  ),
-  facebook: <path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2z" />,
-  linkedin: (
-    <>
-      <rect x="3" y="3" width="18" height="18" rx="3" />
-      <path d="M8 10v7M8 7v.01M12 17v-7M12 13a3 3 0 0 1 6 0v4" />
-    </>
-  ),
-  tiktok: (
-    <>
-      <path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5" />
-      <path d="M14 3c.4 2.6 2.4 4.6 5 5" />
-    </>
-  ),
-  youtube: (
-    <>
-      <rect x="2.5" y="5" width="19" height="14" rx="4" />
-      <path d="m10 9 5 3-5 3z" />
-    </>
-  ),
-  x: <path d="M4 4l16 16M20 4 4 20" />,
-  website: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" />
-    </>
-  ),
+/** The networks' own marks (as the site footer's), a globe for a website. */
+const SOCIAL_ICONS: Record<string, IconType> = {
+  instagram: FaInstagram,
+  facebook: FaFacebookF,
+  linkedin: FaLinkedinIn,
+  tiktok: FaTiktok,
+  youtube: FaYoutube,
+  x: FaXTwitter,
+  website: FaGlobe,
 };
 
-const CalendarIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <rect x="3" y="5" width="18" height="16" rx="2" />
-    <path d="M3 10h18M8 3v4M16 3v4" />
-  </svg>
-);
-const PinIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M12 21s-7-6.1-7-11.5a7 7 0 0 1 14 0C19 14.9 12 21 12 21z" />
-    <circle cx="12" cy="9.5" r="2.5" />
-  </svg>
-);
 const BagIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
     <path d="M6 7h12l1 13H5z" />
@@ -174,16 +150,8 @@ const factsOf = (l: Experience): RowFacts => ({
 });
 const priceOf = (l: { priceMin?: number; priceMax?: number }) =>
   l.priceMin == null ? '' : (l.priceMax ?? l.priceMin) === 0 ? 'Free' : l.priceMin === (l.priceMax ?? l.priceMin) ? dollars(l.priceMin) : `${dollars(l.priceMin)}+`;
-const whenOf = (l: Experience) =>
-  l.startDate ? [dateText(l.startDate), [clock(l.startTime), clock(l.endTime)].filter(Boolean).join(' – ')].filter(Boolean).join(', ') : 'Ongoing · book any time';
 const cityOf = (l: Experience) => CITIES[l.tags.find((t) => CITIES[t]) ?? ''] ?? l.subtitle ?? '';
-const agesOf = (l: Experience) => l.tags.filter((t) => AGES[t]).map((t) => AGES[t]);
 const isExperience = (l: Experience) => !l.listingType || l.listingType === 'experiences';
-/** "18+" on the photo of an adults-only listing. */
-const ageBadge = (l: Experience) => {
-  const policy = agePolicy(l.tags);
-  return policy.kind === 'adult' ? `${policy.minAge}+` : '';
-};
 const ctaOf = (l: Experience) => (!isBookable(toItem(l)) ? 'Details' : priceOf(l) === 'Free' ? 'RSVP' : 'Book Now');
 
 /**
@@ -302,11 +270,6 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         <section className={s.hero} data-header-tone="light" data-page-hero>
           {page.hero ? <img className={s.heroImage} src={page.hero} alt="" /> : <span className={s.heroBlank} />}
           <span className={s.heroFade} aria-hidden />
-          {has('content') && (
-            <button type="button" className={s.heroPhotos} onClick={() => pick('content')}>
-              ▦ See all photos &amp; videos
-            </button>
-          )}
         </section>
 
         <section className={s.identity} data-header-tone="dark">
@@ -337,13 +300,14 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                 )}
                 {socials.length > 0 && (
                   <span className={s.socials}>
-                    {socials.map((so) => (
-                      <a key={so.network} href={so.href} target="_blank" rel="noopener noreferrer" className={s.social} aria-label={`${page.short} on ${so.network}`}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                          {SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website}
-                        </svg>
-                      </a>
-                    ))}
+                    {socials.map((so) => {
+                      const Icon = SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website;
+                      return (
+                        <a key={so.network} href={so.href} target="_blank" rel="noopener noreferrer" className={s.social} aria-label={`${page.short} on ${so.network}`}>
+                          <Icon aria-hidden />
+                        </a>
+                      );
+                    })}
                   </span>
                 )}
               </div>
@@ -387,7 +351,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             {shown === 'content' && <Content page={page} onPhoto={setPhoto} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
-            {shown === 'partnerships' && <Partnerships page={page} collabs={collabs} onWork={() => setDialog('intro')} />}
+            {shown === 'partnerships' && <Partnerships collabs={collabs} />}
             {shown === 'reviews' && <Reviews page={page} reviews={reviews} />}
             {shown === 'shop' &&
               (page.shop?.private ? (
@@ -415,7 +379,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                   }}
                 />
               ))}
-            {shown === 'news' && <News page={page} posts={posts} />}
+            {shown === 'news' && <News posts={posts} />}
           </div>
         </main>
 
@@ -563,7 +527,7 @@ function About({
               <span className={s.label}>NEXT UP</span>
               {onAll && (
                 <button type="button" className={s.textLink} onClick={onAll}>
-                  All experiences →
+                  All Experiences →
                 </button>
               )}
             </div>
@@ -668,25 +632,26 @@ const embedOf = (v: PartnerVideo) => {
     '': '',
   }[v.source];
 };
+/** A heading in Title Case ("Game Day", "Teams in Action"): each word capitalised, the short joining words kept small. */
+const SMALL_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
+const titleCase = (text: string) =>
+  text.replace(/\S+/g, (w, i: number) => (i > 0 && SMALL_WORDS.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)));
 const thumbOf = (v: PartnerVideo) => (v.source === 'youtube' && videoId(v) ? `https://i.ytimg.com/vi/${videoId(v)}/hqdefault.jpg` : '');
 
 function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (src: string) => void; onVideo: (v: PartnerVideo) => void }) {
   const videos = page.videos ?? [];
   const [kind, setKind] = useState<'all' | 'photos' | 'videos'>('all');
-  const filters = (
-    [
-      ['all', 'All', page.photos.length + videos.length],
-      ['photos', 'Photos', page.photos.length],
-      ['videos', 'Videos', videos.length],
-    ] as const
-  ).filter(([id, , n]) => id === 'all' || n > 0);
+  // Every kind its own tab (a kind with nothing in it says so).
+  const filters = [
+    ['all', 'All', page.photos.length + videos.length],
+    ['photos', 'Photos', page.photos.length],
+    ['videos', 'Videos', videos.length],
+  ] as const;
+  const none = (kind === 'photos' ? page.photos.length : kind === 'videos' ? videos.length : 1) === 0;
   return (
     <div className={s.stack}>
       <div className={s.sectionHead}>
-        <div className={s.headStack}>
-          <span className={s.label}>CONTENT</span>
-          <h2 className={s.cardTitle}>Photos &amp; videos</h2>
-        </div>
+        <h2 className={s.cardTitle}>Photos &amp; Videos</h2>
         <div className={s.pills}>
           {filters.map(([id, label, n]) => (
             <button key={id} type="button" className={`${s.pill} ${kind === id ? s.pillOn : ''}`} aria-pressed={kind === id} onClick={() => setKind(id)}>
@@ -714,7 +679,7 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
                   </span>
                 </span>
                 <span className={s.contentText}>
-                  <strong>{v.title || `${page.short} video ${i + 1}`}</strong>
+                  <strong>{titleCase(v.title || `${page.short} video ${i + 1}`)}</strong>
                   <span>Video · {src.label.charAt(0) + src.label.slice(1).toLowerCase()}</span>
                 </span>
               </button>
@@ -728,12 +693,13 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
                 <span className={s.contentSource}>PHOTOS</span>
               </span>
               <span className={s.contentText}>
-                <strong>{ph.caption || `${page.short} photo ${i + 1}`}</strong>
+                <strong>{titleCase(ph.caption || `${page.short} photo ${i + 1}`)}</strong>
                 <span>{page.name}</span>
               </span>
             </button>
           ))}
       </div>
+      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : `No photos from ${page.short} yet.`}</div>}
       <div className={s.note}>Youth albums and videos are private to the families booked on that session. Download, print or license a photo from any public album.</div>
     </div>
   );
@@ -741,12 +707,54 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
 
 // --- Experiences --------------------------------------------------------------------------------------------------------
 
+/**
+ * A tab's filter as the listing pages' (FilterChip): a pill with its icon and name opening its options, A to Z in Title
+ * Case with how many each shows, one at a time ("Show N results" applies it). None to choose: no pill.
+ */
+function ChoiceChip({
+  id,
+  name,
+  icon,
+  options,
+  value,
+  open,
+  onOpen,
+  count,
+  onChange,
+}: {
+  id: string;
+  name: string;
+  icon: ReactNode;
+  options: { value: string; label: string; count: number }[];
+  value: string;
+  open: string | null;
+  onOpen: (id: string | null) => void;
+  count: (value: string) => number;
+  onChange: (value: string) => void;
+}) {
+  if (options.length === 0) return null;
+  return (
+    <FilterChip
+      name={name}
+      icon={icon}
+      single
+      options={options.map((o) => ({ ...o, label: titleCase(o.label) })).sort((a, b) => a.label.localeCompare(b.label))}
+      value={value ? [value] : []}
+      open={open === id}
+      onOpenChange={(o) => onOpen(o ? id : null)}
+      resultsFor={(draft) => count(draft[0] ?? '')}
+      onApply={(values) => onChange(values[0] ?? '')}
+    />
+  );
+}
+
 type ExpFilters = { q: string; type: string; ages: string; loc: string; when: string };
 const NO_FILTERS: ExpFilters = { q: '', type: '', ages: '', loc: '', when: '' };
 
 function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Experience[]; onOpen: (l: Experience) => void }) {
   const [f, setF] = useState<ExpFilters>(NO_FILTERS);
-  const [view, setView] = useState<'list' | 'grid'>('list');
+  // As the experiences pages: grid first, or the list.
+  const [view, setView] = useState<ResultsView>('grid');
   const [now] = useState(() => Date.now());
   const exps = items.filter(isExperience);
   const other = items.filter((l) => !isExperience(l));
@@ -756,61 +764,74 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
   const places = [...new Set(exps.map(cityOf).filter(Boolean))].sort();
   const today = new Date(now).toISOString().slice(0, 10);
   const plus = (days: number) => new Date(now + days * 86_400_000).toISOString().slice(0, 10);
-  const words = f.q.toLowerCase().split(/\s+/).filter(Boolean);
-  const shown = exps.filter(
-    (l) =>
-      (!f.type || typeOf(l) === f.type) &&
-      (!f.ages || l.tags.includes(f.ages)) &&
-      (!f.loc || cityOf(l) === f.loc) &&
-      (!f.when || (l.startDate && l.startDate <= plus(f.when === 'week' ? 7 : 31) && (l.endDate ?? l.startDate) >= today)) &&
-      words.every((w) => [l.title, l.subtitle, l.excerpt, typeOf(l), cityOf(l)].join(' ').toLowerCase().includes(w)),
-  );
-  const any = Object.values(f).some(Boolean);
-  const select = (key: keyof ExpFilters, label: string, options: [string, string][]) =>
-    options.length > 0 && (
-      <PillSelect variant="filter" label={label} value={f[key]} options={[{ value: '', label }, ...options.map(([value, l]) => ({ value, label: l }))]} onChange={(v) => setF({ ...f, [key]: v })} />
+  const [chip, setChip] = useState<string | null>(null);
+  const matching = (g: ExpFilters) => {
+    const words = g.q.toLowerCase().split(/\s+/).filter(Boolean);
+    return exps.filter(
+      (l) =>
+        (!g.type || typeOf(l) === g.type) &&
+        (!g.ages || l.tags.includes(g.ages)) &&
+        (!g.loc || cityOf(l) === g.loc) &&
+        (!g.when || (l.startDate && l.startDate <= plus(g.when === 'week' ? 7 : 31) && (l.endDate ?? l.startDate) >= today)) &&
+        words.every((w) => [l.title, l.subtitle, l.excerpt, typeOf(l), cityOf(l)].join(' ').toLowerCase().includes(w)),
     );
-  const badge = (l: Experience) => (l.cornerTag ? cornerTagLabel(l.cornerTag).toUpperCase() : '✓ CLP PARTNER');
-  const unit = (l: Experience) => (l.priceUnit && priceOf(l) !== 'Free' ? `/ ${unitLabel(l.priceUnit)}` : '');
+  };
+  const shown = matching(f);
+  const any = Object.values(f).some(Boolean);
+  // A filter as the experiences pages': its options with how many each would show.
+  const select = (key: Exclude<keyof ExpFilters, 'q'>, name: string, icon: ReactNode, options: [string, string][]) => (
+    <ChoiceChip
+      id={key}
+      name={name}
+      icon={icon}
+      options={options.map(([value, label]) => ({ value, label, count: matching({ ...f, [key]: value }).length }))}
+      value={f[key]}
+      open={chip}
+      onOpen={setChip}
+      count={(value) => matching({ ...f, [key]: value }).length}
+      onChange={(value) => setF({ ...f, [key]: value })}
+    />
+  );
+  // A listing as the experiences pages' card: this partner's name on it, its own rating.
+  const cardOf = (l: Experience): DirectoryItem => ({ ...toItem(l), partner: { name: page.name, slug: page.slug } });
 
   return (
     <div className={s.stack}>
-      <div className={s.sectionHead}>
-        <div className={s.headStack}>
-          <span className={s.label}>EXPERIENCES</span>
-          <h2 className={s.cardTitle}>Upcoming with {page.short}</h2>
-        </div>
-        <span className={s.countText}>{plural(shown.length, 'experience')}</span>
-      </div>
+      <h2 className={s.cardTitle}>Upcoming with {page.short}</h2>
 
       {exps.length > 0 && (
         <div className={s.filterBar}>
           <SearchPill label="Search experiences" placeholder={`Search ${page.short} experiences`} value={f.q} onChange={(q) => setF({ ...f, q })} />
           {select(
             'type',
-            'All types',
+            'All Types',
+            <LuShapes />,
             types.map((t) => [t, t]),
           )}
           {select(
             'ages',
-            'All ages',
+            'All Ages',
+            <LuUsers />,
             ages.map((t) => [t, AGES[t]]),
           )}
           {select(
             'loc',
-            'All locations',
+            'All Locations',
+            <LuMapPin />,
             places.map((p) => [p, p]),
           )}
-          {select('when', 'Any date', [
-            ['week', 'This week'],
-            ['month', 'This month'],
+          {select('when', 'Any Date', <LuCalendar />, [
+            ['week', 'This Week'],
+            ['month', 'This Month'],
           ])}
           {any && (
             <button type="button" className={s.textLink} onClick={() => setF(NO_FILTERS)}>
-              Clear
+              Clear All
             </button>
           )}
-          <ViewToggle view={view} onView={setView} />
+          <span className={s.filterEnd}>
+            <ResultsToggle value={view} onChange={setView} />
+          </span>
         </div>
       )}
 
@@ -818,79 +839,21 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
         <div className={s.emptyCard}>
           No experiences match these filters.{' '}
           <button type="button" className={s.textLink} onClick={() => setF(NO_FILTERS)}>
-            Clear filters
+            Clear Filters
           </button>
         </div>
       )}
 
-      {view === 'list' ? (
-        <div className={s.expList}>
-          {shown.map((l) => (
-            <article key={l.id} className={`${s.expRow} ${l.cornerTag ? s.expFeatured : ''}`}>
-              <div className={s.expMedia}>
-                {l.image && <img src={l.image} alt="" loading="lazy" />}
-                <span className={`${s.expBadge} ${l.cornerTag ? s.expBadgeDark : ''}`}>{badge(l)}</span>
-                {ageBadge(l) && <span className={s.expAge}>{ageBadge(l)}</span>}
+      {shown.length > 0 && (
+        <div key={view} className={view === 'list' ? t.listingList : t.listingGrid}>
+          {shown.map((l, i) => {
+            const card = cardOf(l);
+            return (
+              <div key={l.id} className={t.listingItem}>
+                <ListingCard card={card} view={view} eager={i < 4} facts={listingFacts(card)} onOpen={() => onOpen(l)} onBook={() => onOpen(l)} />
               </div>
-              <div className={s.expBody}>
-                <span className={s.expCat}>{typeOf(l) || l.subtitle}</span>
-                <strong className={s.expTitle}>{l.title}</strong>
-                <span className={s.expFact}>
-                  <CalendarIcon />
-                  {whenOf(l)}
-                </span>
-                {cityOf(l) && (
-                  <span className={s.expFact}>
-                    <PinIcon />
-                    {cityOf(l)}
-                  </span>
-                )}
-                {agesOf(l).length > 0 && <span className={s.expAges}>{agesOf(l).join(' · ')}</span>}
-                <div className={s.expFoot}>
-                  <span className={s.expPrice}>
-                    <span>
-                      <strong>{priceOf(l)}</strong> <span className={s.mutedText}>{unit(l)}</span>
-                    </span>
-                    {l.capacity ? <span className={s.expSpots}>{l.capacity} spots a session</span> : null}
-                  </span>
-                  <button type="button" className={`${s.btnAccent} ${s.btnLg}`} onClick={() => onOpen(l)}>
-                    {ctaOf(l)}
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <div className={s.grid3}>
-          {shown.map((l) => (
-            <article key={l.id} className={`${s.expCard} ${l.cornerTag ? s.expFeatured : ''}`}>
-              <div className={s.expCardMedia}>
-                {l.image && <img src={l.image} alt="" loading="lazy" />}
-                <span className={`${s.expBadge} ${l.cornerTag ? s.expBadgeDark : ''}`}>{badge(l)}</span>
-                {ageBadge(l) && <span className={s.expAge}>{ageBadge(l)}</span>}
-              </div>
-              <div className={s.expCardBody}>
-                <span className={s.expCat}>{cityOf(l) || typeOf(l)}</span>
-                <strong className={s.expCardTitle}>{l.title}</strong>
-                <span className={s.expFact}>
-                  <CalendarIcon />
-                  {whenOf(l)}
-                </span>
-                <strong className={s.expCardPrice}>
-                  {priceOf(l)} <span className={s.mutedText}>{unit(l)}</span>
-                </strong>
-                <div className={s.expCardFoot}>
-                  <span>{agesOf(l).join(' · ') || 'All ages'}</span>
-                  <span className={s.rule} aria-hidden />
-                  <span>{page.name}</span>
-                </div>
-                <button type="button" className={`${s.btnAccent} ${s.btnLg}`} onClick={() => onOpen(l)}>
-                  {ctaOf(l)}
-                </button>
-              </div>
-            </article>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -935,60 +898,58 @@ function SearchPill({ label, placeholder, value, onChange }: { label: string; pl
   );
 }
 
-function ViewToggle({ view, onView }: { view: 'list' | 'grid'; onView: (v: 'list' | 'grid') => void }) {
-  return (
-    <span className={s.viewToggle} role="group" aria-label="View">
-      {(
-        [
-          ['list', 'List'],
-          ['grid', 'Grid'],
-        ] as const
-      ).map(([v, label]) => (
-        <button key={v} type="button" className={view === v ? s.viewOn : ''} aria-pressed={view === v} onClick={() => onView(v)}>
-          {label}
-        </button>
-      ))}
-    </span>
-  );
-}
-
 // --- Jobs ---------------------------------------------------------------------------------------------------------------
 
 function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOpen: (j: Job) => void }) {
   const [q, setQ] = useState('');
   const [kind, setKind] = useState('');
   const [loc, setLoc] = useState('');
-  const [view, setView] = useState<'list' | 'grid'>('list');
+  const [view, setView] = useState<ResultsView>('list');
+  const [chip, setChip] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
   const kinds = [...new Set(jobs.map((j) => j.type))];
-  const places = [...new Set(jobs.map((j) => placeText(j)).filter(Boolean))].sort();
+  const places = [...new Set(jobs.map((j) => placeText(j)).filter(Boolean))];
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const shown = jobs.filter(
-    (j) => (!kind || j.type === kind) && (!loc || placeText(j) === loc) && words.every((w) => [j.title, j.description, placeText(j)].join(' ').toLowerCase().includes(w)),
-  );
+  const matching = (k: string, l: string) =>
+    jobs.filter((j) => (!k || j.type === k) && (!l || placeText(j) === l) && words.every((w) => [j.title, j.description, placeText(j)].join(' ').toLowerCase().includes(w)));
+  const shown = matching(kind, loc);
   const fresh = (j: Job) => now - Date.parse(j.postedAt) < 7 * 86_400_000;
   const meta = (j: Job) => [placeText(j), jobTypeLabel(j.type)].filter(Boolean).join(' · ');
   const summary = (j: Job) => j.description.split('\n')[0];
   return (
     <div className={s.stack} style={{ gap: 30 }}>
-      <div className={s.listHead}>
+      <div className={`${s.listHead} ${s.listHeadCenter}`}>
         <div className={s.headStack} style={{ gap: 10 }}>
           <span className={s.bigTitle}>
-            Open roles <span className={s.countText}>{shown.length === jobs.length ? jobs.length : `${shown.length} of ${jobs.length}`}</span>
+            Open Roles <span className={s.countText}>{shown.length === jobs.length ? jobs.length : `${shown.length} of ${jobs.length}`}</span>
           </span>
           <span className={s.mutedText}>Work with {page.short}. Every role is also on CLP Jobs &amp; Internships.</span>
         </div>
-        <div className={s.listTools}>
+        <div className={`${s.listTools} ${s.listToolsRow}`}>
           <SearchPill label="Search roles" placeholder="Role or keyword" value={q} onChange={setQ} />
-          <PillSelect
-            variant="filter"
-            label="Type"
+          <ChoiceChip
+            id="type"
+            name="All Types"
+            icon={<LuBriefcase />}
+            options={kinds.map((k) => ({ value: k, label: jobTypeLabel(k), count: matching(k, loc).length }))}
             value={kind}
-            options={[{ value: '', label: `All types (${jobs.length})` }, ...kinds.map((k) => ({ value: k, label: `${jobTypeLabel(k)} (${jobs.filter((j) => j.type === k).length})` }))]}
+            open={chip}
+            onOpen={setChip}
+            count={(k) => matching(k, loc).length}
             onChange={setKind}
           />
-          {places.length > 1 && <PillSelect variant="filter" label="Location" value={loc} options={[{ value: '', label: 'All locations' }, ...places.map((p) => ({ value: p, label: p }))]} onChange={setLoc} />}
-          <ViewToggle view={view} onView={setView} />
+          <ChoiceChip
+            id="loc"
+            name="All Locations"
+            icon={<LuMapPin />}
+            options={places.map((p) => ({ value: p, label: p, count: matching(kind, p).length }))}
+            value={loc}
+            open={chip}
+            onOpen={setChip}
+            count={(p) => matching(kind, p).length}
+            onChange={setLoc}
+          />
+          <ResultsToggle value={view} onChange={setView} />
         </div>
       </div>
       {shown.length === 0 ? (
@@ -1003,7 +964,7 @@ function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOp
               setLoc('');
             }}
           >
-            Clear filters
+            Clear Filters
           </button>
         </div>
       ) : view === 'list' ? (
@@ -1023,7 +984,7 @@ function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOp
               <div className={s.jobSide}>
                 {payText(j) && <strong>{payText(j)}</strong>}
                 <button type="button" className={`${s.btnAccent} ${s.btnLg}`} onClick={() => onOpen(j)}>
-                  View &amp; apply
+                  View &amp; Apply
                 </button>
                 <span className={s.mutedSmall}>Posted {postedAgo(j.postedAt, now).toLowerCase()}</span>
               </div>
@@ -1049,7 +1010,7 @@ function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOp
                   <span className={s.mutedSmall}>Posted {postedAgo(j.postedAt, now).toLowerCase()}</span>
                 </div>
                 <button type="button" className={`${s.btnAccent} ${s.btnLg}`} onClick={() => onOpen(j)}>
-                  View &amp; apply
+                  View &amp; Apply
                 </button>
               </div>
             </article>
@@ -1198,14 +1159,15 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
 
 // --- Partnerships -------------------------------------------------------------------------------------------------------
 
-function Partnerships({ page, collabs, onWork }: { page: PartnerPageData; collabs: PartnerCollab[]; onWork: () => void }) {
+function Partnerships({ collabs }: { collabs: PartnerCollab[] }) {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('');
   const [sort, setSort] = useState('new');
+  const [chip, setChip] = useState<string | null>(null);
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const cats = [...new Set(collabs.map((c) => c.type))];
-  const shown = collabs
-    .filter((c) => (!cat || c.type === cat) && words.every((w) => [c.title, c.brand, c.description, c.dates, collabLabel(c.type)].join(' ').toLowerCase().includes(w)))
+  const matching = (k: string) => collabs.filter((c) => (!k || c.type === k) && words.every((w) => [c.title, c.brand, c.description, c.dates, collabLabel(c.type)].join(' ').toLowerCase().includes(w)));
+  const shown = matching(cat)
     .sort((a, b) => (sort === 'az' ? a.title.localeCompare(b.title) : sort === 'old' ? a.createdAt.localeCompare(b.createdAt) : b.createdAt.localeCompare(a.createdAt)));
   const card = (c: PartnerCollab) => (
     <>
@@ -1217,22 +1179,21 @@ function Partnerships({ page, collabs, onWork }: { page: PartnerPageData; collab
   );
   return (
     <div className={s.stack} style={{ gap: 30 }}>
-      <div className={s.listHead}>
-        <div className={s.headStack} style={{ gap: 14 }}>
-          <span className={s.bigTitle}>
-            All partnerships <span className={s.countText}>{shown.length === collabs.length ? collabs.length : `${shown.length} of ${collabs.length}`}</span>
-          </span>
-          <button type="button" className={s.btnOutlineDark} onClick={onWork} disabled={page.preview}>
-            Work with {page.short} →
-          </button>
-        </div>
-        <div className={s.listTools}>
+      <div className={`${s.listHead} ${s.listHeadCenter}`}>
+        <span className={s.bigTitle}>
+          All Partnerships <span className={s.countText}>{shown.length === collabs.length ? collabs.length : `${shown.length} of ${collabs.length}`}</span>
+        </span>
+        <div className={`${s.listTools} ${s.listToolsRow}`}>
           <SearchPill label="Search partnerships" placeholder="Brand, title or dates" value={q} onChange={setQ} />
-          <PillSelect
-            variant="filter"
-            label="Category"
+          <ChoiceChip
+            id="cat"
+            name="All Categories"
+            icon={<LuShapes />}
+            options={cats.map((c) => ({ value: c, label: collabLabel(c), count: matching(c).length }))}
             value={cat}
-            options={[{ value: '', label: `All categories (${collabs.length})` }, ...cats.map((c) => ({ value: c, label: `${collabLabel(c)} (${collabs.filter((x) => x.type === c).length})` }))]}
+            open={chip}
+            onOpen={setChip}
+            count={(c) => matching(c).length}
             onChange={setCat}
           />
           <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={NEWEST_FIRST} onChange={setSort} />
@@ -1263,7 +1224,7 @@ function Partnerships({ page, collabs, onWork }: { page: PartnerPageData; collab
               setCat('');
             }}
           >
-            Clear filters
+            Clear Filters
           </button>
         </div>
       )}
@@ -1327,8 +1288,8 @@ function Reviews({ page, reviews }: { page: PartnerPageData; reviews: PartnerRev
 const SORTS = [
   ['featured', 'Featured'],
   ['newest', 'Newest'],
-  ['price-asc', 'Price: low to high'],
-  ['price-desc', 'Price: high to low'],
+  ['price-asc', 'Price: Low to High'],
+  ['price-desc', 'Price: High to Low'],
 ] as const;
 type Sort = (typeof SORTS)[number][0];
 
@@ -1353,65 +1314,86 @@ function ProductImage({ page, product, size }: { page: PartnerPageData; product:
 }
 
 const subOf = (p: PartnerProduct) => [p.collection, p.optionGroups.find((g) => g.kind === 'Colors')?.values[0]].filter(Boolean).join(' · ');
+const isFresh = (p: PartnerProduct, now: number) => Boolean(p.addedAt) && now - Date.parse(p.addedAt!) < 30 * 86_400_000;
+
+/** A product as the experiences pages' card: the photo (NEW), its category, name, collection and colour, price and View Item. */
+function ProductCard({ page, product, fresh, onOpen }: { page: PartnerPageData; product: PartnerProduct; fresh: boolean; onOpen: () => void }) {
+  return (
+    <article className={`${lc.card} ${lc.verified}`} onClick={onOpen}>
+      <div className={`${lc.media} ${s.productCardMedia}`}>
+        <ProductImage page={page} product={product} size={44} />
+        {fresh && <span className={s.productTag}>New</span>}
+      </div>
+      <div className={lc.body}>
+        {product.category && <span className={lc.provider}>{titleCase(product.category)}</span>}
+        <h3 className={lc.title}>{product.title}</h3>
+        {subOf(product) && <span className={s.mutedSmall}>{subOf(product)}</span>}
+        <span className={lc.bigPrice}>{dollars(product.price)}</span>
+        <div className={lc.facilityFooter}>
+          <button
+            type="button"
+            className={`${lc.cta} ${lc.ctaWide}`}
+            aria-label={`View ${product.title}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+          >
+            View Item
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 function Shop({ page, products, onOpen }: { page: PartnerPageData; products: PartnerProduct[]; onOpen: (p: PartnerProduct) => void }) {
   const [cat, setCat] = useState('');
   const [sort, setSort] = useState<Sort>('featured');
+  const [chip, setChip] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
-  const cats = [...new Set(products.map((p) => p.category))];
+  const cats = [...new Set(products.map((p) => p.category).filter(Boolean))];
   const shown = products
     .filter((p) => !cat || p.category === cat)
     .sort((a, b) =>
       sort === 'price-asc' ? a.price - b.price : sort === 'price-desc' ? b.price - a.price : sort === 'newest' ? (b.addedAt ?? '').localeCompare(a.addedAt ?? '') : 0,
     );
   const cover = page.hero || products.find((p) => p.image)?.image;
-  const fresh = (p: PartnerProduct) => p.addedAt && now - Date.parse(p.addedAt) < 30 * 86_400_000;
   return (
     <div className={s.stack}>
       <div className={s.storeBanner}>
         {cover && <img src={cover} alt="" />}
         <span className={s.storeBannerShade} aria-hidden />
         <div className={s.storeBannerText}>
-          <span className={s.storeKicker}>THE {page.short.toUpperCase()} STORE</span>
-          <strong>{page.store.title || 'Wear the club.'}</strong>
-          <span>{page.store.sub || `Gear and keepsakes from ${page.name}. Every order supports ${page.short}.`}</span>
+          <strong>{page.store.title || `Shop ${page.name}`}</strong>
         </div>
       </div>
       <div className={s.shopTools}>
-        <div className={s.pills}>
-          {[['', 'All'], ...cats.map((c) => [c, c])].map(([id, label]) => (
-            <button key={id} type="button" className={`${s.pill} ${cat === id ? s.pillOn : ''}`} aria-pressed={cat === id} onClick={() => setCat(id)}>
-              {label} <span>{id ? products.filter((p) => p.category === id).length : products.length}</span>
-            </button>
-          ))}
-        </div>
+        <ChoiceChip
+          id="cat"
+          name="All Categories"
+          icon={<LuShapes />}
+          options={cats.map((c) => ({ value: c, label: c, count: products.filter((p) => p.category === c).length }))}
+          value={cat}
+          open={chip}
+          onOpen={setChip}
+          count={(c) => products.filter((p) => !c || p.category === c).length}
+          onChange={setCat}
+        />
         <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={SORTS.map(([value, label]) => ({ value, label }))} onChange={setSort} />
       </div>
-      <div className={s.productGrid}>
+      <div className={t.listingGrid}>
         {shown.map((p) => (
-          <button key={p.id} type="button" className={s.product} onClick={() => onOpen(p)}>
-            <span className={s.productMedia}>
-              <ProductImage page={page} product={p} size={56} />
-              {fresh(p) && <span className={s.productTag}>New</span>}
-            </span>
-            <span className={s.productInfo}>
-              <span className={s.headStack} style={{ gap: 2 }}>
-                <strong>{p.title}</strong>
-                {subOf(p) && <span className={s.mutedSmall}>{subOf(p)}</span>}
-              </span>
-              <strong>{dollars(p.price)}</strong>
-            </span>
-          </button>
+          <div key={p.id} className={t.listingItem}>
+            <ProductCard page={page} product={p} fresh={isFresh(p, now)} onOpen={() => onOpen(p)} />
+          </div>
         ))}
-      </div>
-      <div className={s.noteRow}>
-        <span>Sold by {page.name} · Made and shipped by CLP</span>
-        <span>Have a team code? Use it at checkout.</span>
       </div>
     </div>
   );
 }
 
+/** A product in the Shop tab, as the shop's product page: its photos and buy column, then more from the store. */
 function ProductPage({
   page,
   product,
@@ -1427,123 +1409,32 @@ function ProductPage({
   onOpen: (p: PartnerProduct) => void;
   onAdded: () => void;
 }) {
-  const [choices, setChoices] = useState<Record<string, string>>(() => Object.fromEntries(product.optionGroups.map((g) => [g.kind, g.values[0]])));
-  const [shot, setShot] = useState(0);
-  const [info, setInfo] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const images = product.images.length ? product.images : product.image ? [product.image] : [];
-  const colors = product.optionGroups.find((g) => g.kind === 'Colors');
-  const swatchy = Boolean(colors?.values.every(canPaint));
-  const sized = product.optionGroups.some((g) => g.kind === 'Sizes');
-  const add = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      cartChanged(await addToCart(page.slug, product.id, choices, 1));
-      onAdded();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not add it. Please try again.');
-    } finally {
-      setBusy(false);
-    }
+  const [now] = useState(() => Date.now());
+  const store: DetailStore = {
+    slug: page.slug,
+    name: page.name,
+    short: page.short,
+    color: page.color,
+    type: page.type,
+    logo: page.logo,
+    mono: page.mono,
+    shop: { exclusive: Boolean(page.shop?.exclusive), private: Boolean(page.shop?.private), pickup: Boolean(page.shop?.pickup), pickupNote: page.shop?.pickupNote ?? '' },
   };
-  const rows: [string, string][] = [
-    ['Details', product.description || `${product.title} from ${page.name}.`],
-    ...(sized ? ([['Size & fit', 'True to size. Size up for a relaxed fit.']] as [string, string][]) : []),
-    ['Shipping & returns', 'Made to order by CLP. Ships in 5–7 days. Free returns on unworn items within 30 days.'],
-  ];
   const more = products.filter((p) => p.id !== product.id).slice(0, 4);
   return (
     <div className={s.stack} style={{ gap: 18 }}>
       <button type="button" className={s.textLink} style={{ alignSelf: 'flex-start' }} onClick={onBack}>
         ← {page.short} Store
       </button>
-      <div className={s.pdp}>
-        <div className={s.stack} style={{ gap: 12 }}>
-          <div className={s.pdpMedia}>{images.length ? <img src={images[shot]} alt={product.title} /> : <ProductImage page={page} product={product} size={72} />}</div>
-          {images.length > 1 && (
-            <div className={s.thumbs}>
-              {images.slice(0, 4).map((src, i) => (
-                <button key={src} type="button" className={`${s.thumb} ${shot === i ? s.thumbOn : ''}`} aria-label={`Photo ${i + 1}`} onClick={() => setShot(i)}>
-                  <img src={src} alt="" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className={s.pdpInfo}>
-          <span className={s.miniBrand}>
-            <span className={s.miniLogo}>
-              <LogoImage page={page} />
-            </span>
-            {page.name}
-          </span>
-          <strong className={s.pdpTitle}>{product.title}</strong>
-          <strong className={s.pdpPrice}>{dollars(product.price)}</strong>
-          {product.optionGroups.map((g) =>
-            g.kind === 'Colors' && swatchy ? (
-              <div key={g.kind} className={s.option}>
-                <span className={s.optionLabel}>
-                  Color · <span>{choices[g.kind]}</span>
-                </span>
-                <div className={s.swatches}>
-                  {g.values.map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      aria-label={v}
-                      aria-pressed={choices[g.kind] === v}
-                      className={`${s.swatch} ${choices[g.kind] === v ? s.swatchOn : ''}`}
-                      style={{ background: paint(v) }}
-                      onClick={() => setChoices({ ...choices, [g.kind]: v })}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div key={g.kind} className={s.option}>
-                <span className={s.optionLabel}>{g.kind === 'Sizes' ? 'Size' : g.kind === 'Colors' ? `Color · ${choices[g.kind]}` : g.kind}</span>
-                <div className={s.sizes}>
-                  {g.values.map((v) => (
-                    <button key={v} type="button" className={`${s.size} ${choices[g.kind] === v ? s.sizeOn : ''}`} aria-pressed={choices[g.kind] === v} onClick={() => setChoices({ ...choices, [g.kind]: v })}>
-                      {v}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ),
-          )}
-          {error && <span className={s.formError}>{error}</span>}
-          <button type="button" className={`${s.btnAccent} ${s.btnXl}`} disabled={busy || page.preview} onClick={add}>
-            {page.preview ? 'On sale once the page is live' : busy ? 'Adding…' : `Add to cart · ${dollars(product.price)}`}
-          </button>
-          <span className={s.mutedSmall}>Made to order and shipped by CLP in 5–7 days. Free returns on unworn items within 30 days.</span>
-          <div className={s.accordion}>
-            {rows.map(([t, d], i) => (
-              <div key={t} className={s.accordionItem}>
-                <button type="button" aria-expanded={info === i} onClick={() => setInfo(info === i ? -1 : i)}>
-                  {t}
-                  <span aria-hidden>{info === i ? '−' : '+'}</span>
-                </button>
-                {info === i && <p>{d}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <ProductDetail store={store} product={{ ...product, slug: page.slug }} onViewCart={onAdded} onStore={onBack} disabled={page.preview} />
       {more.length > 0 && (
-        <div className={s.stack} style={{ gap: 14, marginTop: 20 }}>
-          <span className={s.label}>MORE FROM {page.short.toUpperCase()}</span>
-          <div className={s.moreGrid}>
+        <div className={s.stack} style={{ gap: 18, marginTop: 28 }}>
+          <h2 className={s.cardTitle}>More from {page.short}</h2>
+          <div className={t.listingGrid}>
             {more.map((p) => (
-              <button key={p.id} type="button" className={s.moreItem} onClick={() => onOpen(p)}>
-                <span className={s.moreMedia}>
-                  <ProductImage page={page} product={p} size={32} />
-                </span>
-                <strong>{p.title}</strong>
-                <span className={s.mutedText}>{dollars(p.price)}</span>
-              </button>
+              <div key={p.id} className={t.listingItem}>
+                <ProductCard page={page} product={p} fresh={isFresh(p, now)} onOpen={() => onOpen(p)} />
+              </div>
             ))}
           </div>
         </div>
@@ -1571,58 +1462,64 @@ function PrivateStore({ page }: { page: PartnerPageData }) {
 
 // --- Updates & News -----------------------------------------------------------------------------------------------------
 
-type Post = { key: string; kind: 'update' | 'news'; title: string; excerpt: string; image: string; date: string; href: string; source: string };
+type Post = { key: string; kind: 'update' | 'news'; title: string; excerpt: string; image: string; date: string; href: string; source: string; read?: string };
 
 /** Their updates (articles on CLP) and press, newest first. */
 function postsOf(page: PartnerPageData, articles: PartnerPageResponse['articles']): Post[] {
   return [
-    ...articles.map((a) => ({ key: a.slug, kind: 'update' as const, title: a.title, excerpt: a.excerpt, image: a.image, date: a.publishedAt, href: a.path, source: page.short })),
-    ...page.press.map((p, i) => ({ key: `press-${i}`, kind: 'news' as const, title: p.title, excerpt: '', image: p.image, date: p.date, href: p.href, source: p.source })),
+    ...articles.map((a) => ({
+      key: a.slug,
+      kind: 'update' as const,
+      title: a.title,
+      excerpt: a.excerpt,
+      image: a.image,
+      date: a.publishedAt,
+      href: a.path,
+      source: page.name,
+      read: a.readingTime ? `${a.readingTime} min read` : undefined,
+    })),
+    ...page.press.map((p, i) => ({
+      key: `press-${i}`,
+      kind: 'news' as const,
+      title: p.title,
+      excerpt: '',
+      image: p.image,
+      date: p.date,
+      href: p.href,
+      source: p.source,
+      read: p.readingTime ? `${p.readingTime} min read` : undefined,
+    })),
   ].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
 
-function News({ page, posts }: { page: PartnerPageData; posts: Post[] }) {
-  const [kind, setKind] = useState<'all' | Post['kind']>('all');
+/**
+ * Updates & News: their updates and press as the site's article cards (the photo with its date, the title, then the
+ * reading time and who wrote it), in a grid or the list's rows, with Recent / Updates / In the News, a search and a sort.
+ */
+function News({ posts }: { posts: Post[] }) {
+  // "Recent": all of them, newest first.
+  const [kind, setKind] = useState<'recent' | Post['kind']>('recent');
   const [q, setQ] = useState('');
-  const [year, setYear] = useState('');
   const [sort, setSort] = useState('new');
-  const top = posts[0];
-  const rest = posts.slice(1);
-  const years = [...new Set(rest.map((p) => p.date.slice(0, 4)).filter(Boolean))].sort().reverse();
+  const [view, setView] = useState<ResultsView>('grid');
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const shown = rest
-    .filter((p) => (kind === 'all' || p.kind === kind) && (!year || p.date.startsWith(year)) && words.every((w) => [p.title, p.excerpt, p.source].join(' ').toLowerCase().includes(w)))
+  const shown = posts
+    .filter((p) => (kind === 'recent' || p.kind === kind) && words.every((w) => [p.title, p.excerpt, p.source].join(' ').toLowerCase().includes(w)))
     .sort((a, b) => (sort === 'old' ? (a.date || '').localeCompare(b.date || '') : (b.date || '').localeCompare(a.date || '')));
-  const external = (p: Post) => p.kind === 'news';
-  const typeLabel = (p: Post) => (p.kind === 'news' ? 'In the news' : 'Update');
+  // Another site's piece opens in a new tab (a CLP article, with its reading time, in this one).
+  const external = (p: Post) => p.kind === 'news' && !p.read;
+  const day = (p: Post) => (p.date ? articleDate(p.date.slice(0, 10)) : '');
   return (
     <div className={s.stack} style={{ gap: 40 }}>
-      {top && (
-        <a className={s.topPost} href={top.href || undefined} target={external(top) ? '_blank' : undefined} rel="noopener noreferrer">
-          <span className={s.topPostMedia}>{top.image && <img src={top.image} alt="" />}</span>
-          <span className={s.topPostText}>
-            <span className={s.topPostKicker}>
-              <span>{typeLabel(top).toUpperCase()}</span>
-              {top.date && <span>{monthYear(top.date).toUpperCase()}</span>}
-            </span>
-            <strong>{top.title}</strong>
-            {top.excerpt && <span className={s.mutedText}>{top.excerpt}</span>}
-            <span className={s.btnDark}>{external(top) ? `Read it on ${top.source || 'the site'}` : 'Read the update'}</span>
-          </span>
-        </a>
-      )}
-      {rest.length > 0 && (
+      {posts.length > 0 && (
         <div className={s.stack} style={{ gap: 22 }}>
-          <div className={s.listHead} style={{ alignItems: 'flex-end' }}>
-            <span className={s.bigTitle}>
-              Recent <span className={s.countText}>{shown.length === rest.length ? rest.length : `${shown.length} of ${rest.length}`}</span>
-            </span>
+          <div className={`${s.listHead} ${s.listHeadCenter}`}>
             <div className={s.newsTabs}>
               {(
                 [
-                  ['all', 'All'],
+                  ['recent', 'Recent'],
                   ['update', 'Updates'],
-                  ['news', 'In the news'],
+                  ['news', 'In the News'],
                 ] as const
               ).map(([id, label]) => (
                 <button key={id} type="button" className={kind === id ? s.newsTabOn : ''} aria-pressed={kind === id} onClick={() => setKind(id)}>
@@ -1630,26 +1527,23 @@ function News({ page, posts }: { page: PartnerPageData; posts: Post[] }) {
                 </button>
               ))}
             </div>
-          </div>
-          <div className={s.newsTools}>
-            <SearchPill label="Search updates" placeholder="Search updates and news" value={q} onChange={setQ} />
-            {years.length > 1 && <PillSelect variant="filter" label="Year" value={year} options={[{ value: '', label: 'Any year' }, ...years.map((y) => ({ value: y, label: y }))]} onChange={setYear} />}
-            <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={NEWEST_FIRST.slice(0, 2)} onChange={setSort} />
+            <div className={`${s.listTools} ${s.listToolsRow}`}>
+              <SearchPill label="Search updates and news" placeholder="Search updates" value={q} onChange={setQ} />
+              <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={NEWEST_FIRST.slice(0, 2)} onChange={setSort} />
+              <ResultsToggle value={view} onChange={setView} />
+            </div>
           </div>
           {shown.length ? (
-            <div className={s.grid3} style={{ gap: 28 }}>
+            // As the article listings: the cards in a grid, or the list's rows.
+            <div key={view} className={view === 'list' ? pf.list : pf.grid}>
               {shown.map((p) => (
-                <a key={p.key} className={s.post} href={p.href || undefined} target={external(p) ? '_blank' : undefined} rel="noopener noreferrer">
-                  <span className={s.postMedia}>
-                    {p.image ? <img src={p.image} alt="" loading="lazy" /> : <span>{p.source || page.short}</span>}
-                    <span className={`${s.postType} ${p.kind === 'update' ? s.postTypeUpdate : ''}`}>{typeLabel(p)}</span>
-                  </span>
-                  <span className={s.mutedSmall} style={{ fontWeight: 700 }}>
-                    {[p.source, p.date && monthYear(p.date)].filter(Boolean).join(' · ')}
-                  </span>
-                  <strong className={s.postTitle}>{p.title}</strong>
-                  {p.excerpt && <span className={s.mutedText}>{p.excerpt}</span>}
-                </a>
+                <ArticleCard
+                  key={p.key}
+                  post={storyCard({ title: p.title, href: p.href, image: p.image, date: day(p) || undefined, readingTime: p.read, author: p.source })}
+                  eager={false}
+                  row={view === 'list'}
+                  external={external(p)}
+                />
               ))}
             </div>
           ) : (
@@ -1660,11 +1554,10 @@ function News({ page, posts }: { page: PartnerPageData; posts: Post[] }) {
                 className={s.textLink}
                 onClick={() => {
                   setQ('');
-                  setYear('');
-                  setKind('all');
+                  setKind('recent');
                 }}
               >
-                Clear filters
+                Clear Filters
               </button>
             </div>
           )}
@@ -1761,9 +1654,7 @@ function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamM
             )}
             {m.instagram && (
               <a className={s.btnOutline} href={`https://www.instagram.com/${m.instagram}/`} target="_blank" rel="noopener noreferrer">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  {SOCIAL_ICONS.instagram}
-                </svg>
+                <FaInstagram aria-hidden />
                 @{m.instagram}
               </a>
             )}

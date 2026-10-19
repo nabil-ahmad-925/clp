@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { PRINT_GROUPS, PRINT_PRODUCTS, dollars, printFrom, printPrice, printRatio, type PrintProduct } from '@/content/gallery';
@@ -16,6 +17,8 @@ type Props = {
   shareable: boolean;
   /** Who took the photos ("Photographed by …"; Compete Like Pros when not given). */
   by?: string;
+  /** Their partner page ("Photographed by" links to it). */
+  byHref?: string;
   images: GalleryImage[];
   index: number;
   /** The side panel's tab on opening (the album's "Prints & products" filter opens on prints). */
@@ -23,6 +26,11 @@ type Props = {
   onIndex: (index: number) => void;
   onClose: () => void;
   onOpenCart: () => void;
+  /**
+   * `images` as one page of a longer list: where the page starts in it (`offset`) and its length (`total`), for the
+   * photo numbers and the count; stepping past the page's first or last photo asks for the page before or after.
+   */
+  paged?: { offset: number; total: number; onEdge: (step: 1 | -1) => void };
 };
 
 const Arrow = ({ back }: { back?: boolean }) => (
@@ -38,26 +46,43 @@ const defaults = (product: PrintProduct) => Object.fromEntries(product.options.m
 const summary = (product: PrintProduct) =>
   product.options.map((o) => `${o.options.length} ${o.label.toLowerCase()}${o.options.length > 1 && !/s$/.test(o.label.toLowerCase()) ? 's' : ''}`).join(' · ');
 
-/** A product's mockup: the photo in the product's shape (a frame for framed prints), in a box of `max` px. */
-function Mockup({ product, chosen, src, max }: { product: PrintProduct; chosen: Record<string, string>; src: string; max: number }) {
+/**
+ * A product's mockup: the photo in the product's shape (a frame for framed prints), in a box of `max` px. `back`: its
+ * back instead (`product.back`): a canvas' stretcher bars, a metal print's float mount or easel back, a frame's backing
+ * and hanging wire.
+ */
+function Mockup({ product, chosen, src, max, back }: { product: PrintProduct; chosen: Record<string, string>; src: string; max: number; back?: boolean }) {
   const [w, h] = printRatio(product, chosen).split('/').map((n) => parseFloat(n));
   const wide = w / h >= 1;
   const frameColor = { Black: '#111111', White: '#F4F4F4', Oak: '#B08A5B', Walnut: '#5C3F2A' }[chosen.frame ?? ''];
   const matted = chosen.mat === 'White mat';
+  const side = back ? product.back : undefined;
   return (
     <span
-      className={styles.mockup}
+      className={`${styles.mockup} ${side === 'canvas' ? styles.backCanvas : side === 'metal' ? styles.backMetal : side === 'frame' ? styles.backFrame : ''}`}
       style={{
         aspectRatio: `${w} / ${h}`,
         width: wide ? max : 'auto',
         height: wide ? 'auto' : max,
         borderRadius: product.radius,
         border: product.frame && frameColor ? `${Math.round(max / 22)}px solid ${frameColor}` : undefined,
-        padding: product.frame && matted ? Math.round(max / 14) : undefined,
+        padding: product.frame && matted && !side ? Math.round(max / 14) : undefined,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- the photo on the product */}
-      <img src={src} alt="" />
+      {side === 'canvas' ? (
+        <span className={styles.stretcher} style={{ borderWidth: Math.round(max / (chosen.depth === '1.5 in' ? 10 : 14)) }} />
+      ) : side === 'metal' ? (
+        <span className={chosen.mount === 'Easel back' ? styles.easel : styles.floatMount} />
+      ) : side === 'frame' ? (
+        <svg className={styles.wire} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+          <path d="M16 32 Q50 20 84 32" />
+          <circle cx="16" cy="32" r="2" />
+          <circle cx="84" cy="32" r="2" />
+        </svg>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element -- the photo on the product
+        <img src={src} alt="" />
+      )}
     </span>
   );
 }
@@ -69,7 +94,7 @@ function Mockup({ product, chosen, src, max }: { product: PrintProduct; chosen: 
  * (content/gallery.ts), then a product's options with a live preview, the quantity and "Add to cart". Arrow keys and
  * swipes step through the album, Esc or × closes it.
  */
-export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, images, index, startTab = 'digital', onIndex, onClose, onOpenCart }: Props) {
+export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, byHref, images, index, startTab = 'digital', onIndex, onClose, onOpenCart, paged }: Props) {
   const [tab, setTab] = useState<'digital' | 'print'>(startTab);
   const [product, setProduct] = useState<PrintProduct | null>(null);
   const [chosen, setChosen] = useState<Record<string, string>>({});
@@ -81,9 +106,15 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
   const touchX = useRef<number | null>(null);
   const strip = useRef<HTMLDivElement>(null);
   const image = images[index];
-  const count = images.length;
+  // The photo's number and how many there are: across every page when this is one page of them.
+  const count = paged?.total ?? images.length;
+  const number = (paged?.offset ?? 0) + index + 1;
 
-  const go = (step: number) => onIndex((index + step + count) % count);
+  const go = (step: 1 | -1) => {
+    const next = index + step;
+    if (paged && (next < 0 || next >= images.length)) paged.onEdge(step);
+    else onIndex((next + images.length) % images.length);
+  };
   const goRef = useRef(go);
   const closeRef = useRef(onClose);
   useEffect(() => {
@@ -126,7 +157,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
   const shareUrl = encodeURIComponent(`${pageUrl}#gallery/${galleryId}/${image.id}`);
   const imageUrl = encodeURIComponent(typeof window === 'undefined' ? image.full : window.location.origin + image.full);
   const price = image.download;
-  const photoName = `Photo ${index + 1} · ${albumTitle}`;
+  const photoName = `Photo ${number} · ${albumTitle}`;
 
   const addDownload = () => {
     if (price == null) return;
@@ -148,7 +179,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
   };
 
   return createPortal(
-    <div className={styles.viewer} role="dialog" aria-modal="true" aria-label={`${albumTitle}: photo ${index + 1} of ${count}`}>
+    <div className={styles.viewer} role="dialog" aria-modal="true" aria-label={`${albumTitle}: photo ${number} of ${count}`}>
       <div className={styles.main}>
         <div
           className={styles.stage}
@@ -178,7 +209,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
             </svg>
           </button>
           <span className={styles.counter}>
-            {index + 1} / {count}
+            {number} / {count}
           </span>
         </div>
         <div ref={strip} className={styles.thumbs}>
@@ -187,7 +218,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
               key={thumb.id}
               type="button"
               className={`${styles.thumb} ${i === index ? styles.thumbOn : ''}`}
-              aria-label={`Photo ${i + 1} of ${count}`}
+              aria-label={`Photo ${(paged?.offset ?? 0) + i + 1} of ${count}`}
               aria-current={i === index}
               onClick={() => onIndex(i)}
             >
@@ -199,10 +230,21 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
       </div>
 
       <aside className={styles.side}>
+        {/* As the site's headings: the title and its lines, the gold eyebrow under them. */}
         <div className={styles.sideHead}>
+          <span className={styles.photoTitle}>Photo {number}</span>
+          <span className={styles.by}>
+            Photographed by{' '}
+            {byHref ? (
+              <Link href={byHref} className={styles.byLink}>
+                {by}
+              </Link>
+            ) : (
+              (by ?? 'Compete Like Pros')
+            )}
+          </span>
+          {image.description && <p className={styles.description}>{image.description}</p>}
           <span className={styles.kicker}>{albumTitle.toUpperCase()}</span>
-          <span className={styles.photoTitle}>Photo {index + 1}</span>
-          <span className={styles.by}>Photographed by {by ?? 'Compete Like Pros'}</span>
         </div>
 
         <div className={styles.tabs} role="tablist">
@@ -331,8 +373,22 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
             >
               <span className="glyph" aria-hidden>←</span> All Products
             </button>
+            {/* Its front and, for a product with one, its back, side by side in the same frame. */}
             <div className={styles.preview}>
-              <Mockup product={product} chosen={chosen} src={image.src} max={220} />
+              {product.back ? (
+                <div className={styles.sides}>
+                  {[false, true].map((back) => (
+                    <figure key={String(back)} className={styles.sideView}>
+                      <span className={styles.sideFrame}>
+                        <Mockup product={product} chosen={chosen} src={image.src} max={140} back={back} />
+                      </span>
+                      <figcaption>{back ? 'Back' : 'Front'}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              ) : (
+                <Mockup product={product} chosen={chosen} src={image.src} max={220} />
+              )}
             </div>
             <div className={styles.productHead}>
               <span className={styles.productName}>{product.name}</span>

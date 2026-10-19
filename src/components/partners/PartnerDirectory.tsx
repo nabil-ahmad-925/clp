@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { LuArrowUpDown, LuBadgeCheck, LuMapPin, LuSearch, LuShapes, LuStar, LuVolleyball } from 'react-icons/lu';
 import { NO_SEARCH, fold, useSharedSearch, type Search } from '@/components/sections/DirectorySearch';
 import FilterChip from '@/components/ui/FilterChip';
@@ -297,11 +297,33 @@ function Directory({ category, label }: { category: string; label: string }) {
  * experiences they host, over a full-width "Learn More"; a row (list, photo on the left) with them and the button side
  * by side, as the Experiences row.
  */
-export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { partner: PartnerCardData; eager: boolean; featured: boolean; view?: 'grid' | 'list' }) {
+export function PartnerCard({
+  partner: p,
+  eager,
+  featured,
+  view = 'grid',
+  href,
+  cta = 'Learn More',
+  stat,
+  tag,
+}: {
+  partner: PartnerCardData;
+  eager: boolean;
+  featured: boolean;
+  view?: 'grid' | 'list';
+  /** Where it leads (the shop's cards: the store), else the partner's page. */
+  href?: string;
+  cta?: string;
+  /** A count beside the rating in place of the experiences ("12 Products"). */
+  stat?: string;
+  /** A label over the photo's corner (a private store's). */
+  tag?: ReactNode;
+}) {
   const type = partnerType(p.type);
   const color = p.color || type.color;
+  const count = stat ?? (p.experiences ? `${p.experiences} ${p.experiences === 1 ? 'Experience' : 'Experiences'}` : '');
   return (
-    <Link href={partnerHref(p.slug)} className={[c.card, featured && c.cardFeatured, view === 'list' && c.list].filter(Boolean).join(' ')}>
+    <Link href={href ?? partnerHref(p.slug)} className={[c.card, featured && c.cardFeatured, view === 'list' && c.list].filter(Boolean).join(' ')}>
       <span className={c.media} style={{ background: color }}>
         {/* The photo is clipped to the frame; the logo sits over its bottom edge. */}
         <span className={c.frame}>
@@ -322,6 +344,7 @@ export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { pa
           <LuBadgeCheck aria-hidden /> CLP Partner
         </span>
         {featured && <span className={c.featuredTag}>Featured</span>}
+        {tag}
         <span className={c.logo} style={{ background: color }}>
           {/* Their logo, else their photo (as the experiences' partner cards); their initials without either. */}
           {p.logo || p.hero ? <Image src={p.logo || p.hero} alt="" width={64} height={64} /> : p.mono}
@@ -358,13 +381,9 @@ export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { pa
             ) : (
               <span className={c.fresh}>New on CLP</span>
             )}
-            {Boolean(p.experiences) && (
-              <span className={c.hosted}>
-                {p.experiences} {p.experiences === 1 ? 'Experience' : 'Experiences'}
-              </span>
-            )}
+            {count && <span className={c.hosted}>{count}</span>}
           </span>
-          <span className={`${c.cta} ${view === 'list' ? '' : c.ctaWide}`}>Learn More</span>
+          <span className={`${c.cta} ${view === 'list' ? '' : c.ctaWide}`}>{cta}</span>
         </span>
       </span>
     </Link>
