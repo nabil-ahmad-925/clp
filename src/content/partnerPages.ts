@@ -42,7 +42,7 @@ export type PartnerCardData = {
   featured?: string[];
   /** CLP's Feature star: the shop's first row and the home page's featured spots. */
   homeFeatured?: boolean;
-  /** How many experiences it hosts (its published listings): the cards' "N experiences hosted". */
+  /** How many experiences it hosts (its published listings): the cards' "N Experiences". */
   experiences?: number;
 };
 

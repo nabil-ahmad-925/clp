@@ -63,7 +63,7 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
     image: p.hero || p.logo,
     excerpt: [p.category, p.area].filter(Boolean).join(' · '),
     rating: p.rating != null && p.reviewCount ? `★ ${p.rating.toFixed(1)} · ${p.reviewCount} review${p.reviewCount === 1 ? '' : 's'}` : undefined,
-    hosted: p.experiences ? `${p.experiences} ${p.experiences === 1 ? 'experience' : 'experiences'} hosted` : undefined,
+    hosted: p.experiences ? `${p.experiences} ${p.experiences === 1 ? 'Experience' : 'Experiences'}` : undefined,
   }));
   const empty = live?.length === 0;
   // "View All Partners": the category's listing filtered as this band is, by the page's sport and the partner types shown.

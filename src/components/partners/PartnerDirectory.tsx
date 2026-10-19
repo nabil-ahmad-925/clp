@@ -360,7 +360,7 @@ export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { pa
             )}
             {Boolean(p.experiences) && (
               <span className={c.hosted}>
-                {p.experiences} {p.experiences === 1 ? 'experience' : 'experiences'} hosted
+                {p.experiences} {p.experiences === 1 ? 'Experience' : 'Experiences'}
               </span>
             )}
           </span>

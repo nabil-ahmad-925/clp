@@ -285,6 +285,11 @@
   border-top: 1px solid #eeeeeb;
 }
 
+/* Grid cards: the rating and experiences line centred above the full-width Learn More. */
+.footerWide .stats {
+  justify-content: center;
+}
+
 .ctaWide {
   justify-content: center;
   height: 44px;

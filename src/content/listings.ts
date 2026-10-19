@@ -140,7 +140,7 @@ export type SpotlightPartner = {
   excerpt: string;
   /** Their rating ("★ 4.5 · 2 reviews"), if reviewed. */
   rating?: string;
-  /** "3 experiences hosted", if they host any. */
+  /** "3 Experiences", if they host any. */
   hosted?: string;
 };
 
