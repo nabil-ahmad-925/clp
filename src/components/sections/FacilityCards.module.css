@@ -1,69 +1,9 @@
+/* The sport and service pages' four cards: the experiences' listing cards in their grid (TeamDirectory's). */
 .section {
   background: var(--white);
   color: var(--black);
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin: 0 -10px 20px;
-}
-
-.column {
-  padding: 0 10px;
-}
-
-/* 1st and 3rd cards sit 80px lower, giving the staggered look. */
-.grid > .column:nth-child(odd) {
-  margin-top: 80px;
-}
-
-/* Below 1000px the original's row is a wrapping flex row of half-width columns (full width from 690px
-   down). Odd cards keep their 80px stagger and every card gains a 20px bottom margin (except the last one on
-   phones), so each wrapped line starts below the taller, staggered card of the line above. */
-@media (max-width: 999px) {
-  .grid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-
-  .grid > .column {
-    width: 50%;
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 690px) {
-  .grid > .column {
-    width: 100%;
-  }
-
-  .grid > .column:last-child {
-    margin-bottom: 0;
-  }
-}
-
-/* Loading the live facilities: placeholder cards the size of the real ones (TeamCard: 434px photo, 7px margins). */
-.skeleton {
-  height: 434px;
-  margin: 7px 0 31px;
-  border-radius: 10px;
-  background: linear-gradient(100deg, #ececec 30%, #f6f6f6 50%, #ececec 70%) 0 0 / 300% 100%;
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  from {
-    background-position: 100% 0;
-  }
-  to {
-    background-position: 0 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
-  }
+  margin-bottom: 20px;
 }

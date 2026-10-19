@@ -201,7 +201,9 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
     <div className={styles.page}>
       <section className={styles.hero} data-header-tone="light" data-page-hero>
         <div className={styles.heroInner}>
-          {/* The breadcrumb over the title (as an article's heading). */}
+          <h1 className={styles.heroTitle}>{hero.title}</h1>
+          {hero.line && <p className={styles.heroLine}>{hero.line}</p>}
+          {/* The breadcrumb on the heading's bottom line (as an article's heading). */}
           {crumbs.length > 0 && (
             <nav aria-label="Breadcrumb" className={styles.crumbs}>
               {crumbs.map((c, i) => (
@@ -216,8 +218,6 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
               ))}
             </nav>
           )}
-          <h1 className={styles.heroTitle}>{hero.title}</h1>
-          {hero.line && <p className={styles.heroLine}>{hero.line}</p>}
         </div>
       </section>
 

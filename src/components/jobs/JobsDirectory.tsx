@@ -42,6 +42,7 @@ import {
 } from '@/content/jobs';
 import { ADMIN_URL, PARTNER_SPORTS, partnerHref } from '@/content/partnerPages';
 import c from './jobs.module.css';
+import { JOB_STARTS, useJobApplication } from './useJobApplication';
 
 const PAGE_SIZES = [12, 24, 48];
 const sportLabel = (id: string) => PARTNER_SPORTS.find((s) => s.id === id)?.label ?? id;
@@ -400,8 +401,12 @@ function Hiring({ empty }: { empty: boolean }) {
   );
 }
 
-/** A role in full (its own address, ?job=<id>): who, where, pay, what it is, requirements and how to apply. */
+/**
+ * A role in full (its own address, ?job=<id>): who, where, pay, what it is, requirements and how to apply: a partner's
+ * with "Apply with CLP" (the application form), CLP's own by its link or e-mail.
+ */
 function JobDialog({ id, job: listed, onClose }: { id: string; job?: Job; onClose: () => void }) {
+  const [applying, setApplying] = useState(false);
   const [fetched, setFetched] = useState<{ id: string; job: Job | null; error: string } | null>(null);
   const job = listed ?? (fetched?.id === id ? fetched.job : null);
   const error = !listed && fetched?.id === id ? fetched.error : '';
@@ -449,6 +454,8 @@ function JobDialog({ id, job: listed, onClose }: { id: string; job?: Job; onClos
           <div className={c.dialogBody}>
             <p className={c.dialogNote}>{error || 'Loading…'}</p>
           </div>
+        ) : applying && !job.clp ? (
+          <ApplyWithClp job={job} onBack={() => setApplying(false)} onClose={onClose} />
         ) : (
           <>
             <div className={c.dialogBody}>
@@ -524,6 +531,11 @@ function JobDialog({ id, job: listed, onClose }: { id: string; job?: Job; onClos
               <span className={c.postedLine}>Posted {jobDate(job.postedAt)}</span>
             </div>
             <div className={c.dialogFoot}>
+              {!job.clp && (
+                <button type="button" className={c.apply} onClick={() => setApplying(true)}>
+                  Apply with CLP
+                </button>
+              )}
               {job.applyUrl && (
                 <a className={c.apply} href={job.applyUrl} target="_blank" rel="noopener">
                   Apply Now ↗
@@ -540,5 +552,85 @@ function JobDialog({ id, job: listed, onClose }: { id: string; job?: Job; onClos
       </div>
     </div>,
     document.body,
+  );
+}
+
+/** "Apply with CLP" on a partner's role: the application (a conversation with them on CLP Messages), then "sent". */
+function ApplyWithClp({ job, onBack, onClose }: { job: Job; onBack: () => void; onClose: () => void }) {
+  const app = useJobApplication(job, job.organization);
+  const { form, set } = app;
+  if (app.sent)
+    return (
+      <div className={`${c.dialogBody} ${c.applyDone}`}>
+        <span className={c.applyMark}>✓</span>
+        <h2 className={c.dialogTitle}>{app.sent.already ? 'You already applied' : 'Application sent'}</h2>
+        <p className={c.dialogNote}>
+          {app.sent.already
+            ? `Your application for ${job.title} is with ${job.organization}. Their reply comes to your conversation in CLP Messages.`
+            : `${job.organization} usually replies within a few days. The conversation lives in your CLP Messages.`}
+        </p>
+        <Link className={c.apply} href={app.sent.path}>
+          Open the conversation
+        </Link>
+        <button type="button" className={c.applySecondary} onClick={onClose}>
+          Back to jobs
+        </button>
+      </div>
+    );
+  return (
+    <form className={c.applyForm} onSubmit={app.submit} noValidate>
+      <div className={c.dialogBody}>
+        <span className={c.kind}>Apply with CLP</span>
+        <h2 className={c.dialogTitle}>{job.title}</h2>
+        <div className={c.applyContact}>
+          <label className={c.applyField}>
+            Your name
+            <input type="text" autoComplete="name" maxLength={80} value={form.name} onChange={set('name')} />
+          </label>
+          <label className={c.applyField}>
+            Your e-mail
+            <input type="email" autoComplete="email" maxLength={200} value={form.email} onChange={set('email')} />
+          </label>
+          <label className={c.applyField}>
+            <span>
+              Your phone <span className={c.optional}>(optional)</span>
+            </span>
+            <input type="tel" autoComplete="tel" maxLength={40} value={form.phone} onChange={set('phone')} />
+          </label>
+        </div>
+        <label className={c.applyField}>
+          <span>
+            Resume or portfolio link <span className={c.optional}>(optional)</span>
+          </span>
+          <input type="url" inputMode="url" placeholder="https://" maxLength={500} value={form.link} onChange={set('link')} />
+        </label>
+        <label className={c.applyField}>
+          Why {job.organization}?
+          <textarea rows={4} maxLength={1900} placeholder="A few lines about you and why this role" value={form.note} onChange={set('note')} />
+        </label>
+        <label className={c.applyField}>
+          When can you start?
+          <select value={form.start} onChange={set('start')}>
+            {JOB_STARTS.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        {/* A field people don't see: filled in, the request is a bot's. */}
+        <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className={c.trap} value={form.website} onChange={set('website')} />
+        <span className={c.applyNote}>{job.organization} sees your name, contact and answers. They’ll reply in your CLP Messages.</span>
+        {app.error && <span className={c.applyError}>{app.error}</span>}
+      </div>
+      <div className={c.dialogFoot}>
+        <button type="button" className={c.applySecondary} onClick={onBack}>
+          Back
+        </button>
+        <button type="submit" className={c.apply} disabled={app.busy}>
+          {app.busy ? 'Sending…' : 'Send application'}
+        </button>
+      </div>
+    </form>
   );
 }

@@ -14,11 +14,11 @@ import { LuArrowUpDown, LuSearch } from 'react-icons/lu';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
+import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
 import { agePolicy, categoryName, cornerTagLabel, isBookable, toItem, unitLabel } from '@/content/listings';
 import {
   collabLabel,
   partnerType,
-  sendPartnerLead,
   subscribeToPartner,
   TEAM_CHECK_LABELS,
   type PartnerCollab,
@@ -29,6 +29,7 @@ import {
   type PartnerProduct,
   type PartnerReviewData,
 } from '@/content/partnerPages';
+import { askQuestion, saveConversation, sendIntro, sitePath } from '@/content/messages';
 import { canPaint, paint, storeHref } from '@/content/storefront';
 import type { DirectoryItem } from '@/content/types';
 import s from './partnerPage.module.css';
@@ -57,6 +58,13 @@ const initials = (name: string) =>
     .slice(0, 2)
     .map((w) => w[0]!.toUpperCase())
     .join('');
+
+/** The partner's logo, else their photo (cropped to the tile, as the experiences' partner cards), else their initials. */
+function LogoImage({ page, alt = '' }: { page: PartnerPageData; alt?: string }) {
+  if (page.logo) return <img src={page.logo} alt={alt} />;
+  if (page.hero) return <img src={page.hero} alt={alt} className={s.logoPhoto} />;
+  return <>{page.mono}</>;
+}
 
 // --- The partner's colours ----------------------------------------------------------------------------------------------
 
@@ -243,6 +251,8 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   };
 
   const [dialog, setDialog] = useState<'follow' | 'question' | 'intro' | null>(null);
+  // Who follows the page: the API's count, and the new one once the visitor follows (Follow or the sign-up card).
+  const [followers, setFollowers] = useState(page.followers ?? 0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [booking, setBooking] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts } | null>(null);
   const [details, setDetails] = useState<DirectoryItem | null>(null);
@@ -301,7 +311,9 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
 
         <section className={s.identity} data-header-tone="dark">
           <div className={`${s.wrap} ${s.identityInner}`}>
-            <span className={s.logo}>{page.logo ? <img src={page.logo} alt={`${page.name} logo`} /> : page.mono}</span>
+            <span className={s.logo}>
+              <LogoImage page={page} alt={`${page.name} logo`} />
+            </span>
             <div className={s.identityText}>
               <div className={s.badges}>
                 <span className={`${s.badge} ${s.badgeGold}`}>CLP PARTNER</span>
@@ -311,6 +323,10 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
               <h1 className={s.name}>{page.name}</h1>
               <div className={s.identityLine}>
                 <span>{[type.label, page.area].filter(Boolean).join(' · ')}</span>
+                <span className={s.dot} aria-hidden />
+                <span className={s.followers}>
+                  <strong>{followers.toLocaleString('en-US')}</strong> {followers === 1 ? 'follower' : 'followers'}
+                </span>
                 {page.rating != null && sectionOn('reviews') && (
                   <>
                     <span className={s.dot} aria-hidden />
@@ -367,7 +383,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
 
         <main className={s.main} data-header-tone="dark" data-listing="">
           <div className={s.wrap}>
-            {shown === 'about' && <About page={page} experiences={exps} onOpen={open} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} />}
+            {shown === 'about' && <About page={page} experiences={exps} onOpen={open} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />}
             {shown === 'content' && <Content page={page} onPhoto={setPhoto} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
@@ -403,7 +419,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           </div>
         </main>
 
-        {dialog === 'follow' && <FollowDialog page={page} onClose={() => setDialog(null)} />}
+        {dialog === 'follow' && <FollowDialog page={page} onFollowed={setFollowers} onClose={() => setDialog(null)} />}
         {(dialog === 'question' || dialog === 'intro') && <MessageDialog page={page} kind={dialog} onKind={setDialog} onClose={() => setDialog(null)} />}
         {job && <JobDialog page={page} job={job} onClose={() => setJob(null)} />}
         {member && (
@@ -442,12 +458,14 @@ function About({
   onOpen,
   onAll,
   onMember,
+  onFollowed,
 }: {
   page: PartnerPageData;
   experiences: Experience[];
   onOpen: (l: Experience) => void;
   onAll?: () => void;
   onMember: (m: PartnerTeamMember) => void;
+  onFollowed: (followers: number) => void;
 }) {
   const [faq, setFaq] = useState(0);
   // Dated sessions first (soonest), then the ones booked any time.
@@ -495,7 +513,7 @@ function About({
           <div className={s.card}>
             <div className={s.cardHead}>
               <span className={s.label}>WHO RUNS IT</span>
-              {page.team.some(hasBio) && <span className={s.mutedSmall}>Tap a person to read their bio</span>}
+              <span className={s.mutedSmall}>Tap a person to read their bio</span>
             </div>
             <div className={s.people}>
               {page.team.map((m) => {
@@ -506,19 +524,16 @@ function About({
                     <span className={s.personText}>
                       <strong>{m.name}</strong>
                       <span>{m.role}</span>
-                      {hasBio(m) && <span className={s.readBio}>Read bio →</span>}
+                      <span className={s.readBio}>Read bio →</span>
                     </span>
                     {youthCleared(m) && <span className={s.youthCleared}>✓ Youth cleared</span>}
                   </>
                 );
-                return hasBio(m) ? (
+                // Every card opens the person's bio (their story, the sessions they run, CLP's checks).
+                return (
                   <button key={`${m.name}-${m.role}`} type="button" className={s.person} aria-label={`About ${m.name}`} onClick={() => onMember(m)}>
                     {inner}
                   </button>
-                ) : (
-                  <div key={`${m.name}-${m.role}`} className={s.person}>
-                    {inner}
-                  </div>
                 );
               })}
             </div>
@@ -575,14 +590,14 @@ function About({
             ))}
           </div>
         )}
-        <SignupCard page={page} />
+        <SignupCard page={page} onFollowed={onFollowed} />
       </aside>
     </div>
   );
 }
 
 /** "Get first dibs": the partner's e-mail list (adults and parents). */
-function SignupCard({ page }: { page: PartnerPageData }) {
+function SignupCard({ page, onFollowed }: { page: PartnerPageData; onFollowed: (followers: number) => void }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
   const [error, setError] = useState('');
@@ -591,7 +606,7 @@ function SignupCard({ page }: { page: PartnerPageData }) {
     setState('busy');
     setError('');
     try {
-      await subscribeToPartner(page.slug, email.trim());
+      onFollowed((await subscribeToPartner(page.slug, email.trim())).followers);
       setState('done');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not sign you up.');
@@ -1057,13 +1072,18 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
       .filter(Boolean);
   const [about, ...does] = lines(job.description);
   const needs = lines(job.requirements);
-  const apply = job.applyUrl || (job.applyEmail ? `mailto:${job.applyEmail}?subject=${encodeURIComponent(`${job.title} · ${page.name}`)}` : `/jobs/?job=${encodeURIComponent(job.id)}`);
+  // "Apply with CLP": the role, then the application form, then "Application sent".
+  const [applying, setApplying] = useState(false);
+  const app = useJobApplication(job, page.name);
+  const { form, set } = app;
   return (
     <Overlay onClose={onClose} width={760}>
       <div className={s.dialogHead}>
         <span className={s.headStack} style={{ gap: 6 }}>
           <span className={s.miniBrand}>
-            <span className={s.miniLogo}>{page.logo ? <img src={page.logo} alt="" /> : page.mono}</span>
+            <span className={s.miniLogo}>
+              <LogoImage page={page} />
+            </span>
             {page.name} · {jobTypeLabel(job.type)}
           </span>
           <strong className={s.dialogTitleCaps}>{job.title}</strong>
@@ -1071,6 +1091,74 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
         </span>
         <CloseButton onClose={onClose} />
       </div>
+      {app.sent ? (
+        <div className={`${s.dialogBody} ${s.done}`}>
+          <span className={s.doneMark}>✓</span>
+          <strong className={s.doneTitle}>{app.sent.already ? 'You already applied' : 'Application sent'}</strong>
+          <span className={s.doneText}>
+            {app.sent.already
+              ? `Your application for ${job.title} is with ${page.short}. Their reply comes to your conversation in CLP Messages.`
+              : `${page.short} usually replies within a few days. The conversation lives in your CLP Messages.`}
+          </span>
+          <Link className={`${s.btnAccent} ${s.btnLg}`} href={app.sent.path}>
+            Open the conversation
+          </Link>
+          <button type="button" className={s.btnOutlineDark} onClick={onClose}>
+            Back to {page.short}
+          </button>
+        </div>
+      ) : applying ? (
+        <form className={`${s.dialogBody} ${s.applyForm}`} onSubmit={app.submit} noValidate>
+          <div className={s.applyContact}>
+            <label className={s.applyField}>
+              Your name
+              <input type="text" autoComplete="name" maxLength={80} value={form.name} onChange={set('name')} />
+            </label>
+            <label className={s.applyField}>
+              Your e-mail
+              <input type="email" autoComplete="email" maxLength={200} value={form.email} onChange={set('email')} />
+            </label>
+            <label className={s.applyField}>
+              <span>
+                Your phone <span className={s.optional}>(optional)</span>
+              </span>
+              <input type="tel" autoComplete="tel" maxLength={40} value={form.phone} onChange={set('phone')} />
+            </label>
+          </div>
+          <label className={s.applyField}>
+            <span>
+              Resume or portfolio link <span className={s.optional}>(optional)</span>
+            </span>
+            <input type="url" inputMode="url" placeholder="https://" maxLength={500} value={form.link} onChange={set('link')} />
+          </label>
+          <label className={s.applyField}>
+            Why {page.short}?
+            <textarea rows={4} maxLength={1900} placeholder="A few lines about you and why this role" value={form.note} onChange={set('note')} />
+          </label>
+          <label className={s.applyField}>
+            When can you start?
+            <select value={form.start} onChange={set('start')}>
+              {JOB_STARTS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {/* A field people don't see: filled in, the request is a bot's. */}
+          <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className={s.trap} value={form.website} onChange={set('website')} />
+          <span className={s.applyNote}>{page.short} sees your name, contact and answers. They’ll reply in your CLP Messages.</span>
+          {app.error && <span className={s.formError}>{app.error}</span>}
+          <div className={s.applyButtons}>
+            <button type="button" className={s.applyBack} onClick={() => setApplying(false)}>
+              Back
+            </button>
+            <button type="submit" className={`${s.btnAccent} ${s.applySend}`} disabled={app.busy || page.preview}>
+              {app.busy ? 'Sending…' : 'Send application'}
+            </button>
+          </div>
+        </form>
+      ) : (
       <div className={s.dialogBody}>
         {about && <p className={s.dialogText}>{about}</p>}
         {(does.length > 0 || needs.length > 0) && (
@@ -1099,10 +1187,11 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
         )}
         {job.backgroundCheck && <div className={s.clearedNote}>This role works with kids. If you’re hired, CLP runs a background check and SafeSport training before your first session.</div>}
         {job.deadline && <span className={s.mutedSmall}>Apply by {dateText(job.deadline)}.</span>}
-        <a className={`${s.btnAccent} ${s.btnBlock}`} href={apply} target={job.applyUrl ? '_blank' : undefined} rel="noopener noreferrer">
-          {job.applyUrl ? 'Apply now ↗' : job.applyEmail ? 'Apply by e-mail' : 'Apply on CLP Jobs'}
-        </a>
+        <button type="button" className={`${s.btnAccent} ${s.btnBlock}`} onClick={() => setApplying(true)}>
+          Apply with CLP
+        </button>
       </div>
+      )}
     </Overlay>
   );
 }
@@ -1385,7 +1474,9 @@ function ProductPage({
         </div>
         <div className={s.pdpInfo}>
           <span className={s.miniBrand}>
-            <span className={s.miniLogo}>{page.logo ? <img src={page.logo} alt="" /> : page.mono}</span>
+            <span className={s.miniLogo}>
+              <LogoImage page={page} />
+            </span>
             {page.name}
           </span>
           <strong className={s.pdpTitle}>{product.title}</strong>
@@ -1637,7 +1728,7 @@ function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamM
             </span>
             <CloseButton onClose={onClose} />
           </div>
-          {m.bio && <p className={s.dialogText}>{m.bio}</p>}
+          {m.bio ? <p className={s.dialogText}>{m.bio}</p> : !hasBio(m) && <p className={s.mutedText}>{m.name} hasn’t added a bio yet.</p>}
           {Boolean(m.runs?.length) && (
             <div className={s.headStack} style={{ gap: 8 }}>
               <span className={s.label}>RUNS</span>
@@ -1718,15 +1809,17 @@ function VideoDialog({ video, onClose }: { video: PartnerVideo; onClose: () => v
 const PARTNER_KINDS = ['Brand', 'Photo & video', 'Facility', 'Service provider', 'Another club or team'];
 
 /**
- * "Message": a question about a session, or a partnership intro (brands, photographers, facilities, other clubs). Both go
- * to the partner through CLP, who replies by e-mail.
+ * "Message": a question about a session, or a partnership intro (brands, photographers, facilities, other
+ * clubs) that the partner accepts before a conversation opens. Both start a conversation on CLP Messages: the sender
+ * gets its private link (here and by e-mail), and nobody sees the other's e-mail or phone.
  */
 function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData; kind: 'question' | 'intro'; onKind: (k: 'question' | 'intro') => void; onClose: () => void }) {
   const intro = kind === 'intro';
   const [form, setForm] = useState({ name: '', organization: '', email: '', partnerKind: PARTNER_KINDS[0], message: '', website: '' });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [sent, setSent] = useState(false);
+  // The conversation's page (/messages/?thread=…&t=…) once sent.
+  const [sent, setSent] = useState('');
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [key]: e.target.value });
   const send = async (e: FormEvent) => {
     e.preventDefault();
@@ -1734,16 +1827,12 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
     setBusy(true);
     setError('');
     try {
-      await sendPartnerLead(page.slug, {
-        name: form.name.trim(),
-        organization: intro ? form.organization.trim() : `${form.name.trim()} (a question)`,
-        email: form.email.trim(),
-        onClp: false,
-        collabType: 'other',
-        idea: intro ? `${form.partnerKind}: ${form.message.trim()}` : `Question: ${form.message.trim()}`,
-        website: form.website,
-      });
-      setSent(true);
+      const link = intro
+        ? await sendIntro({ slug: page.slug, name: form.name.trim(), organization: form.organization.trim(), email: form.email.trim(), partnerKind: form.partnerKind, text: form.message.trim(), website: form.website })
+        : await askQuestion({ slug: page.slug, name: form.name.trim(), email: form.email.trim(), text: form.message.trim(), website: form.website });
+      const path = sitePath(link);
+      saveConversation({ path, name: page.name, subject: intro ? `Intro from ${form.organization.trim()}` : 'Your question', at: new Date().toISOString() });
+      setSent(path);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send. Try again.');
     } finally {
@@ -1760,7 +1849,14 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
         <div className={`${s.dialogBody} ${s.done}`}>
           <span className={s.doneMark}>✓</span>
           <strong className={s.cardTitle}>{intro ? 'Intro sent' : 'Message sent'}</strong>
-          <span className={s.mutedText}>{page.short} gets it through CLP and replies to you by e-mail.</span>
+          <span className={s.mutedText}>
+            {intro
+              ? `Once ${page.short} accepts it, you can message each other in your conversation on CLP.`
+              : `${page.short}’s reply comes to your conversation on CLP. It’s saved on this device under Messages, and its link opens it anywhere.`}
+          </span>
+          <Link className={`${s.btnAccent} ${s.btnLg}`} href={sent}>
+            Open the conversation
+          </Link>
           <button type="button" className={s.btnOutlineDark} onClick={onClose}>
             Back to {page.short}
           </button>
@@ -1782,7 +1878,7 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
           <span className={s.mutedText}>
             {intro
               ? `Brands, photographers, facilities and other clubs: introduce yourself. ${page.short} decides whether to take it further.`
-              : `Ask about a session before you book. Already booked? Reply to your booking e-mail so ${page.short} has the details.`}
+              : `Ask about a session before you book. Already booked? Message ${page.short} from your booking’s page so they have the details.`}
           </span>
           {intro && (
             <div className={s.formField}>
@@ -1823,11 +1919,11 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
           />
           {/* A field people don't see: filled in, the request is a bot's. */}
           <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className={s.trap} value={form.website} onChange={set('website')} />
-          <div className={s.rule2}>
+          {/* <div className={s.rule2}>
             {intro
-              ? `Sent through CLP. ${page.short} sees your name, organization and e-mail.`
-              : 'For adults. Under 18? Ask a parent or guardian to reach out.'}
-          </div>
+              ? `Sent through CLP. ${page.short} sees your name and organization, never your e-mail. They accept before a conversation opens.`
+              : 'Sent through CLP. Your e-mail and phone stay private.'}
+          </div> */}
           {error && <span className={s.formError}>{error}</span>}
           <button type="submit" className={`${s.btnAccent} ${s.btnLg}`} disabled={busy || page.preview}>
             {busy ? 'Sending…' : intro ? 'Send intro request' : 'Send message'}
@@ -1839,7 +1935,7 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
 }
 
 /** "Follow": the partner's e-mail list (new dates, drops and events). */
-function FollowDialog({ page, onClose }: { page: PartnerPageData; onClose: () => void }) {
+function FollowDialog({ page, onFollowed, onClose }: { page: PartnerPageData; onFollowed: (followers: number) => void; onClose: () => void }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
   const [error, setError] = useState('');
@@ -1848,7 +1944,7 @@ function FollowDialog({ page, onClose }: { page: PartnerPageData; onClose: () =>
     setState('busy');
     setError('');
     try {
-      await subscribeToPartner(page.slug, email.trim());
+      onFollowed((await subscribeToPartner(page.slug, email.trim())).followers);
       setState('done');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not follow.');
@@ -1940,7 +2036,7 @@ function CartDrawer({ page, cart, onClose, onShop }: { page: PartnerPageData; ca
         <div className={s.drawerHead}>
           <span className={s.miniBrand} style={{ fontSize: 18, color: '#111' }}>
             <span className={s.miniLogo} style={{ width: 32, height: 32 }}>
-              {page.logo ? <img src={page.logo} alt="" /> : page.mono}
+              <LogoImage page={page} />
             </span>
             <strong>Your {page.short} cart</strong>
           </span>

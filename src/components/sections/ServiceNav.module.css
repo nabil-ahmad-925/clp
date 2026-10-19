@@ -31,6 +31,12 @@
   margin-left: auto;
 }
 
+/* The partnership pages: the first or last page's one link in the middle. */
+.centerLone .item:only-child {
+  width: 100%;
+  margin-left: 0;
+}
+
 .cover {
   position: absolute;
   inset: 0;

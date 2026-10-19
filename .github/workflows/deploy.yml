@@ -43,6 +43,7 @@ jobs:
           STATIC_EXPORT: '1'
           # Listings API + image bucket (clp-api). Repo variables override these defaults.
           NEXT_PUBLIC_LISTINGS_API_URL: ${{ vars.NEXT_PUBLIC_LISTINGS_API_URL || 'https://yp2fairc3h.execute-api.us-east-1.amazonaws.com' }}
+          NEXT_PUBLIC_MESSAGES_WS_URL: ${{ vars.NEXT_PUBLIC_MESSAGES_WS_URL || 'wss://bqd28mhzo2.execute-api.us-east-1.amazonaws.com/live' }}
           NEXT_PUBLIC_LISTINGS_MEDIA_URL: ${{ vars.NEXT_PUBLIC_LISTINGS_MEDIA_URL || 'https://clp-listings-media.s3.us-east-1.amazonaws.com' }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ vars.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
           NEXT_PUBLIC_ADMIN_URL: ${{ vars.NEXT_PUBLIC_ADMIN_URL || 'https://d2v5g3qu3uuuvq.cloudfront.net' }}

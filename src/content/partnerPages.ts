@@ -42,6 +42,8 @@ export type PartnerCardData = {
   featured?: string[];
   /** CLP's Feature star: the shop's first row and the home page's featured spots. */
   homeFeatured?: boolean;
+  /** How many experiences it hosts (its published listings): the cards' "N experiences hosted". */
+  experiences?: number;
 };
 
 /** Someone who runs the partner's sessions; CLP sets their checks (SafeSport, background check, CPR). */
@@ -65,6 +67,8 @@ export type PartnerPageData = PartnerCardData & {
   socials: { network: string; href: string }[];
   website: string;
   sections: { id: string; on: boolean }[];
+  /** Who follows the page (its e-mail list). */
+  followers: number;
   /** Opened with a preview link before the page is live. */
   preview: boolean;
   /** Its store on the shop: private (behind its password, until a date) or not. */
@@ -162,7 +166,8 @@ export const loadLivePartners = () => (livePartners ??= fetchPartners().catch(()
 export type LeadInput = { name: string; organization: string; email: string; onClp: boolean; collabType: string; idea: string; website?: string };
 /** A "Work with us" idea, e-mailed to the partner and CLP. */
 export const sendPartnerLead = (slug: string, lead: LeadInput) => call<{ sent: true }>(`/partners/${encodeURIComponent(slug)}/leads`, { method: 'POST', body: JSON.stringify(lead) });
-export const subscribeToPartner = (slug: string, email: string) => call<{ subscribed: true }>(`/partners/${encodeURIComponent(slug)}/subscribe`, { method: 'POST', body: JSON.stringify({ email }) });
+/** Follows a page: its follower count after (the same e-mail counts once). */
+export const subscribeToPartner = (slug: string, email: string) => call<{ subscribed: true; followers: number }>(`/partners/${encodeURIComponent(slug)}/subscribe`, { method: 'POST', body: JSON.stringify({ email }) });
 
 export type ReviewEligibility = { canReview: boolean; reason?: 'not-partner' | 'reviewed' | 'not-checked-in'; review?: PartnerReviewData; partner?: { name: string; slug: string; mono: string; live: boolean } };
 /** Whether the guest of a booking (their link's token) may review it. */

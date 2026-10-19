@@ -11,6 +11,7 @@ import { AppliedPill } from '@/components/ui/FilterPopover';
 import MobileFilters from '@/components/ui/MobileFilters';
 import PillSelect from '@/components/ui/PillSelect';
 import Pager from '@/components/ui/Pager';
+import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
 import { PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, type PartnerCardData } from '@/content/partnerPages';
 import t from '@/components/sections/TeamDirectory.module.css';
 import BecomePartner from './BecomePartner';
@@ -103,6 +104,8 @@ function Directory({ category, label }: { category: string; label: string }) {
     SORTS.some((o) => o.value === params.get('sort')) ? (params.get('sort') as PartnerSort) : 'recommended',
   );
   const [page, setPage] = useState({ key: '', index: 0 });
+  // Cards in a grid or rows in a list (as the experiences' listings).
+  const [view, setView] = useState<ResultsView>('grid');
   const top = useRef<HTMLDivElement>(null);
 
   const setPlaces = shared?.setPlaces;
@@ -211,11 +214,6 @@ function Directory({ category, label }: { category: string; label: string }) {
               </button>
             )}
           </div>
-          <div className={t.sortSlot}>
-            <span className={t.sortDesktop}>
-              <PillSelect value={sort} options={SORTS} onChange={chooseSort} label="Sort partners" icon={<LuArrowUpDown />} />
-            </span>
-          </div>
           <div className={t.mobileFilters}>
             <MobileFilters
               sections={[
@@ -231,6 +229,12 @@ function Directory({ category, label }: { category: string; label: string }) {
               }}
             />
           </div>
+          <div className={t.sortSlot}>
+            <span className={t.sortDesktop}>
+              <PillSelect value={sort} options={SORTS} onChange={chooseSort} label="Sort partners" icon={<LuArrowUpDown />} />
+            </span>
+            <ViewToggle value={view} onChange={setView} />
+          </div>
         </div>
       </div>
 
@@ -243,16 +247,15 @@ function Directory({ category, label }: { category: string; label: string }) {
             </button>
           </div>
         ) : (
-          <div className={t.listingGrid}>
+          <div key={view} className={view === 'list' ? t.listingList : t.listingGrid}>
             {pageItems.map((p, i) => (
-              <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={isFeatured(p, category)} />
+              <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={isFeatured(p, category)} view={view} />
             ))}
             {lastPage && (
-              <BecomePartner className={c.join}>
+              <BecomePartner className={`${c.join} ${view === 'list' ? c.joinRow : ''}`}>
                 <span className={c.joinKicker}>{label} Partners</span>
                 <span className={c.joinTitle}>
-                  Your Brand
-                  <br />
+                  Your Brand {view === 'grid' && <br />}
                   Should Be Here
                 </span>
                 <span className={c.joinLine}>Your own page on CLP: bookings, a store, partnerships and verified reviews.</span>
@@ -289,9 +292,10 @@ function Directory({ category, label }: { category: string; label: string }) {
 }
 
 /**
- * A partner's card (the listing card's design): their photo with their logo and the CLP Partner badge, then who they
- * are. A card (grid) ends with the rating over a full-width "View Partner"; a row (list, photo on the left) with the
- * rating and the button side by side, as the Experiences row.
+ * A partner's card (the listing card's design): their photo with the CLP Partner badge and their logo on its bottom
+ * edge (as the experiences' partner cards), then who they are. A card (grid) ends with a line, the rating and the
+ * experiences they host, over a full-width "Learn More"; a row (list, photo on the left) with them and the button side
+ * by side, as the Experiences row.
  */
 export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { partner: PartnerCardData; eager: boolean; featured: boolean; view?: 'grid' | 'list' }) {
   const type = partnerType(p.type);
@@ -299,24 +303,28 @@ export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { pa
   return (
     <Link href={partnerHref(p.slug)} className={[c.card, featured && c.cardFeatured, view === 'list' && c.list].filter(Boolean).join(' ')}>
       <span className={c.media} style={{ background: color }}>
-        {p.hero ? (
-          <Image
-            className={c.image}
-            src={p.hero}
-            alt=""
-            fill
-            sizes={view === 'list' ? '(max-width: 767px) 100vw, 320px' : '(max-width: 860px) 50vw, 300px'}
-            loading={eager ? 'eager' : 'lazy'}
-          />
-        ) : (
-          <span className={c.mono}>{p.mono}</span>
-        )}
+        {/* The photo is clipped to the frame; the logo sits over its bottom edge. */}
+        <span className={c.frame}>
+          {p.hero ? (
+            <Image
+              className={c.image}
+              src={p.hero}
+              alt=""
+              fill
+              sizes={view === 'list' ? '(max-width: 767px) 100vw, 320px' : '(max-width: 860px) 50vw, 300px'}
+              loading={eager ? 'eager' : 'lazy'}
+            />
+          ) : (
+            <span className={c.mono}>{p.mono}</span>
+          )}
+        </span>
         <span className={c.badge}>
           <LuBadgeCheck aria-hidden /> CLP Partner
         </span>
         {featured && <span className={c.featuredTag}>Featured</span>}
         <span className={c.logo} style={{ background: color }}>
-          {p.logo ? <Image src={p.logo} alt="" width={56} height={56} /> : p.mono}
+          {/* Their logo, else their photo (as the experiences' partner cards); their initials without either. */}
+          {p.logo || p.hero ? <Image src={p.logo || p.hero} alt="" width={64} height={64} /> : p.mono}
         </span>
       </span>
       <span className={c.body}>
@@ -339,17 +347,24 @@ export function PartnerCard({ partner: p, eager, featured, view = 'grid' }: { pa
           </span>
         )}
         <span className={view === 'list' ? c.footer : c.footerWide}>
-          {p.rating != null && p.reviewCount > 0 ? (
-            <span className={c.rating}>
-              <LuStar aria-hidden /> {p.rating.toFixed(1)}{' '}
-              <span>
-                ({p.reviewCount} review{p.reviewCount === 1 ? '' : 's'})
+          <span className={c.stats}>
+            {p.rating != null && p.reviewCount > 0 ? (
+              <span className={c.rating}>
+                <LuStar aria-hidden /> {p.rating.toFixed(1)}{' '}
+                <span>
+                  ({p.reviewCount} review{p.reviewCount === 1 ? '' : 's'})
+                </span>
               </span>
-            </span>
-          ) : (
-            <span className={c.fresh}>New on CLP</span>
-          )}
-          <span className={`${c.cta} ${view === 'list' ? '' : c.ctaWide}`}>View Partner</span>
+            ) : (
+              <span className={c.fresh}>New on CLP</span>
+            )}
+            {Boolean(p.experiences) && (
+              <span className={c.hosted}>
+                {p.experiences} {p.experiences === 1 ? 'experience' : 'experiences'} hosted
+              </span>
+            )}
+          </span>
+          <span className={`${c.cta} ${view === 'list' ? '' : c.ctaWide}`}>Learn More</span>
         </span>
       </span>
     </Link>

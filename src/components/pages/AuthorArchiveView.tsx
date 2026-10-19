@@ -32,7 +32,7 @@ function toCard(post: ArchivePost): FilterPost {
 
 /**
  * An author's articles (/author/<slug>/, "More from …" on an article), in the new design of the article lists: a black
- * heading with "← Updates & News", the author's avatar, name, bio and social links, then their articles as the
+ * heading (its bottom line "← Updates & News") with the author's avatar, name, bio and social links, then their articles as the
  * article lists' cards (three a row, newest first) and the page links. While a page loads (`loading`) the grid
  * shimmers.
  */
@@ -42,12 +42,6 @@ export default function AuthorArchiveView({ archive, loading }: { archive: Categ
     <div className={styles.page}>
       <section className={styles.hero} data-header-tone="light" data-page-hero>
         <div className={styles.heroInner}>
-          <Link href="/updates/" className={styles.back}>
-            <span className="glyph" aria-hidden>
-              ←
-            </span>{' '}
-            Updates &amp; News
-          </Link>
           <span className={styles.avatar} aria-hidden>
             {authorInitials(archive.title)}
           </span>
@@ -55,6 +49,12 @@ export default function AuthorArchiveView({ archive, loading }: { archive: Categ
           <h1 className={styles.title}>{archive.title}</h1>
           {bio && <p className={styles.bio}>{bio}</p>}
           <AuthorSocials name={archive.title} socials={socials} className={styles.socials} linkClassName={styles.social} />
+          <Link href="/updates/" className={styles.back}>
+            <span className="glyph" aria-hidden>
+              ←
+            </span>{' '}
+            Updates &amp; News
+          </Link>
         </div>
       </section>
 

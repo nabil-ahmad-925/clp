@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { agePolicy, cornerTagLabel } from '@/content/listings';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
@@ -84,6 +84,34 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
   const facility = view === 'grid';
   // The ages and the access options (Open Access, Members Only…), three at most: chips on a card, pills on a row.
   const chips = [facts.ages, ...(facts.access ?? [])].filter((c): c is string => Boolean(c)).slice(0, 3);
+  // The listing's rating (its reviews' average), beside the ages, as a partner card shows one. Every card has it: only CLP
+  // Partners' listings collect reviews (a checked-in booking's), so the others say so.
+  const reviews = card.reviewCount ?? 0;
+  const rating =
+    card.rating != null && reviews > 0 ? (
+      <span className={styles.rating}>
+        <span className={styles.star} aria-hidden>
+          ★
+        </span>
+        {card.rating.toFixed(1)}{' '}
+        <span className={styles.reviews}>
+          ({reviews} {reviews === 1 ? 'review' : 'reviews'})
+        </span>
+      </span>
+    ) : (
+      <span className={`${styles.rating} ${styles.fresh}`}>No reviews yet</span>
+    );
+  // The ages first, the rating next to them, then the access options.
+  const withRating = (render: (c: string) => ReactNode) =>
+    chips.length === 0 ? (
+      rating
+    ) : (
+      <>
+        {facts.ages && render(chips[0])}
+        {rating}
+        {chips.slice(facts.ages ? 1 : 0).map(render)}
+      </>
+    );
   const price = facts.price ? (
     <>
       {facts.price}
@@ -153,9 +181,9 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
           <>
             {price ? <span className={styles.bigPrice}>{price}</span> : noPrice}
             <div className={styles.facilityFooter}>
-              {chips.length > 0 && (
+              {(chips.length > 0 || rating) && (
                 <span className={styles.chips}>
-                  {chips.map((c) => (
+                  {withRating((c) => (
                     <span key={c} className={styles.chip}>
                       {c}
                     </span>
@@ -167,9 +195,9 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
           </>
         ) : (
           <>
-            {chips.length > 0 && (
+            {(chips.length > 0 || rating) && (
               <span className={styles.pills}>
-                {chips.map((p) => (
+                {withRating((p) => (
                   <span key={p} className={styles.ages}>
                     {p}
                   </span>

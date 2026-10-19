@@ -345,3 +345,29 @@
   font-size: 13px;
   font-weight: 700;
 }
+
+/* The rating and the experiences hosted, a line above them, a bar between. */
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.hosted {
+  color: #aaa;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stats > * + *::before {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  margin: 0 10px;
+  background: #444;
+  vertical-align: -1px;
+  content: '';
+}

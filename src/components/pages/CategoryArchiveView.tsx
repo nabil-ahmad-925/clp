@@ -13,12 +13,12 @@ export default function CategoryArchiveView({ archive }: { archive: CategoryArch
       <div className={styles.headerSpace} aria-hidden />
       <div className={styles.header}>
         <div className={styles.title}>
-          {/* The breadcrumb back to Updates & News (the new design's article lists). */}
+          <span className={styles.subheader}>{archive.subheader}</span>
+          <h1>{archive.title}</h1>
+          {/* The breadcrumb back to Updates & News, on the heading's bottom line (the new design's article lists). */}
           <Link href="/updates/" className={styles.back}>
             <span className="glyph" aria-hidden>←</span> Updates &amp; News
           </Link>
-          <span className={styles.subheader}>{archive.subheader}</span>
-          <h1>{archive.title}</h1>
         </div>
       </div>
       <div className={styles.wrap}>

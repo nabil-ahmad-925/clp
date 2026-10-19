@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import BookingReview from '@/components/partners/BookingReview';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ListingHero from '@/components/sections/ListingHero';
 import { CANCEL_TIME, cancelGuestBooking, directionsHref, fetchGuestBooking, type BookingConfirmation } from '@/content/listings';
+import { messageHost, saveConversation, sitePath } from '@/content/messages';
 import styles from './GuestBooking.module.css';
 
 const longDay = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -165,9 +166,10 @@ export default function GuestBooking() {
                 )
               ) : (
                 <p className={styles.muted}>
-                  Free cancellation ended on {longDay(current.booking.cancelBy)}. To change your booking, reply to your booking e-mail to reach the host.
+                  Free cancellation ended on {longDay(current.booking.cancelBy)}. To change your booking, message the host.
                 </p>
               )}
+              <MessageHost id={id} token={token} title={current.booking.listingTitle ?? 'Your booking'} />
               {/* Checked in at a CLP Partner's session: a verified review for their page. */}
               {current.booking.status === 'confirmed' && <BookingReview id={id} token={token} />}
             </div>
@@ -177,3 +179,36 @@ export default function GuestBooking() {
     </>
   );
 }
+
+/** "Message the host": the booking's conversation on CLP Messages (made the first time), opened here. */
+function MessageHost({ id, token, title }: { id: string; token: string; title: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const open = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const path = sitePath(await messageHost(id, token));
+      saveConversation({ path, name: title, subject: 'Your booking', at: new Date().toISOString() });
+      router.push(path);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not open the conversation. Try again.');
+      setBusy(false);
+    }
+  };
+  return (
+    <div className={styles.stack}>
+      <button type="button" className={styles.secondary} disabled={busy} onClick={open}>
+        {busy ? 'Opening…' : 'Message the Host'}
+      </button>
+      <span className={styles.muted}>Questions about your booking? Message the host on CLP. Your e-mail and phone stay private.</span>
+      {error && (
+        <p className={styles.error} role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+

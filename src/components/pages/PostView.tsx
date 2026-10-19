@@ -41,6 +41,10 @@ export default function PostView({ post }: { post: BlogPost }) {
     <div className={styles.page}>
       <section className={styles.head} data-header-tone="light" data-page-hero>
         <div className={styles.headInner}>
+          <h1 className={styles.title}>{hero.title}</h1>
+          {/* The author is on the card under the article. */}
+          <p className={styles.dateline}>{[hero.date, hero.readingTime].filter(Boolean).join(' | ')}</p>
+          {/* The breadcrumb on the heading's bottom line. */}
           <nav className={styles.crumbs} aria-label="Breadcrumb">
             <Link href="/updates/">Updates &amp; News</Link>
             {topic && (
@@ -52,9 +56,6 @@ export default function PostView({ post }: { post: BlogPost }) {
               </>
             )}
           </nav>
-          <h1 className={styles.title}>{hero.title}</h1>
-          {/* The author is on the card under the article. */}
-          <p className={styles.dateline}>{[hero.date, hero.readingTime].filter(Boolean).join(' | ')}</p>
         </div>
       </section>
 

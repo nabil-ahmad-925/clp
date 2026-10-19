@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import PartnershipsView, { PartnershipsMeta } from '@/components/partners/PartnershipsView';
+import PartnershipsView from '@/components/partners/PartnershipsView';
 import { DirectorySearchProvider, DirectorySearchSlot } from '@/components/sections/DirectorySearch';
 import { partnershipsHero, partnershipsMeta } from '@/content/partnerships';
 import styles from '@/components/partners/partnerships.module.css';
@@ -16,10 +16,10 @@ export default function PartnershipsPage() {
     <DirectorySearchProvider placeholder="Search partners, sports or services…" label="Partner name">
       <section className={styles.hero} data-header-tone="light" data-page-hero>
         <div className={styles.heroInner}>
-          <span className={styles.eyebrow}>{partnershipsHero.eyebrow}</span>
           <h1 className={styles.heroTitle}>{partnershipsHero.title}</h1>
           <p className={styles.heroBlurb}>{partnershipsHero.blurb}</p>
-          <PartnershipsMeta className={styles.heroMeta} />
+          {/* The page's label under its heading (the headings' labels sit under them). */}
+          <span className={styles.eyebrow}>{partnershipsHero.eyebrow}</span>
         </div>
       </section>
       <div className={styles.content} data-header-tone="dark" data-listing="">

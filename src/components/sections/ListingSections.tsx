@@ -56,8 +56,9 @@ export function ProgramPlans({ category, section }: { category?: string; section
   return (
     <section className={styles.plans} data-header-tone="dark">
       <div className={styles.plansHead}>
-        <span className={styles.eyebrowDark}>{services ? 'OFFER A SERVICE?' : 'RUN A PROGRAM?'}</span>
         <h2 className={`${styles.plansTitle} ${styles.plansTitleBold}`}>{services ? 'Get in Front of More Teams & Brands' : 'Get in Front of More Athletes'}</h2>
+        {/* The section's label under its heading. */}
+        <span className={styles.eyebrowDark}>{services ? 'OFFER A SERVICE?' : 'RUN A PROGRAM?'}</span>
       </div>
       <div className={styles.planGrid}>
         {PLANS.map((p) => (

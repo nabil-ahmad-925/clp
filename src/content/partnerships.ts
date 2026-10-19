@@ -7,7 +7,7 @@ export const partnershipsMeta = {
 
 export const partnershipsHero = {
   eyebrow: 'PARTNERSHIPS',
-  title: 'The clubs, coaches and brands behind CLP.',
+  title: 'The Clubs, Coaches and Brands Behind CLP.',
   blurb: 'Every partner has a page on CLP where you can book sessions, shop their store, see their photos and videos, and message them.',
 };
 
@@ -21,7 +21,7 @@ export type PartnerWay = { id: string; label: string; cta: string; partnerType: 
 export const partnerWays: PartnerWay[] = [
   {
     id: 'athlete',
-    label: 'Athletes & creators',
+    label: 'Athletes & Creators',
     cta: 'Apply as an athlete',
     partnerType: 'athlete',
     perks: ['Your own page with bio, photos and videos', 'Paid appearances, clinics and brand deals', 'A merch store, no inventory needed', 'Content with CLP events and partners'],
@@ -51,7 +51,7 @@ export const partnerWays: PartnerWay[] = [
   },
   {
     id: 'operator',
-    label: 'Clubs, coaches & facilities',
+    label: 'Clubs, Coaches & Facilities',
     cta: 'Apply as an operator',
     partnerType: 'club',
     perks: ['Bookings, check-in and payouts', 'A page and your own store', 'Messages and session updates', 'Help filling sessions and fields'],
@@ -69,7 +69,7 @@ export const partnerWays: PartnerWay[] = [
   },
   {
     id: 'org',
-    label: 'Schools & organizations',
+    label: 'Schools & Organizations',
     cta: 'Apply as an organization',
     partnerType: 'org',
     perks: ['Host events and programs with CLP', 'Volunteer and service hours', 'Fundraising through your store', 'A page for your community'],

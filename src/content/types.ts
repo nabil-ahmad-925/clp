@@ -51,6 +51,9 @@ export type DirectoryItem = FacilityCard & {
   cornerTag?: string;
   /** A CLP Partner's listing: the partner, whose name is the card's provider line. */
   partner?: { name: string; slug: string };
+  /** A CLP Partner's listing's own rating (its reviews' average; null before any review) and reviews, beside the ages. */
+  rating?: number | null;
+  reviewCount?: number;
   /** Its price in dollars (listings from the admin): the same in both for a single price, 0 for free. */
   priceMin?: number;
   priceMax?: number;

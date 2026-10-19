@@ -5,7 +5,7 @@ type Props = {
   /** The title's lines, each on its own ("Fútbol (Soccer)", "Advancement & Workshops Nearby"; see listingTitleLines). */
   title: string[];
   blurb?: string;
-  /** The page it belongs to, above the title ("← Updates & News"): an article list's breadcrumb, with its larger title. */
+  /** The page it belongs to, on the heading's bottom line ("← Updates & News"): an article list's breadcrumb. */
   back?: { label: string; href: string };
 };
 
@@ -17,11 +17,6 @@ export default function ListingHero({ title, blurb, back }: Props) {
   return (
     <section className={`${styles.hero} ${back ? styles.withBack : ''}`} data-header-tone="light" data-page-hero>
       <div className={styles.inner}>
-        {back && (
-          <Link href={back.href} className={styles.back}>
-            <span className="glyph" aria-hidden>←</span> {back.label}
-          </Link>
-        )}
         <h1 className={styles.title}>
           {title.map((line, i) => (
             <span key={i} className={styles.line}>
@@ -31,6 +26,11 @@ export default function ListingHero({ title, blurb, back }: Props) {
           ))}
         </h1>
         {blurb && <p className={styles.blurb}>{blurb}</p>}
+        {back && (
+          <Link href={back.href} className={styles.back}>
+            <span className="glyph" aria-hidden>←</span> {back.label}
+          </Link>
+        )}
       </div>
     </section>
   );

@@ -11,7 +11,7 @@ import styles from './SiteHeader.module.css';
 
 // Pages without a hero get a solid black header instead of the transparent one.
 // A CLP Partner's page (/partner/) too: the handoff's black header band, with the page's tabs sticking under it.
-const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/', '/shopping-cart/', '/partner/']);
+const SOLID_HEADER_PATHS = new Set(['/resources/', '/services/', '/book-a-session/', '/experiences/futbol/facilities-parks/', '/shopping-cart/', '/partner/', '/messages/']);
 
 /** Finds the tone of the section currently behind the header (sections opt in with data-header-tone). */
 function toneBehindHeader(header: HTMLElement): HeaderTone {

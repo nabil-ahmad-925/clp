@@ -208,6 +208,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  /* The ages and the rating, centred on the card. */
+  justify-content: center;
   padding-top: 12px;
   border-top: 1px solid #eeeeeb;
   color: #555;
@@ -220,8 +222,41 @@
   align-items: center;
 }
 
-/* A thin bar between chips. */
-.chip + .chip::before {
+/* A CLP Partner's rating beside the ages. */
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #111;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.star {
+  color: var(--gold);
+}
+
+.reviews {
+  color: #777;
+  font-weight: 500;
+}
+
+.fresh {
+  color: #888;
+  font-weight: 600;
+}
+
+.pills .rating {
+  align-self: flex-start;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f2f1ee;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* A thin bar between chips (the rating among them). */
+.chips > * + *::before {
   width: 1px;
   height: 12px;
   margin: 0 10px;

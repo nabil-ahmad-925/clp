@@ -6,6 +6,7 @@ export default function PortfolioNav({ links }: { links: PortfolioNavLink[] }) {
   return (
     <ServiceNav
       label="Partnerships"
+      centerLone
       previous={links.find((l) => l.kind === 'previous')}
       next={links.find((l) => l.kind === 'next')}
     />

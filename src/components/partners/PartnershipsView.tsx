@@ -9,7 +9,6 @@ import FilterChip from '@/components/ui/FilterChip';
 import { AppliedPill } from '@/components/ui/FilterPopover';
 import MobileFilters from '@/components/ui/MobileFilters';
 import PillSelect from '@/components/ui/PillSelect';
-import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
 import { PARTNER_CATEGORIES, PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, type PartnerCardData } from '@/content/partnerPages';
 import { partnerWays, partnershipsDisclaimer } from '@/content/partnerships';
 import t from '@/components/sections/TeamDirectory.module.css';
@@ -43,7 +42,7 @@ const featuredAnywhere = (p: PartnerCardData) => (p.featured?.length ?? 0) > 0;
 const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
 const SORTS = [
   { value: 'recommended', label: 'Recommended' },
-  { value: 'rating', label: 'Top rated' },
+  { value: 'rating', label: 'Top Rated' },
   { value: 'az', label: 'A–Z' },
 ] as const;
 type Sort = (typeof SORTS)[number]['value'];
@@ -54,14 +53,14 @@ const ORDER: Record<Sort, (a: PartnerCardData, b: PartnerCardData) => number> = 
   az: (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }),
 };
 
-/** How many featured partners the dark band shows. */
-const FEATURED_SHOWN = 3;
+/** How many featured partners the dark band shows (a row of the experiences' cards). */
+const FEATURED_SHOWN = 4;
 
 /**
  * The Partnerships page (/partnerships/, the "Partnerships · category directory" design): under the heading and its
  * search bar, the filters, then the partner categories (each opening its listing, /portfolio/<category>-partners/)
- * and CLP's featured partners. A search, a filter or "View All Partners" shows the matching partners instead, as cards or
- * rows. Then the ways to partner with CLP and the gold "Want your page on CLP?" band.
+ * and CLP's featured partners. A search, a filter or "View All Partners" shows the matching partners' cards instead.
+ * Then the ways to partner with CLP and the gold "Want your page on CLP?" band.
  */
 export default function PartnershipsView() {
   const shared = useSharedSearch();
@@ -71,7 +70,6 @@ export default function PartnershipsView() {
   const [all, setAll] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>('recommended');
-  const [view, setView] = useState<ResultsView>('grid');
   const results = useRef<HTMLDivElement>(null);
   const toResults = () => setTimeout(() => results.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
 
@@ -127,24 +125,17 @@ export default function PartnershipsView() {
   const sportOptions = PARTNER_SPORTS.map((sp) => ({ value: sp.id, label: sp.label, count: items ? count({ ...filters, sports: [sp.id] }) : undefined }));
 
   const where = filters.cats.length === 1 ? `in ${catLabel(filters.cats[0])}` : filters.cats.length > 1 ? `in ${filters.cats.length} categories` : 'across all categories';
-  const summary = !items ? (
-    <>Loading partners…</>
-  ) : listing ? (
-    <>
-      <strong>
-        {shown.length} {shown.length === 1 ? 'result' : 'results'}
-      </strong>{' '}
-      {where}
-      {search.loc ? ` near ${search.loc}` : ''}
-    </>
-  ) : (
-    <>
-      <strong>
-        {list.length} {list.length === 1 ? 'partner' : 'partners'}
-      </strong>{' '}
-      in {PARTNER_CATEGORIES.length} categories · search or filter to see a list
-    </>
-  );
+  // The results' count, while a search or a filter shows them.
+  const summary =
+    listing && items ? (
+      <>
+        <strong>
+          {shown.length} {shown.length === 1 ? 'result' : 'results'}
+        </strong>{' '}
+        {where}
+        {search.loc ? ` near ${search.loc}` : ''}
+      </>
+    ) : null;
 
   return (
     <div className={s.page} data-listing="">
@@ -153,7 +144,7 @@ export default function PartnershipsView() {
           <div className={t.barRow}>
             <div className={`${t.filters} ${items ? '' : t.busy}`} inert={!items}>
               <FilterChip
-                name="All categories"
+                name="All Categories"
                 heading="Category"
                 icon={<LuLayers />}
                 plural="categories"
@@ -166,7 +157,7 @@ export default function PartnershipsView() {
               />
               {typeOptions.length > 0 && (
                 <FilterChip
-                  name="Any partner type"
+                  name="Any Partner Type"
                   heading="Partner Type"
                   icon={<LuShapes />}
                   plural="types"
@@ -217,30 +208,31 @@ export default function PartnershipsView() {
               <span className={t.sortDesktop}>
                 <PillSelect value={sort} options={SORTS} onChange={setSort} label="Sort partners" icon={<LuArrowUpDown />} />
               </span>
-              <ViewToggle value={view} onChange={setView} />
             </div>
           </div>
         </div>
-        <div className={s.summary} role="status">
-          {summary}
-        </div>
+        {summary && (
+          <div className={s.summary} role="status">
+            {summary}
+          </div>
+        )}
       </section>
 
       {listing ? (
         <section className={`${s.wrap} ${s.results}`}>
           {!items ? (
-            <div className={view === 'list' ? t.listingList : t.listingGrid} aria-hidden>
-              {Array.from({ length: view === 'list' ? 4 : 8 }, (_, i) => (
-                <div key={i} className={`${t.skeleton} ${view === 'list' ? t.listingSkeletonRow : t.listingSkeleton}`} />
+            <div className={t.listingGrid} aria-hidden>
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className={`${t.skeleton} ${t.listingSkeleton}`} />
               ))}
             </div>
           ) : shown.length === 0 ? (
             <Empty category={filters.cats.length === 1 && !list.some((p) => p.partnerCategories.includes(filters.cats[0])) ? catLabel(filters.cats[0]) : undefined} onClear={clearAll} />
           ) : (
-            // The partners' cards (or rows) as on the categories' listings and the experiences.
-            <div key={view} className={view === 'list' ? t.listingList : t.listingGrid}>
+            // The partners' cards as on the categories' listings.
+            <div className={t.listingGrid}>
               {shown.map((p, i) => (
-                <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={featuredAnywhere(p)} view={view} />
+                <PartnerCard key={p.slug} partner={p} eager={i < 4} featured={featuredAnywhere(p)} />
               ))}
             </div>
           )}
@@ -263,7 +255,7 @@ export default function PartnershipsView() {
 
       <section className={s.goldWrap} data-header-tone="dark">
         <div className={s.gold}>
-          <h2 className={s.goldTitle}>Want your page on CLP?</h2>
+          <h2 className={s.goldTitle}>Want Your Page on CLP?</h2>
           <span className={s.goldText}>One short application for clubs, coaches, facilities, brands, athletes and organizations. We reply within 3 business days.</span>
           <div className={s.goldActions}>
             <BecomePartner className={s.btnDark}>Apply to be a partner</BecomePartner>
@@ -277,11 +269,11 @@ export default function PartnershipsView() {
   );
 }
 
-/** A partner's logo tile: their logo, else their initials on their colour. */
+/** A partner's logo tile: their logo, else their photo, else their initials on their colour. */
 function Logo({ partner: p, className }: { partner: PartnerCardData; className: string }) {
   return (
     <span className={className} style={{ background: p.color || partnerType(p.type).color }} title={p.name}>
-      {p.logo ? <Image src={p.logo} alt="" width={96} height={96} /> : p.mono}
+      {p.logo || p.hero ? <Image src={p.logo || p.hero} alt="" width={96} height={96} /> : p.mono}
     </span>
   );
 }
@@ -319,7 +311,7 @@ function CategoryDirectory({ items }: { items: PartnerCardData[] | null }) {
   return (
     <section className={`${s.wrap} ${s.directory}`}>
       <div className={s.head}>
-        <h2 className={s.headTitle}>Browse partners by category</h2>
+        <h2 className={s.headTitle}>Browse Partners by Category</h2>
         <span className={s.headText}>Tap a category to see every partner in it.</span>
       </div>
       <div className={s.cats}>
@@ -372,15 +364,15 @@ function FeaturedBand({ items, onViewAll }: { items: PartnerCardData[]; onViewAl
     <section className={s.featured} data-header-tone="light">
       <div className={s.featuredInner}>
         <div className={s.head}>
-          <span className={s.eyebrow}>FEATURED PARTNERS</span>
-          <h2 className={s.featuredTitle}>Hand-picked by CLP</h2>
+          <h2 className={s.featuredTitle}>Hand-Picked by CLP</h2>
           <span className={s.featuredText}>Partners our team recommends this month.</span>
+          <span className={s.eyebrow}>FEATURED PARTNERS</span>
         </div>
         <div className={s.featuredGrid} style={{ '--n': items.length } as CSSProperties}>
           {items.map((p, i) => (
-            <Link key={p.slug} href={partnerHref(p.slug)} className={s.fcard} aria-label={`View ${p.name}`}>
+            <Link key={p.slug} href={partnerHref(p.slug)} className={s.fcard} aria-label={`Learn more about ${p.name}`}>
               <span className={s.fmedia}>
-                <Photo partner={p} eager={i === 0} sizes="(max-width: 999px) 100vw, 440px" />
+                <Photo partner={p} eager={i === 0} sizes="(max-width: 999px) 50vw, 320px" />
               </span>
               <span className={s.fbody}>
                 <Logo partner={p} className={s.flogo} />
@@ -392,7 +384,7 @@ function FeaturedBand({ items, onViewAll }: { items: PartnerCardData[]; onViewAl
                   </span>
                 )}
                 <span className={s.fgo}>
-                  <span>View Partner</span>
+                  <span>Learn More</span>
                   <span className={s.farrow} aria-hidden>
                     →
                   </span>
@@ -417,9 +409,9 @@ function WaysToPartner() {
   return (
     <section className={s.ways}>
       <div className={s.head}>
-        <span className={s.eyebrowDeep}>BECOME A PARTNER</span>
-        <h2 className={s.headTitle}>Ways to partner with CLP</h2>
+        <h2 className={s.headTitle}>Ways to Partner with CLP</h2>
         <span className={s.headText}>Pick what fits you. Every partner gets a page, bookings, a store and support from our team.</span>
+        <span className={s.eyebrowDeep}>BECOME A PARTNER</span>
       </div>
       <div className={s.switch} role="group" aria-label="Partner type">
         {partnerWays.map((w) => (
@@ -467,23 +459,5 @@ function WaysToPartner() {
         </div>
       </div>
     </section>
-  );
-}
-
-/** The heading's line under the blurb: "8 partners · 12 categories" (the categories alone while the partners load). */
-export function PartnershipsMeta({ className }: { className?: string }) {
-  const [n, setN] = useState<number | null>(null);
-  useEffect(() => {
-    let active = true;
-    loadLivePartners().then((list) => active && setN(list.length));
-    return () => {
-      active = false;
-    };
-  }, []);
-  return (
-    <span className={className}>
-      {n ? `${n} ${n === 1 ? 'partner' : 'partners'} · ` : ''}
-      {PARTNER_CATEGORIES.length} categories
-    </span>
   );
 }

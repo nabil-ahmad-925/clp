@@ -26,6 +26,7 @@ import PriceChip, { priceBuckets, type PriceBucket } from '@/components/ui/Price
 import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
+import tagLabels from '@/content/data/listingTags.json';
 import { FIRST_LOAD_TIMEOUT_MS, SPORT_FILTER, unitLabel, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout, Provider } from '@/content/types';
@@ -147,12 +148,15 @@ const CHIPS: Record<string, Chip> = {
  * experience: Dieting & Nutrition, Mental Health & Resilience and Injury Prevention & Recovery.
  */
 const COACHING_EXPERIENCE_WIDGETS = [40, 39, 16];
+/** Groups & Private Lessons: its "Skill Level" filter (Licensed Coach, Former/Current Pro…) is the coach's experience. */
+const GROUPS_PRIVATE_WIDGET = 6;
 
 const chipFor = (filter: DirectoryFilter, widgetId?: number): Chip => {
   if (filter.key === START_TIME_FILTER.key) return { ...CHIPS.starttime, name: filter.label };
   if (filter.key === 'experiences' && widgetId != null && COACHING_EXPERIENCE_WIDGETS.includes(widgetId)) {
     return { ...CHIPS.experiences, name: 'Coaching Experience' };
   }
+  if (filter.key === 'specialty' && widgetId === GROUPS_PRIVATE_WIDGET) return { ...CHIPS.specialty, name: 'Coaching Experience', plural: 'selected' };
   if (filter.key && CHIPS[filter.key]) return CHIPS[filter.key];
   if (filter.key?.startsWith('experience')) return { name: 'Experience Type', icon: <LuSparkles />, plural: 'experience types' };
   const name = filter.label.replace(/^all\s+/i, '').toLowerCase();
@@ -197,6 +201,22 @@ function rowFacts(item: DirectoryItem, filters: DirectoryFilter[], prices: Map<s
         ? `${months.slice(0, 3).join(', ')} +${months.length - 3}`
         : months.join(', ') || undefined,
     price,
+  };
+}
+
+const AGE_LABELS = tagLabels.ages as Record<string, string>;
+const CITY_LABELS = tagLabels.cities as Record<string, string>;
+
+/**
+ * A card's details outside a directory (the sport and service pages' sections): its city and ages from its tags (the
+ * listings' own labels), its dates and its price, as the directory's cards show them.
+ */
+export function listingFacts(item: DirectoryItem): RowFacts {
+  const facts = rowFacts(item, [], new Map());
+  return {
+    ...facts,
+    city: firstOf([...new Set(item.tags.map((t) => CITY_LABELS[t]).filter(Boolean))]),
+    ages: firstOf(item.tags.map((t) => AGE_LABELS[t]).filter(Boolean)),
   };
 }
 

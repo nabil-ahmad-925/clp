@@ -133,7 +133,16 @@ export const isListingWidget = (widgetId: number | undefined): widgetId is numbe
 export const isFacilitiesWidget = (widgetId: number | undefined): widgetId is number => widgetId != null && WIDGET_TYPES[widgetId] === 'facilities';
 
 /** A CLP partner in a listing page's spotlight (from the partner directory). */
-export type SpotlightPartner = { name: string; href: string; image?: string; excerpt: string; /** Their rating ("★ 4.5 · 2 reviews"), if reviewed. */ rating?: string };
+export type SpotlightPartner = {
+  name: string;
+  href: string;
+  image?: string;
+  excerpt: string;
+  /** Their rating ("★ 4.5 · 2 reviews"), if reviewed. */
+  rating?: string;
+  /** "3 experiences hosted", if they host any. */
+  hosted?: string;
+};
 
 /**
  * What a listing page's directory shows besides its cards: its design (an Experiences or Resources category, or a
@@ -163,7 +172,10 @@ export const listingTitleLines = (title: string[]) => {
   if (!m) return [text];
   const sport = m[1].replace('Fútbol(', 'Fútbol (').replace(' and ', ' & ');
   const amp = m[2].indexOf(' & ');
-  return amp >= 0 ? [`${sport} ${m[2].slice(0, amp)} &`, m[2].slice(amp + 3)] : [sport, m[2]];
+  if (amp >= 0) return [`${sport} ${m[2].slice(0, amp)} &`, m[2].slice(amp + 3)];
+  // No "&": the category's first word joins the sport ("Golf Branded", "Activations Nearby").
+  const [first, ...rest] = m[2].split(' ');
+  return rest.length ? [`${sport} ${first}`, rest.join(' ')] : [sport, m[2]];
 };
 
 /** The search field's placeholder of a directory: "Search Advancement & Workshops…", else "Search <fallback>…". */
@@ -185,6 +197,9 @@ export type Listing = {
   cornerTag?: string;
   /** A CLP Partner's listing: the partner (their live page). */
   partner?: { name: string; slug: string };
+  /** A CLP Partner's listing's own rating (its reviews' average, one decimal; null before any review) and reviews. */
+  rating?: number | null;
+  reviewCount?: number;
   /** The built-in card this listing replaces (listings imported from the site's own data). */
   sourceId?: string;
   title: string;
@@ -292,6 +307,8 @@ export const toItem = (l: Listing): AddedItem => ({
   priceUnit: l.priceUnit ?? (l.widgetId ? unitsFor(l.widgetId)[0] : undefined),
   cornerTag: l.cornerTag,
   partner: l.partner,
+  rating: l.rating,
+  reviewCount: l.reviewCount,
   sourceId: l.sourceId,
   tags: l.tags,
   priceMin: l.priceMin,

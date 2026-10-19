@@ -63,6 +63,7 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
     image: p.hero || p.logo,
     excerpt: [p.category, p.area].filter(Boolean).join(' · '),
     rating: p.rating != null && p.reviewCount ? `★ ${p.rating.toFixed(1)} · ${p.reviewCount} review${p.reviewCount === 1 ? '' : 's'}` : undefined,
+    hosted: p.experiences ? `${p.experiences} ${p.experiences === 1 ? 'experience' : 'experiences'} hosted` : undefined,
   }));
   const empty = live?.length === 0;
   // "View All Partners": the category's listing filtered as this band is, by the page's sport and the partner types shown.
@@ -101,7 +102,7 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
     sub: resources
       ? 'Verified CLP partners. Licensed and certified providers are marked on their listing.'
       : 'Verified programs that book, pay and check in through CLP.',
-    more: 'View Partner',
+    more: 'Learn More',
     all: 'View All Partners',
   };
   const card = (p: SpotlightPartner) => (
@@ -115,7 +116,12 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
       <span className={styles.body}>
         <span className={styles.name}>{p.name}</span>
         {p.excerpt && <span className={styles.meta}>{p.excerpt}</span>}
-        {p.rating && <span className={styles.rating}>{p.rating}</span>}
+        {(p.rating || p.hosted) && (
+          <span className={styles.stats}>
+            {p.rating && <span className={styles.rating}>{p.rating}</span>}
+            {p.hosted && <span className={styles.hosted}>{p.hosted}</span>}
+          </span>
+        )}
         <span className={styles.more}>
           {copy.more}
           <span className="glyph" aria-hidden>
@@ -129,9 +135,10 @@ export default function PartnerSpotlight({ section, category, sport }: Props) {
     <section className={styles.spotlight} data-header-tone="light">
       <div className={styles.inner}>
         <div className={styles.head}>
-          <span className={styles.eyebrow}>{copy.eyebrow}</span>
           <h2 className={styles.title}>{copy.title}</h2>
           <p className={styles.sub}>{copy.sub}</p>
+          {/* The section's label under its heading. */}
+          <span className={styles.eyebrow}>{copy.eyebrow}</span>
         </div>
         {empty ? (
           <div className={styles.none}>
