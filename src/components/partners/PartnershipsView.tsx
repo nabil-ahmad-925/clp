@@ -38,7 +38,8 @@ const matches = (p: PartnerCardData, f: Filters, search: Search) => {
   return !search.loc || fold(p.area).includes(fold(search.loc));
 };
 
-const featuredAnywhere = (p: PartnerCardData) => (p.featured?.length ?? 0) > 0;
+/** CLP features a partner with its ★ (Partners in the admin) or on one of its categories' listings (the Partnerships page). */
+const featuredAnywhere = (p: PartnerCardData) => Boolean(p.homeFeatured) || (p.featured?.length ?? 0) > 0;
 const byRating = (a: PartnerCardData, b: PartnerCardData) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name);
 const SORTS = [
   { value: 'recommended', label: 'Recommended' },
@@ -53,8 +54,8 @@ const ORDER: Record<Sort, (a: PartnerCardData, b: PartnerCardData) => number> = 
   az: (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }),
 };
 
-/** How many featured partners the dark band shows (a row of the experiences' cards). */
-const FEATURED_SHOWN = 4;
+/** The featured band's cards a row (more wrap onto the next). */
+const FEATURED_ROW = 4;
 
 /**
  * The Partnerships page (/partnerships/, the "Partnerships · category directory" design): under the heading and its
@@ -242,7 +243,7 @@ export default function PartnershipsView() {
         <>
           <CategoryDirectory items={items} />
           <FeaturedBand
-            items={list.filter(featuredAnywhere).sort(byRating).slice(0, FEATURED_SHOWN)}
+            items={list.filter(featuredAnywhere).sort((a, b) => Number(Boolean(b.homeFeatured)) - Number(Boolean(a.homeFeatured)) || byRating(a, b))}
             onViewAll={() => {
               setAll(true);
               toResults();
@@ -368,7 +369,7 @@ function FeaturedBand({ items, onViewAll }: { items: PartnerCardData[]; onViewAl
           <span className={s.featuredText}>Partners our team recommends this month.</span>
           <span className={s.eyebrow}>FEATURED PARTNERS</span>
         </div>
-        <div className={s.featuredGrid} style={{ '--n': items.length } as CSSProperties}>
+        <div className={s.featuredGrid} style={{ '--n': Math.min(items.length, FEATURED_ROW) } as CSSProperties}>
           {items.map((p, i) => (
             <Link key={p.slug} href={partnerHref(p.slug)} className={s.fcard} aria-label={`Learn more about ${p.name}`}>
               <span className={s.fmedia}>
