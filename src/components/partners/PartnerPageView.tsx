@@ -1366,6 +1366,7 @@ function Shop({ page, products, onOpen }: { page: PartnerPageData; products: Par
         <span className={s.storeBannerShade} aria-hidden />
         <div className={s.storeBannerText}>
           <strong>{page.store.title || `Shop ${page.name}`}</strong>
+          <span>{page.store.sub || `Gear and keepsakes from ${page.name}. Every order supports ${page.short}.`}</span>
         </div>
       </div>
       <div className={s.shopTools}>

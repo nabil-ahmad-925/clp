@@ -1448,7 +1448,7 @@ a.collab:hover .collabImage img {
 /* ---- Shop ---- */
 .storeBanner {
   position: relative;
-  height: 160px;
+  height: 180px;
   overflow: hidden;
   border-radius: 18px;
   background: var(--accent-deep);
@@ -1457,28 +1457,31 @@ a.collab:hover .collabImage img {
 
 .storeBanner img {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 55%;
+  inset: 0;
+  width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.9;
 }
 
+/* The photo under the partner's colour, evenly, so the centred text reads on any part of it. */
 .storeBannerShade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, var(--accent-deep) 45%, rgba(0, 0, 0, 0) 80%);
+  background: var(--accent-deep);
+  opacity: 0.78;
 }
 
-/* The store's name, on one wide line. */
+/* The store's name and its line, centred. */
 .storeBannerText {
   position: absolute;
-  top: 50%;
-  right: 36px;
-  left: 36px;
+  inset: 0;
   display: flex;
-  transform: translateY(-50%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 36px;
+  text-align: center;
 }
 
 .storeBannerText strong {
@@ -1486,6 +1489,13 @@ a.collab:hover .collabImage img {
   font-size: 30px;
   font-weight: 800;
   line-height: 1.15;
+}
+
+.storeBannerText span {
+  max-width: 640px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .shopTools {
@@ -2183,14 +2193,8 @@ article:hover .productCardMedia > img {
     max-width: none;
   }
 
-  .storeBanner img {
-    width: 100%;
-    opacity: 0.35;
-  }
-
   .storeBannerText {
-    right: 24px;
-    left: 24px;
+    padding: 0 24px;
   }
 
   .storeBannerText strong {
