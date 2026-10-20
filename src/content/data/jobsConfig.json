@@ -24,15 +24,17 @@
   "payUnits": [
     { "id": "hour", "label": "hour" },
     { "id": "session", "label": "session" },
+    { "id": "day", "label": "day" },
     { "id": "week", "label": "week" },
     { "id": "month", "label": "month" },
     { "id": "year", "label": "year" },
-    { "id": "season", "label": "season" }
+    { "id": "stipend", "label": "stipend (total)" }
   ],
   "statuses": [
     { "id": "draft", "label": "Draft" },
     { "id": "review", "label": "In review" },
     { "id": "live", "label": "Live" },
+    { "id": "changes", "label": "Changes asked" },
     { "id": "rejected", "label": "Not approved" },
     { "id": "closed", "label": "Closed" }
   ]

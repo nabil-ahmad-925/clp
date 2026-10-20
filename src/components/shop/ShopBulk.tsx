@@ -3,16 +3,21 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { LuBox, LuClock, LuLayers, LuPalette, LuShapes } from 'react-icons/lu';
 import BecomePartner from '@/components/partners/BecomePartner';
-import PillSelect from '@/components/ui/PillSelect';
+import lc from '@/components/sections/ListingCard.module.css';
+import t from '@/components/sections/TeamDirectory.module.css';
+import Pager from '@/components/ui/Pager';
+import { type ResultsView } from '@/components/ui/ViewToggle';
 import {
   BULK_CATEGORIES,
   BULK_ITEMS,
   CUSTOM_ITEM,
   DECORATIONS,
   PRIORITIES,
+  VIEWS,
   bulkItem,
   categoryOf,
   createDesign,
@@ -31,7 +36,8 @@ import { shopHref } from '@/content/storefront';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
 import ShopTabs from './shopTabs';
-import { LockIcon, SearchIcon } from './shopIcons';
+import { LockIcon } from './shopIcons';
+import { CardGrid, LIST_SIZES, ListToolbar, ShopSearch, hasWords, titleCase, type ListChip } from './shopListing';
 import { useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
@@ -40,18 +46,18 @@ import s from './shop.module.css';
 const DEFAULT_SWATCHES = ['#111111', '#FFFFFF', '#0B2A5B', '#7A1F2B', '#1D6363', '#C8102E', '#2E7D32', '#DCBD7D'];
 const GUEST_FILL = '#1F2A44';
 
+/** The list's filters besides its category: each pill's "All …" name, its panel heading, icon and options. */
 const FILTERS = {
-  src: { label: 'Availability', options: [['clp', 'Made to order'], ['stock', 'In stock · ships faster']] },
-  deco: { label: 'Decoration', options: DECORATIONS.map((d) => [d.id, d.label]) },
-  lead: { label: 'Lead time', options: [['fast', '2 weeks or less'], ['mid', '3–4 weeks'], ['long', '5+ weeks']] },
-  min: { label: 'Minimum', options: [['one', 'Single units'], ['small', '24 or less'], ['mid', '100 or less']] },
+  src: { name: 'All Availability', heading: 'Availability', icon: <LuBox />, plural: 'options', options: [['clp', 'Made to Order'], ['stock', 'In Stock · Ships Faster']] },
+  deco: { name: 'All Decorations', heading: 'Decoration', icon: <LuPalette />, plural: 'decorations', options: DECORATIONS.map((d) => [d.id, d.label]) },
+  lead: { name: 'All Lead Times', heading: 'Lead Time', icon: <LuClock />, plural: 'lead times', options: [['fast', '2 Weeks or Less'], ['mid', '3–4 Weeks'], ['long', '5+ Weeks']] },
+  min: { name: 'All Minimums', heading: 'Minimum Order', icon: <LuLayers />, plural: 'minimums', options: [['one', 'Single Units'], ['small', '24 or Less'], ['mid', '100 or Less']] },
 } as const;
 type FilterKey = keyof typeof FILTERS;
-type Filters = Record<FilterKey, string>;
-const NO_FILTERS: Filters = { src: '', deco: '', lead: '', min: '' };
+type Filters = Record<FilterKey | 'cat', string>;
 
-const matches = (it: BulkItem, f: Filters, cat: string, q: string) => {
-  if (cat && it.category !== cat) return false;
+const matches = (it: BulkItem, f: Filters, q: string) => {
+  if (f.cat && it.category !== f.cat) return false;
   if (f.src === 'clp' && it.stock) return false;
   if (f.src === 'stock' && !it.stock) return false;
   if (f.deco && !it.decoration.some((d) => d.toLowerCase().includes(f.deco))) return false;
@@ -62,9 +68,21 @@ const matches = (it: BulkItem, f: Filters, cat: string, q: string) => {
   if (f.min === 'one' && it.min !== 1) return false;
   if (f.min === 'small' && it.min > 24) return false;
   if (f.min === 'mid' && it.min > 100) return false;
-  if (q && !`${it.name} ${it.description} ${it.material} ${categoryOf(it.category)?.label ?? ''}`.toLowerCase().includes(q.toLowerCase())) return false;
-  return true;
+  return hasWords(`${it.name} ${it.description} ${it.material} ${it.decoration.join(' ')} ${categoryOf(it.category)?.label ?? ''}`, q);
 };
+
+type BulkSort = 'recommended' | 'lead' | 'min' | 'az';
+const BULK_SORTS: { value: BulkSort; label: string }[] = [
+  { value: 'recommended', label: 'Recommended' },
+  { value: 'lead', label: 'Fastest Lead Time' },
+  { value: 'min', label: 'Lowest Minimum' },
+  { value: 'az', label: 'A–Z' },
+];
+const bulkSortBy = (sort: BulkSort) => (a: BulkItem, b2: BulkItem) =>
+  sort === 'lead' ? leadWeeks(a.lead) - leadWeeks(b2.lead) : sort === 'min' ? a.min - b2.min : sort === 'az' ? a.name.localeCompare(b2.name) : 0;
+
+/** The address of an item's page (with the destination searched, its quote's delivery place). */
+const itemHref = (id: string, loc: string) => shopHref({ view: 'bulk', item: id, loc });
 
 const KIND_LABEL: Record<BulkKind, string> = { saved: 'Saved ✓', quote: 'Quote requested ✓', order: 'Ordered ✓' };
 const STATUS: Record<string, [string, string, string]> = {
@@ -92,35 +110,72 @@ function useRequests(partner: boolean, ready: boolean) {
 
 /**
  * Bulk & Operations (/shop/?view=bulk, the Shop design): team kits, staff gear, event supplies, inflatables, awards and
- * promo, made to order and quoted direct from manufacturing. A signed-in CLP partner sees every item in their brand
- * (logo and colours), designs it in the studio, saves designs and asks for a quote or orders at partner pricing; a guest
- * requests a quote. "My designs" / "My quote requests" lists what they sent.
+ * promo, made to order and quoted direct from manufacturing. The shop's search (what, and where it ships), the
+ * experiences' bar (All Categories and the other filters, the sort, grid or list), the items as the experiences'
+ * cards, and pages; an item opens on its own page (?item=). A signed-in CLP partner sees every item in their brand (logo
+ * and colours) and designs it in the studio; a guest requests a quote. "My designs" / "My quote requests" lists what
+ * they sent. The search, filters, sort, page and view live in the address.
  */
 export default function ShopBulk() {
   const params = useSearchParams();
   const router = useRouter();
   const studio = useStudio();
   const { partner } = studio;
-  const [q, setQ] = useState('');
-  const [cat, setCat] = useState(params.get('cat') ?? '');
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
-  const [open, setOpen] = useState<string | null>(null);
+  const get = (key: string) => params.get(key) ?? '';
+  const set = (next: Record<string, string>, step = false) => {
+    const q = new URLSearchParams(params.toString());
+    for (const [k, v] of Object.entries(next)) {
+      if (v) q.set(k, v);
+      else q.delete(k);
+    }
+    if (!('page' in next)) q.delete('page');
+    const query = q.toString();
+    const href = `${window.location.pathname}${query ? `?${query}` : ''}`;
+    if (step) router.push(href, { scroll: false });
+    else router.replace(href, { scroll: false });
+  };
   const [reqsOpen, setReqsOpen] = useState(false);
   const [signIn, setSignIn] = useState(false);
   const reqs = useRequests(partner, !studio.loading);
   const fileRef = useRef<HTMLInputElement>(null);
+  const topRef = useRef<HTMLElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  const items = BULK_ITEMS.filter((it) => matches(it, filters, cat, q));
-  const any = Boolean(q || cat || Object.values(filters).some(Boolean));
-  const clear = () => {
-    setQ('');
-    setCat('');
-    setFilters(NO_FILTERS);
+  const q = get('q');
+  const loc = get('loc');
+  const filters: Filters = {
+    cat: BULK_CATEGORIES.some((c) => c.id === get('cat')) ? get('cat') : '',
+    ...(Object.fromEntries((Object.keys(FILTERS) as FilterKey[]).map((k) => [k, FILTERS[k].options.some(([v]) => v === get(k)) ? get(k) : ''])) as Record<FilterKey, string>),
   };
+  const sort: BulkSort = BULK_SORTS.some((o) => o.value === get('sort')) ? (get('sort') as BulkSort) : 'recommended';
+  const view: ResultsView = get('cards') === 'list' ? 'list' : 'grid';
+  const per = (LIST_SIZES as readonly number[]).includes(Number(get('per'))) ? Number(get('per')) : LIST_SIZES[0];
+  const matching = (f: Filters) => BULK_ITEMS.filter((it) => matches(it, f, q));
+  const items = matching(filters).sort(bulkSortBy(sort));
+  const any = Boolean(q || Object.values(filters).some(Boolean));
+  // The whole catalog leads with the fully custom product, counted in its first page.
+  const list = any ? items : [CUSTOM_ITEM, ...items];
+  const pageCount = Math.max(1, Math.ceil(list.length / per));
+  const page = Math.min(Math.max(0, (Number(get('page')) || 1) - 1), pageCount - 1);
+  const onPage = list.slice(page * per, page * per + per);
   const latest = (id: string) => reqs.items.find((r) => r.itemId === id);
   const swatches = studio.kit.locked && studio.kit.colors.length ? studio.kit.colors : studio.kit.colors.length ? [...new Set([...studio.kit.colors, ...DEFAULT_SWATCHES])].slice(0, 8) : DEFAULT_SWATCHES;
+  const chip = (id: FilterKey | 'cat', name: string, heading: string, icon: ReactNode, plural: string, options: [string, string][]): ListChip => ({
+    id,
+    name,
+    heading,
+    icon,
+    plural,
+    options: options.map(([value, label]) => ({ value, label, count: matching({ ...filters, [id]: value }).length })),
+    value: filters[id],
+    onChange: (v) => set({ [id]: v }),
+    count: (v) => matching({ ...filters, [id]: v }).length,
+  });
+  const chips = [
+    chip('cat', 'All Categories', 'Category', <LuShapes />, 'categories', BULK_CATEGORIES.map((c) => [c.id, c.label] as [string, string]).sort((a, z) => a[1].localeCompare(z[1]))),
+    ...(Object.keys(FILTERS) as FilterKey[]).map((k) => chip(k, FILTERS[k].name, FILTERS[k].heading, FILTERS[k].icon, FILTERS[k].plural, FILTERS[k].options.map(([v, l]) => [v, l] as [string, string]))),
+  ];
 
   const onLogo = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,8 +191,64 @@ export default function ShopBulk() {
       setUploading(false);
     }
   };
-  const openItem = (it: BulkItem) => (partner && it.id !== 'custom' ? router.push(shopHref({ view: 'studio', item: it.id })) : setOpen(it.id));
+  // A partner designs a catalog item in the studio; anyone else (and the custom item) opens its page.
+  const hrefOf = (it: BulkItem) => (partner && it.id !== 'custom' ? shopHref({ view: 'studio', item: it.id }) : itemHref(it.id, loc));
   const reqTitle = partner ? 'My designs' : 'My quote requests';
+  const drawers = (
+    <>
+      {reqsOpen && (
+        <Requests
+          title={reqTitle}
+          partner={partner}
+          items={reqs.items}
+          onClose={() => setReqsOpen(false)}
+          onOpen={(r) => router.push(shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
+          onRemove={async (r) => {
+            await deleteDesign(r.id);
+            reqs.setItems((list) => list.filter((x) => x.id !== r.id));
+          }}
+        />
+      )}
+      {signIn && <PartnerSignIn onClose={() => setSignIn(false)} />}
+    </>
+  );
+
+  // An item's own page.
+  const itemId = get('item');
+  if (itemId) {
+    const it = bulkItem(itemId);
+    return (
+      <div className={b.bulk}>
+        {it ? (
+          <BulkItemPage
+            key={it.id}
+            item={it}
+            studio={studio}
+            swatches={swatches}
+            loc={loc}
+            onBack={() => router.push(shopHref({ view: 'bulk', loc }))}
+            onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])}
+            onShowRequests={() => setReqsOpen(true)}
+            onSignIn={() => setSignIn(true)}
+          />
+        ) : (
+          <>
+            <section className={s.thinBand} />
+            <div className={`${s.section} ${s.spacedSm}`}>
+              <div className={s.empty}>
+                This item isn&rsquo;t in the catalog anymore.
+                <Link href={shopHref({ view: 'bulk' })} className={s.btnDark}>
+                  Back to Bulk &amp; Operations
+                </Link>
+              </div>
+            </div>
+            <div className={s.bottomSpace} />
+          </>
+        )}
+        {drawers}
+      </div>
+    );
+  }
 
   return (
     <div className={b.bulk}>
@@ -164,59 +275,27 @@ export default function ShopBulk() {
             </span>
           </div>
           <div className={s.headCenter}>
-            <span className={s.kicker}>BULK &amp; OPERATIONS</span>
-            <h1 className={b.heroTitle}>Outfit your team, staff or event</h1>
+            <h1 className={b.heroTitle}>Outfit Your Team, Staff or Event</h1>
             <p className={b.heroText}>
               {partner
                 ? 'Design team kits, staff gear, event supplies and more in the CLP studio, then save, buy at partner pricing or get a quote.'
                 : 'Team kits, staff gear, event supplies, inflatables and promo, made direct from our factories and shipped in bulk. Request a quote on anything.'}
             </p>
+            <span className={s.kicker}>BULK &amp; OPERATIONS</span>
           </div>
         </div>
       </section>
       <ShopTabs />
-      <div className={s.navGap} />
+      <ShopSearch q={q} loc={loc} places={[]} placeholder="Search jerseys, socks, tents, medals…" label="Bulk items" onSearch={(nq, nloc) => set({ q: nq, loc: nloc })} />
 
-      <section className={b.wrap}>
-        <form className={s.search} role="search" onSubmit={(e) => e.preventDefault()}>
-          <input className={s.searchInput} type="search" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search bulk items" placeholder="Search jerseys, socks, tents, medals…" />
-          <span className={s.searchRule} aria-hidden />
-          <PillSelect className={s.searchPick} label="Category" value={cat} options={[{ value: '', label: 'All categories' }, ...BULK_CATEGORIES.map((c) => ({ value: c.id, label: c.label }))]} onChange={setCat} />
-          <button type="submit" className={s.searchBtn} aria-label="Search">
-            <SearchIcon />
-          </button>
-        </form>
-
-        <div className={b.toolbar}>
-          <div className={b.filters}>
-            {(Object.keys(FILTERS) as FilterKey[]).map((key) => (
-              <PillSelect
-                key={key}
-                variant="filter"
-                label={FILTERS[key].label}
-                value={filters[key]}
-                options={[{ value: '', label: FILTERS[key].label }, ...FILTERS[key].options.map(([value, label]) => ({ value, label }))]}
-                onChange={(v) => setFilters({ ...filters, [key]: v })}
-              />
-            ))}
-            {any && (
-              <button type="button" className={b.clear} onClick={clear}>
-                Clear
-              </button>
-            )}
-          </div>
-          <div className={b.toolbarEnd}>
-            <span className={s.count}>
-              <strong>{items.length}</strong> items
-            </span>
-            <button type="button" className={b.reqBtn} onClick={() => setReqsOpen(true)}>
-              {reqTitle}
-              <span>{reqs.items.length}</span>
-            </button>
-          </div>
-        </div>
-
-        {partner ? (
+      <section ref={topRef} className={b.wrap} data-listing="">
+        <ListToolbar
+          chips={chips}
+          sort={{ value: sort, options: BULK_SORTS, onChange: (v) => set({ sort: v === 'recommended' ? '' : v }) }}
+          view={view}
+          onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })}
+        />
+        {partner && (
           <div className={b.kit}>
             <span className={b.kitLabel}>YOUR BRAND KIT</span>
             <span className={b.kitFor}>
@@ -258,151 +337,174 @@ export default function ShopBulk() {
             </span>
             <span className={b.kitNote}>{uploadError || 'Every item previews with your brand. Open one to design it in the studio.'}</span>
           </div>
-        ) : (
-          <div className={b.guestBar}>
-            <span className={b.kitLabel}>CLP PARTNERS</span>
-            <span>Mockups, saved designs and the design studio are for approved CLP partners. Anyone can request a quote.</span>
-            <BecomePartner className={b.guestLink}>Apply to become a partner →</BecomePartner>
-          </div>
         )}
       </section>
 
-      <section className={b.gridWrap}>
-        <div className={b.grid}>
-          {!any && (
-            <button type="button" className={b.item} onClick={() => setOpen('custom')}>
-              <span className={b.custom}>
-                <span className={b.customPlus}>+</span>
-                <span className={b.customKicker}>DIRECT FROM MANUFACTURING</span>
-                <span className={b.customTitle}>Design something new</span>
-                <span className={b.customText}>Custom patterns, colors, materials and shapes. Our designers and factories make it from scratch.</span>
-              </span>
-              <span className={b.itemCat}>FULLY CUSTOM</span>
-              <strong className={b.itemName}>Bring us your idea</strong>
-              <span className={b.itemMeta}>{partner ? 'Free design concepts for partners' : 'Quoted by our team · partners get concepts'}</span>
-              <span className={b.customFoot}>
-                <span className={b.customCta}>{partner ? 'Start a design' : 'Request a quote'}</span>
-              </span>
-            </button>
-          )}
-          {items.map((it) => {
-            const req = latest(it.id);
-            return (
-              <div key={it.id} className={b.item}>
-                <button type="button" className={b.tile} aria-label={it.name} onClick={() => openItem(it)}>
-                  <Mockup shape={it.shape} base={partner ? studio.color : GUEST_FILL} logo={partner ? studio.logo : undefined} placeholder={partner} place="front" className={b.tileSvg} />
-                  {it.badge && <span className={b.badge}>{it.badge}</span>}
-                  {req && <span className={b.onLabel}>{KIND_LABEL[req.kind]}</span>}
-                </button>
-                <span className={b.itemCat}>{categoryOf(it.category)?.label.toUpperCase()}</span>
-                <strong className={b.itemName}>{it.name}</strong>
-                {it.stock && (
-                  <span className={b.stock}>
-                    <span />
-                    In stock · ready to decorate
-                  </span>
-                )}
-                <span className={b.itemMeta}>
-                  <span>{it.styles.length} styles</span>
-                  <span className={b.metaRule} />
-                  <span>
-                    Min {it.min} {it.unit}
-                  </span>
-                  <span className={b.metaRule} />
-                  <span>{it.lead}</span>
-                </span>
-                <button type="button" className={b.itemBtn} onClick={() => openItem(it)}>
-                  {partner ? 'Mock It Up' : 'Request a quote'}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-        {items.length === 0 && (
+      <section className={b.gridWrap} data-listing="">
+        {items.length === 0 ? (
           <div className={b.empty}>
-            No items match those filters.
-            <button type="button" onClick={clear}>
-              Clear filters
+            No items match. Try other words or filters.
+            <button type="button" onClick={() => set({ q: '', cat: '', src: '', deco: '', lead: '', min: '' })}>
+              Clear All
             </button>
+          </div>
+        ) : (
+          <CardGrid view={view}>
+            {onPage.map((it) => (
+              <div key={it.id} className={t.listingItem}>
+                {it.id === 'custom' ? (
+                  <BulkCard item={it} href={itemHref('custom', loc)} partner={partner} studio={studio} view={view} custom />
+                ) : (
+                  <BulkCard item={it} href={hrefOf(it)} partner={partner} studio={studio} view={view} sent={latest(it.id)?.kind} />
+                )}
+              </div>
+            ))}
+          </CardGrid>
+        )}
+        {list.length > LIST_SIZES[0] && (
+          <div data-listing className={s.pager}>
+            <Pager
+              page={page}
+              pageCount={pageCount}
+              total={list.length}
+              shown={onPage.length}
+              pageSize={per}
+              sizes={LIST_SIZES}
+              onPage={(n) => {
+                set({ page: n ? String(n + 1) : '' }, true);
+                topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              onPageSize={(n) => set({ per: n === LIST_SIZES[0] ? '' : String(n) })}
+            />
           </div>
         )}
       </section>
 
+      {/* How it works: a centred heading over four numbered steps, joined by a line. */}
       <section className={b.howWrap}>
         <div className={b.how}>
           <div className={b.howHead}>
-            <div className={b.howTitleWrap}>
-              <span className={s.kicker}>HOW IT WORKS</span>
-              <span className={b.howTitle}>{partner ? 'Design to doorstep' : 'Request, quote, deliver'}</span>
-            </div>
-            <span className={b.howText}>Every order is quoted direct from manufacturing, with options from value to premium so you get the best fit.</span>
+            <h2 className={b.howTitle}>{partner ? 'Design to doorstep' : 'Request, quote, deliver'}</h2>
+            <p className={b.howText}>Every order is quoted direct from manufacturing, with options from value to premium so you get the best fit.</p>
+            <span className={s.kicker}>HOW IT WORKS</span>
           </div>
-          <div className={b.steps}>
+          <ol className={b.steps}>
             {(partner
               ? [
-                  ['01', 'Mock it up', 'Design on CLP-made items and in-stock blanks.'],
-                  ['02', 'Approve your proof', 'Save, share with your team and sign off.'],
-                  ['03', 'We produce it', 'Our team handles sourcing and production.'],
-                  ['04', 'Shipped & tracked', 'Tracking and status sync back to your account.'],
+                  ['Mock it up', 'Design on CLP-made items and in-stock blanks.'],
+                  ['Approve your proof', 'Save, share with your team and sign off.'],
+                  ['We produce it', 'Our team handles sourcing and production.'],
+                  ['Shipped & tracked', 'Tracking and status sync back to your account.'],
                 ]
               : [
-                  ['01', 'Pick items & styles', 'Choose what you need and how many.'],
-                  ['02', 'Send a quote request', 'Tell us your idea, date and a link to your logo.'],
-                  ['03', 'Get a custom quote', 'Direct from manufacturing, with 2–3 options to compare.'],
-                  ['04', 'Made & shipped in bulk', 'With a proof to approve before production.'],
+                  ['Pick items & styles', 'Choose what you need and how many.'],
+                  ['Send a quote request', 'Tell us your idea, date and a link to your logo.'],
+                  ['Get a custom quote', 'Direct from manufacturing, with 2–3 options to compare.'],
+                  ['Made & shipped in bulk', 'With a proof to approve before production.'],
                 ]
-            ).map(([n, t, d]) => (
-              <div key={n} className={b.step}>
-                <span className={b.stepN}>{n}</span>
-                <strong>{t}</strong>
-                <span>{d}</span>
-              </div>
+            ).map(([title, text], i) => (
+              <li key={title} className={b.step}>
+                <span className={b.stepN} aria-hidden>
+                  {i + 1}
+                </span>
+                <strong className={b.stepTitle}>{title}</strong>
+                <span className={b.stepText}>{text}</span>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {open && (
-        <BulkDialog
-          key={open}
-          item={bulkItem(open) ?? CUSTOM_ITEM}
-          studio={studio}
-          onClose={() => setOpen(null)}
-          onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])}
-          onShowRequests={() => {
-            setOpen(null);
-            setReqsOpen(true);
-          }}
-          onSignIn={() => setSignIn(true)}
-          swatches={swatches}
-        />
-      )}
-      {reqsOpen && (
-        <Requests
-          title={reqTitle}
-          partner={partner}
-          items={reqs.items}
-          onClose={() => setReqsOpen(false)}
-          onOpen={(r) => router.push(shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
-          onRemove={async (r) => {
-            await deleteDesign(r.id);
-            reqs.setItems((list) => list.filter((x) => x.id !== r.id));
-          }}
-        />
-      )}
-      {signIn && <PartnerSignIn onClose={() => setSignIn(false)} />}
+      {drawers}
     </div>
+  );
+}
+
+/**
+ * A catalog item as the experiences' card: its mockup (in the partner's brand, else the guest colour) with its maker's
+ * badge and what was sent for it, its category, name, In stock, styles, minimum and lead time, and Request a Quote
+ * (Mock It Up for a partner). The fully custom product: a dark card that starts a design or a quote.
+ */
+function BulkCard({
+  item,
+  href,
+  partner,
+  studio,
+  view,
+  sent,
+  custom = false,
+}: {
+  item: BulkItem;
+  href: string;
+  partner: boolean;
+  studio: StudioBrand;
+  view: ResultsView;
+  sent?: BulkKind;
+  custom?: boolean;
+}) {
+  return (
+    <Link href={href} className={[lc.card, view === 'list' && lc.list, b.card].filter(Boolean).join(' ')}>
+      <span className={`${lc.media} ${b.cardMedia} ${custom ? b.cardMediaCustom : ''}`}>
+        {custom ? (
+          <span className={b.cardCustom}>
+            <span className={b.customPlus}>+</span>
+            <span className={b.customKicker}>DIRECT FROM MANUFACTURING</span>
+            <span className={b.cardCustomTitle}>Design something new</span>
+          </span>
+        ) : (
+          <Mockup shape={item.shape} base={partner ? studio.color : GUEST_FILL} logo={partner ? studio.logo : undefined} placeholder={partner} place="front" className={b.cardSvg} />
+        )}
+        {!custom && item.badge && <span className={b.badge}>{item.badge}</span>}
+        {sent && <span className={b.onLabel}>{KIND_LABEL[sent]}</span>}
+      </span>
+      <span className={lc.body}>
+        <span className={lc.provider}>{custom ? 'Fully Custom' : titleCase(categoryOf(item.category)?.label ?? '')}</span>
+        <span className={lc.title}>{custom ? 'Bring us your idea' : item.name}</span>
+        {custom ? (
+          <span className={b.cardLine}>Custom patterns, colors, materials and shapes. Our designers and factories make it from scratch.</span>
+        ) : (
+          <>
+            {item.stock && (
+              <span className={b.stock}>
+                <span />
+                In stock · ready to decorate
+              </span>
+            )}
+            <span className={b.itemMeta}>
+              <span>{item.styles.length} styles</span>
+              <span className={b.metaRule} />
+              <span>
+                Min {item.min} {item.unit}
+              </span>
+              <span className={b.metaRule} />
+              <span>{item.lead}</span>
+            </span>
+          </>
+        )}
+        {/* A row of the list: the button on the right of its foot, as the experiences' rows. */}
+        <span className={view === 'list' ? lc.footer : lc.facilityFooter}>
+          {view === 'list' && <span />}
+          <span className={`${lc.cta} ${view === 'list' ? '' : lc.ctaWide}`}>{custom ? (partner ? 'Start a Design' : 'Request a Quote') : partner ? 'Mock It Up' : 'Request a Quote'}</span>
+        </span>
+      </span>
+    </Link>
   );
 }
 
 /* ---------------------------------------------------------------- an item */
 
-/** The design's item popup: the mockup (partners design it; guests see it), the styles, then save, quote or buy. */
-function BulkDialog({
+/**
+ * An item's page (as a product's page on the shop): the breadcrumb, its mockup with its views (front, back, sides) and,
+ * under it, a partner's studio tools or the partner sign-up; beside it its name, minimum and lead time, description, then
+ * the styles and quantities, how it gets designed (partners) or who is asking (guests), where it ships, what matters
+ * most, and save, quote or buy.
+ */
+function BulkItemPage({
   item,
   studio,
   swatches,
-  onClose,
+  loc,
+  onBack,
   onSent,
   onShowRequests,
   onSignIn,
@@ -410,7 +512,9 @@ function BulkDialog({
   item: BulkItem;
   studio: StudioBrand;
   swatches: string[];
-  onClose: () => void;
+  /** The searched destination: where it ships (editable). */
+  loc: string;
+  onBack: () => void;
   onSent: (r: BulkRequest) => void;
   onShowRequests: () => void;
   onSignIn: () => void;
@@ -424,7 +528,9 @@ function BulkDialog({
   const [place, setPlace] = useState('front');
   const [text, setText] = useState('');
   const [prio, setPrio] = useState<string[]>([]);
-  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '' });
+  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: loc });
+  const views = VIEWS[item.shape] ?? [['front', 'Front']];
+  const [shown, setShown] = useState(views[0][0]);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
@@ -432,16 +538,6 @@ function BulkDialog({
   const [downloaded, setDownloaded] = useState(false);
   const svgWrap = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    document.body.classList.add('menu-open');
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.classList.remove('menu-open');
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onClose]);
 
   const chosen = Object.entries(styles).map(([i, q]) => ({ name: item.styles[Number(i)].name, qty: Number(q) || 0 }));
   const total = item.styles.length ? chosen.reduce((n, x) => n + x.qty, 0) : Number(qty) || 0;
@@ -478,8 +574,14 @@ function BulkDialog({
         qty: total || item.min,
         priorities: prio,
         ...(partner
-          ? { mode, brief, design: { base: studio.color, accent: '#DCBD7D', pattern: 'none', trim: false, logoOn: true, logo: studio.logo, place: isApparel(item.shape) && place === 'chest' ? 'chest' : 'center', logoScale: 1, dx: 0, dy: 0, text, font: 'mont', textColor: '', textPlace: 'below', textScale: 1, playerName: 'PLAYER', playerNumber: '10', numberColor: '', numberFont: 'college', locations: [], style: 0 }, mockup }
-          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim() } }),
+          ? {
+              ...(contact.deliverTo.trim() ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: contact.deliverTo.trim() } } : {}),
+              mode,
+              brief,
+              design: { base: studio.color, accent: '#DCBD7D', pattern: 'none', trim: false, logoOn: true, logo: studio.logo, place: isApparel(item.shape) && place === 'chest' ? 'chest' : 'center', logoScale: 1, dx: 0, dy: 0, text, font: 'mont', textColor: '', textPlace: 'below', textScale: 1, playerName: 'PLAYER', playerNumber: '10', numberColor: '', numberFont: 'college', locations: [], style: 0 },
+              mockup,
+            }
+          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } }),
       };
       const r = partner ? await createDesign(input) : await sendGuestQuote(input);
       onSent(r);
@@ -521,6 +623,7 @@ function BulkDialog({
         placeholder={partner}
         place={isApparel(item.shape) ? place : 'center'}
         text={partner ? text : ''}
+        view={shown}
         className={b.dialogSvg}
         label={`${item.name} mockup`}
       />
@@ -545,256 +648,293 @@ function BulkDialog({
     </div>
   );
 
-  return createPortal(
-    <div className={b.overlay} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={b.dialog} role="dialog" aria-modal="true" aria-label={item.name}>
-        <div className={b.dialogLeft}>
-          {partner ? (
-            <div className={b.leftStack}>
-              <span className={b.leftHead}>
-                <span className={b.leftKicker}>DESIGN STUDIO</span>
-                <span className={b.leftNote}>Partner tool</span>
-              </span>
-              {mock}
+  const category = categoryOf(item.category);
+  // The mockup's views (front, back, sides) as the product page's photos: thumbnails beside the large one.
+  const gallery = (
+    <div className={`${s.gallery} ${views.length < 2 ? b.galleryOne : ''}`}>
+      {views.length > 1 && (
+        <div className={s.thumbs}>
+          {views.map(([v, label]) => (
+            <button key={v} type="button" className={`${s.thumb} ${b.viewThumb} ${shown === v ? s.thumbOn : ''}`} aria-label={label} aria-pressed={shown === v} onClick={() => setShown(v)}>
+              <Mockup shape={item.shape} base={partner ? studio.color : GUEST_FILL} logo={partner ? studio.logo : undefined} placeholder={partner} place={isApparel(item.shape) ? place : 'center'} view={v} className={b.dialogSvg} />
+            </button>
+          ))}
+        </div>
+      )}
+      <div className={`${s.mainPhoto} ${b.pageMock}`}>{mock}</div>
+    </div>
+  );
+
+  return (
+    <>
+      <section className={s.thinBand} />
+      <section className={`${s.section} ${s.productSection}`}>
+        <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
+          <Link href={shopHref()}>Shop</Link>
+          {'  ›  '}
+          <Link href={shopHref({ view: 'bulk', loc })}>Bulk &amp; Operations</Link>
+          {category && (
+            <>
+              {'  ›  '}
+              <Link href={shopHref({ view: 'bulk', cat: category.id, loc })}>{titleCase(category.label)}</Link>
+            </>
+          )}
+          {'  ›  '}
+          {item.name}
+        </nav>
+        <div className={s.productLayout}>
+          <div className={b.pageLeft}>
+        {partner ? (
+          <div className={b.leftStack}>
+            <span className={b.leftHead}>
+              <span className={b.leftKicker}>DESIGN STUDIO</span>
+              <span className={b.leftNote}>Partner tool</span>
+            </span>
+            {gallery}
+            <div className={b.row}>
+              <span className={b.rowLabel}>Color</span>
+              {swatches.map((c) => (
+                <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
+              ))}
+            </div>
+            {isApparel(item.shape) && (
               <div className={b.row}>
-                <span className={b.rowLabel}>Color</span>
-                {swatches.map((c) => (
-                  <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
+                <span className={b.rowLabel}>Placement</span>
+                {[
+                  ['front', 'Front center'],
+                  ['chest', 'Left chest'],
+                ].map(([v, l]) => (
+                  <button key={v} type="button" className={`${b.place} ${place === v ? b.placeOn : ''}`} aria-pressed={place === v} onClick={() => setPlace(v)}>
+                    {l}
+                  </button>
                 ))}
               </div>
-              {isApparel(item.shape) && (
-                <div className={b.row}>
-                  <span className={b.rowLabel}>Placement</span>
-                  {[
-                    ['front', 'Front center'],
-                    ['chest', 'Left chest'],
-                  ].map(([v, l]) => (
-                    <button key={v} type="button" className={`${b.place} ${place === v ? b.placeOn : ''}`} aria-pressed={place === v} onClick={() => setPlace(v)}>
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {!studio.kit.locked && (
-                <div className={b.row}>
-                  <span className={b.rowLabel}>Logo</span>
-                  <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
-                    {busy === 'logo' ? 'Uploading…' : studio.logo ? 'Change logo' : 'Upload logo'}
-                  </button>
-                  <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
-                </div>
-              )}
+            )}
+            {!studio.kit.locked && (
               <div className={b.row}>
-                <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
-                <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
+                <span className={b.rowLabel}>Logo</span>
+                <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
+                  {busy === 'logo' ? 'Uploading…' : studio.logo ? 'Change logo' : 'Upload logo'}
+                </button>
+                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
               </div>
-              <button type="button" className={b.underline} onClick={download}>
-                {downloaded ? 'Downloaded ✓' : 'Download mockup'}
+            )}
+            <div className={b.row}>
+              <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
+              <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
+            </div>
+            <button type="button" className={b.underline} onClick={download}>
+              {downloaded ? 'Downloaded ✓' : 'Download mockup'}
+            </button>
+          </div>
+        ) : (
+          <div className={b.leftStack}>
+            {gallery}
+            <div className={b.partnerBox}>
+              <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
+              <strong>Mockups are for approved partners</strong>
+              <span>Approved CLP partners get the design studio, live mockups, saved designs and partner pricing.</span>
+              <span className={b.partnerBoxLinks}>
+                <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
+                <button type="button" onClick={onSignIn}>
+                  Partner sign in
+                </button>
+              </span>
+            </div>
+          </div>
+        )}
+          </div>
+          <div className={b.pageRight}>
+        {done ? (
+          <div className={b.done}>
+            <span className={b.doneMark}>✓</span>
+            <span className={b.doneTitle}>{done === 'order' ? 'Order placed' : 'Quote request sent'}</span>
+            <span className={b.doneText}>
+              {done === 'order'
+                ? `${item.name} is in production review. We’ll send a final proof to approve, then it’s made and shipped in bulk.`
+                : `${item.name} is with our sourcing team. Expect your custom quote within 2 business days.`}
+            </span>
+            <div className={b.doneBtns}>
+              <button type="button" className={b.btnDark} onClick={onBack}>
+                Keep Browsing
+              </button>
+              <button type="button" className={b.btnLight} onClick={onShowRequests}>
+                {partner ? 'My designs' : 'My quote requests'}
               </button>
             </div>
-          ) : (
-            <div className={b.leftStack}>
-              <span className={b.leftKicker}>{categoryOf(item.category)?.label.toUpperCase() ?? 'FULLY CUSTOM'}</span>
-              {mock}
-              <div className={b.partnerBox}>
-                <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
-                <strong>Mockups are for approved partners</strong>
-                <span>Approved CLP partners get the design studio, live mockups, saved designs and partner pricing.</span>
-                <span className={b.partnerBoxLinks}>
-                  <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
-                  <button type="button" onClick={onSignIn}>
-                    Partner sign in
-                  </button>
+          </div>
+        ) : (
+          <div className={b.form}>
+            {/* As a product page's heading: the name, what it takes to order, the description. */}
+            <div className={s.buyHead}>
+              <span className={b.leftKicker}>{category?.label.toUpperCase() ?? 'FULLY CUSTOM'}</span>
+              <h1 className={s.productName}>{custom ? 'Bring us your idea' : item.name}</h1>
+              <strong className={s.productPrice}>{custom ? 'Quoted by our team' : `Min ${item.min} ${item.unit} · ${item.lead}`}</strong>
+              <span className={s.productText}>{item.description}</span>
+              <span className={b.formSpec}>{custom ? 'Any product · any decoration' : `${item.decoration.join(', ')} · ${item.sizes}`}</span>
+            </div>
+
+            {item.styles.length > 0 ? (
+              <div className={b.block}>
+                <span className={b.blockHead}>
+                  <strong>1. Choose styles</strong>
+                  <span>Pick one or more</span>
                 </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className={b.dialogRight}>
-          <button type="button" className={b.dialogClose} aria-label="Close" onClick={onClose}>
-            ×
-          </button>
-          {done ? (
-            <div className={b.done}>
-              <span className={b.doneMark}>✓</span>
-              <span className={b.doneTitle}>{done === 'order' ? 'Order placed' : 'Quote request sent'}</span>
-              <span className={b.doneText}>
-                {done === 'order'
-                  ? `${item.name} is in production review. We’ll send a final proof to approve, then it’s made and shipped in bulk.`
-                  : `${item.name} is with our sourcing team. Expect your custom quote within 2 business days.`}
-              </span>
-              <div className={b.doneBtns}>
-                <button type="button" className={b.btnDark} onClick={onClose}>
-                  Keep browsing
-                </button>
-                <button type="button" className={b.btnLight} onClick={onShowRequests}>
-                  {partner ? 'My designs' : 'My quote requests'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className={b.form}>
-              <div className={b.formHead}>
-                <span className={b.leftKicker}>{categoryOf(item.category)?.label.toUpperCase() ?? 'FULLY CUSTOM'}</span>
-                <span className={b.formTitle}>{item.name}</span>
-                <span className={b.formDesc}>{item.description}</span>
-                <span className={b.formSpec}>{custom ? 'Any product · any decoration' : `${item.decoration.join(', ')} · ${item.sizes} · ${item.lead}`}</span>
-              </div>
-
-              {item.styles.length > 0 ? (
-                <div className={b.block}>
-                  <span className={b.blockHead}>
-                    <strong>1. Choose styles</strong>
-                    <span>Pick one or more</span>
-                  </span>
-                  <div className={b.styles}>
-                    {item.styles.map((v, i) => {
-                      const on = styles[i] !== undefined;
-                      return (
-                        <div key={v.name} className={`${b.style} ${on ? b.styleOn : ''}`}>
-                          <button type="button" className={`${b.box} ${on ? b.boxOn : ''}`} aria-pressed={on} aria-label={`Select ${v.name}`} onClick={() => toggleStyle(i)}>
-                            {on ? '✓' : ''}
-                          </button>
-                          <span className={b.styleText}>
-                            <strong>{v.name}</strong>
-                            <span>{v.note}</span>
-                          </span>
-                          {on && (
-                            <input
-                              type="number"
-                              className={b.styleQty}
-                              min={v.min}
-                              value={styles[i]}
-                              aria-label={`Quantity for ${v.name}`}
-                              onChange={(e) => setStyles({ ...styles, [i]: e.target.value })}
-                            />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <span className={b.styleSum}>{styleSum}</span>
+                <div className={b.styles}>
+                  {item.styles.map((v, i) => {
+                    const on = styles[i] !== undefined;
+                    return (
+                      <div key={v.name} className={`${b.style} ${on ? b.styleOn : ''}`}>
+                        <button type="button" className={`${b.box} ${on ? b.boxOn : ''}`} aria-pressed={on} aria-label={`Select ${v.name}`} onClick={() => toggleStyle(i)}>
+                          {on ? '✓' : ''}
+                        </button>
+                        <span className={b.styleText}>
+                          <strong>{v.name}</strong>
+                          <span>{v.note}</span>
+                        </span>
+                        {on && (
+                          <input
+                            type="number"
+                            className={b.styleQty}
+                            min={v.min}
+                            value={styles[i]}
+                            aria-label={`Quantity for ${v.name}`}
+                            onChange={(e) => setStyles({ ...styles, [i]: e.target.value })}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              ) : (
-                <label className={b.block}>
-                  <strong className={b.stepTitle}>Quantity</strong>
-                  <input type="number" className={b.input} min={item.min} value={qty} onChange={(e) => setQty(e.target.value)} />
-                </label>
-              )}
+                <span className={b.styleSum}>{styleSum}</span>
+              </div>
+            ) : (
+              <label className={b.block}>
+                <strong className={b.stepTitle}>Quantity</strong>
+                <input type="number" className={b.input} min={item.min} value={qty} onChange={(e) => setQty(e.target.value)} />
+              </label>
+            )}
 
-              {partner ? (
-                <>
-                  <div className={b.block}>
-                    <strong className={b.stepTitle}>{step(1)}. Design it</strong>
-                    <div className={b.modes}>
-                      {(
-                        [
-                          ['logo', 'Design it myself', 'Use the studio. Save, buy or quote anytime.'],
-                          ['design', 'Have our designers create it', 'Original artwork made direct at the factory. Free concepts.'],
-                        ] as const
-                      )
-                        .filter(([v]) => !(custom && v === 'logo'))
-                        .map(([v, t, d]) => (
-                          <button key={v} type="button" aria-pressed={mode === v} className={`${b.mode} ${mode === v ? b.modeOn : ''}`} onClick={() => setMode(v)}>
-                            <strong>{t}</strong>
-                            <span>{d}</span>
-                          </button>
-                        ))}
-                    </div>
-                    {mode === 'logo' && !custom && (
-                      <Link href={shopHref({ view: 'studio', item: item.id })} className={b.studioLink}>
-                        Open the full design studio →
-                      </Link>
-                    )}
-                    {mode === 'design' && (
-                      <label className={b.field}>
-                        Brief for our designers
-                        <textarea rows={3} value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Theme, colors, patterns, materials, who it’s for" />
-                      </label>
-                    )}
+            {partner ? (
+              <>
+                <div className={b.block}>
+                  <strong className={b.stepTitle}>{step(1)}. Design it</strong>
+                  <div className={b.modes}>
+                    {(
+                      [
+                        ['logo', 'Design it myself', 'Use the studio. Save, buy or quote anytime.'],
+                        ['design', 'Have our designers create it', 'Original artwork made direct at the factory. Free concepts.'],
+                      ] as const
+                    )
+                      .filter(([v]) => !(custom && v === 'logo'))
+                      .map(([v, t, d]) => (
+                        <button key={v} type="button" aria-pressed={mode === v} className={`${b.mode} ${mode === v ? b.modeOn : ''}`} onClick={() => setMode(v)}>
+                          <strong>{t}</strong>
+                          <span>{d}</span>
+                        </button>
+                      ))}
                   </div>
-                  <div className={b.priceBox}>
-                    <span className={b.priceHead}>
-                      <strong>{step(2)}. Price &amp; checkout</strong>
-                      <span>PARTNER PRICING</span>
-                    </span>
-                    <div className={b.priceRow}>
-                      <span>{styleSum}</span>
-                      <span className={b.priceValue}>
-                        <strong>Quoted</strong>
-                        <span>Partner pricing on your quote · before shipping</span>
-                      </span>
-                    </div>
-                    {priorities}
-                  </div>
-                  {saved && <span className={b.savedNote}>Saved to My designs ✓ · share it with your team or come back later</span>}
-                  {error && <span className={b.error}>{error}</span>}
-                  <div className={b.actions}>
-                    <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('saved')}>
-                      {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save design'}
-                    </button>
-                    <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('quote')}>
-                      {busy === 'quote' ? 'Sending…' : 'Get a quote'}
-                    </button>
-                    <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('order')}>
-                      {busy === 'order' ? 'Placing…' : 'Buy now'}
-                    </button>
-                  </div>
-                  <span className={b.finePrint}>Buy now places a production order at partner pricing. We confirm a final proof before anything is made.</span>
-                </>
-              ) : (
-                <>
-                  <div className={b.block}>
-                    <strong className={b.stepTitle}>{step(1)}. Your details</strong>
-                    <div className={b.fields}>
-                      <label className={b.field}>
-                        Name
-                        <input value={contact.name} maxLength={120} autoComplete="name" onChange={(e) => setContact({ ...contact, name: e.target.value })} placeholder="Your name" />
-                      </label>
-                      <label className={b.field}>
-                        Organization
-                        <input value={contact.organization} maxLength={120} autoComplete="organization" onChange={(e) => setContact({ ...contact, organization: e.target.value })} placeholder="Team, school or company" />
-                      </label>
-                      <label className={b.field}>
-                        Email
-                        <input type="email" value={contact.email} maxLength={200} autoComplete="email" onChange={(e) => setContact({ ...contact, email: e.target.value })} placeholder="you@example.com" />
-                      </label>
-                      <label className={b.field}>
-                        In-hands date
-                        <input type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
-                      </label>
-                    </div>
+                  {mode === 'logo' && !custom && (
+                    <Link href={shopHref({ view: 'studio', item: item.id })} className={b.studioLink}>
+                      Open the full design studio →
+                    </Link>
+                  )}
+                  {mode === 'design' && (
                     <label className={b.field}>
-                      What do you have in mind?
-                      <textarea rows={3} maxLength={2000} value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} placeholder="Colors, logo placement, sizes, anything you want designed" />
+                      Brief for our designers
+                      <textarea rows={3} value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Theme, colors, patterns, materials, who it’s for" />
                     </label>
-                    <label className={b.attach}>
-                      <span>Link to your logo or inspiration (optional)</span>
-                      <input type="url" maxLength={500} value={contact.logoLink} onChange={(e) => setContact({ ...contact, logoLink: e.target.value })} placeholder="https://" />
-                    </label>
-                  </div>
-                  <div className={b.guestPrice}>
-                    <span>
-                      <strong>Options for every budget.</strong> <span>We quote direct from manufacturing.</span>
+                  )}
+                  <label className={b.field}>
+                    Deliver to
+                    <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or destination" />
+                  </label>
+                </div>
+                <div className={b.priceBox}>
+                  <span className={b.priceHead}>
+                    <strong>{step(2)}. Price &amp; checkout</strong>
+                    <span>PARTNER PRICING</span>
+                  </span>
+                  <div className={b.priceRow}>
+                    <span>{styleSum}</span>
+                    <span className={b.priceValue}>
+                      <strong>Quoted</strong>
+                      <span>Partner pricing on your quote · before shipping</span>
                     </span>
-                    {priorities}
                   </div>
-                  {error && <span className={b.error}>{error}</span>}
-                  <div className={b.guestActions}>
-                    <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('quote')}>
-                      {busy ? 'Sending…' : 'Send quote request'}
-                    </button>
-                    <span className={b.finePrint}>Free to request. Our sourcing team replies within 2 business days.</span>
+                  {priorities}
+                </div>
+                {saved && <span className={b.savedNote}>Saved to My designs ✓ · share it with your team or come back later</span>}
+                {error && <span className={b.error}>{error}</span>}
+                <div className={b.actions}>
+                  <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('saved')}>
+                    {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save design'}
+                  </button>
+                  <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('quote')}>
+                    {busy === 'quote' ? 'Sending…' : 'Get a quote'}
+                  </button>
+                  <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('order')}>
+                    {busy === 'order' ? 'Placing…' : 'Buy now'}
+                  </button>
+                </div>
+                <span className={b.finePrint}>Buy now places a production order at partner pricing. We confirm a final proof before anything is made.</span>
+              </>
+            ) : (
+              <>
+                <div className={b.block}>
+                  <strong className={b.stepTitle}>{step(1)}. Your details</strong>
+                  <div className={b.fields}>
+                    <label className={b.field}>
+                      Name
+                      <input value={contact.name} maxLength={120} autoComplete="name" onChange={(e) => setContact({ ...contact, name: e.target.value })} placeholder="Your name" />
+                    </label>
+                    <label className={b.field}>
+                      Organization
+                      <input value={contact.organization} maxLength={120} autoComplete="organization" onChange={(e) => setContact({ ...contact, organization: e.target.value })} placeholder="Team, school or company" />
+                    </label>
+                    <label className={b.field}>
+                      Email
+                      <input type="email" value={contact.email} maxLength={200} autoComplete="email" onChange={(e) => setContact({ ...contact, email: e.target.value })} placeholder="you@example.com" />
+                    </label>
+                    <label className={b.field}>
+                      In-hands date
+                      <input type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
+                    </label>
+                    <label className={b.field}>
+                      Deliver to
+                      <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or destination" />
+                    </label>
                   </div>
-                </>
-              )}
-            </div>
-          )}
+                  <label className={b.field}>
+                    What do you have in mind?
+                    <textarea rows={3} maxLength={2000} value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} placeholder="Colors, logo placement, sizes, anything you want designed" />
+                  </label>
+                  <label className={b.attach}>
+                    <span>Link to your logo or inspiration (optional)</span>
+                    <input type="url" maxLength={500} value={contact.logoLink} onChange={(e) => setContact({ ...contact, logoLink: e.target.value })} placeholder="https://" />
+                  </label>
+                </div>
+                <div className={b.guestPrice}>
+                  <span>
+                    <strong>Options for every budget.</strong> <span>We quote direct from manufacturing.</span>
+                  </span>
+                  {priorities}
+                </div>
+                {error && <span className={b.error}>{error}</span>}
+                <div className={b.guestActions}>
+                  <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('quote')}>
+                    {busy ? 'Sending…' : 'Send quote request'}
+                  </button>
+                  <span className={b.finePrint}>Free to request. Our sourcing team replies within 2 business days.</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+          </div>
         </div>
-      </div>
-    </div>,
-    document.body,
+      </section>
+    </>
   );
 }
 

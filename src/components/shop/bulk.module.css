@@ -583,69 +583,100 @@ button.item {
 }
 
 .how {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 40px;
-  border-radius: 16px;
-  background: #0a0a0a;
+  gap: 48px;
+  overflow: hidden;
+  padding: 64px 56px;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 0%, rgba(220, 189, 125, 0.14), rgba(220, 189, 125, 0) 70%),
+    #0a0a0a;
   color: var(--white);
 }
 
+/* The heading, centred: the title, its line, then the gold label. */
 .howHead {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.howTitleWrap {
-  display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
 }
 
 .howTitle {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: 34px;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .howText {
-  max-width: 420px;
-  color: #bbb;
-  font-size: 14px;
+  max-width: 560px;
+  margin: 0;
+  color: #bdbdbd;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
+/* Four steps in a row, a gold line joining their numbers behind them. */
 .steps {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps::before {
+  position: absolute;
+  top: 24px;
+  right: 12.5%;
+  left: 12.5%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(220, 189, 125, 0.15), rgba(220, 189, 125, 0.6), rgba(220, 189, 125, 0.15));
+  content: '';
 }
 
 .step {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid #2a2a2a;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
 }
 
 .stepN {
-  color: #dcbd7d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  background: #dcbd7d;
+  box-shadow: 0 0 0 8px #0a0a0a;
+  color: #0a0a0a;
   font-family: var(--font-heading);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 800;
 }
 
-.step strong {
-  font-size: 16px;
+.stepTitle {
+  color: var(--white);
+  font-size: 17px;
 }
 
-.step span:last-child {
-  color: #aaa;
+.stepText {
+  max-width: 240px;
+  color: #a8a8a8;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* ---- The item popup ---- */
@@ -1485,6 +1516,20 @@ button.item {
 
   .steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 40px;
+  }
+
+  /* Two rows: no line across. */
+  .steps::before {
+    display: none;
+  }
+
+  .how {
+    padding: 48px 28px;
+  }
+
+  .howTitle {
+    font-size: 34px;
   }
 }
 
@@ -1544,5 +1589,123 @@ button.item {
 @media (max-width: 480px) {
   .steps {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- The items as the experiences' cards (BulkCard) ---- */
+.card {
+  text-decoration: none;
+}
+
+.cardMedia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f1ec;
+}
+
+.cardSvg {
+  display: block;
+  width: 72%;
+  height: 86%;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cardSvg {
+  transform: scale(1.04);
+}
+
+.cardMediaCustom {
+  background: #0a0a0a;
+}
+
+.cardCustom {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 22px;
+}
+
+.cardCustomTitle {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.cardLine {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ---- An item's page (BulkItemPage), as a product's page ---- */
+.pageLeft,
+.pageRight {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.pageRight {
+  position: sticky;
+  top: calc(var(--header-height, 0px) + 24px);
+}
+
+/* The mockup fills the product page's large photo box. */
+.pageMock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f1ec;
+}
+
+.pageMock .dialogMock {
+  max-width: none;
+  height: 100%;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* An item with one view: no thumbnails beside it. */
+.galleryOne {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.viewThumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f1ec;
+}
+
+.viewThumb svg {
+  width: 86%;
+  height: 86%;
+}
+
+@media (max-width: 999px) {
+  .pageRight {
+    position: static;
+  }
+}
+
+.whoPill button {
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  /* Phones: the two pills side by side, without the "CLP PARTNER?" label. */
+  .who {
+    flex-wrap: wrap;
+    font-size: 0;
+  }
+
+  .who > .whoPill {
+    font-size: 11px;
   }
 }

@@ -112,7 +112,7 @@ export type BulkRequest = {
   mockup: string;
   status: string;
   createdAt: string;
-  contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string } | null;
+  contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string } | null;
 };
 export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'createdAt' | 'design' | 'mockup' | 'brief' | 'addons' | 'mode' | 'contact'> & {
   mode?: 'logo' | 'design';

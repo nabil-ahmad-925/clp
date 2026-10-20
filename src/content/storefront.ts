@@ -61,11 +61,11 @@ export const groupById = (id: string) => SHOP_GROUPS.find((g) => g.id === id);
 /** "Clubs" for a tile's line (the design drops " & Teams"). */
 export const groupShort = (g: ShopGroup) => g.label.replace(' & Teams', '');
 /** The stores of a group (partner stores only, never CLP's own). */
-/** A group's stores (every store for ''), CLP's featured ones (its Feature star) first. */
+/** A group's stores (every store for ''), A to Z. */
 export const storesIn = (stores: ShopStore[], group: string) =>
   partnerStores(stores)
     .filter((s) => !group || groupOf(s.type).id === group)
-    .sort((a, b) => Number(Boolean(b.homeFeatured)) - Number(Boolean(a.homeFeatured)));
+    .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 /** The partner type's own label, kept for search. */
 export const typeLabel = (type: string) => PARTNER_TYPES.find((t) => t.id === type)?.label ?? '';
 export const sportLabel = (id: string) => PARTNER_SPORTS.find((s) => s.id === id)?.label ?? id;

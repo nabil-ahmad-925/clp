@@ -215,7 +215,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 50%;
+  /* A rounded square, as the partner listings' logos. */
+  border-radius: 22%;
   color: var(--white);
   font-family: var(--font-heading);
   font-style: italic;
@@ -1371,7 +1372,21 @@
 }
 
 .productsHome {
-  padding-top: 96px;
+  padding-top: 56px;
+}
+
+/* Its filters right under its heading (the list bar's own top margin dropped): the same 28px as above the cards. */
+.productsHome > .headRow + * {
+  margin-top: 0;
+}
+
+/* Phones: its line under the heading, not squeezed beside it. */
+@media (max-width: 767px) {
+  .productsHome > .headRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .pager {
@@ -2641,5 +2656,52 @@
 
 .searchPick > button:hover {
   border: 0;
+  background: #f7f6f3;
+}
+
+/* ---- The listing cards (shopListing.tsx: the experiences' cards) ---- */
+.productCard {
+  text-decoration: none;
+}
+
+.productCardMedia > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.productCard:hover .productCardMedia > img {
+  transform: scale(1.03);
+}
+
+.productCardInfo {
+  color: #666;
+  font-size: 14px;
+}
+
+.productCardPrice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* A section's View All, centred under its cards. */
+.viewAllRow {
+  margin-top: 12px;
+}
+
+/* The section right before a grey list band: room under its View All before the band starts. */
+.section:has(+ .listingBand) {
+  padding-bottom: 56px;
+}
+
+/* The strip under the search bar when a grey list follows: the list's grey (the bar's own negative margin stays inside). */
+.searchOnGrey {
+  display: flow-root;
   background: #f7f6f3;
 }

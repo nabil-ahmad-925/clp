@@ -1,50 +1,123 @@
-/* Jobs & Internships (the listing pages' design): a role's card (the listing card's frame, text only), the "Hiring?"
-   card and a role's popup. */
+/* Jobs & Internships (the Jobs Board design): a role's card (its photo, the poster's logo on its edge) and its list row,
+   the "Hiring?" card, a role's panel, and the saved note. */
 .results {
   padding-top: 32px;
 }
 
 .skeleton {
-  min-height: 340px;
+  min-height: 520px;
 }
 
+/* ---- A role's card ---- */
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  height: 100%;
-  min-height: 340px;
-  padding: 20px 18px;
-  border: 1px solid #e5e5e2;
-  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e8e6e1;
+  border-radius: 16px;
   background: var(--white);
   color: #111;
-  font: inherit;
   font-family: var(--font-body);
   line-height: 1.5;
-  text-align: left;
   cursor: pointer;
-  transition:
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
 
-.card:hover {
-  border-color: #d6d3cc;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+.card:hover,
+.row:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
-.card:focus-visible {
+/* Its photo (its cover, its partner's page photo, else its colour with CLP's mark), NEW and Youth Role, the heart. */
+.photo {
+  position: relative;
+  display: block;
+  flex: none;
+  height: 170px;
+  background-color: #333;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.photoMark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: auto;
+  opacity: 0.35;
+  transform: translate(-50%, -50%);
+}
+
+.badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.newTag,
+.youthTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.newTag {
+  background: #1e5b33;
+  color: var(--white);
+  letter-spacing: 0.8px;
+}
+
+.youthTag {
+  background: rgba(255, 255, 255, 0.92);
+  color: #6b5426;
+}
+
+.heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #555;
+  cursor: pointer;
+}
+
+.heartOn {
+  color: #b03a2e;
+}
+
+.heart:focus-visible,
+.viewJob:focus-visible,
+.saveBtn:focus-visible,
+.panelSave:focus-visible,
+.panelApply:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 
-.cardTop {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 6px;
+/* The small box on the photo's bottom edge (as the partners' cards). */
+.cardMark {
+  position: absolute;
+  bottom: -28px;
+  left: 16px;
+  z-index: 1;
 }
 
 .mark {
@@ -52,13 +125,15 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   overflow: hidden;
-  border-radius: 10px;
+  border: 3px solid var(--white);
+  border-radius: 12px;
   color: var(--white);
-  font-family: var(--font-heading);
-  font-size: 14px;
+  font-family: var(--font-archivo), 'Archivo', sans-serif;
+  font-size: 15px;
   font-style: italic;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .mark img {
@@ -71,50 +146,38 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
-.orgName {
-  overflow: hidden;
-  color: #111;
-  font-size: 14px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.verified,
-.orgLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.badge {
   color: #8a6f33;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
-.orgLink {
-  text-decoration: none;
-}
-
-.orgLink:hover {
-  text-decoration: underline;
+.cardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  /* Clear of the small box over the photo's edge. */
+  padding: 42px 20px 0;
 }
 
 .kind {
   color: #8a6f33;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
   text-transform: uppercase;
 }
 
 .title {
   color: #111;
   font-family: var(--font-heading);
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .tags {
@@ -124,80 +187,271 @@
 }
 
 .tag {
-  padding: 4px 8px;
-  border-radius: 4px;
-  background: #f2f1ee;
-  color: #111;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #f2f1ed;
+  color: #333;
+  font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .tagGold {
-  background: #fbf4e4;
+  background: #fbf1dd;
   color: #8a6f33;
+}
+
+.tagTeal {
+  background: #e7f4f4;
+  color: #1d6363;
+}
+
+.tagGrey {
+  background: #f0eee9;
+  color: #555;
 }
 
 .facts {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
+  gap: 6px;
 }
 
 .fact {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
-  font-size: 14px;
+  color: #555;
+  font-size: 15px;
 }
 
 .fact svg {
   flex: none;
+  color: #777;
 }
 
-.footer {
+.pay {
+  color: #1e5b33;
+  font-weight: 700;
+}
+
+.payNone {
+  color: #777;
+}
+
+.dollar {
+  flex: none;
+  width: 16px;
+  color: #777;
+  font-weight: 400;
+  text-align: center;
+}
+
+.cardFoot {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid #eeeeeb;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #efede8;
+}
+
+.dates {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
 }
 
 .posted {
   color: #888;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
 }
 
-.deadline {
+.deadline,
+.deadlineSoon {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.deadlineSoon {
   color: #b03a2e;
-  font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
 }
 
-.cta {
+.viewJob {
   display: inline-flex;
   align-items: center;
-  height: 40px;
-  margin-left: auto;
-  padding: 0 16px;
+  justify-content: center;
+  gap: 6px;
+  height: 52px;
   border: 1px solid #111;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #111;
   color: var(--white);
-  font-size: 14px;
-  font-weight: 700;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
 }
 
-.card:hover .cta {
+.viewJob:hover {
   background: var(--white);
   color: #111;
+}
+
+/* ---- The list view: a row each (photo, the role, then pay, dates, View Job and Save) ---- */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 260px;
+  min-height: 210px;
+  overflow: hidden;
+  border: 1px solid #e8e6e1;
+  border-radius: 16px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.row .photo {
+  height: auto;
+  min-height: 210px;
+}
+
+.rowMark {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 24px;
+}
+
+.rowOrg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.rowTitle {
+  font-size: 24px;
+}
+
+.rowSide {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px;
+  border-left: 1px solid #efede8;
+  background: #fcfbf9;
+}
+
+.rowDates {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowPay,
+.rowPayNone {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e5b33;
+}
+
+.rowPayNone {
+  color: #777;
+}
+
+.rowActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rowActions .viewJob {
+  height: 50px;
+}
+
+.saveBtn {
+  height: 44px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.saveBtn[aria-pressed='true'],
+.panelSave[aria-pressed='true'] {
+  color: #b03a2e;
+}
+
+@media (max-width: 1023px) {
+  .row {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .rowSide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    border-top: 1px solid #efede8;
+    border-left: 0;
+  }
+
+  .rowActions {
+    flex-direction: row;
+    flex: 1 1 280px;
+  }
+
+  .rowActions > * {
+    flex: 1;
+  }
+}
+
+@media (max-width: 639px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .row .photo {
+    height: 170px;
+    min-height: 0;
+  }
+
+  .rowTitle {
+    font-size: 21px;
+  }
 }
 
 /* The last card: posting roles as a CLP partner. */
@@ -208,7 +462,7 @@
   gap: 12px;
   min-height: 340px;
   padding: 28px 24px;
-  border-radius: 10px;
+  border-radius: 16px;
   background: #0a0a0a;
   color: var(--white);
   font-family: var(--font-body);
@@ -256,47 +510,66 @@
   font-weight: 600;
 }
 
-/* A role's popup (the site's popups: see ClaimModal). */
+/* In the list view: a full-width band. */
+.list .join {
+  min-height: 0;
+}
+
+/* ---- A role's panel (the design's drawer): its photo, who, the role, its facts, the lists, Save and Apply ---- */
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32px;
-  background: rgba(10, 10, 10, 0.6);
+  align-items: flex-start;
+  justify-content: flex-end;
+  /* On the right of the page's content (1440px wide, 48px in). */
+  padding: 24px max(24px, calc((100vw - 1440px) / 2 + 48px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(17, 17, 17, 0.35);
   font-family: var(--font-body);
 }
 
-.dialog {
+.panel {
   position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 720px;
-  max-height: calc(100dvh - 64px);
+  width: 680px;
+  max-width: 100%;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 18px;
   background: var(--white);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
   color: #111;
   line-height: 1.5;
   outline: none;
 }
 
+.panelPhoto {
+  position: relative;
+  flex: none;
+  height: 200px;
+  background-color: #333;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 14px;
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 0;
-  border-radius: 8px;
-  background: var(--white);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
   color: #111;
   cursor: pointer;
 }
@@ -305,6 +578,242 @@
   background: #f2f1ee;
 }
 
+.panelBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 28px 28px;
+}
+
+.panelHead {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: -40px;
+}
+
+.panelHead .mark {
+  border-width: 4px;
+  font-size: 22px;
+}
+
+.panelHead .org {
+  padding-bottom: 4px;
+}
+
+.panelOrg {
+  color: #111;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+a.panelOrg:hover {
+  text-decoration: underline;
+}
+
+.panelTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.factGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.factCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7f6f3;
+}
+
+.factKey {
+  color: #888;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.factCell strong {
+  color: #111;
+  font-size: 15px;
+}
+
+.factCell .factPay {
+  color: #1e5b33;
+}
+
+.factCell .factSoon {
+  color: #b03a2e;
+}
+
+.youthNote {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fbf1dd;
+  color: #6b5426;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.about {
+  margin: 0;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.lists {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.listCol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 16px;
+}
+
+.listCol ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 16px;
+  color: #444;
+  font-size: 14px;
+}
+
+.panelActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.panelSave,
+.panelApply,
+.appliedTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 54px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.panelSave {
+  border: 1px solid #ccc;
+  background: var(--white);
+  color: #111;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.panelApply {
+  border: 0;
+  background: #111;
+  color: var(--white);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.panelApply:hover {
+  background: #333;
+}
+
+.appliedTag {
+  background: #e6f2e9;
+  color: #1e5b33;
+  font-weight: 800;
+}
+
+.panelNote {
+  color: #777;
+  font-size: 12px;
+  text-align: center;
+}
+
+.panelNote a {
+  color: inherit;
+}
+
+@media (max-width: 639px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .panel {
+    width: 100%;
+    max-height: 92dvh;
+    overflow-y: auto;
+    border-radius: 14px 14px 0 0;
+  }
+
+  .panelPhoto {
+    height: 160px;
+  }
+
+  .panelBody {
+    padding: 0 20px 24px;
+  }
+
+  .panelTitle {
+    font-size: 24px;
+  }
+
+  .factGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lists {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* "Job saved" / "Removed from saved jobs", a moment at the bottom. */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  z-index: 10001;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background: #111;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  transform: translateX(-50%);
+}
+
+/* The application form and its "sent" (in the panel). */
 .dialogBody {
   display: flex;
   flex: 1 1 auto;
@@ -312,15 +821,6 @@
   gap: 12px;
   min-height: 0;
   padding: 40px 44px 28px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.dialogHead {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding-right: 40px;
 }
 
 .dialogTitle {
@@ -329,80 +829,6 @@
   font-size: 28px;
   font-weight: 800;
   line-height: 1.2;
-}
-
-.facts4 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin: 6px 0;
-}
-
-.factBox {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #f7f6f3;
-  font-size: 15px;
-}
-
-.factBox svg {
-  flex: none;
-  margin-top: 3px;
-  color: #8a6f33;
-}
-
-.factBox span {
-  display: flex;
-  flex-direction: column;
-}
-
-.factBox strong {
-  color: #888;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.dialogH3 {
-  margin: 12px 0 0;
-  font-family: var(--font-heading);
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.text {
-  margin: 0;
-  color: #444;
-  font-size: 16px;
-  line-height: 1.7;
-  white-space: pre-line;
-}
-
-.check {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin: 8px 0 0;
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: #fbf4e4;
-  color: #5c4a1e;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.check svg {
-  flex: none;
-  margin-top: 2px;
-}
-
-.postedLine {
-  color: #888;
-  font-size: 13px;
 }
 
 .dialogNote {
@@ -417,7 +843,6 @@
   gap: 10px;
   padding: 16px 44px 24px;
   border-top: 1px solid #eeeeeb;
-  box-shadow: 0 -10px 20px -16px rgba(0, 0, 0, 0.3);
 }
 
 .apply,
@@ -448,16 +873,6 @@
 }
 
 @media (max-width: 639px) {
-  .overlay {
-    align-items: flex-end;
-    padding: 0;
-  }
-
-  .dialog {
-    max-height: 92dvh;
-    border-radius: 14px 14px 0 0;
-  }
-
   .dialogBody {
     padding: 32px 20px 20px;
   }
@@ -468,10 +883,6 @@
 
   .dialogTitle {
     font-size: 22px;
-  }
-
-  .facts4 {
-    grid-template-columns: 1fr;
   }
 }
 
