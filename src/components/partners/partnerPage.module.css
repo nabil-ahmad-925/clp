@@ -367,24 +367,33 @@
   color: #111;
 }
 
+/* The social links on the hero's lower right (where "See all photos & videos" was). */
 .socials {
+  position: absolute;
+  right: 48px;
+  bottom: 24px;
+  z-index: 1;
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .social {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid #d9d7d2;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
   color: #111;
+  font-size: 17px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .social:hover {
-  border-color: #111;
+  background: #fff;
+  transform: translateY(-1px);
 }
 
 .identityActions {
@@ -931,12 +940,22 @@
   min-width: 0;
   height: 44px;
   padding: 0 12px;
-  border: 1px solid #333;
+  border: 1px solid #fff;
   border-radius: 8px;
-  background: #161616;
-  color: #fff;
+  background: #fff;
+  color: #111;
   font: inherit;
   font-size: 14px;
+}
+
+.signupRow input::placeholder {
+  color: #888;
+}
+
+.signupRow input:focus {
+  border-color: #dcbd7d;
+  outline: 2px solid rgba(220, 189, 125, 0.5);
+  outline-offset: 1px;
 }
 
 .signupRow .btnGold {
@@ -2125,6 +2144,20 @@ article:hover .productCardMedia > img {
 
   .hero {
     height: 340px;
+  }
+
+  /* Phones: the logo overlaps the photo's lower left, so the links sit on its upper right. */
+  .socials {
+    top: 16px;
+    right: 24px;
+    bottom: auto;
+    gap: 6px;
+  }
+
+  .social {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
   }
 
   .logo {

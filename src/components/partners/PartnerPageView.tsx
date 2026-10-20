@@ -270,6 +270,19 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         <section className={s.hero} data-header-tone="light" data-page-hero>
           {page.hero ? <img className={s.heroImage} src={page.hero} alt="" /> : <span className={s.heroBlank} />}
           <span className={s.heroFade} aria-hidden />
+          {/* Their social links and website, on the photo's lower right. */}
+          {socials.length > 0 && (
+            <span className={s.socials}>
+              {socials.map((so) => {
+                const Icon = SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website;
+                return (
+                  <a key={so.network} href={so.href} target="_blank" rel="noopener noreferrer" className={s.social} aria-label={`${page.short} on ${so.network}`}>
+                    <Icon aria-hidden />
+                  </a>
+                );
+              })}
+            </span>
+          )}
         </section>
 
         <section className={s.identity} data-header-tone="dark">
@@ -297,18 +310,6 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                       <strong>{page.rating}★</strong> {plural(page.reviewCount, 'review')}
                     </button>
                   </>
-                )}
-                {socials.length > 0 && (
-                  <span className={s.socials}>
-                    {socials.map((so) => {
-                      const Icon = SOCIAL_ICONS[so.network] ?? SOCIAL_ICONS.website;
-                      return (
-                        <a key={so.network} href={so.href} target="_blank" rel="noopener noreferrer" className={s.social} aria-label={`${page.short} on ${so.network}`}>
-                          <Icon aria-hidden />
-                        </a>
-                      );
-                    })}
-                  </span>
                 )}
               </div>
             </div>
