@@ -1829,7 +1829,13 @@
   align-self: flex-start;
   align-items: center;
   gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .buyStoreLogo {
