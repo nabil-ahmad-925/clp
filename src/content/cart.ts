@@ -102,9 +102,12 @@ export const keepCodes = (codes: string[]) => {
 };
 
 export const getCart = (slug?: string, pricing?: Pricing) => read<{ cart: Cart }>(path(pricingQuery(slug, pricing))).then((r) => r.cart);
-/** Adds a product (a private store's needs the invite key the shop got when it was unlocked). */
+/**
+ * Adds a product (a private store's needs the invite key the shop got when it was unlocked) and answers the whole cart,
+ * every store's lines (the shop's badge and drawer), not only this store's.
+ */
 export const addToCart = (slug: string, productId: string, choices: Record<string, string>, qty: number, key?: string) =>
-  call<{ cart: Cart }>(path(`/items${slugQuery(slug)}`), { method: 'POST', body: JSON.stringify({ slug, productId, choices, qty, ...(key ? { key } : {}) }) }).then((r) => r.cart);
+  call<{ cart: Cart }>(path('/items'), { method: 'POST', body: JSON.stringify({ slug, productId, choices, qty, ...(key ? { key } : {}) }) }).then((r) => r.cart);
 export const setLineQty = (key: string, qty: number, slug?: string) =>
   call<{ cart: Cart }>(path(`/items/${encodeURIComponent(key)}${slugQuery(slug)}`), { method: 'PATCH', body: JSON.stringify({ qty }) }).then((r) => r.cart);
 export const removeLine = (key: string, slug?: string) => call<{ cart: Cart }>(path(`/items/${encodeURIComponent(key)}${slugQuery(slug)}`), { method: 'DELETE' }).then((r) => r.cart);

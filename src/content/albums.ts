@@ -14,6 +14,9 @@ const TIMEOUT_MS = 10_000;
 
 export const PHOTO_SPORTS = taxonomy.sports;
 export const PHOTO_CATEGORIES = taxonomy.categories;
+/** The albums' types, also the videos' categories (Events & Games, Behind the Scenes, Highlights, Partnerships). */
+export const ALBUM_TYPES = taxonomy.types;
+export const albumTypeName = (slug = '') => ALBUM_TYPES.find((t) => t.slug === slug)?.name ?? '';
 
 /** The sport of a sport photo page ("/experiences/futbol/futbol-soccer-photos/" -> "futbol-soccer"). */
 export const sportOfPage = (path: string) => PHOTO_SPORTS.find((s) => s.page === path)?.slug;
@@ -95,6 +98,8 @@ const post = <T>(path: string, body: unknown) =>
 
 /** A sport's published albums (newest event first); private ones come locked (no photo links). */
 export const fetchSportAlbums = (sport: string) => call<{ items: LiveAlbum[] }>(`/albums?sport=${encodeURIComponent(sport)}`).then((r) => r.items);
+/** Every sport's listed albums, newest event first (the "Find your game photos" page). */
+export const fetchAllAlbums = () => call<{ items: LiveAlbum[] }>('/albums').then((r) => r.items);
 
 /** Unlocked private albums' tokens, in memory only: never stored, so the code is asked again on the next visit. */
 const tokens = new Map<string, { token: string; expiresAt: string }>();
@@ -164,6 +169,17 @@ export async function fetchPhotoPage(album: Pick<LiveAlbum, 'id' | 'access'>, q:
   const r = await (viewer ? viewerCall<PhotoPage>(albumPath(album.id, q, true)) : call<PhotoPage>(albumPath(album.id, q, false)));
   return { photos: r.photos, page: r.page, limit: r.limit, total: r.total, pages: r.pages };
 }
+
+/** The print products' back photos ({ <back>: link }, clp-api GET /albums/print-backs), asked once per visit. */
+let printBacks: Promise<Record<string, string>> | null = null;
+export const fetchPrintBacks = () =>
+  (printBacks ??= call<{ images: Record<string, string> }>('/albums/print-backs')
+    .then((r) => r.images ?? {})
+    .catch(() => {
+      // Asked again next time; the viewer draws the backs meanwhile.
+      printBacks = null;
+      return {};
+    }));
 
 /** Opens the private album of a code (for the rest of this visit); throws with a message to show. */
 export async function unlockAlbum(code: string): Promise<LiveAlbum> {

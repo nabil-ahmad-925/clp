@@ -37,7 +37,7 @@ import Mockup, { FONT_STYLE, isLight, mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
 import { Chevron, LockIcon } from './shopIcons';
 import { studioFontVariables } from './studioFonts';
-import { useStudio, type StudioBrand } from './useStudio';
+import { SAMPLE_LOGO, useStudio, type StudioBrand } from './useStudio';
 import st from './studio.module.css';
 
 type Tab = 'prod' | 'tpl' | 'color' | 'pat' | 'logo' | 'text' | 'back';
@@ -106,10 +106,16 @@ export default function ShopStudio() {
   const item = bulkItem(params.get('item') ?? '') ?? BULK_ITEMS[0];
   const designId = params.get('design') ?? '';
 
-  if (brand.loading) return <div className={`${st.studio} ${st.loading}`} aria-busy />;
+  if (brand.loading)
+    return (
+      <div className={`${st.studio} ${st.loading}`} aria-busy role="status">
+        <span className={st.spinner} aria-hidden />
+        Opening the design studio…
+      </div>
+    );
   if (!brand.partner)
     return (
-      <div className={st.gate}>
+      <div className={st.gate} data-header-tone="light">
         <div className={st.gateCard}>
           <span className={st.gateKicker}>FOR CLP PARTNERS</span>
           <strong className={st.gateTitle}>The design studio is for approved partners</strong>
@@ -251,6 +257,15 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
       im.src = url;
     };
     reader.readAsDataURL(file);
+  };
+
+  // The design's sample: the CLP logo (its full address, so CLP's admin opens it too), print-ready as CLP's vector master.
+  const pickSample = () => {
+    const url = new URL(SAMPLE_LOGO, window.location.href).href;
+    setArt({ name: 'clp-logo.svg', kind: 'vector' });
+    setOrig(url);
+    setClean({ remove: false, tolerance: 60, color: '' });
+    set({ logo: url, logoOn: true });
   };
 
   // Logo clean-up: the background (the corner's colour) taken out, and the logo recoloured, on a canvas.
@@ -642,6 +657,9 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                           Use my brand logo
                         </button>
                       )}
+                      <button type="button" className={st.linkBtn} onClick={pickSample}>
+                        Use sample logo
+                      </button>
                     </span>
                   </div>
                   <span className={st.note}>Best: vector AI, EPS, PDF or SVG. Also accepted: PNG or JPG at 300 DPI at print size.</span>

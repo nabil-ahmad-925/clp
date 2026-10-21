@@ -126,6 +126,9 @@ export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'create
 /** A guest's quote requests (this browser's) and sending one. */
 export const guestRequests = () => read<{ items: BulkRequest[] }>(`/cart/${cartId()}/bulk`).then((r) => r.items);
 export const sendGuestQuote = (input: BulkInput) => call<{ item: BulkRequest }>(`/cart/${cartId()}/bulk`, { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
+/** Keeps an image for a guest's quote (their logo or its mockup, a PNG, JPG or WebP data URL) and answers its address. */
+export const uploadGuestImage = (image: string) =>
+  call<{ url: string }>(`/cart/${cartId()}/images`, { method: 'POST', body: JSON.stringify({ image }) }).then((r) => r.url);
 
 /** A signed-in partner's designs, quote requests and orders. */
 export const myDesigns = () => partnerCall<{ items: BulkRequest[] }>('/my/designs').then((r) => r.items);

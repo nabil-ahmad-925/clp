@@ -336,6 +336,29 @@
   font-size: 13px;
 }
 
+.kitError {
+  color: #a3261b;
+  font-weight: 600;
+}
+
+/* "Try sample" (the CLP logo on black) and a logo's Remove: underlined text buttons. */
+.sampleBtn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sampleBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 .guestLink {
   margin-left: auto;
   padding: 0;
@@ -667,7 +690,8 @@ button.item {
   font-weight: 800;
 }
 
-.stepTitle {
+/* How it works (on black): its steps' titles. The form's step titles share the name and stay dark. */
+.step .stepTitle {
   color: var(--white);
   font-size: 17px;
 }
@@ -968,6 +992,7 @@ button.item {
 
 .blockHead strong,
 .stepTitle {
+  color: #111;
   font-size: 16px;
 }
 
@@ -1534,6 +1559,11 @@ button.item {
 }
 
 @media (max-width: 767px) {
+  /* The logo and the colours wrap to their own lines: no rule between them. */
+  .kitRule {
+    display: none;
+  }
+
   .heroInner,
   .wrap,
   .gridWrap,
@@ -1674,6 +1704,33 @@ button.item {
 /* An item with one view: no thumbnails beside it. */
 .galleryOne {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* The fully custom product (its one view): the design's white square card on the beige panel, the shape whole. */
+.galleryOne .pageMock {
+  aspect-ratio: 1 / 1;
+  padding: 48px;
+  box-sizing: border-box;
+}
+
+.galleryOne .pageMock .dialogMock {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  padding: 56px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: var(--white);
+}
+
+@media (max-width: 767px) {
+  .galleryOne .pageMock {
+    padding: 20px;
+  }
+
+  .galleryOne .pageMock .dialogMock {
+    padding: 28px;
+  }
 }
 
 .viewThumb {

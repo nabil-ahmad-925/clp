@@ -1,0 +1,266 @@
+/* Find your game photos (the Event photos & prints design): the search on the heading's edge, then the albums. */
+.page {
+  position: relative;
+  z-index: 3;
+  box-sizing: border-box;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 48px 96px;
+  font-family: var(--font-body);
+}
+
+.page::before {
+  /* The page's warm grey behind the cards, the full width, from the bar's middle (its top half is on the black). */
+  position: absolute;
+  inset: 46px calc(50% - 50vw) 0;
+  z-index: -1;
+  background: #f7f6f3;
+  content: '';
+}
+
+/* The bar: what to find, the album code, then Find photos (straddling the black heading's bottom edge). */
+.bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px auto;
+  align-items: center;
+  width: 1000px;
+  max-width: 100%;
+  margin: -46px auto 0;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.12);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 14px;
+  color: #888;
+}
+
+.field svg {
+  flex: none;
+}
+
+.field input {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.codeField {
+  border-left: 1px solid #ecebe7;
+}
+
+.codeField input {
+  letter-spacing: 0.5px;
+}
+
+.bar:focus-within {
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.12),
+    0 0 0 2px var(--gold);
+}
+
+.find {
+  height: 56px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 10px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.find:hover {
+  background: #333;
+}
+
+.find:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.note {
+  margin: 24px 0 0;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
+.results {
+  padding-top: 40px;
+  scroll-margin-top: 110px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e8e6e1;
+  border-radius: 14px;
+  background: var(--white);
+  color: #111;
+  text-decoration: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.cover {
+  position: relative;
+  display: block;
+  height: 230px;
+  overflow: hidden;
+  background: #e9e7e2;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cover img {
+  transform: scale(1.03);
+}
+
+/* A family album's cover: blurred, so no child shows outside their family. */
+.blur {
+  filter: blur(14px);
+  transform: scale(1.1);
+}
+
+.card:hover .cover img.blur {
+  transform: scale(1.1);
+}
+
+.tagOpen,
+.tagFamily {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.tagOpen {
+  background: var(--white);
+  color: #111;
+}
+
+.tagFamily {
+  background: #fbf1dd;
+  color: #8a6f33;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px 22px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.line {
+  margin-top: 2px;
+  color: #555;
+  font-size: 14px;
+}
+
+.muted {
+  color: #666;
+  font-size: 14px;
+}
+
+.skeleton {
+  height: 360px;
+  border-radius: 14px;
+  background: #ecebe7;
+}
+
+.empty {
+  margin: 0;
+  padding: 40px;
+  border-radius: 14px;
+  background: var(--white);
+  color: #666;
+  text-align: center;
+}
+
+.pager {
+  margin-top: 32px;
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 0 16px 64px;
+  }
+
+  .bar {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .codeField {
+    border-top: 1px solid #ecebe7;
+    border-left: 0;
+  }
+
+  .find {
+    width: 100%;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cover {
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+}

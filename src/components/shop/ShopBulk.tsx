@@ -1,5 +1,5 @@
 'use client';
-/* eslint-disable @next/next/no-img-element -- the partner's own logo (their upload), shown as it is. */
+/* eslint-disable @next/next/no-img-element -- the partner's or guest's own logo (their upload), shown as it is. */
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -27,6 +27,7 @@ import {
   leadWeeks,
   myDesigns,
   sendGuestQuote,
+  uploadGuestImage,
   type BulkItem,
   type BulkKind,
   type BulkRequest,
@@ -38,12 +39,13 @@ import PartnerSignIn from './PartnerSignIn';
 import ShopTabs from './shopTabs';
 import { LockIcon } from './shopIcons';
 import { CardGrid, LIST_SIZES, ListToolbar, ShopSearch, hasWords, titleCase, type ListChip } from './shopListing';
-import { useStudio, type StudioBrand } from './useStudio';
+import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
 
-/** The bulk tiles' colours for a partner without brand colours, and a guest's preview colour. */
+/** The bulk tiles' colours (a partner's brand colours first, when they have any). */
 const DEFAULT_SWATCHES = ['#111111', '#FFFFFF', '#0B2A5B', '#7A1F2B', '#1D6363', '#C8102E', '#2E7D32', '#DCBD7D'];
+/** A request without a design (sent before guests could add their logo) in the requests list. */
 const GUEST_FILL = '#1F2A44';
 
 /** The list's filters besides its category: each pill's "All …" name, its panel heading, icon and options. */
@@ -112,9 +114,10 @@ function useRequests(partner: boolean, ready: boolean) {
  * Bulk & Operations (/shop/?view=bulk, the Shop design): team kits, staff gear, event supplies, inflatables, awards and
  * promo, made to order and quoted direct from manufacturing. The shop's search (what, and where it ships), the
  * experiences' bar (All Categories and the other filters, the sort, grid or list), the items as the experiences'
- * cards, and pages; an item opens on its own page (?item=). A signed-in CLP partner sees every item in their brand (logo
- * and colours) and designs it in the studio; a guest requests a quote. "My designs" / "My quote requests" lists what
- * they sent. The search, filters, sort, page and view live in the address.
+ * cards, and pages; an item opens on its own page (?item=). Everyone previews every item with their logo and colour (the
+ * brand kit: a partner's from their account, a guest's kept in this browser); a signed-in CLP partner designs it in the
+ * studio, a guest requests a quote with it. "My designs" / "My quote requests" lists what they sent. The search,
+ * filters, sort, page and view live in the address.
  */
 export default function ShopBulk() {
   const params = useSearchParams();
@@ -233,7 +236,7 @@ export default function ShopBulk() {
           />
         ) : (
           <>
-            <section className={s.thinBand} />
+            <section className={s.thinBand} data-header-tone="light" />
             <div className={`${s.section} ${s.spacedSm}`}>
               <div className={s.empty}>
                 This item isn&rsquo;t in the catalog anymore.
@@ -252,7 +255,7 @@ export default function ShopBulk() {
 
   return (
     <div className={b.bulk}>
-      <section className={b.hero}>
+      <section className={b.hero} data-header-tone="light">
         <div className={b.heroInner}>
           <div className={b.heroTop}>
             <nav className={s.crumbs} aria-label="Breadcrumb">
@@ -295,49 +298,55 @@ export default function ShopBulk() {
           view={view}
           onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })}
         />
-        {partner && (
-          <div className={b.kit}>
-            <span className={b.kitLabel}>YOUR BRAND KIT</span>
+        <div className={b.kit}>
+          <span className={b.kitLabel}>YOUR BRAND KIT</span>
+          {/* Once the partner's page has loaded: their name, never a placeholder in the meantime. */}
+          {partner && !studio.loading && (
             <span className={b.kitFor}>
               For <strong>{studio.name || 'your team'}</strong>
             </span>
-            {studio.kit.locked && (
-              <span className={b.locked}>
-                <LockIcon size={14} stroke="currentColor" />
-                Guidelines on
-              </span>
+          )}
+          {studio.kit.locked && (
+            <span className={b.locked}>
+              <LockIcon size={14} stroke="currentColor" />
+              Guidelines on
+            </span>
+          )}
+          <span className={b.kitLogo}>
+            <span className={b.logoBox} style={{ background: studio.logo ? studio.color : '#FBFAF7' }}>
+              {studio.logo ? <img src={studio.logo} alt="Your logo" /> : <span>LOGO</span>}
+            </span>
+            {!studio.kit.locked && (
+              <>
+                <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={uploading}>
+                  {uploading ? 'Adding…' : studio.logo ? 'Change logo' : 'Upload logo'}
+                </button>
+                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
+                <button type="button" className={b.sampleBtn} onClick={studio.trySample}>
+                  Try sample
+                </button>
+              </>
             )}
-            <span className={b.kitLogo}>
-              <span className={b.logoBox} style={{ background: studio.logo ? studio.color : '#FBFAF7' }}>
-                {studio.logo ? <img src={studio.logo} alt="Your logo" /> : <span>LOGO</span>}
-              </span>
-              {!studio.kit.locked && (
-                <>
-                  <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={uploading}>
-                    {uploading ? 'Uploading…' : studio.logo ? 'Change logo' : 'Upload logo'}
-                  </button>
-                  <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
-                </>
-              )}
-              {studio.kit.logos.length > 1 && (
-                <select className={b.kitSelect} value={studio.logo} onChange={(e) => studio.setLogo(e.target.value)} aria-label="Brand logo">
-                  {studio.kit.logos.map((l) => (
-                    <option key={l.src} value={l.src}>
-                      {l.label}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </span>
-            <span className={b.kitRule} />
-            <span className={b.kitSwatches}>
-              {swatches.map((c) => (
-                <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.kitSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
-              ))}
-            </span>
-            <span className={b.kitNote}>{uploadError || 'Every item previews with your brand. Open one to design it in the studio.'}</span>
-          </div>
-        )}
+            {studio.kit.logos.length > 1 && (
+              <select className={b.kitSelect} value={studio.logo} onChange={(e) => studio.setLogo(e.target.value)} aria-label="Brand logo">
+                {studio.kit.logos.map((l) => (
+                  <option key={l.src} value={l.src}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            )}
+          </span>
+          <span className={b.kitRule} />
+          <span className={b.kitSwatches}>
+            {swatches.map((c) => (
+              <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.kitSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
+            ))}
+          </span>
+          <span className={`${b.kitNote} ${uploadError ? b.kitError : ''}`} role={uploadError ? 'alert' : undefined}>
+            {uploadError || (partner ? 'Every item previews with your brand. Open one to design it in the studio.' : 'Every item previews with your logo and color. Send them with your quote request.')}
+          </span>
+        </div>
       </section>
 
       <section className={b.gridWrap} data-listing="">
@@ -398,7 +407,7 @@ export default function ShopBulk() {
                 ]
               : [
                   ['Pick items & styles', 'Choose what you need and how many.'],
-                  ['Send a quote request', 'Tell us your idea, date and a link to your logo.'],
+                  ['Send a quote request', 'Add your logo, then tell us your idea and date.'],
                   ['Get a custom quote', 'Direct from manufacturing, with 2–3 options to compare.'],
                   ['Made & shipped in bulk', 'With a proof to approve before production.'],
                 ]
@@ -421,7 +430,7 @@ export default function ShopBulk() {
 }
 
 /**
- * A catalog item as the experiences' card: its mockup (in the partner's brand, else the guest colour) with its maker's
+ * A catalog item as the experiences' card: its mockup (in the partner's or guest's logo and colour) with its maker's
  * badge and what was sent for it, its category, name, In stock, styles, minimum and lead time, and Request a Quote
  * (Mock It Up for a partner). The fully custom product: a dark card that starts a design or a quote.
  */
@@ -452,7 +461,7 @@ function BulkCard({
             <span className={b.cardCustomTitle}>Design something new</span>
           </span>
         ) : (
-          <Mockup shape={item.shape} base={partner ? studio.color : GUEST_FILL} logo={partner ? studio.logo : undefined} placeholder={partner} place="front" className={b.cardSvg} />
+          <Mockup shape={item.shape} base={studio.color} logo={studio.logo || undefined} placeholder place="front" className={b.cardSvg} />
         )}
         {!custom && item.badge && <span className={b.badge}>{item.badge}</span>}
         {sent && <span className={b.onLabel}>{KIND_LABEL[sent]}</span>}
@@ -495,9 +504,10 @@ function BulkCard({
 
 /**
  * An item's page (as a product's page on the shop): the breadcrumb, its mockup with its views (front, back, sides) and,
- * under it, a partner's studio tools or the partner sign-up; beside it its name, minimum and lead time, description, then
- * the styles and quantities, how it gets designed (partners) or who is asking (guests), where it ships, what matters
- * most, and save, quote or buy.
+ * under it, the colour, placement, logo and text (a guest's too, then the partner sign-up); beside it its name, minimum
+ * and lead time, description, then the styles and quantities, how it gets designed (partners) or who is asking
+ * (guests), where it ships, what matters most, and save, quote or buy. A guest's quote carries their design, logo and
+ * mockup.
  */
 function BulkItemPage({
   item,
@@ -541,7 +551,13 @@ function BulkItemPage({
 
   const chosen = Object.entries(styles).map(([i, q]) => ({ name: item.styles[Number(i)].name, qty: Number(q) || 0 }));
   const total = item.styles.length ? chosen.reduce((n, x) => n + x.qty, 0) : Number(qty) || 0;
-  const styleSum = item.styles.length ? (chosen.length ? `${chosen.length} ${chosen.length === 1 ? 'style' : 'styles'} · ${total} total` : 'Select at least one style') : `${total} ${item.unit}`;
+  const styleSum = custom
+    ? 'New product idea'
+    : item.styles.length
+      ? chosen.length
+        ? `${chosen.length} ${chosen.length === 1 ? 'style' : 'styles'} · ${total} total`
+        : 'Select at least one style'
+      : `${total} ${item.unit}`;
   const step = (n: number) => (item.styles.length ? n + 1 : n);
   const toggleStyle = (i: number) => {
     const next = { ...styles };
@@ -550,6 +566,37 @@ function BulkItemPage({
     setStyles(next);
   };
   const svg = () => svgWrap.current?.querySelector('svg') as SVGSVGElement | null;
+  const design = (logo: string) => ({
+    base: studio.color,
+    accent: '#DCBD7D',
+    pattern: 'none',
+    trim: false,
+    logoOn: true,
+    logo,
+    place: isApparel(item.shape) && place === 'chest' ? 'chest' : 'center',
+    logoScale: 1,
+    dx: 0,
+    dy: 0,
+    text,
+    font: 'mont',
+    textColor: '',
+    textPlace: 'below',
+    textScale: 1,
+    playerName: 'PLAYER',
+    playerNumber: '10',
+    numberColor: '',
+    numberFont: 'college',
+    locations: [],
+    style: 0,
+  });
+  /** A guest's logo as a link for their quote: their image (or the sample) kept with the cart, then used from there. */
+  const guestLogo = async () => {
+    const logo = studio.logo;
+    if (!logo || /^https:\/\//.test(logo)) return logo;
+    const url = await uploadGuestImage(await imageDataUrl(logo));
+    studio.setLogo(url);
+    return url;
+  };
 
   const send = async (kind: BulkKind) => {
     setError('');
@@ -559,10 +606,18 @@ function BulkItemPage({
     }
     setBusy(kind);
     try {
-      let mockup = '';
-      if (partner && kind !== 'saved' && svg()) {
+      let logo = studio.logo;
+      if (!partner) {
         try {
-          mockup = await uploadImage(await mockupPng(svg()!));
+          logo = await guestLogo();
+        } catch (err) {
+          throw new Error(err instanceof Error && err.message ? `${err.message} Or remove your logo and send a link to it instead.` : 'Could not add your logo. Try again.');
+        }
+      }
+      let mockup = '';
+      if (kind !== 'saved' && svg()) {
+        try {
+          mockup = partner ? await uploadImage(await mockupPng(svg()!)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800));
         } catch {
           // The request goes without its picture.
         }
@@ -578,10 +633,10 @@ function BulkItemPage({
               ...(contact.deliverTo.trim() ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: contact.deliverTo.trim() } } : {}),
               mode,
               brief,
-              design: { base: studio.color, accent: '#DCBD7D', pattern: 'none', trim: false, logoOn: true, logo: studio.logo, place: isApparel(item.shape) && place === 'chest' ? 'chest' : 'center', logoScale: 1, dx: 0, dy: 0, text, font: 'mont', textColor: '', textPlace: 'below', textScale: 1, playerName: 'PLAYER', playerNumber: '10', numberColor: '', numberFont: 'college', locations: [], style: 0 },
+              design: design(logo),
               mockup,
             }
-          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } }),
+          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() }, design: design(logo), mockup }),
       };
       const r = partner ? await createDesign(input) : await sendGuestQuote(input);
       onSent(r);
@@ -605,10 +660,11 @@ function BulkItemPage({
     e.target.value = '';
     if (!file) return;
     setBusy('logo');
+    setError('');
     try {
       studio.setLogo(await studio.upload(file));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not upload your logo.');
+      setError(err instanceof Error ? err.message : 'Could not add your logo.');
     } finally {
       setBusy('');
     }
@@ -618,11 +674,11 @@ function BulkItemPage({
     <div ref={svgWrap} className={b.dialogMock}>
       <Mockup
         shape={item.shape}
-        base={partner ? studio.color : GUEST_FILL}
-        logo={partner ? studio.logo : undefined}
-        placeholder={partner}
+        base={studio.color}
+        logo={studio.logo || undefined}
+        placeholder
         place={isApparel(item.shape) ? place : 'center'}
-        text={partner ? text : ''}
+        text={text}
         view={shown}
         className={b.dialogSvg}
         label={`${item.name} mockup`}
@@ -656,7 +712,7 @@ function BulkItemPage({
         <div className={s.thumbs}>
           {views.map(([v, label]) => (
             <button key={v} type="button" className={`${s.thumb} ${b.viewThumb} ${shown === v ? s.thumbOn : ''}`} aria-label={label} aria-pressed={shown === v} onClick={() => setShown(v)}>
-              <Mockup shape={item.shape} base={partner ? studio.color : GUEST_FILL} logo={partner ? studio.logo : undefined} placeholder={partner} place={isApparel(item.shape) ? place : 'center'} view={v} className={b.dialogSvg} />
+              <Mockup shape={item.shape} base={studio.color} logo={studio.logo || undefined} placeholder place={isApparel(item.shape) ? place : 'center'} text={text} view={v} className={b.dialogSvg} />
             </button>
           ))}
         </div>
@@ -667,7 +723,7 @@ function BulkItemPage({
 
   return (
     <>
-      <section className={s.thinBand} />
+      <section className={s.thinBand} data-header-tone="light" />
       <section className={`${s.section} ${s.productSection}`}>
         <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
           <Link href={shopHref()}>Shop</Link>
@@ -684,65 +740,69 @@ function BulkItemPage({
         </nav>
         <div className={s.productLayout}>
           <div className={b.pageLeft}>
-        {partner ? (
-          <div className={b.leftStack}>
-            <span className={b.leftHead}>
-              <span className={b.leftKicker}>DESIGN STUDIO</span>
-              <span className={b.leftNote}>Partner tool</span>
-            </span>
-            {gallery}
-            <div className={b.row}>
-              <span className={b.rowLabel}>Color</span>
-              {swatches.map((c) => (
-                <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
-              ))}
-            </div>
-            {isApparel(item.shape) && (
+            <div className={b.leftStack}>
+              <span className={b.leftHead}>
+                <span className={b.leftKicker}>{partner ? 'DESIGN STUDIO' : 'PREVIEW'}</span>
+                <span className={b.leftNote}>{partner ? 'Partner tool' : 'Your logo and color'}</span>
+              </span>
+              {gallery}
               <div className={b.row}>
-                <span className={b.rowLabel}>Placement</span>
-                {[
-                  ['front', 'Front center'],
-                  ['chest', 'Left chest'],
-                ].map(([v, l]) => (
-                  <button key={v} type="button" className={`${b.place} ${place === v ? b.placeOn : ''}`} aria-pressed={place === v} onClick={() => setPlace(v)}>
-                    {l}
-                  </button>
+                <span className={b.rowLabel}>Color</span>
+                {swatches.map((c) => (
+                  <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
                 ))}
               </div>
-            )}
-            {!studio.kit.locked && (
+              {isApparel(item.shape) && (
+                <div className={b.row}>
+                  <span className={b.rowLabel}>Placement</span>
+                  {[
+                    ['front', 'Front center'],
+                    ['chest', 'Left chest'],
+                  ].map(([v, l]) => (
+                    <button key={v} type="button" className={`${b.place} ${place === v ? b.placeOn : ''}`} aria-pressed={place === v} onClick={() => setPlace(v)}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!studio.kit.locked && (
+                <div className={b.row}>
+                  <span className={b.rowLabel}>Logo</span>
+                  <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
+                    {busy === 'logo' ? 'Adding…' : studio.logo ? 'Change logo' : 'Upload logo'}
+                  </button>
+                  <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
+                  <button type="button" className={b.sampleBtn} onClick={studio.trySample}>
+                    Try sample
+                  </button>
+                  {studio.logo && (
+                    <button type="button" className={b.sampleBtn} onClick={() => studio.setLogo('')}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+              )}
               <div className={b.row}>
-                <span className={b.rowLabel}>Logo</span>
-                <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
-                  {busy === 'logo' ? 'Uploading…' : studio.logo ? 'Change logo' : 'Upload logo'}
-                </button>
-                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
+                <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
+                <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
               </div>
-            )}
-            <div className={b.row}>
-              <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
-              <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
+              <button type="button" className={b.underline} onClick={download}>
+                {downloaded ? 'Downloaded ✓' : 'Download mockup'}
+              </button>
+              {!partner && (
+                <div className={b.partnerBox}>
+                  <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
+                  <strong>The full design studio is for approved partners</strong>
+                  <span>Approved CLP partners also get templates, patterns, print locations, saved designs and partner pricing.</span>
+                  <span className={b.partnerBoxLinks}>
+                    <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
+                    <button type="button" onClick={onSignIn}>
+                      Partner sign in
+                    </button>
+                  </span>
+                </div>
+              )}
             </div>
-            <button type="button" className={b.underline} onClick={download}>
-              {downloaded ? 'Downloaded ✓' : 'Download mockup'}
-            </button>
-          </div>
-        ) : (
-          <div className={b.leftStack}>
-            {gallery}
-            <div className={b.partnerBox}>
-              <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
-              <strong>Mockups are for approved partners</strong>
-              <span>Approved CLP partners get the design studio, live mockups, saved designs and partner pricing.</span>
-              <span className={b.partnerBoxLinks}>
-                <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
-                <button type="button" onClick={onSignIn}>
-                  Partner sign in
-                </button>
-              </span>
-            </div>
-          </div>
-        )}
           </div>
           <div className={b.pageRight}>
         {done ? (
@@ -768,8 +828,8 @@ function BulkItemPage({
             {/* As a product page's heading: the name, what it takes to order, the description. */}
             <div className={s.buyHead}>
               <span className={b.leftKicker}>{category?.label.toUpperCase() ?? 'FULLY CUSTOM'}</span>
-              <h1 className={s.productName}>{custom ? 'Bring us your idea' : item.name}</h1>
-              <strong className={s.productPrice}>{custom ? 'Quoted by our team' : `Min ${item.min} ${item.unit} · ${item.lead}`}</strong>
+              <h1 className={s.productName}>{item.name}</h1>
+              {!custom && <strong className={s.productPrice}>{`Min ${item.min} ${item.unit} · ${item.lead}`}</strong>}
               <span className={s.productText}>{item.description}</span>
               <span className={b.formSpec}>{custom ? 'Any product · any decoration' : `${item.decoration.join(', ')} · ${item.sizes}`}</span>
             </div>
@@ -809,10 +869,13 @@ function BulkItemPage({
                 <span className={b.styleSum}>{styleSum}</span>
               </div>
             ) : (
-              <label className={b.block}>
-                <strong className={b.stepTitle}>Quantity</strong>
-                <input type="number" className={b.input} min={item.min} value={qty} onChange={(e) => setQty(e.target.value)} />
-              </label>
+              // A fully custom idea has no quantity yet (the design): it's in the brief.
+              !custom && (
+                <label className={b.block}>
+                  <strong className={b.stepTitle}>Quantity</strong>
+                  <input type="number" className={b.input} min={item.min} value={qty} onChange={(e) => setQty(e.target.value)} />
+                </label>
+              )
             )}
 
             {partner ? (
@@ -910,7 +973,7 @@ function BulkItemPage({
                     <textarea rows={3} maxLength={2000} value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} placeholder="Colors, logo placement, sizes, anything you want designed" />
                   </label>
                   <label className={b.attach}>
-                    <span>Link to your logo or inspiration (optional)</span>
+                    <span>{studio.logo ? 'A link to your logo files or inspiration (optional)' : 'Or a link to your logo or inspiration (optional)'}</span>
                     <input type="url" maxLength={500} value={contact.logoLink} onChange={(e) => setContact({ ...contact, logoLink: e.target.value })} placeholder="https://" />
                   </label>
                 </div>
@@ -934,6 +997,7 @@ function BulkItemPage({
           </div>
         </div>
       </section>
+      <div className={s.bottomSpace} />
     </>
   );
 }

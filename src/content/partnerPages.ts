@@ -50,7 +50,18 @@ export type PartnerCardData = {
 export type PartnerTeamMember = { name: string; role: string; photo: string; bio?: string; instagram?: string; runs?: string[]; checks?: ('safesport' | 'background' | 'cpr')[] };
 export const TEAM_CHECK_LABELS = { safesport: 'SafeSport trained', background: 'Background check', cpr: 'CPR & first aid' } as const;
 /** A video on the Content tab, and where it plays from. */
-export type PartnerVideo = { url: string; title: string; source: 'youtube' | 'instagram' | 'tiktok' | 'vimeo' | '' };
+/**
+ * A video on the page's Content tab: its link, title, site and category (the albums' types: Events & Games, Behind the
+ * Scenes, Highlights, Partnerships); `from`: the partner who posted it, on a page it was shared to.
+ */
+export type PartnerVideo = {
+  id?: string;
+  url: string;
+  title: string;
+  source: 'youtube' | 'instagram' | 'tiktok' | 'vimeo' | '';
+  category?: string;
+  from?: { name: string; slug: string };
+};
 
 export type PartnerPageData = PartnerCardData & {
   highlights: string[];

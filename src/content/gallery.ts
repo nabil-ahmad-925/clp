@@ -46,8 +46,12 @@ export type PrintProduct = {
   ratio?: string;
   radius: string;
   frame?: boolean;
-  /** What its back looks like (the configurator's Back view): stretcher bars, the metal's mount, or the frame's backing. */
-  back?: 'canvas' | 'metal' | 'frame';
+  /**
+   * What its back looks like (shown beside its front in the configurator): a canvas' stretcher bars, the metal's mount,
+   * the frame's backing, a poster's paper, the far side of a full-wrap print, a blanket's fleece or sherpa, a garment's
+   * blank back, a phone case's inside, or a sticker's liner.
+   */
+  back: 'canvas' | 'metal' | 'frame' | 'paper' | 'wrap' | 'fabric' | 'garment' | 'case' | 'liner';
   ships: string;
   options: PrintOption[];
 };
@@ -120,6 +124,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     name: 'Poster',
     desc: 'Museum-grade paper, unframed.',
     radius: '0',
+    back: 'paper',
     ships: '3–5 business days',
     options: [sizes([['12 × 18', 19], ['18 × 24', 29], ['24 × 36', 39]]), seg('paper', 'Paper', ['Matte', 'Satin'])],
   },
@@ -130,6 +135,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     desc: 'Full-wrap print, dishwasher safe.',
     ratio: '2.3 / 1',
     radius: '10px',
+    back: 'wrap',
     ships: '3–5 business days',
     options: [
       {
@@ -160,6 +166,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     name: 'Blanket',
     desc: 'Soft throw with an edge-to-edge print.',
     radius: '12px',
+    back: 'fabric',
     ships: '5–7 business days',
     options: [sizes([['50 × 60', 59], ['60 × 80', 79]]), seg('material', 'Material', ['Fleece', 'Sherpa'])],
   },
@@ -170,6 +177,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     desc: 'Your photo printed on soft blanks.',
     ratio: '1 / 1',
     radius: '4px',
+    back: 'garment',
     ships: '4–7 business days',
     options: [
       {
@@ -203,6 +211,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     desc: 'Impact-resistant case with a glossy print.',
     ratio: '1 / 2',
     radius: '18px',
+    back: 'case',
     ships: '3–5 business days',
     options: [
       {
@@ -229,6 +238,7 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     desc: 'Weatherproof vinyl, die-cut.',
     ratio: '1 / 1',
     radius: '14px',
+    back: 'liner',
     ships: '2–4 business days',
     options: [
       seg('size', 'Size', ['3 in', '4 in', '5 in']),
@@ -245,6 +255,35 @@ export const PRINT_PRODUCTS: PrintProduct[] = [
     ],
   },
 ];
+
+/**
+ * The back photo a product shows with these options (clp-api's print backs): a canvas' by its depth, a metal print's by
+ * its hanging, a blanket's by its material, a garment's by its colour; none for drinkware (its back is the photo's
+ * other side).
+ */
+export function printBackKey(product: PrintProduct, chosen: Record<string, string>): string | undefined {
+  const slug = (v = '') => v.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  switch (product.back) {
+    case 'canvas':
+      return chosen.depth === '1.5 in' ? 'canvas-150' : 'canvas-075';
+    case 'metal':
+      return chosen.mount === 'Easel back' ? 'metal-easel' : 'metal-float';
+    case 'frame':
+      return 'frame';
+    case 'paper':
+      return 'poster';
+    case 'fabric':
+      return chosen.material === 'Sherpa' ? 'blanket-sherpa' : 'blanket-fleece';
+    case 'garment':
+      return `tee-${slug(chosen.color ?? 'White')}`;
+    case 'case':
+      return 'case';
+    case 'liner':
+      return 'sticker';
+    default:
+      return undefined;
+  }
+}
 
 /** The product groups, in the design's order. */
 export const PRINT_GROUPS: PrintProduct['group'][] = ['Wall art', 'Home & drinkware', 'Wear & carry'];

@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { PRINT_GROUPS, PRINT_PRODUCTS, dollars, printFrom, printPrice, printRatio, type PrintProduct } from '@/content/gallery';
+import { PRINT_GROUPS, PRINT_PRODUCTS, dollars, printBackKey, printFrom, printPrice, printRatio, type PrintProduct } from '@/content/gallery';
+import { fetchPrintBacks } from '@/content/albums';
 import { SITE_URL } from '@/content/site';
 import type { GalleryImage } from '@/content/types';
 import { addToGalleryCart, onGalleryCart, readGalleryCart } from '@/components/cart/galleryCart';
@@ -47,19 +48,203 @@ const summary = (product: PrintProduct) =>
   product.options.map((o) => `${o.options.length} ${o.label.toLowerCase()}${o.options.length > 1 && !/s$/.test(o.label.toLowerCase()) ? 's' : ''}`).join(' · ');
 
 /**
+ * The back of a wall-art product, drawn as it looks (in the product's shape, `ratio` = width / height):
+ * - a canvas: the linen over wooden stretcher bars (thicker for the 1.5 in depth) with a centre brace, corner keys,
+ *   staples, a sawtooth hanger and the maker's label;
+ * - a metal print: brushed aluminum with its black float mount (screws and all) or its easel leg, and the label;
+ * - a framed print: the kraft backing inside the frame, its retaining tabs, D-rings and hanging wire, bumpers and label.
+ */
+function BackArt({ kind, ratio, chosen }: { kind: 'canvas' | 'metal' | 'frame'; ratio: number; chosen: Record<string, string> }) {
+  const uid = useId().replace(/:/g, '');
+  const W = 100 * ratio;
+  const H = 100;
+  const m = Math.min(W, H);
+  const label = (x: number, y: number, lw: number) => (
+    <g>
+      <rect x={x} y={y} width={lw} height={lw * 0.5} rx={0.8} fill="#ffffff" stroke="rgba(0,0,0,0.12)" strokeWidth={0.3} />
+      <rect x={x + lw * 0.1} y={y + lw * 0.1} width={lw * 0.36} height={lw * 0.09} fill="#8a6f33" />
+      <rect x={x + lw * 0.1} y={y + lw * 0.25} width={lw * 0.78} height={lw * 0.05} fill="#c8c4bb" />
+      <rect x={x + lw * 0.1} y={y + lw * 0.35} width={lw * 0.6} height={lw * 0.05} fill="#c8c4bb" />
+    </g>
+  );
+
+  if (kind === 'canvas') {
+    const t = m * (chosen.depth === '1.5 in' ? 0.13 : 0.1);
+    // The staples along one bar: `along` places the n-th at its distance from the bar's start.
+    const staples = (len: number, along: (at: number) => [number, number, boolean]): ReactNode[] => {
+      const count = Math.max(3, Math.floor(len / 11));
+      return Array.from({ length: count }, (_, i) => {
+        const [x, y, vertical] = along(((i + 0.5) / count) * len);
+        return <rect key={i} x={vertical ? x - 0.35 : x - 1.6} y={vertical ? y - 1.6 : y - 0.35} width={vertical ? 0.7 : 3.2} height={vertical ? 3.2 : 0.7} fill="#7d7d7d" />;
+      });
+    };
+    const wood = `url(#${uid}w)`;
+    return (
+      <svg className={styles.backArt} viewBox={`0 0 ${W} ${H}`} aria-hidden>
+        <defs>
+          <pattern id={`${uid}l`} width={2.4} height={2.4} patternUnits="userSpaceOnUse">
+            <rect width={2.4} height={2.4} fill="#efe7d3" />
+            <path d="M0 0.6H2.4M0 1.8H2.4" stroke="#e2d8c0" strokeWidth={0.35} />
+            <path d="M0.6 0V2.4M1.8 0V2.4" stroke="#e8dfca" strokeWidth={0.3} />
+          </pattern>
+          <linearGradient id={`${uid}w`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#ddb57d" />
+            <stop offset="0.5" stopColor="#cfa16a" />
+            <stop offset="1" stopColor="#c08f58" />
+          </linearGradient>
+        </defs>
+        <rect width={W} height={H} fill={`url(#${uid}l)`} />
+        {/* The stretcher bars, the centre brace and their grain. */}
+        <rect x={0} y={0} width={W} height={t} fill={wood} />
+        <rect x={0} y={H - t} width={W} height={t} fill={wood} />
+        <rect x={0} y={0} width={t} height={H} fill={wood} />
+        <rect x={W - t} y={0} width={t} height={H} fill={wood} />
+        {ratio >= 1 ? <rect x={W / 2 - t * 0.4} y={0} width={t * 0.8} height={H} fill={wood} /> : <rect x={0} y={H / 2 - t * 0.4} width={W} height={t * 0.8} fill={wood} />}
+        <g stroke="#a87a45" strokeOpacity={0.35} strokeWidth={0.3} fill="none">
+          <path d={`M2 ${t * 0.35}H${W - 2}M2 ${t * 0.7}H${W - 2}M2 ${H - t * 0.4}H${W - 2}`} />
+          <path d={`M${t * 0.4} 2V${H - 2}M${W - t * 0.45} 2V${H - 2}`} />
+        </g>
+        {/* Corner keys. */}
+        {[
+          [t, t, 1, 1],
+          [W - t, t, -1, 1],
+          [t, H - t, 1, -1],
+          [W - t, H - t, -1, -1],
+        ].map(([x, y, dx, dy], i) => (
+          <path key={i} d={`M${x} ${y}l${dx * t * 0.7} 0l${-dx * t * 0.7} ${dy * t * 0.7}z`} fill="#b88a55" stroke="#9c7244" strokeWidth={0.3} />
+        ))}
+        {/* The canvas stapled round the bars' outer edge. */}
+        {staples(W, (at) => [at, t * 0.18, false])}
+        {staples(W, (at) => [at, H - t * 0.18, false])}
+        {staples(H, (at) => [t * 0.18, at, true])}
+        {staples(H, (at) => [W - t * 0.18, at, true])}
+        {/* The sawtooth hanger. */}
+        <path d={`M${W / 2 - 5} ${t * 0.55}l1 -1.4l1 1.4l1 -1.4l1 1.4l1 -1.4l1 1.4l1 -1.4l1 1.4l1 -1.4l1 1.4`} stroke="#6f6f6f" strokeWidth={0.7} fill="none" />
+        {label(W - t - m * 0.32 - 3, H - t - m * 0.16 - 3, m * 0.32)}
+      </svg>
+    );
+  }
+
+  if (kind === 'metal') {
+    const easel = chosen.mount === 'Easel back';
+    return (
+      <svg className={styles.backArt} viewBox={`0 0 ${W} ${H}`} aria-hidden>
+        <defs>
+          <linearGradient id={`${uid}a`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#e6e9ec" />
+            <stop offset="0.55" stopColor="#c9ced3" />
+            <stop offset="1" stopColor="#b3b8be" />
+          </linearGradient>
+          <pattern id={`${uid}b`} width={W} height={1.2} patternUnits="userSpaceOnUse">
+            <path d={`M0 0.3H${W}`} stroke="#ffffff" strokeOpacity={0.35} strokeWidth={0.25} />
+            <path d={`M0 0.9H${W}`} stroke="#8e949b" strokeOpacity={0.18} strokeWidth={0.25} />
+          </pattern>
+          <linearGradient id={`${uid}k`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#3a3a3a" />
+            <stop offset="1" stopColor="#151515" />
+          </linearGradient>
+        </defs>
+        <rect width={W} height={H} fill={`url(#${uid}a)`} />
+        <rect width={W} height={H} fill={`url(#${uid}b)`} />
+        {easel ? (
+          <g>
+            {/* The easel leg, hinged near the top, and its hinge plate. */}
+            <rect x={W / 2 - m * 0.12} y={H * 0.16} width={m * 0.24} height={m * 0.07} rx={0.8} fill={`url(#${uid}k)`} />
+            <path d={`M${W / 2 - m * 0.07} ${H * 0.22}L${W / 2 + m * 0.07} ${H * 0.22}L${W / 2 + m * 0.11} ${H * 0.9}L${W / 2 - m * 0.11} ${H * 0.9}Z`} fill={`url(#${uid}k)`} />
+            <path d={`M${W / 2} ${H * 0.24}V${H * 0.88}`} stroke="#4a4a4a" strokeWidth={0.4} />
+          </g>
+        ) : (
+          <g>
+            {/* The float mount: a black block that holds the print off the wall, its screws, its hanging slot. */}
+            <rect x={W * 0.25} y={H * 0.28} width={W * 0.5} height={H * 0.44} rx={1.2} fill={`url(#${uid}k)`} />
+            <rect x={W * 0.25 + 1} y={H * 0.28 + 1} width={W * 0.5 - 2} height={1.4} fill="#ffffff" opacity={0.08} />
+            <rect x={W / 2 - m * 0.09} y={H * 0.33} width={m * 0.18} height={m * 0.05} rx={m * 0.025} fill="#0a0a0a" stroke="#555" strokeWidth={0.25} />
+            {[
+              [0.29, 0.33],
+              [0.71, 0.33],
+              [0.29, 0.67],
+              [0.71, 0.67],
+            ].map(([x, y], i) => (
+              <g key={i}>
+                <circle cx={W * x} cy={H * y} r={m * 0.025} fill="#9aa0a6" stroke="#5b5f63" strokeWidth={0.3} />
+                <path d={`M${W * x - m * 0.015} ${H * y}h${m * 0.03}`} stroke="#5b5f63" strokeWidth={0.4} />
+              </g>
+            ))}
+          </g>
+        )}
+        {label(W * 0.06, H - m * 0.2, m * 0.26)}
+      </svg>
+    );
+  }
+
+  // A framed print's back: kraft backing, retaining tabs, D-rings and wire, bumpers, the label.
+  return (
+    <svg className={styles.backArt} viewBox={`0 0 ${W} ${H}`} aria-hidden>
+      <defs>
+        <pattern id={`${uid}f`} width={6} height={6} patternUnits="userSpaceOnUse">
+          <rect width={6} height={6} fill="#b98d5c" />
+          <path d="M0.5 1.5l2 0.4M3 4l2.2 -0.3M1 5l1.2 0.5" stroke="#a87c4d" strokeWidth={0.3} />
+          <path d="M3.5 1l1 0.6M0.6 3.6l1.4 -0.4" stroke="#c99d6b" strokeWidth={0.3} />
+        </pattern>
+      </defs>
+      <rect width={W} height={H} fill={`url(#${uid}f)`} />
+      {/* The retaining tabs round the edge. */}
+      {[0.25, 0.75].flatMap((f, i) => [
+        <rect key={`t${i}`} x={W * f - 2} y={0} width={4} height={2.2} fill="#9a9a9a" />,
+        <rect key={`b${i}`} x={W * f - 2} y={H - 2.2} width={4} height={2.2} fill="#9a9a9a" />,
+        <rect key={`l${i}`} x={0} y={H * f - 2} width={2.2} height={4} fill="#9a9a9a" />,
+        <rect key={`r${i}`} x={W - 2.2} y={H * f - 2} width={2.2} height={4} fill="#9a9a9a" />,
+      ])}
+      {/* D-rings a third down each side, and the wire between them. */}
+      <path d={`M${W * 0.14} ${H * 0.3} Q${W / 2} ${H * 0.16} ${W * 0.86} ${H * 0.3}`} stroke="#6d6d6d" strokeWidth={0.7} fill="none" />
+      {[0.14, 0.86].map((x) => (
+        <g key={x}>
+          <rect x={W * x - 2} y={H * 0.3 - 1.2} width={4} height={3} rx={0.6} fill="#8a8a8a" />
+          <path d={`M${W * x - 1.6} ${H * 0.3 - 1.2} a1.6 1.6 0 0 1 3.2 0`} stroke="#6d6d6d" strokeWidth={0.6} fill="none" />
+        </g>
+      ))}
+      {/* The bumpers on the bottom corners. */}
+      {[W * 0.1, W * 0.9].map((x) => (
+        <circle key={x} cx={x} cy={H * 0.9} r={m * 0.025} fill="#efefef" opacity={0.85} />
+      ))}
+      {label(W / 2 - m * 0.16, H * 0.62, m * 0.32)}
+    </svg>
+  );
+}
+
+/**
  * A product's mockup: the photo in the product's shape (a frame for framed prints), in a box of `max` px. `back`: its
  * back instead (`product.back`): a canvas' stretcher bars, a metal print's float mount or easel back, a frame's backing
- * and hanging wire.
+ * and hanging wire, a poster's paper, a mug's far side, a blanket's fleece or sherpa, a garment's blank back in its
+ * colour, a phone case's inside or a sticker's liner.
  */
-function Mockup({ product, chosen, src, max, back }: { product: PrintProduct; chosen: Record<string, string>; src: string; max: number; back?: boolean }) {
+export function Mockup({
+  product,
+  chosen,
+  src,
+  max,
+  back,
+  backPhoto,
+}: {
+  product: PrintProduct;
+  chosen: Record<string, string>;
+  src: string;
+  max: number;
+  back?: boolean;
+  /** The back's photo (the API's print backs); drawn when there is none (still loading, or not uploaded). */
+  backPhoto?: string;
+}) {
   const [w, h] = printRatio(product, chosen).split('/').map((n) => parseFloat(n));
   const wide = w / h >= 1;
   const frameColor = { Black: '#111111', White: '#F4F4F4', Oak: '#B08A5B', Walnut: '#5C3F2A' }[chosen.frame ?? ''];
   const matted = chosen.mat === 'White mat';
   const side = back ? product.back : undefined;
+  // A garment's or a mug's chosen colour (its back is that colour, or shows it at the seam).
+  const swatch = product.options.find((o) => o.id === 'color')?.options.find((o) => o.value === chosen.color)?.swatch ?? '#FFFFFF';
+  const sideClass = side ? styles[`back_${side}`] : '';
   return (
     <span
-      className={`${styles.mockup} ${side === 'canvas' ? styles.backCanvas : side === 'metal' ? styles.backMetal : side === 'frame' ? styles.backFrame : ''}`}
+      className={`${styles.mockup} ${side ? styles.backSide : ''} ${sideClass ?? ''} ${side === 'fabric' && chosen.material === 'Sherpa' ? styles.back_sherpa : ''}`}
       style={{
         aspectRatio: `${w} / ${h}`,
         width: wide ? max : 'auto',
@@ -67,22 +252,33 @@ function Mockup({ product, chosen, src, max, back }: { product: PrintProduct; ch
         borderRadius: product.radius,
         border: product.frame && frameColor ? `${Math.round(max / 22)}px solid ${frameColor}` : undefined,
         padding: product.frame && matted && !side ? Math.round(max / 14) : undefined,
+        ...(side === 'garment' ? { background: swatch } : {}),
       }}
     >
-      {side === 'canvas' ? (
-        <span className={styles.stretcher} style={{ borderWidth: Math.round(max / (chosen.depth === '1.5 in' ? 10 : 14)) }} />
-      ) : side === 'metal' ? (
-        <span className={chosen.mount === 'Easel back' ? styles.easel : styles.floatMount} />
-      ) : side === 'frame' ? (
-        <svg className={styles.wire} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-          <path d="M16 32 Q50 20 84 32" />
-          <circle cx="16" cy="32" r="2" />
-          <circle cx="84" cy="32" r="2" />
-        </svg>
-      ) : (
+      {side === 'canvas' || side === 'metal' || side === 'frame' ? (
+        <BackArt kind={side} ratio={w / h} chosen={chosen} />
+      ) : side === 'paper' ? (
+        <span className={styles.paperLabel}>Compete Like Pros</span>
+      ) : side === 'wrap' ? (
+        <>
+          {/* The far side of the full-wrap print, the handle's seam down its middle. */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- the photo on the product */}
+          <img src={src} alt="" style={{ objectPosition: '100% 50%', transform: 'scaleX(-1)' }} />
+          <span className={styles.seam} style={{ background: swatch }} />
+        </>
+      ) : side === 'garment' ? (
+        <span className={styles.neckTag} style={{ background: swatch === '#FFFFFF' || swatch === '#B5B5B5' ? '#1a1a1a' : '#f4f4f4' }} />
+      ) : side === 'case' ? (
+        <span className={styles.caseCamera} />
+      ) : side === 'liner' ? (
+        <span className={styles.linerSlit} />
+      ) : side === 'fabric' ? null : (
         // eslint-disable-next-line @next/next/no-img-element -- the photo on the product
         <img src={src} alt="" />
       )}
+      {/* The back's photo over its drawing: the drawing shows until the photo has loaded (or when there is none). */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- the back's photo (the media bucket) */}
+      {side && backPhoto && <img className={styles.backPhoto} src={backPhoto} alt="" />}
     </span>
   );
 }
@@ -102,6 +298,16 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
   const [added, setAdded] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  // The products' back photos, once a product is opened.
+  const [backs, setBacks] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!product) return;
+    let live = true;
+    fetchPrintBacks().then((b) => live && setBacks(b));
+    return () => {
+      live = false;
+    };
+  }, [product]);
   const [inCart, setInCart] = useState<string[]>([]);
   const touchX = useRef<number | null>(null);
   const strip = useRef<HTMLDivElement>(null);
@@ -373,22 +579,18 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
             >
               <span className="glyph" aria-hidden>←</span> All Products
             </button>
-            {/* Its front and, for a product with one, its back, side by side in the same frame. */}
+            {/* Its front and its back, side by side in the same frame. */}
             <div className={styles.preview}>
-              {product.back ? (
-                <div className={styles.sides}>
-                  {[false, true].map((back) => (
-                    <figure key={String(back)} className={styles.sideView}>
-                      <span className={styles.sideFrame}>
-                        <Mockup product={product} chosen={chosen} src={image.src} max={140} back={back} />
-                      </span>
-                      <figcaption>{back ? 'Back' : 'Front'}</figcaption>
-                    </figure>
-                  ))}
-                </div>
-              ) : (
-                <Mockup product={product} chosen={chosen} src={image.src} max={220} />
-              )}
+              <div className={styles.sides}>
+                {[false, true].map((back) => (
+                  <figure key={String(back)} className={styles.sideView}>
+                    <span className={styles.sideFrame}>
+                      <Mockup product={product} chosen={chosen} src={image.src} max={140} back={back} backPhoto={back ? backs[printBackKey(product, chosen) ?? ''] : undefined} />
+                    </span>
+                    <figcaption>{back ? 'Back' : 'Front'}</figcaption>
+                  </figure>
+                ))}
+              </div>
             </div>
             <div className={styles.productHead}>
               <span className={styles.productName}>{product.name}</span>

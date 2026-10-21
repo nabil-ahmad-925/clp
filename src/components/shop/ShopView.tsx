@@ -223,7 +223,8 @@ export default function ShopView() {
   else body = <Home data={data} go={go} />;
 
   return (
-    <div className={s.shop}>
+    // The shop's pages are light (the header's logo dark) except the black sections, each marked light.
+    <div className={s.shop} data-header-tone="dark">
       {tabsBelow ? <div className={s.headerRoom} data-header-tone="light" /> : nav}
       <ShopTabsContext.Provider value={tabsBelow ? nav : null}>{body}</ShopTabsContext.Provider>
       {cartOpen && <CartDrawer cart={cart} stores={data?.stores ?? []} onClose={() => setCartOpen(false)} />}
@@ -236,7 +237,7 @@ export default function ShopView() {
 function Loading() {
   return (
     <>
-      <section className={`${s.hero} ${s.heroFirst}`}>
+      <section className={`${s.hero} ${s.heroFirst}`} data-header-tone="light">
         <div className={s.heroInner}>
           <span className={`${s.skeleton} ${s.skeletonTitle}`} />
         </div>
@@ -257,7 +258,7 @@ function Loading() {
 function Notice({ text, back }: { text: string; back?: ShopStore }) {
   return (
     <>
-      <section className={s.thinBand} />
+      <section className={s.thinBand} data-header-tone="light" />
       <div className={`${s.section} ${s.spacedSm}`}>
         <div className={s.empty}>
           <p>{text}</p>
@@ -405,7 +406,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
   const everything = mixStores(data.products.filter((p) => publicSlugs.has(p.slug)));
   return (
     <>
-      <section className={`${s.hero} ${s.heroFirst}`}>
+      <section className={`${s.hero} ${s.heroFirst}`} data-header-tone="light">
         <div className={s.heroInner}>
           <h1 className={s.heroTitle}>Shop the CLP community</h1>
           <p className={s.heroText}>Official gear from our athletes, clubs, schools and organizations, plus exclusives you can only get from CLP.</p>
@@ -677,7 +678,7 @@ function Products({ products, stores, filters = [], title, id }: { products: Sho
 function ListBand({ crumb, name, kicker, sub }: { crumb: string; name: string; kicker: string; sub: string }) {
   return (
     <>
-      <section className={s.band}>
+      <section className={s.band} data-header-tone="light">
         <div className={`${s.bandInner} ${s.bandList}`}>
           <nav className={s.crumbs} aria-label="Breadcrumb">
             <Link href={shopHref()}>Shop</Link>
@@ -871,7 +872,7 @@ function Gate({ store, onOpen }: { store: ShopStore; onOpen: (products: ShopProd
   };
   return (
     <>
-    <section className={s.gate}>
+    <section className={s.gate} data-header-tone="light">
       {store.hero && <img className={s.gateCover} src={store.hero} alt="" />}
       <div className={s.gateInner}>
         <form className={s.gateCard} onSubmit={submit}>
@@ -925,7 +926,7 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
   const short = store.short || store.name;
   return (
     <>
-      <section className={s.storeHero} style={{ background: color }}>
+      <section className={s.storeHero} style={{ background: color }} data-header-tone="light">
         {store.hero && <img className={s.storeHeroImg} src={store.hero} alt="" />}
         <span className={s.storeShade} aria-hidden />
         <div className={s.storeHeroInner}>
@@ -1051,7 +1052,7 @@ function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data
   const more = store.products.filter((p) => p.id !== product.id).slice(0, HOME_ROW);
   return (
     <>
-      <section className={s.thinBand} />
+      <section className={s.thinBand} data-header-tone="light" />
       <section className={`${s.section} ${s.productSection}`}>
         <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
           <Link href={shopHref()}>Shop</Link>

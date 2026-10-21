@@ -23,6 +23,7 @@ import { ProductDetail, type DetailStore } from '@/components/shop/ShopView';
 import { articleDate, storyCard } from '@/content/articles';
 import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
+import { albumTypeName } from '@/content/albums';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
 import { categoryName, isBookable, toItem } from '@/content/listings';
@@ -404,7 +405,13 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         {video && <VideoDialog video={video} onClose={() => setVideo(null)} />}
         {photo && (
           <Overlay onClose={() => setPhoto(null)} bare>
-            <img src={photo} alt="" className={s.lightbox} />
+            {/* A photo, full size: Close (as the video's) as well as Escape and a click outside. */}
+            <div className={s.lightboxWrap} role="dialog" aria-modal="true" aria-label={`${page.short} photo`}>
+              <img src={photo} alt="" className={s.lightbox} />
+              <button type="button" className={`${s.videoClose} ${s.lightboxClose}`} aria-label="Close" onClick={() => setPhoto(null)}>
+                ✕
+              </button>
+            </div>
           </Overlay>
         )}
         {cartOpen && <CartDrawer page={page} cart={cart} onClose={() => setCartOpen(false)} onShop={has('shop') ? () => pick('shop') : undefined} />}
@@ -667,7 +674,7 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
             const src = VIDEO_SOURCES[v.source] ?? { label: 'VIDEO', bg: 'rgba(0,0,0,0.6)' };
             const thumb = thumbOf(v);
             return (
-              <button key={`v-${i}-${v.url}`} type="button" className={s.contentCard} onClick={() => onVideo(v)}>
+              <button key={v.id ?? `v-${i}-${v.url}`} type="button" className={s.contentCard} onClick={() => onVideo(v)}>
                 <span className={s.contentMedia}>
                   {thumb ? <img src={thumb} alt="" loading="lazy" /> : <span className={s.videoBlank}>{page.mono}</span>}
                   <span className={s.contentSource} style={{ background: src.bg }}>
@@ -681,7 +688,10 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
                 </span>
                 <span className={s.contentText}>
                   <strong>{titleCase(v.title || `${page.short} video ${i + 1}`)}</strong>
-                  <span>Video · {src.label.charAt(0) + src.label.slice(1).toLowerCase()}</span>
+                  {/* Its category, and who posted it when it was shared to this page. */}
+                  <span>
+                    {[albumTypeName(v.category) || 'Video', v.from ? `From ${v.from.name}` : src.label.charAt(0) + src.label.slice(1).toLowerCase()].join(' · ')}
+                  </span>
                 </span>
               </button>
             );

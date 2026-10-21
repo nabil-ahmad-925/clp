@@ -66,7 +66,7 @@ export function ShopSearch({
 }) {
   return (
     <>
-      <div className={s.navGap} />
+      <div className={s.navGap} data-header-tone="light" />
       <div className={onGrey ? s.searchOnGrey : undefined}>
         <div className={ds.slot}>
           <DirectorySearch query={q} location={loc} places={places} placeholder={placeholder} label={label} onSearch={onSearch} />
