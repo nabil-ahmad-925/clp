@@ -36,7 +36,6 @@ import { partnerSignOut, uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
-import ShopTabs from './shopTabs';
 import { LockIcon } from './shopIcons';
 import { CardGrid, LIST_SIZES, ListToolbar, ShopSearch, hasWords, titleCase, type ListChip } from './shopListing';
 import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
@@ -195,7 +194,8 @@ export default function ShopBulk() {
     }
   };
   // A partner designs a catalog item in the studio; anyone else (and the custom item) opens its page.
-  const hrefOf = (it: BulkItem) => (partner && it.id !== 'custom' ? shopHref({ view: 'studio', item: it.id }) : itemHref(it.id, loc));
+  // Every catalog item opens its design studio page (guests ask for a quote there); the fully custom one its own page.
+  const hrefOf = (it: BulkItem) => (it.id !== 'custom' ? shopHref({ view: 'studio', item: it.id }) : itemHref(it.id, loc));
   const reqTitle = partner ? 'My designs' : 'My quote requests';
   const drawers = (
     <>
@@ -288,7 +288,6 @@ export default function ShopBulk() {
           </div>
         </div>
       </section>
-      <ShopTabs />
       <ShopSearch q={q} loc={loc} places={[]} placeholder="Search jerseys, socks, tents, medals…" label="Bulk items" onSearch={(nq, nloc) => set({ q: nq, loc: nloc })} />
 
       <section ref={topRef} className={b.wrap} data-listing="">

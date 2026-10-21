@@ -26,7 +26,9 @@ import {
   isApparel,
   myDesigns,
   printInches,
+  sendGuestQuote,
   updateDesign,
+  uploadGuestImage,
   type BulkItem,
   type BulkKind,
   type StudioDesign,
@@ -34,10 +36,9 @@ import {
 import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { FONT_STYLE, isLight, mockupPng, saveFile } from './Mockup';
-import PartnerSignIn from './PartnerSignIn';
 import { Chevron, LockIcon } from './shopIcons';
 import { studioFontVariables } from './studioFonts';
-import { SAMPLE_LOGO, useStudio, type StudioBrand } from './useStudio';
+import { SAMPLE_LOGO, imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import st from './studio.module.css';
 
 type Tab = 'prod' | 'tpl' | 'color' | 'pat' | 'logo' | 'text' | 'back';
@@ -89,6 +90,26 @@ function freshDesign(item: BulkItem, brand: StudioBrand): StudioDesign {
   };
 }
 
+/** Guests' saved designs, by item, in this browser (no account). */
+type GuestDesign = { design: StudioDesign; qty: string; addons: string[]; at: string };
+const GUEST_DESIGNS = 'clp-studio-designs-guest';
+const guestDesigns = (): Record<string, GuestDesign> => {
+  try {
+    return JSON.parse(localStorage.getItem(GUEST_DESIGNS) || '{}') as Record<string, GuestDesign>;
+  } catch {
+    return {};
+  }
+};
+/** Saves a guest's design of an item; false when the browser can't (private mode, or full). */
+const keepGuestDesign = (itemId: string, kept: GuestDesign) => {
+  try {
+    localStorage.setItem(GUEST_DESIGNS, JSON.stringify({ ...guestDesigns(), [itemId]: kept }));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 /** A data URL as a Blob (a cleaned-up logo, uploaded when the design is saved or sent). */
 const dataBlob = async (url: string) => (await fetch(url)).blob();
 
@@ -96,13 +117,13 @@ const dataBlob = async (url: string) => (await fetch(url)).blob();
  * The design studio (/shop/?view=studio&item=<id>[&design=<id>], the Shop design): a CLP partner designs a bulk item
  * in their brand (templates, colours, patterns, their logo with clean-up and print locations, text, names and numbers),
  * sees it from every side, then saves it, asks for a bulk quote or orders it. Brand guidelines (the partner's kit,
- * locked) limit every choice to what's approved. Guests are asked to sign in as a partner.
+ * locked) limit every choice to what's approved. Guests design here too and ask for a bulk quote with their details
+ * (saving, ordering and partner pricing need a partner sign-in).
  */
 export default function ShopStudio() {
   const params = useSearchParams();
   const router = useRouter();
   const brand = useStudio();
-  const [signIn, setSignIn] = useState(false);
   const item = bulkItem(params.get('item') ?? '') ?? BULK_ITEMS[0];
   const designId = params.get('design') ?? '';
 
@@ -113,39 +134,25 @@ export default function ShopStudio() {
         Opening the design studio…
       </div>
     );
-  if (!brand.partner)
-    return (
-      <div className={st.gate} data-header-tone="light">
-        <div className={st.gateCard}>
-          <span className={st.gateKicker}>FOR CLP PARTNERS</span>
-          <strong className={st.gateTitle}>The design studio is for approved partners</strong>
-          <span className={st.gateText}>Approved CLP partners get the design studio, live mockups, saved designs and partner pricing. Anyone can request a quote.</span>
-          <div className={st.gateBtns}>
-            <button type="button" className={st.gold} onClick={() => setSignIn(true)}>
-              Partner sign in
-            </button>
-            <Link className={st.ghost} href={shopHref({ view: 'bulk' })}>
-              Request a quote instead
-            </Link>
-          </div>
-        </div>
-        {signIn && <PartnerSignIn onClose={() => setSignIn(false)} />}
-      </div>
-    );
   return <Studio key={`${item.id}|${designId}`} item={item} designId={designId} brand={brand} go={(href) => router.push(href)} />;
 }
 
 function Studio({ item, designId, brand, go }: { item: BulkItem; designId: string; brand: StudioBrand; go: (href: string) => void }) {
+  // A guest (not a signed-in partner): a bulk quote with their details, no saving, ordering or partner pricing.
+  const guest = !brand.partner;
+  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: '' });
   const kit = brand.kit;
   const locked = kit.locked;
   const shape = item.shape;
   const app = isApparel(shape);
-  const [d, setD] = useState<StudioDesign>(() => freshDesign(item, brand));
+  // A guest's design saved in this browser comes back where they left it.
+  const [kept] = useState(() => (guest && !designId ? guestDesigns()[item.id] : undefined));
+  const [d, setD] = useState<StudioDesign>(() => kept?.design ?? freshDesign(item, brand));
   const [savedId, setSavedId] = useState(designId);
   const [tab, setTab] = useState<Tab>('prod');
   const [view, setView] = useState('front');
-  const [qty, setQty] = useState(String(item.styles[0]?.min ?? item.min));
-  const [addons, setAddons] = useState<string[]>([]);
+  const [qty, setQty] = useState(kept?.qty ?? String(item.styles[0]?.min ?? item.min));
+  const [addons, setAddons] = useState<string[]>(kept?.addons ?? []);
   const [colorTarget, setColorTarget] = useState<'main' | 'acc'>('main');
   const [custom, setCustom] = useState<[string, string][]>([]);
   const [pms, setPms] = useState('');
@@ -316,21 +323,28 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
 
   /** The design with its logo uploaded (a cleaned-up or new file is sent to CLP's media first). */
   const persisted = async (): Promise<StudioDesign> => {
-    if (!d.logo.startsWith('data:')) return d;
-    const url = await uploadImage(await dataBlob(d.logo));
+    if (!d.logo || /^https:\/\//.test(d.logo)) return d;
+    // A guest's logo is kept with their cart (as their quote's); a partner's goes to CLP's media.
+    const url = guest ? await uploadGuestImage(await imageDataUrl(d.logo)) : await uploadImage(await dataBlob(d.logo));
     setD((x) => ({ ...x, logo: url }));
     return { ...d, logo: url };
   };
 
   const send = async (kind: BulkKind) => {
-    setBusy(kind);
     setError('');
+    // A guest's design is saved in this browser (no account): its logo too, as it is.
+    if (guest && kind === 'saved') {
+      if (!keepGuestDesign(item.id, { design: d, qty, addons, at: new Date().toISOString() })) return setError('Your browser couldn’t save it. Remove the logo or free some space and try again.');
+      return setSaved(true);
+    }
+    if (guest && (!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact.email.trim()))) return setError('Enter your name and a valid email for the quote.');
+    setBusy(kind);
     try {
       const design = await persisted();
       let mockup = '';
       if (kind !== 'saved' && svg()) {
         try {
-          mockup = await uploadImage(await mockupPng(svg()!));
+          mockup = guest ? await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800)) : await uploadImage(await mockupPng(svg()!));
         } catch {
           // The request goes without its picture.
         }
@@ -347,7 +361,8 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
         design,
         mockup,
       };
-      if (kind === 'saved' && savedId) await updateDesign(savedId, input);
+      if (guest) await sendGuestQuote({ ...input, kind: 'quote', contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } });
+      else if (kind === 'saved' && savedId) await updateDesign(savedId, input);
       else {
         const r = await createDesign(input);
         if (kind === 'saved') setSavedId(r.id);
@@ -464,13 +479,15 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
             </button>
           </span>
           <span className={st.barEnd}>
-            <span className={st.forWho}>
-              For <strong>{brand.name || 'your team'}</strong>
-            </span>
+            {!guest && (
+              <span className={st.forWho}>
+                For <strong>{brand.name || 'your team'}</strong>
+              </span>
+            )}
             <button type="button" className={st.startOver} onClick={() => set(freshDesign(item, brand))}>
               Start over
             </button>
-            <button type="button" className={st.save} onClick={() => send('saved')} disabled={Boolean(busy)}>
+            <button type="button" className={st.save} onClick={() => send('saved')} disabled={Boolean(busy)} title={guest ? 'Saved in this browser' : undefined}>
               {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save design'}
             </button>
           </span>
@@ -952,12 +969,28 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
             )}
             <span className={`${st.priceRow} ${st.priceTotal}`}>
               <span>Est. total · {Math.max(Number(qty) || 0, 0)} pcs</span>
-              <strong>Partner pricing</strong>
+              <strong>{guest ? 'On your quote' : 'Partner pricing'}</strong>
             </span>
+            {guest && (
+              <div className={st.guestFields}>
+                <span className={st.kicker}>YOUR DETAILS</span>
+                <input className={st.input} aria-label="Name" placeholder="Name" maxLength={120} autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+                <input className={st.input} aria-label="Email" type="email" placeholder="Email" maxLength={200} autoComplete="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+                <input className={st.input} aria-label="Organization" placeholder="Team, school or company" maxLength={120} autoComplete="organization" value={contact.organization} onChange={(e) => setContact({ ...contact, organization: e.target.value })} />
+                <input className={st.input} aria-label="Deliver to" placeholder="Deliver to (city)" maxLength={160} value={contact.deliverTo} onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} />
+                <label className={st.field}>
+                  In-hands date
+                  <input className={st.input} type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
+                </label>
+                <textarea className={st.input} aria-label="Anything else" rows={2} maxLength={2000} placeholder="Anything else? Sizes, colors, deadline" value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} />
+              </div>
+            )}
             {error && <span className={st.error}>{error}</span>}
-            <button type="button" className={st.buy} disabled={Boolean(busy) || Number(qty) < min} onClick={() => send('order')}>
-              {busy === 'order' ? 'Placing…' : 'Buy Now'}
-            </button>
+            {!guest && (
+              <button type="button" className={st.buy} disabled={Boolean(busy) || Number(qty) < min} onClick={() => send('order')}>
+                {busy === 'order' ? 'Placing…' : 'Buy Now'}
+              </button>
+            )}
             <button type="button" className={st.quote} disabled={Boolean(busy) || Number(qty) < min} onClick={() => send('quote')}>
               {busy === 'quote' ? 'Sending…' : 'Get a Bulk Quote'}
             </button>

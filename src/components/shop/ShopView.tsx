@@ -43,9 +43,8 @@ import {
 } from '@/content/storefront';
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
-import ShopTabs, { ShopTabsContext } from './shopTabs';
 import { CardGrid, LIST_SIZES, ListToolbar, ProductCard, ShopSearch, ViewAll, hasWords, inPlace, storePlaces, type ListChip } from './shopListing';
-import { Arrow, CategoryIcon, Chevron, LockIcon } from './shopIcons';
+import { Arrow, CategoryIcon, LockIcon } from './shopIcons';
 import s from './shop.module.css';
 
 type Sort = 'featured' | 'newest' | 'price-asc' | 'price-desc';
@@ -61,7 +60,6 @@ const sortBy = (sort: Sort) => (a: ShopProduct, b: ShopProduct) =>
 /** How many stores the home's "Shop by partner" shows (two rows of tiles), new arrivals and exclusives (a row), stores per menu column. */
 const HOME_STORES = 12;
 const HOME_ROW = 4;
-const MENU_STORES = 3;
 /** The "Shop by partner" tabs: the store groups A to Z. */
 const GROUP_TABS = [...SHOP_GROUPS].sort((a, b) => a.label.localeCompare(b.label));
 
@@ -92,7 +90,6 @@ function useAddress() {
 /** A page size of the address, the smallest when it names none of the list sizes. */
 const sizeOf = (asked: string) => ((LIST_SIZES as readonly number[]).includes(Number(asked)) ? Number(asked) : LIST_SIZES[0]);
 
-type Nav = 'home' | 'partners' | 'exclusives' | 'new' | 'bulk' | '';
 
 /**
  * The shop (/shop/, the "Shop" design), under the site header co-branded "CLP │ SHOP" with the cart. The address says
@@ -108,8 +105,6 @@ export default function ShopView() {
   const [failed, setFailed] = useState(false);
   const [cart, setCart] = useState<Cart | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [mega, setMega] = useState(false);
-  const megaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let live = true;
@@ -135,80 +130,11 @@ export default function ShopView() {
   }, [cartCount]);
   useEffect(() => () => setHeaderBrand(null), []);
 
-  // The menu closes on a click outside it or Escape.
-  useEffect(() => {
-    if (!mega) return;
-    const onDown = (e: MouseEvent) => !megaRef.current?.contains(e.target as Node) && setMega(false);
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setMega(false);
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [mega]);
-
   const slug = params.get('store') ?? '';
   const productId = params.get('product') ?? '';
   const view = params.get('view') ?? '';
-  const go = (href: string) => {
-    setMega(false);
-    router.push(href);
-  };
-  // Changing what shows closes the menu.
-  const where = params.toString();
-  const [shownWhere, setShownWhere] = useState(where);
-  if (shownWhere !== where) {
-    setShownWhere(where);
-    setMega(false);
-  }
-
+  const go = (href: string) => router.push(href);
   const store = data?.stores.find((x) => x.slug === slug);
-  const active: Nav = productId
-    ? 'home'
-    : slug
-      ? store?.shop.exclusive
-        ? 'exclusives'
-        : 'partners'
-    : view === 'partners'
-      ? 'partners'
-      : view === 'exclusives' || view === 'new' || view === 'bulk' || view === 'studio'
-        ? view === 'studio'
-          ? 'bulk'
-          : view
-        : view
-          ? ''
-          : 'home';
-
-  // The tabs sit under each view's heading; on top only where there is none (a product, a message, the design studio).
-  const bulkItem = view === 'bulk' && Boolean(params.get('item'));
-  const tabsBelow = !failed && view !== 'studio' && !bulkItem && !productId && !(slug && data && !store);
-  const tabs: { id: Nav; label: string; href?: string }[] = [
-    { id: 'home', label: 'Shop', href: shopHref() },
-    { id: 'partners', label: 'Shop by Partner' },
-    { id: 'exclusives', label: 'CLP Exclusives', href: shopHref({ view: 'exclusives' }) },
-    { id: 'new', label: 'New Arrivals', href: shopHref({ view: 'new' }) },
-    { id: 'bulk', label: 'Bulk & Operations', href: shopHref({ view: 'bulk' }) },
-  ];
-  const nav = (
-    <section className={`${s.top} ${tabsBelow ? s.topUnder : ''}`} data-header-tone="light" ref={megaRef}>
-      <nav className={s.nav} aria-label="Shop">
-        {tabs.map((tab) =>
-          tab.href ? (
-            <Link key={tab.id} href={tab.href} className={`${s.navLink} ${active === tab.id && !mega ? s.navOn : ''}`}>
-              {tab.label}
-            </Link>
-          ) : (
-            <button key={tab.id} type="button" className={`${s.navLink} ${active === tab.id || mega ? s.navOn : ''}`} aria-expanded={mega} onClick={() => setMega(!mega)}>
-              {tab.label}
-              <Chevron />
-            </button>
-          ),
-        )}
-      </nav>
-      {mega && data && <MegaMenu data={data} go={go} />}
-    </section>
-  );
 
   let body;
   if (view === 'bulk') body = <ShopBulk />;
@@ -225,14 +151,22 @@ export default function ShopView() {
   return (
     // The shop's pages are light (the header's logo dark) except the black sections, each marked light.
     <div className={s.shop} data-header-tone="dark">
-      {tabsBelow ? <div className={s.headerRoom} data-header-tone="light" /> : nav}
-      <ShopTabsContext.Provider value={tabsBelow ? nav : null}>{body}</ShopTabsContext.Provider>
+      {/* The black room under the site header (the shop has no tabs). */}
+      <div className={s.headerRoom} data-header-tone="light" />
+      {body}
       {cartOpen && <CartDrawer cart={cart} stores={data?.stores ?? []} onClose={() => setCartOpen(false)} />}
     </div>
   );
 }
 
 /* ---------------------------------------------------------------- pieces */
+
+/**
+ * Where a store leads: the partner's own page on its Shop tab. CLP's exclusives have no page, and a private store opens
+ * with its password: their store.
+ */
+const partnerShopHref = (store: { slug: string; shop: { exclusive?: boolean; private?: boolean } }) =>
+  store.shop.exclusive || store.shop.private ? storeHref(store.slug) : `${partnerHref(store.slug)}#shop`;
 
 function Loading() {
   return (
@@ -242,7 +176,6 @@ function Loading() {
           <span className={`${s.skeleton} ${s.skeletonTitle}`} />
         </div>
       </section>
-      <ShopTabs />
       <div className={`${s.section} ${s.spaced}`}>
         <div className={s.grid4} aria-hidden>
           {Array.from({ length: 8 }, (_, i) => (
@@ -262,7 +195,7 @@ function Notice({ text, back }: { text: string; back?: ShopStore }) {
       <div className={`${s.section} ${s.spacedSm}`}>
         <div className={s.empty}>
           <p>{text}</p>
-          <Link href={back ? storeHref(back.slug) : shopHref()} className={s.btnDark}>
+          <Link href={back ? partnerShopHref(back) : shopHref()} className={s.btnDark}>
             {back ? `Back to ${back.name}` : 'Back to the shop'}
           </Link>
         </div>
@@ -305,60 +238,6 @@ function exclusivesOf(data: ShopData) {
   return { products, sports, drops };
 }
 
-/** "Shop by Partner": a column per store group (its first stores), CLP's exclusives, then every store. */
-function MegaMenu({ data, go }: { data: ShopData; go: (href: string) => void }) {
-  const ex = exclusivesOf(data);
-  const total = partnerStores(data.stores).length;
-  return (
-    <div className={s.mega}>
-      <div className={s.megaCols}>
-        {SHOP_GROUPS.map((g) => {
-          const list = storesIn(data.stores, g.id);
-          return (
-            <div key={g.id} className={s.megaCol}>
-              <span className={s.megaLabel}>{g.label.toUpperCase()}</span>
-              {list.slice(0, MENU_STORES).map((x) => (
-                <button key={x.slug} type="button" className={s.megaItem} onClick={() => go(storeHref(x.slug))}>
-                  <StoreLogo store={x} className={s.megaLogo} />
-                  {x.name}
-                </button>
-              ))}
-              {list.length === 0 && <span className={s.megaNone}>Coming soon</span>}
-              <button type="button" className={s.megaAll} onClick={() => go(shopHref({ view: 'partners', group: g.id }))}>
-                All {g.label}
-              </button>
-            </div>
-          );
-        })}
-        <div className={`${s.megaCol} ${s.megaX}`}>
-          <span className={s.megaLabel}>CLP EXCLUSIVES</span>
-          {ex.sports.slice(0, 3).map((sp) => (
-            <button key={sp} type="button" className={s.megaText} onClick={() => go(shopHref({ view: 'exclusives', sport: sp }))}>
-              {sportLabel(sp)}
-            </button>
-          ))}
-          {ex.drops.slice(0, 3).map((d) => (
-            <button key={d} type="button" className={s.megaText} onClick={() => go(shopHref({ view: 'exclusives', drop: d }))}>
-              {d}
-            </button>
-          ))}
-          <button type="button" className={s.megaAll} onClick={() => go(shopHref({ view: 'exclusives' }))}>
-            All Exclusives
-          </button>
-        </div>
-      </div>
-      <div className={s.megaFoot}>
-        <div className={s.megaFootInner}>
-          <span>{total} official stores on CLP, A–Z</span>
-          <button type="button" className={s.pillDark} onClick={() => go(shopHref({ view: 'partners' }))}>
-            View All Partners <Arrow />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ---------------------------------------------------------------- home */
 
 /** Products with the stores taking turns (each store's first, then each one's second…), so a page shows many stores. */
@@ -378,7 +257,7 @@ function StoreCard({ store, eager, view = 'grid' }: { store: ShopStore; eager: b
       eager={eager}
       featured={false}
       view={view}
-      href={storeHref(store.slug)}
+      href={partnerShopHref(store)}
       cta={store.shop.private && !storeKey(store.slug) ? 'Enter Password' : 'Visit Store'}
       stat={`${store.productCount} ${store.productCount === 1 ? 'Product' : 'Products'}`}
       tag={
@@ -412,7 +291,6 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
           <p className={s.heroText}>Official gear from our athletes, clubs, schools and organizations, plus exclusives you can only get from CLP.</p>
         </div>
       </section>
-      <ShopTabs />
       <ShopSearch
         q=""
         loc=""
@@ -431,7 +309,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
           {/* The stores A to Z as logo tiles: the logo, the name, its group and how many items. */}
           <div className={s.partnerTiles}>
             {stores.map((x) => (
-              <Link key={x.slug} href={storeHref(x.slug)} className={s.partnerTile}>
+              <Link key={x.slug} href={partnerShopHref(x)} className={s.partnerTile}>
                 <StoreLogo store={x} className={s.partnerTileLogo} />
                 <span className={s.partnerTileText}>
                   <strong>{x.name}</strong>
@@ -694,7 +572,6 @@ function ListBand({ crumb, name, kicker, sub }: { crumb: string; name: string; k
           </div>
         </div>
       </section>
-      <ShopTabs />
     </>
   );
 }
@@ -906,7 +783,6 @@ function Gate({ store, onOpen }: { store: ShopStore; onOpen: (products: ShopProd
         </form>
       </div>
     </section>
-    <ShopTabs />
     </>
   );
 }
@@ -961,7 +837,6 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
           </div>
         </div>
       </section>
-      <ShopTabs />
       <section className={s.facts}>
         <div className={s.factsInner}>
           <span>
@@ -1057,7 +932,7 @@ function ProductPage({ data, store, product, storeKey: key, onViewCart }: { data
         <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
           <Link href={shopHref()}>Shop</Link>
           {'  ›  '}
-          <Link href={storeHref(store.slug)}>{store.name}</Link>
+          <Link href={partnerShopHref(store)}>{store.name}</Link>
           {'  ›  '}
           {product.title}
         </nav>
@@ -1189,7 +1064,7 @@ export function ProductDetail({
           </button>
         ) : (
           // The partner's own page on its Shop tab (CLP's exclusives have no page: their store).
-          <Link href={exclusive ? storeHref(store.slug) : `${partnerHref(store.slug)}#shop`} className={s.buyStore}>
+          <Link href={partnerShopHref(store)} className={s.buyStore}>
             {storeChip}
           </Link>
         )}

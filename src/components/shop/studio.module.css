@@ -1414,3 +1414,17 @@
     text-align: center;
   }
 }
+
+/* A guest's details for their bulk quote (above Get a Bulk Quote). */
+.guestFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.guestFields textarea {
+  height: auto;
+  padding-top: 10px;
+  resize: vertical;
+}
