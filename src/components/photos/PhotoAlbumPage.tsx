@@ -20,13 +20,12 @@ import {
   type PhotoPage,
   type PhotoShow,
 } from '@/content/albums';
-import { PRINT_PRODUCTS, dollars, printBackKey, printFrom, printPrice, type PrintProduct } from '@/content/gallery';
+import { dollars, printBackKey, printFrom, printPrice, type PrintProduct } from '@/content/gallery';
 import usePhotoLogin from './usePhotoLogin';
+import usePrintProducts from './usePrintProducts';
 import s from './PhotoAlbumPage.module.css';
 
 const plural = (n: number, word: string) => `${n.toLocaleString('en-US')} ${word}${n === 1 ? '' : 's'}`;
-/** The cheapest product: a printable photo's "From $5". */
-const FROM = Math.min(...PRINT_PRODUCTS.map(printFrom));
 /** The album filters the API offers (the design's All photos, Free, and its prints). */
 const FILTERS: [PhotoShow, string][] = [
   ['all', 'All photos'],
@@ -71,6 +70,9 @@ export default function PhotoAlbumPage({ id, photoId }: { id: string; photoId: s
   const [state, setState] = useState<State>({ kind: 'loading' });
   const [attempt, setAttempt] = useState(0);
   const top = useRef<HTMLDivElement>(null);
+  // The products this album's photos go on (CLP's Photo products): a printable photo's "From $5" is the cheapest.
+  const print = usePrintProducts(state.kind === 'open' ? state.album.partner : undefined);
+  const from = print.ready && print.products.length ? Math.min(...print.products.map(printFrom)) : 0;
 
   // The album, at the page asked for (a photo: the page it's on, so the strip shows its neighbours).
   useEffect(() => {
@@ -194,7 +196,7 @@ export default function PhotoAlbumPage({ id, photoId }: { id: string; photoId: s
                 {page.photos.map((p, i) => (
                   <Link key={p.id} href={photoHref(album.id, p.id)} className={s.tile} aria-label={`Photo ${(page.page - 1) * page.limit + i + 1}`}>
                     <img src={p.thumb} alt="" loading={i < 8 ? 'eager' : 'lazy'} />
-                    {p.download ? <span className={s.free}>Free</span> : p.print ? <span className={s.from}>From {dollars(FROM)}</span> : null}
+                    {p.download ? <span className={s.free}>Free</span> : p.print && from ? <span className={s.from}>From {dollars(from)}</span> : null}
                   </Link>
                 ))}
               </div>
@@ -256,9 +258,15 @@ function AlbumHead({ album, filters }: { album: LiveAlbum; filters?: { label: st
  * photos; beside it the free download (when the album offers it) and the prints and products with their options.
  */
 function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: LivePhoto; number: number; photos: LivePhoto[] }) {
-  const printable = photo.print;
-  const [product, setProduct] = useState<PrintProduct>(PRINT_PRODUCTS[0]);
-  const [chosen, setChosen] = useState<Record<string, string>>(() => defaults(PRINT_PRODUCTS[0]));
+  // The products CLP offers on this album's photos (until they're read: the photo on its own, never a price that changes).
+  const { products, ready } = usePrintProducts(album.partner);
+  const [selection, setSelection] = useState<{ id: string; chosen: Record<string, string> }>({ id: '', chosen: {} });
+  const product: PrintProduct | undefined = products.find((p) => p.id === selection.id) ?? products[0];
+  const chosen = product && selection.id === product.id ? selection.chosen : product ? defaults(product) : {};
+  const setChosen = (next: Record<string, string>) => product && setSelection({ id: product.id, chosen: next });
+  const printable = Boolean(photo.print && ready && product);
+  // Prints may be offered (until the products are read, a printable photo is taken to have some): the heading never changes.
+  const offersPrints = photo.print && (!ready || products.length > 0);
   const [side, setSide] = useState<'front' | 'back'>('front');
   const [backs, setBacks] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
@@ -297,14 +305,14 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
   }, [photo.id]);
 
   const pick = (p: PrintProduct) => {
-    setProduct(p);
-    setChosen(defaults(p));
+    setSelection({ id: p.id, chosen: defaults(p) });
     setSide('front');
     setAdded(false);
   };
-  const price = printPrice(product, chosen);
+  const price = product ? printPrice(product, chosen) : 0;
   const name = `Photo ${number} · ${album.name}`;
   const addPrint = () => {
+    if (!product) return;
     const detail = product.options.map((o) => o.options.find((x) => x.value === chosen[o.id])?.label ?? chosen[o.id]).join(' · ');
     addToGalleryCart({ kind: 'print', photoId: photo.id, src: photo.thumb, name: product.name, detail: `${detail} · ${name}`, price, qty: 1 });
     setAdded(true);
@@ -318,7 +326,7 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
             ← {album.name}
           </Link>
           <div ref={stage} className={s.stage}>
-            {printable ? (
+            {printable && product ? (
               <>
                 <span className={s.sideLabel}>{side === 'front' ? 'FRONT' : 'BACK'}</span>
                 <Mockup
@@ -364,7 +372,7 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
         <span className={s.kicker}>
           PHOTO {number} · {album.name}
         </span>
-        <h2 className={s.buyTitle}>{printable ? (photo.download ? 'Download it or put it on something' : 'Put it on something') : photo.download ? 'Download this photo' : 'This photo'}</h2>
+        <h2 className={s.buyTitle}>{offersPrints ? (photo.download ? 'Download it or put it on something' : 'Put it on something') : photo.download ? 'Download this photo' : 'This photo'}</h2>
         {photo.description && <p className={s.description}>{photo.description}</p>}
 
         {photo.download && (
@@ -377,11 +385,15 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
           </a>
         )}
 
-        {printable ? (
+        {photo.print && !ready ? (
+          <p className={s.small} role="status">
+            Loading prints and products…
+          </p>
+        ) : printable && product ? (
           <>
             <span className={s.label}>PRINTS &amp; PRODUCTS</span>
             <div className={s.products}>
-              {PRINT_PRODUCTS.map((p) => (
+              {products.map((p) => (
                 <button key={p.id} type="button" aria-pressed={p.id === product.id} className={`${s.product} ${p.id === product.id ? s.productOn : ''}`} onClick={() => pick(p)}>
                   <strong>{p.name}</strong>
                   <span>from {dollars(printFrom(p))}</span>
@@ -433,7 +445,7 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
           </>
         ) : (
           <p className={s.small}>
-            {album.forSale ? 'This photo is under 12 MP, too small to print well.' : 'Prints and products aren’t offered for this album.'}
+            {album.forSale && !photo.print ? 'This photo is under 12 MP, too small to print well.' : 'Prints and products aren’t offered for this album.'}
             {photo.download ? ' You can still download it.' : ''}
           </p>
         )}

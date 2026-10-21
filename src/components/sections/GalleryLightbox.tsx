@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { PRINT_GROUPS, PRINT_PRODUCTS, dollars, printBackKey, printFrom, printPrice, printRatio, type PrintProduct } from '@/content/gallery';
+import { PRINT_GROUPS, dollars, printBackKey, printFrom, printPrice, printRatio, type PrintProduct } from '@/content/gallery';
+import usePrintProducts from '@/components/photos/usePrintProducts';
 import { fetchPrintBacks } from '@/content/albums';
 import { SITE_URL } from '@/content/site';
 import type { GalleryImage } from '@/content/types';
@@ -293,6 +294,10 @@ export function Mockup({
 export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, byHref, images, index, startTab = 'digital', onIndex, onClose, onOpenCart, paged }: Props) {
   const [tab, setTab] = useState<'digital' | 'print'>(startTab);
   const [product, setProduct] = useState<PrintProduct | null>(null);
+  // The products CLP offers on this album's photos (Photo products): its photographer's partner page decides the
+  // partners-only ones.
+  const partnerSlug = byHref?.startsWith('/partner/') ? (new URLSearchParams(byHref.split('?')[1] ?? '').get('p') ?? undefined) : undefined;
+  const { products, ready } = usePrintProducts(partnerSlug);
   const [chosen, setChosen] = useState<Record<string, string>>({});
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -539,12 +544,23 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
           </div>
         )}
 
-        {tab === 'print' && image.printable !== false && !product && (
+        {tab === 'print' && image.printable !== false && !product && (!ready || products.length === 0) && (
           <div className={styles.sideBody}>
-            {PRINT_GROUPS.map((group) => (
+            <div className={styles.buy}>
+              <span className={styles.lineTitle}>Prints &amp; Products</span>
+              <span className={styles.muted} role="status">
+                {ready ? 'Prints and products aren’t offered for this album.' : 'Loading prints and products…'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {tab === 'print' && image.printable !== false && !product && ready && products.length > 0 && (
+          <div className={styles.sideBody}>
+            {PRINT_GROUPS.filter((group) => products.some((p) => p.group === group)).map((group) => (
               <div key={group} className={styles.group}>
                 <span className={styles.label}>{group.toUpperCase()}</span>
-                {PRINT_PRODUCTS.filter((p) => p.group === group).map((p) => (
+                {products.filter((p) => p.group === group).map((p) => (
                   <button key={p.id} type="button" className={styles.product} onClick={() => openProduct(p)}>
                     <span className={styles.productThumb}>
                       <Mockup product={p} chosen={defaults(p)} src={image.thumb || image.src} max={38} />

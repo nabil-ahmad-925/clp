@@ -1,4 +1,5 @@
 import taxonomy from './data/photoTaxonomy.json';
+import type { PrintCatalogEntry } from './gallery';
 import type { GalleryImage } from './types';
 
 /**
@@ -179,6 +180,17 @@ export const fetchPrintBacks = () =>
       // Asked again next time; the viewer draws the backs meanwhile.
       printBacks = null;
       return {};
+    }));
+
+/** CLP's photo products (clp-api GET /albums/print-products), asked once per visit; null when they can't be read. */
+let printCatalog: Promise<PrintCatalogEntry[] | null> | null = null;
+export const fetchPrintCatalog = () =>
+  (printCatalog ??= call<{ products: PrintCatalogEntry[] }>('/albums/print-products')
+    .then((r) => (Array.isArray(r.products) ? r.products : null))
+    .catch(() => {
+      // Asked again next time; the photo pages use the built-in catalog meanwhile.
+      printCatalog = null;
+      return null;
     }));
 
 /** Opens the private album of a code (for the rest of this visit); throws with a message to show. */

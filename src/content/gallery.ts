@@ -318,5 +318,50 @@ export function printRatio(product: PrintProduct, chosen: Record<string, string>
   return m ? `${m[1]} / ${m[2]}` : (product.ratio ?? '4 / 5');
 }
 
+/** CLP's settings for a print product (clp-api GET /albums/print-products: the admin's Shop & products → Photo products). */
+export type PrintCatalogEntry = {
+  id: string;
+  name: string;
+  group: PrintProduct['group'];
+  description: string;
+  live: boolean;
+  /** What a family pays for its first option. */
+  suggested: number;
+  /** Every album, only the listed partners' albums, or the CLP Shop only (never on album pages). */
+  where: 'all' | 'partners' | 'shop';
+  partners: string[];
+};
+
+/**
+ * The print products as CLP set them up (Photo products): only the live ones that show on this album (every album, or
+ * the partners' albums `partner` is one of; never the shop-only ones), with CLP's name, description and group, and its
+ * suggested price for the first option (the other options keep their price differences). Without CLP's settings (not
+ * loaded, or a product CLP never saved), the catalog above as it is.
+ */
+export function withCatalog(entries: PrintCatalogEntry[] | null, partner?: string): PrintProduct[] {
+  if (!entries) return PRINT_PRODUCTS;
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  return PRINT_PRODUCTS.flatMap((p) => {
+    const e = byId.get(p.id);
+    if (!e) return [p];
+    if (!e.live || e.where === 'shop' || (e.where === 'partners' && !(partner && e.partners.includes(partner)))) return [];
+    const priced = p.options.findIndex((o) => o.options.some((x) => x.price != null));
+    const shift = e.suggested > 0 ? Math.round((e.suggested - printFrom(p)) * 100) / 100 : 0;
+    return [
+      {
+        ...p,
+        name: e.name || p.name,
+        desc: e.description || p.desc,
+        group: PRINT_GROUPS.includes(e.group) ? e.group : p.group,
+        options: shift
+          ? p.options.map((o, i) =>
+              i !== priced ? o : { ...o, options: o.options.map((x) => (x.price == null ? x : { ...x, price: Math.max(0, Math.round((x.price + shift) * 100) / 100) })) },
+            )
+          : p.options,
+      },
+    ];
+  });
+}
+
 /** "$39" or "$39.50". */
 export const dollars = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
