@@ -26,7 +26,9 @@ import tagLabels from '@/content/data/listingTags.json';
 import { albumTypeName } from '@/content/albums';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
-import { categoryName, isBookable, toItem } from '@/content/listings';
+import { categoryName, isBookable, toItem, waitlistPageHref, type SavedPlace } from '@/content/listings';
+import { useWaitlists } from '@/components/sections/useWaitlists';
+import WaitlistModal from '@/components/sections/WaitlistModal';
 import {
   collabLabel,
   partnerType,
@@ -153,6 +155,10 @@ const priceOf = (l: { priceMin?: number; priceMax?: number }) =>
   l.priceMin == null ? '' : (l.priceMax ?? l.priceMin) === 0 ? 'Free' : l.priceMin === (l.priceMax ?? l.priceMin) ? dollars(l.priceMin) : `${dollars(l.priceMin)}+`;
 const cityOf = (l: Experience) => CITIES[l.tags.find((t) => CITIES[t]) ?? ''] ?? l.subtitle ?? '';
 const isExperience = (l: Experience) => !l.listingType || l.listingType === 'experiences';
+/** A listing's waitlist on this page: sold out with it open (people waiting), and this device's place in it. */
+type Wait = { soldOut?: { waiting: number }; place?: SavedPlace };
+/** Its button when sold out with a waitlist: join it, or (joined) see the place. */
+const waitLabel = (l: Experience, w: Wait) => (w.soldOut && isBookable(toItem(l)) ? (w.place ? 'On the waitlist ✓' : 'Join Waitlist') : undefined);
 const ctaOf = (l: Experience) => (!isBookable(toItem(l)) ? 'Details' : priceOf(l) === 'Free' ? 'RSVP' : 'Book Now');
 
 /**
@@ -224,6 +230,11 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const [followers, setFollowers] = useState(page.followers ?? 0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [booking, setBooking] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts } | null>(null);
+  // A sold-out listing's waitlist being joined (its card, or a full day in the booking popup).
+  const [waiting, setWaiting] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts; date?: string } | null>(null);
+  const items = useMemo(() => experiences.map(toItem), [experiences]);
+  const { soldOut, places } = useWaitlists(items, (i) => experiences.find((l) => l.id === i.id)?.widgetId);
+  const waitOf = (l: Experience): Wait => ({ soldOut: soldOut[`${l.widgetId}.${l.id}`], place: places[`${l.widgetId}.${l.id}`] });
   const [details, setDetails] = useState<DirectoryItem | null>(null);
   const [product, setProduct] = useState<PartnerProduct | null>(null);
   const [job, setJob] = useState<Job | null>(null);
@@ -256,7 +267,10 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
 
   const open = (l: Experience) => {
     const item = toItem(l);
-    if (isBookable(item)) setBooking({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
+    const w = waitOf(l);
+    if (isBookable(item) && w.soldOut && w.place) window.location.assign(waitlistPageHref(w.place.id, w.place.token));
+    else if (isBookable(item) && w.soldOut) setWaiting({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
+    else if (isBookable(item)) setBooking({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
     else setDetails(item);
   };
   const socials = [...page.socials, ...(page.website ? [{ network: 'website', href: page.website }] : [])];
@@ -349,9 +363,11 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
 
         <main className={s.main} data-header-tone="dark" data-listing="">
           <div className={s.wrap}>
-            {shown === 'about' && <About page={page} experiences={exps} onOpen={open} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />}
+            {shown === 'about' && (
+              <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />
+            )}
             {shown === 'content' && <Content page={page} onPhoto={setPhoto} onVideo={setVideo} />}
-            {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} />}
+            {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} waitOf={waitOf} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
             {shown === 'partnerships' && <Partnerships collabs={collabs} />}
             {shown === 'reviews' && <Reviews page={page} reviews={reviews} />}
@@ -415,7 +431,19 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           </Overlay>
         )}
         {cartOpen && <CartDrawer page={page} cart={cart} onClose={() => setCartOpen(false)} onShop={has('shop') ? () => pick('shop') : undefined} />}
-        {booking && <BookingModal item={booking.item} widgetId={booking.widgetId} facts={booking.facts} onClose={() => setBooking(null)} />}
+        {booking && (
+          <BookingModal
+            item={booking.item}
+            widgetId={booking.widgetId}
+            facts={booking.facts}
+            onClose={() => setBooking(null)}
+            onJoinWaitlist={(date) => {
+              setBooking(null);
+              setWaiting({ ...booking, date });
+            }}
+          />
+        )}
+        {waiting && <WaitlistModal item={waiting.item} widgetId={waiting.widgetId} facts={waiting.facts} date={waiting.date} onClose={() => setWaiting(null)} />}
         {details && <BioModal card={details} variant="wps" onClose={() => setDetails(null)} />}
       </div>
     </PaletteContext.Provider>
@@ -428,6 +456,7 @@ function About({
   page,
   experiences,
   onOpen,
+  waitOf,
   onAll,
   onMember,
   onFollowed,
@@ -435,6 +464,7 @@ function About({
   page: PartnerPageData;
   experiences: Experience[];
   onOpen: (l: Experience) => void;
+  waitOf: (l: Experience) => Wait;
   onAll?: () => void;
   onMember: (m: PartnerTeamMember) => void;
   onFollowed: (followers: number) => void;
@@ -556,7 +586,7 @@ function About({
                   <span>{[priceOf(l), cityOf(l)].filter(Boolean).join(' · ')}</span>
                 </span>
                 <button type="button" className={`${s.btnAccent} ${s.btnSm}`} onClick={() => onOpen(l)}>
-                  {ctaOf(l) === 'Book Now' ? 'Book' : ctaOf(l)}
+                  {waitLabel(l, waitOf(l)) ?? (ctaOf(l) === 'Book Now' ? 'Book' : ctaOf(l))}
                 </button>
               </div>
             ))}
@@ -762,7 +792,7 @@ function ChoiceChip({
 type ExpFilters = { q: string; type: string; ages: string; loc: string; when: string };
 const NO_FILTERS: ExpFilters = { q: '', type: '', ages: '', loc: '', when: '' };
 
-function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Experience[]; onOpen: (l: Experience) => void }) {
+function Experiences({ page, items, onOpen, waitOf }: { page: PartnerPageData; items: Experience[]; onOpen: (l: Experience) => void; waitOf: (l: Experience) => Wait }) {
   const [f, setF] = useState<ExpFilters>(NO_FILTERS);
   // As the experiences pages: grid first, or the list.
   const [view, setView] = useState<ResultsView>('grid');
@@ -861,7 +891,17 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
             const card = cardOf(l);
             return (
               <div key={l.id} className={t.listingItem}>
-                <ListingCard card={card} view={view} eager={i < 4} facts={listingFacts(card)} onOpen={() => onOpen(l)} onBook={() => onOpen(l)} />
+                <ListingCard
+                  card={card}
+                  view={view}
+                  eager={i < 4}
+                  facts={listingFacts(card)}
+                  onOpen={() => onOpen(l)}
+                  onBook={() => onOpen(l)}
+                  soldOut={waitOf(l).soldOut}
+                  place={waitOf(l).place}
+                  onWaitlist={() => onOpen(l)}
+                />
               </div>
             );
           })}
@@ -880,7 +920,7 @@ function Experiences({ page, items, onOpen }: { page: PartnerPageData; items: Ex
                 <div className={s.resFoot}>
                   <strong>{priceOf(l) || 'Free'}</strong>
                   <button type="button" className={s.btnOutline} onClick={() => onOpen(l)}>
-                    {isBookable(toItem(l)) ? 'Book a session' : 'Details'}
+                    {waitLabel(l, waitOf(l)) ?? (isBookable(toItem(l)) ? 'Book a session' : 'Details')}
                   </button>
                 </div>
               </div>

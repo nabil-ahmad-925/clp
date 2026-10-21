@@ -338,7 +338,7 @@ export default function Checkout() {
                       <span>{[cart.stores?.find((st) => st.slug === l.slug)?.name, l.option].filter(Boolean).join(' · ')}</span>
                     </span>
                     <span className={styles.linePrice}>
-                      <strong className={all ? styles.strike : undefined}>{money(all ? l.price * l.qty : (l.unitCharge ?? l.price) * (l.qty - covered))}</strong>
+                      <strong className={all ? styles.strike : undefined}>{money(all ? l.price * l.qty : (l.lineCharge ?? (l.unitCharge ?? l.price) * (l.qty - covered)))}</strong>
                       {covered > 0 && <span className={styles.coveredTag}>Covered</span>}
                     </span>
                   </div>

@@ -5,7 +5,7 @@ import { call, read } from './partnerPages';
  * bits, the only key to it), and every line comes back priced by the store. Paying goes through Stripe's checkout
  * (CLP's account) once online payment is on; until then an order is placed unpaid and CLP arranges the payment.
  */
-export type CartLine = { key: string; slug: string; productId: string; title: string; option: string; qty: number; price: number; image: string; coveredQty?: number; unitCharge?: number };
+export type CartLine = { key: string; slug: string; productId: string; title: string; option: string; qty: number; price: number; image: string; coveredQty?: number; unitCharge?: number; lineCharge?: number };
 export type Amounts = { subtotal: number; covered: number; discount: number; shipping: number; tax: number; total: number };
 export type AppliedCode = { code: string; kind: 'percent' | 'team'; label: string; slug: string; team: string };
 export type Cart = {

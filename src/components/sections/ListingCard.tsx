@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
-import { agePolicy, cornerTagLabel } from '@/content/listings';
+import { agePolicy, cornerTagLabel, waitlistPageHref, type SavedPlace } from '@/content/listings';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './ListingCard.module.css';
@@ -25,6 +25,11 @@ type Props = {
   onBook?: () => void;
   /** "Claim this listing" (Community listings): opens the claim form (else the partnerships page). */
   onClaim?: () => void;
+  /** Sold out with its waitlist open (how many wait): "Join Waitlist" (opens `onWaitlist`) instead of Book Now. */
+  soldOut?: { waiting: number };
+  onWaitlist?: () => void;
+  /** This device's place in its waitlist: the card says so and links to it. */
+  place?: SavedPlace;
   /** Shown instead when the card's image is missing or fails to load (an API card's built-in image). */
   fallbackImage?: string;
   /** Cards near the top load their image at once rather than when scrolled near. */
@@ -78,7 +83,7 @@ function ProviderBadge({ provider }: { provider?: Provider }) {
  * A listing in the new design's results: photo, provider, title, when and where, the ages, and the price with
  * "Learn More" (which opens the listing's full-screen bio, as a click anywhere on the card does).
  */
-export default function ListingCard({ card, facts, view, variant = 'listing', onOpen, onBook, onClaim, fallbackImage, eager }: Props) {
+export default function ListingCard({ card, facts, view, variant = 'listing', onOpen, onBook, onClaim, soldOut, onWaitlist, place, fallbackImage, eager }: Props) {
   const [failed, setFailed] = useState(false);
   const src = (failed ? fallbackImage : card.image) || fallbackImage;
   const facility = view === 'grid';
@@ -121,8 +126,33 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
   const noPrice = variant === 'listing' && <span className={styles.noPrice}>Contact for pricing</span>;
   // CLP's and its partners' listings are booked on CLP; the others' details link out.
   const book = Boolean(onBook) && (card.provider === 'partner' || card.provider === 'clp');
+  // Sold out with a waitlist: join it (or, once joined, see the place in line).
+  const waitlist = book && Boolean(soldOut) && Boolean(onWaitlist);
   const ctaLabel = book ? 'Book Now' : 'Learn More';
-  const learnMore = (
+  const learnMore = waitlist ? (
+    place ? (
+      <Link
+        href={waitlistPageHref(place.id, place.token)}
+        className={`${styles.cta} ${styles.ctaWait} ${facility ? styles.ctaWide : ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        On the waitlist ✓
+      </Link>
+    ) : (
+      <button
+        type="button"
+        className={`${styles.cta} ${styles.ctaWait} ${facility ? styles.ctaWide : ''}`}
+        aria-haspopup="dialog"
+        aria-label={`Join Waitlist: ${[card.subtitle, card.title].filter(Boolean).join(' – ')}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onWaitlist!();
+        }}
+      >
+        Join Waitlist
+      </button>
+    )
+  ) : (
     <button
       type="button"
       className={`${styles.cta} ${facility ? styles.ctaWide : ''}`}
@@ -157,10 +187,16 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         <span className={styles.shade} aria-hidden />
         <ProviderBadge provider={card.provider} />
         <CornerTags card={card} />
+        {waitlist && <span className={styles.soldOut}>SOLD OUT · WAITLIST OPEN</span>}
       </div>
       <div className={styles.body}>
         {(card.partner?.name || card.subtitle) && <span className={styles.provider}>{card.partner?.name || card.subtitle}</span>}
         <h3 className={styles.title}>{card.title}</h3>
+        {waitlist && (
+          <span className={styles.spots}>
+            {place ? `✓ You’re #${place.position} on the waitlist` : `Sold out · ${soldOut!.waiting} on the waitlist`}
+          </span>
+        )}
         {(facts.months || facts.city) && (
           <div className={styles.facts}>
             {facts.months && (

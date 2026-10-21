@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import ListingHero from '@/components/sections/ListingHero';
 import { CANCEL_TIME, cancelGuestBooking, directionsHref, fetchGuestBooking, type BookingConfirmation } from '@/content/listings';
 import { messageHost, saveConversation, sitePath } from '@/content/messages';
+import GuestWaitlist from './GuestWaitlist';
 import styles from './GuestBooking.module.css';
 
 const longDay = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -32,8 +33,13 @@ type State = { status: 'loading' } | { status: 'invalid' } | { status: 'error'; 
  */
 export default function GuestBooking() {
   const params = useSearchParams();
-  const id = params.get('id') ?? '';
-  const token = params.get('token') ?? '';
+  // A waitlist place's link (/booking/?waitlist=…&token=…): their place in line.
+  const waitlist = params.get('waitlist');
+  if (waitlist) return <GuestWaitlist id={waitlist} token={params.get('token') ?? ''} />;
+  return <GuestBookingView id={params.get('id') ?? ''} token={params.get('token') ?? ''} />;
+}
+
+function GuestBookingView({ id, token }: { id: string; token: string }) {
   const [state, setState] = useState<State>({ status: 'loading' });
   const [attempt, setAttempt] = useState(0);
   const [confirming, setConfirming] = useState(false);

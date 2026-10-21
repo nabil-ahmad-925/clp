@@ -36,6 +36,8 @@ import ClaimModal from './ClaimModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
 import ListingCard, { SponsoredStrip } from './ListingCard';
+import { useWaitlists } from './useWaitlists';
+import WaitlistModal from './WaitlistModal';
 import PartnerSpotlight from './PartnerSpotlight';
 import TeamCard from './TeamCard';
 import styles from './TeamDirectory.module.css';
@@ -523,6 +525,9 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   const [booking, setBooking] = useState<DirectoryItem | null>(null);
   // The community listing being claimed ("Claim this listing").
   const [claiming, setClaiming] = useState<DirectoryItem | null>(null);
+  // A sold-out listing's waitlist being joined (from its card, or a full day in the booking popup).
+  const [waiting, setWaiting] = useState<{ item: DirectoryItem; date?: string } | null>(null);
+  const { soldOut, places: waitPlaces } = useWaitlists(pageItems, () => widgetId ?? undefined);
   const [openFilter, setOpenFilter] = useState<number | null>(null);
   // As on the original, "No Results Found" appears only when a filter change empties a grid that had cards
   // (a page whose preset already matches nothing stays blank), and goes away once cards match again.
@@ -869,6 +874,9 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
             onOpen={() => setOpen(item)}
             onBook={() => setBooking(item)}
             onClaim={() => setClaiming(item)}
+            soldOut={soldOut[`${widgetId}.${item.id}`]}
+            place={waitPlaces[`${widgetId}.${item.id}`]}
+            onWaitlist={() => setWaiting({ item })}
           />
         </div>
       ))}
@@ -1165,7 +1173,19 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
 
       {open && <BioModal card={open} variant="wps" onClose={() => setOpen(null)} />}
       {booking && widgetId != null && (
-        <BookingModal item={booking} widgetId={widgetId} facts={rowFacts(booking, filters, prices)} onClose={() => setBooking(null)} />
+        <BookingModal
+          item={booking}
+          widgetId={widgetId}
+          facts={rowFacts(booking, filters, prices)}
+          onClose={() => setBooking(null)}
+          onJoinWaitlist={(date) => {
+            setBooking(null);
+            setWaiting({ item: booking, date });
+          }}
+        />
+      )}
+      {waiting && widgetId != null && (
+        <WaitlistModal item={waiting.item} widgetId={widgetId} facts={rowFacts(waiting.item, filters, prices)} date={waiting.date} onClose={() => setWaiting(null)} />
       )}
       {claiming && widgetId != null && <ClaimModal item={claiming} widgetId={widgetId} onClose={() => setClaiming(null)} />}
     </div>

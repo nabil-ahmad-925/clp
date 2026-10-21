@@ -69,6 +69,8 @@ export type DirectoryItem = FacilityCard & {
   /** Booking (listings from the admin): spots per day (none: no limit) and what to bring. */
   capacity?: number;
   whatToBring?: string[];
+  /** Its waitlist when a day is sold out (see content/listings ListingWaitlist). */
+  waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
 };
 
 /** Who provides a listing (the listings API's `provider`): CLP Partner, Compete Like Pros, Community or Sponsored. */

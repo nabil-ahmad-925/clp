@@ -175,3 +175,96 @@
     padding: 24px 20px;
   }
 }
+
+/* ---- The waitlist page: booking the spots held for them ---- */
+.claim {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 18px;
+  border: 1px solid #e7e5e0;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.claimTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.counterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.counter button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.counter button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.checkRow {
+  display: flex;
+  gap: 10px;
+  color: #444;
+  font-size: 14px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.checkRow input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: #111;
+}
+
+.checkRow a {
+  color: #111;
+}
+
+.primary {
+  height: 50px;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  color: var(--white);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.primary:focus-visible,
+.counter button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

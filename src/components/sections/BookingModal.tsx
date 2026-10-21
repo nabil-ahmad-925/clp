@@ -18,6 +18,8 @@ type Props = {
   /** The listing's city, ages, dates and price (see TeamDirectory). */
   facts: RowFacts;
   onClose: () => void;
+  /** A full day of a listing with a waitlist: join it for that day (the waitlist popup). */
+  onJoinWaitlist?: (date: string) => void;
 };
 
 /** The site's Waiver & Release (as in the footer) and Expectations & Commitment pages. */
@@ -60,7 +62,7 @@ type Step = 'details' | 'book' | 'done';
  * address and check-in instructions being private to booked guests. Payment isn't taken online. Esc or the close
  * button closes it.
  */
-export default function BookingModal({ item, widgetId, facts, onClose }: Props) {
+export default function BookingModal({ item, widgetId, facts, onClose, onJoinWaitlist }: Props) {
   const [step, setStep] = useState<Step>('details');
   const now = today();
   // The days offered: a dated listing's (from today on), else any day from today (picked in a date field).
@@ -128,6 +130,9 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
   const per = item.priceMin ?? null;
   const count = adults + kids;
   const spotsLeft = date ? leftOn(date) : null;
+  // A full day (or too few spots for the group) of a listing with a waitlist can be waited for.
+  const canWait = Boolean(item.waitlist && item.capacity && onJoinWaitlist);
+  const waitInstead = canWait && Boolean(date) && spotsLeft !== null && (spotsLeft === 0 || count > spotsLeft);
   const total = per == null ? null : per * count;
   const time = item.startTime ? `${clock(item.startTime)}${item.endTime ? ` – ${clock(item.endTime)}` : ''}` : '';
   // Who runs it: the listing's provider line, else CLP itself.
@@ -329,14 +334,14 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                               type="button"
                               role="radio"
                               aria-checked={date === d}
-                              aria-label={`${p.long}${n === 0 ? ', full' : n !== null ? `, ${n} spot${n === 1 ? '' : 's'} left` : ''}`}
-                              disabled={n === 0}
+                              aria-label={`${p.long}${n === 0 ? (canWait ? ', full, waitlist open' : ', full') : n !== null ? `, ${n} spot${n === 1 ? '' : 's'} left` : ''}`}
+                              disabled={n === 0 && !canWait}
                               className={`${styles.day} ${date === d ? styles.dayOn : ''} ${n === 0 ? styles.dayFull : ''}`}
                               onClick={() => setDate(d)}
                             >
                               <span className={styles.dow}>{p.dow}</span>
                               <span>{p.label}</span>
-                              {n !== null && <span className={styles.dayLeft}>{n === 0 ? 'Full' : `${n} left`}</span>}
+                              {n !== null && <span className={styles.dayLeft}>{n === 0 ? (canWait ? 'Waitlist' : 'Full') : `${n} left`}</span>}
                             </button>
                           );
                         })}
@@ -350,7 +355,8 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                         {spotsLeft} spot{spotsLeft === 1 ? '' : 's'} left on this day
                       </span>
                     )}
-                    {!days && spotsLeft === 0 && <span className={styles.error}>This day is full. Pick another day.</span>}
+                    {!days && spotsLeft === 0 && !canWait && <span className={styles.error}>This day is full. Pick another day.</span>}
+                    {spotsLeft === 0 && canWait && <span className={styles.error}>This day is sold out. The waitlist is open.</span>}
                   </div>
 
                   <div className={styles.section}>
@@ -453,10 +459,23 @@ export default function BookingModal({ item, widgetId, facts, onClose }: Props) 
                     {error}
                   </p>
                 )}
-                <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
-                  {sending ? 'Booking…' : 'Confirm Booking'}
-                </button>
-                <span className={styles.hint}>{missing || `No payment online: you pay ${host} directly.`}</span>
+                {waitInstead ? (
+                  <>
+                    <button type="button" className={styles.primary} onClick={() => onJoinWaitlist!(date)}>
+                      Join the Waitlist
+                    </button>
+                    <span className={styles.hint}>
+                      {spotsLeft === 0 ? 'This day is sold out.' : `Only ${spotsLeft} spot${spotsLeft === 1 ? ' is' : 's are'} left.`} Joining is free. We email you if spots open.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
+                      {sending ? 'Booking…' : 'Confirm Booking'}
+                    </button>
+                    <span className={styles.hint}>{missing || `No payment online: you pay ${host} directly.`}</span>
+                  </>
+                )}
               </div>
             </form>
           )}

@@ -9,6 +9,8 @@ import BioModal from './BioModal';
 import BookingModal from './BookingModal';
 import ClaimModal from './ClaimModal';
 import ListingCard from './ListingCard';
+import { useWaitlists } from './useWaitlists';
+import WaitlistModal from './WaitlistModal';
 import { listingFacts } from './TeamDirectory';
 import t from './TeamDirectory.module.css';
 import styles from './FacilityCards.module.css';
@@ -38,6 +40,8 @@ export default function FacilityCards({ items, live }: Props) {
   const [open, setOpen] = useState<DirectoryItem | null>(null);
   const [booking, setBooking] = useState<DirectoryItem | null>(null);
   const [claiming, setClaiming] = useState<DirectoryItem | null>(null);
+  const [waiting, setWaiting] = useState<{ item: DirectoryItem; date?: string } | null>(null);
+  const { soldOut, places } = useWaitlists(live ? (cards ?? []) : [], () => live?.widgetId);
   const facility = live != null && listingTypeOf(live.widgetId) === 'facilities';
 
   const source = live ? JSON.stringify(live) : '';
@@ -71,6 +75,9 @@ export default function FacilityCards({ items, live }: Props) {
                     onOpen={() => setOpen(card)}
                     onBook={live ? () => setBooking(card) : undefined}
                     onClaim={live ? () => setClaiming(card) : undefined}
+                    soldOut={live ? soldOut[`${live.widgetId}.${card.id}`] : undefined}
+                    place={live ? places[`${live.widgetId}.${card.id}`] : undefined}
+                    onWaitlist={() => setWaiting({ item: card })}
                   />
                 </Reveal>
               ))}
@@ -78,7 +85,19 @@ export default function FacilityCards({ items, live }: Props) {
       </Container>
 
       {open && <BioModal card={open} onClose={() => setOpen(null)} />}
-      {booking && live && <BookingModal item={booking} widgetId={live.widgetId} facts={listingFacts(booking)} onClose={() => setBooking(null)} />}
+      {booking && live && (
+        <BookingModal
+          item={booking}
+          widgetId={live.widgetId}
+          facts={listingFacts(booking)}
+          onClose={() => setBooking(null)}
+          onJoinWaitlist={(date) => {
+            setBooking(null);
+            setWaiting({ item: booking, date });
+          }}
+        />
+      )}
+      {waiting && live && <WaitlistModal item={waiting.item} widgetId={live.widgetId} facts={listingFacts(waiting.item)} date={waiting.date} onClose={() => setWaiting(null)} />}
       {claiming && live && <ClaimModal item={claiming} widgetId={live.widgetId} onClose={() => setClaiming(null)} />}
     </section>
   );

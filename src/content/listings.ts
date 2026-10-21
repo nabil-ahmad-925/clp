@@ -218,6 +218,9 @@ export type Listing = {
   endTime?: string;
   /** Spots per day (none: no limit) and what to bring (CLP Partner and Compete Like Pros listings). */
   capacity?: number;
+  /** "Waitlist when sold out": the hours a spot is held for the person it's offered to, and how spots go out (the next
+   *  in line, everyone told and the first to book wins, or the host picks). None: no waitlist. */
+  waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
   whatToBring?: string[];
   buttons: Cta[];
   socials: { network: string; href: string }[];
@@ -318,6 +321,7 @@ export const toItem = (l: Listing): AddedItem => ({
   startTime: l.startTime,
   endTime: l.endTime,
   capacity: l.capacity,
+  waitlist: l.waitlist,
   whatToBring: l.whatToBring,
   image: l.image,
   subtitle: l.subtitle,
@@ -628,4 +632,130 @@ export async function cancelGuestBooking(id: string, token: string): Promise<Boo
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error || 'Could not cancel your booking. Please try again.');
   return body.booking as BookingConfirmation;
+}
+
+// --- Waitlists (a sold-out day of a listing with its waitlist on; the bookings API) ---------------------------------
+
+/** A place in a day's line, as its person sees it (the join answer and their waitlist page). */
+export type WaitlistPlace = {
+  id: string;
+  listingTitle: string;
+  listingSubtitle?: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  people: number;
+  partial: boolean;
+  name: string;
+  email: string;
+  status: 'waiting' | 'offered' | 'booked' | 'expired' | 'removed' | 'left' | 'closed';
+  /** Their place in line, from 1 (waiting or offered). */
+  position?: number;
+  /** Spots held for them, until when. */
+  offeredSpots?: number;
+  offerExpiresAt?: string;
+  bookingId?: string;
+  claimHours?: number;
+  mode?: 'next' | 'all' | 'pick';
+  pricePer?: number;
+  ages: { kind: 'adult'; minAge: number } | { kind: 'youth' } | { kind: 'all' };
+};
+export type JoinedWaitlist = { waitlist: WaitlistPlace; token: string };
+export type WaitlistJoin = {
+  widgetId: number | string;
+  listingId: string;
+  date: string;
+  people: number;
+  name: string;
+  email: string;
+  phone?: string;
+  /** Offer me part of my group: fewer spots when that's all that opens. */
+  partial?: boolean;
+  website?: string;
+};
+
+/** The person's own waitlist page (/booking/?waitlist=…&token=…). */
+export const waitlistPageHref = (id: string, token: string) => `/booking/?waitlist=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}`;
+
+const waitlistCall = async <T,>(path: string, init: RequestInit | undefined, fallback: string): Promise<T> => {
+  if (!API_URL) throw new Error('The waitlist isn’t available right now.');
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, { cache: 'no-store', signal: AbortSignal.timeout(15_000), ...init });
+  } catch {
+    throw new Error('Could not reach CLP. Check your connection and try again.');
+  }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(body.error || (res.status === 429 ? 'Too many requests. Please try again in a minute.' : fallback)), { status: res.status, code: body.code as string | undefined });
+  return body as T;
+};
+const postJson = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+
+/** Joins a full day's waitlist (the same e-mail again answers with its place). Rejects with the API's message. */
+export const joinWaitlist = (request: WaitlistJoin) => waitlistCall<JoinedWaitlist>('/bookings/waitlist', postJson(request), 'Could not join the waitlist. Please try again.');
+
+/** Their place in line, by the link in their e-mails; null when the link isn't valid. */
+export async function fetchWaitlistPlace(id: string, token: string): Promise<WaitlistPlace | null> {
+  try {
+    return (await waitlistCall<{ waitlist: WaitlistPlace }>(`/bookings/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`, undefined, 'Could not load your place in line. Please try again.')).waitlist;
+  } catch (err) {
+    if ((err as { status?: number }).status === 404) return null;
+    throw err;
+  }
+}
+
+/** Books the spots held for them (or, first to book wins, the open ones). */
+export const claimWaitlistSpot = (
+  id: string,
+  token: string,
+  request: { adults: number; kids: number; waiver: boolean; guardian?: boolean; ageConfirmed?: boolean; notes?: string },
+) => waitlistCall<NewBooking>(`/bookings/${encodeURIComponent(id)}/claim`, postJson({ token, ...request }), 'Could not book your spot. Please try again.');
+
+/** Leaves the line. */
+export const leaveWaitlist = async (id: string, token: string) =>
+  (await waitlistCall<{ waitlist: WaitlistPlace }>(`/bookings/${encodeURIComponent(id)}/cancel`, postJson({ token }), 'Could not leave the waitlist. Please try again.')).waitlist;
+
+/**
+ * Which listings are sold out with their waitlist open ("<widgetId>.<id>" -> people waiting): every day they offer is
+ * full. Only listings with a waitlist are asked about. Never throws: without an answer, none is.
+ */
+export async function fetchSoldOut(listings: { widgetId: number | string; id: string }[]): Promise<Record<string, { waiting: number }>> {
+  const keys = [...new Set(listings.map((l) => `${l.widgetId}.${l.id}`))].slice(0, 60);
+  if (!API_URL || !keys.length) return {};
+  try {
+    const res = await fetch(`${API_URL}/bookings/sold-out?listings=${encodeURIComponent(keys.join(','))}`, { signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) return {};
+    return ((await res.json()).items ?? {}) as Record<string, { waiting: number }>;
+  } catch {
+    return {};
+  }
+}
+
+// The places this device joined ("<widgetId>.<id>" -> place), so a card shows "You're #N on the waitlist".
+const JOINED_KEY = 'clp-waitlists';
+export type SavedPlace = { id: string; token: string; position: number; date: string; at: string };
+export function savedPlaces(): Record<string, SavedPlace> {
+  try {
+    return JSON.parse(localStorage.getItem(JOINED_KEY) || '{}') as Record<string, SavedPlace>;
+  } catch {
+    return {};
+  }
+}
+export function savePlace(key: string, place: SavedPlace) {
+  try {
+    localStorage.setItem(JOINED_KEY, JSON.stringify({ ...savedPlaces(), [key]: place }));
+    window.dispatchEvent(new Event('clp-waitlists'));
+  } catch {
+    // Private mode: the card just doesn't remember it.
+  }
+}
+export function forgetPlace(key: string) {
+  try {
+    const all = savedPlaces();
+    delete all[key];
+    localStorage.setItem(JOINED_KEY, JSON.stringify(all));
+    window.dispatchEvent(new Event('clp-waitlists'));
+  } catch {
+    // Nothing saved.
+  }
 }
