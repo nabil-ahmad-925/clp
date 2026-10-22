@@ -5,7 +5,7 @@ import styles from './ServiceNav.module.css';
 /**
  * Full-width gold "Previous … / Next …" band at the bottom of the /services/<slug>/ pages and the partnership
  * (portfolio) pages: each half darkens and shows an arrow on hover. `centerLone`: the first or last page's one link sits
- * in the middle (the partnership pages'), else on its own side.
+ * in the middle (the services' and partnership pages'), else on its own side.
  */
 export default function ServiceNav({ previous, next, label = 'Services', centerLone = false }: { previous?: ServiceNavLink; next?: ServiceNavLink; label?: string; centerLone?: boolean }) {
   if (!previous && !next) return null;

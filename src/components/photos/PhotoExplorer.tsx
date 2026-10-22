@@ -330,7 +330,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
                 category: liveNow.result.item.categoryName,
                 access: liveNow.result.item.access,
                 by: liveNow.result.item.by,
-                byHref: liveNow.result.item.partner ? partnerHref(liveNow.result.item.partner) : undefined,
+                byHref: liveNow.result.item.byPartner ? partnerHref(liveNow.result.item.byPartner) : undefined,
                 images: NO_IMAGES,
               }}
             />
@@ -592,13 +592,14 @@ function AlbumHead({ access, title, line, children }: { access: AlbumAccess; tit
 }
 
 /**
- * A gate view ("My family's photos", "Client login", a private code): the album heading and its gate; signed in with a
- * photo login, its families-only albums or client galleries.
+ * A gate view ("My family's photos", "Client login", a private code): its gate; signed in with a photo login, its
+ * families-only albums or client galleries. A private code's has the album heading; the family and client logins go
+ * straight to their sign-in (the page's heading already names them).
  */
 function Gate({ sport, access, code }: { sport: PhotoSection['sport']; access: Exclude<AlbumAccess, 'public'>; code?: string }) {
   return (
     <section className={styles.album}>
-      <AlbumHead access={access} title={GATE_COPY[access].album} line={`${sport.title} · Photos by Compete Like Pros`} />
+      {access === 'code' && <AlbumHead access={access} title={GATE_COPY[access].album} line={`${sport.title} · Photos by Compete Like Pros`} />}
       {access === 'code' ? <PhotoGate key={`${access}-${code ?? ''}`} kind={access} initialCode={code} /> : <MyAlbums kind={access} />}
     </section>
   );
@@ -885,6 +886,7 @@ function Album({
           shareable={album.access === 'public'}
           by={album.by}
           byHref={album.byHref}
+          partner={live?.item.partner}
           images={viewing}
           index={open}
           startTab={filter === 'prints' ? 'print' : 'digital'}

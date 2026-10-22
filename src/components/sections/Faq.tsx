@@ -6,6 +6,7 @@ import Reveal from '@/components/ui/Reveal';
 import RichText from '@/components/ui/RichText';
 import { Container } from '@/components/ui/Section';
 import type { FaqData } from '@/content/types';
+import rows from '@/components/faq/FaqRows.module.css';
 import styles from './Faq.module.css';
 
 type Props = FaqData & {
@@ -17,48 +18,88 @@ type Props = FaqData & {
   wide?: boolean;
   /** Only the accordion, for placing inside a page-builder column. */
   bare?: boolean;
-  /** Smaller (22px) questions, as on the sport FAQ pages. */
-  compact?: boolean;
   /** Space above the "View all" button (the service pages' button row has no top margin of its own). */
   viewAllGap?: number;
 };
 
 /**
- * Heading + accordion (one item open at a time) + optional "View all" button.
- * The first item starts open, as the original's accordion script does on load.
+ * Heading + accordion + optional "View all" button. FAQs ("minimal", and bare in a page-builder column) are the FAQ
+ * page's questions (FaqRows: each opens on its own, a gold "+" / "−"). The policy pages ("shadow") keep their own
+ * accordion: one item open at a time, the first open on load, as the original's script does.
  */
-export default function Faq({ title, items, viewAll, italic, variant = 'minimal', introHtml, wide, bare, compact, viewAllGap }: Props) {
+export default function Faq({ title, items, viewAll, italic, variant = 'minimal', introHtml, wide, bare, viewAllGap }: Props) {
   const [open, setOpen] = useState<number | null>(items.length ? 0 : null);
+  const [opened, setOpened] = useState<Set<number>>(new Set());
   const id = useId();
+  const answerOf = (item: (typeof items)[number], className?: string) =>
+    item.html ? <RichText html={item.html} className={className} /> : item.answer ? <p className={className}>{italic ? <i>{item.answer}</i> : item.answer}</p> : null;
 
-  const list = (
-    <div className={`${styles.list} ${compact ? styles.compact : ''}`}>
+  const faqRows = (
+    <div className={rows.list}>
       {items.map((item, i) => {
-        const isOpen = open === i;
+        const isOpen = opened.has(i);
         return (
-          <div key={i} className={`${styles.item} ${isOpen ? styles.open : ''}`}>
-            <h3 className={styles.question}>
+          <div key={i} className={rows.item}>
+            <h3 className={styles.rowHeading}>
               <button
                 type="button"
                 id={`${id}-q${i}`}
+                className={rows.question}
                 aria-expanded={isOpen}
                 aria-controls={`${id}-a${i}`}
-                onClick={() => setOpen(isOpen ? null : i)}
+                onClick={() => {
+                  const next = new Set(opened);
+                  if (isOpen) next.delete(i);
+                  else next.add(i);
+                  setOpened(next);
+                }}
               >
-                <i className={styles.icon} aria-hidden />
-                {item.question}
+                <span className={rows.questionText}>
+                  <span className={rows.q}>{item.question}</span>
+                </span>
+                <span className={rows.sign} aria-hidden>
+                  {isOpen ? '−' : '+'}
+                </span>
               </button>
             </h3>
-            <div id={`${id}-a${i}`} role="region" aria-labelledby={`${id}-q${i}`} className={styles.answer}>
-              <div className={styles.answerInner}>
-                {item.html ? <RichText html={item.html} className={styles.answerText} /> : item.answer ? <p className={styles.answerPlain}>{italic ? <i>{item.answer}</i> : item.answer}</p> : null}
-              </div>
+            <div id={`${id}-a${i}`} role="region" aria-labelledby={`${id}-q${i}`} hidden={!isOpen}>
+              <div className={rows.answer}>{answerOf(item)}</div>
             </div>
           </div>
         );
       })}
     </div>
   );
+
+  const list =
+    variant !== 'shadow' ? (
+      faqRows
+    ) : (
+      <div className={styles.list}>
+        {items.map((item, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={i} className={`${styles.item} ${isOpen ? styles.open : ''}`}>
+              <h3 className={styles.question}>
+                <button
+                  type="button"
+                  id={`${id}-q${i}`}
+                  aria-expanded={isOpen}
+                  aria-controls={`${id}-a${i}`}
+                  onClick={() => setOpen(isOpen ? null : i)}
+                >
+                  <i className={styles.icon} aria-hidden />
+                  {item.question}
+                </button>
+              </h3>
+              <div id={`${id}-a${i}`} role="region" aria-labelledby={`${id}-q${i}`} className={styles.answer}>
+                <div className={styles.answerInner}>{answerOf(item, item.html ? styles.answerText : styles.answerPlain)}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
 
   if (bare) return <div className={styles[variant]}>{list}</div>;
 

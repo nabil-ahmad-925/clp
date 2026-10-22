@@ -47,25 +47,24 @@ const PLANS = [
 ] as const;
 
 /**
- * "Run a program?" ("Offer a service?" on a service's page): the three ways to be listed, at the end of a listing page.
- * Each card's button opens its form (ProgramModal), sent with the page's category.
+ * "Run a program?": the three ways to be listed, at the end of an Experiences or Resources listing page. Each card's
+ * button opens its form (ProgramModal), sent with the page's category.
  */
-export function ProgramPlans({ category, section }: { category?: string; section?: 'experiences' | 'resources' | 'services' }) {
+export function ProgramPlans({ category, section }: { category?: string; section?: 'experiences' | 'resources' }) {
   const [open, setOpen] = useState<ApplicationKind | null>(null);
-  const services = section === 'services';
   return (
     <section className={styles.plans} data-header-tone="dark">
       <div className={styles.plansHead}>
-        <h2 className={`${styles.plansTitle} ${styles.plansTitleBold}`}>{services ? 'Get in Front of More Teams & Brands' : 'Get in Front of More Athletes'}</h2>
+        <h2 className={`${styles.plansTitle} ${styles.plansTitleBold}`}>Get in Front of More Athletes</h2>
         {/* The section's label under its heading. */}
-        <span className={styles.eyebrowDark}>{services ? 'OFFER A SERVICE?' : 'RUN A PROGRAM?'}</span>
+        <span className={styles.eyebrowDark}>RUN A PROGRAM?</span>
       </div>
       <div className={styles.planGrid}>
         {PLANS.map((p) => (
           <div key={p.title} className={`${styles.plan} ${styles[p.tone]}`}>
             <span className={styles.planTag}>{p.tag}</span>
             <span className={styles.planTitle}>{p.title}</span>
-            <span className={styles.planDesc}>{services && p.kind === 'sponsored' ? 'Boost your service to the top of its service pages.' : p.desc}</span>
+            <span className={styles.planDesc}>{p.desc}</span>
             <div className={styles.planPoints}>
               {p.points.map((point) => (
                 <span key={point} className={styles.planPoint}>
@@ -87,8 +86,7 @@ export function ProgramPlans({ category, section }: { category?: string; section
           </div>
         ))}
       </div>
-      {/* The applications API knows the Experiences and Resources sections; a service's form goes with its category only. */}
-      {open && <ProgramModal kind={open} category={category} section={services ? undefined : section} onClose={() => setOpen(null)} />}
+      {open && <ProgramModal kind={open} category={category} section={section} onClose={() => setOpen(null)} />}
     </section>
   );
 }

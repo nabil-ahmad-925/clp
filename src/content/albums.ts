@@ -41,8 +41,10 @@ export type LiveAlbum = {
   /** "Photos by …". */
   by: string;
   ownerName: string;
-  /** The slug of the owner's live partner page (a partner's album): "Photographed by" links to it. */
+  /** The slug of the owner's live partner page (a partner's album): its print products. */
   partner?: string;
+  /** The live partner page "Photographed by" links to: the photographer CLP picked, else the owner's. */
+  byPartner?: string;
   access: 'public' | 'code' | 'family' | 'client';
   /** An open client gallery's client ("Client gallery for …"). */
   clientName?: string;

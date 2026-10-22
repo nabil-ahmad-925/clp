@@ -140,6 +140,7 @@
   font: inherit;
   font-size: 14px;
   font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color 0.15s ease,

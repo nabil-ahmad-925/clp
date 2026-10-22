@@ -222,6 +222,9 @@ export type Listing = {
    *  in line, everyone told and the first to book wins, or the host picks). None: no waitlist. */
   waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
   whatToBring?: string[];
+  /** A facility run by a city, county or state: "Permit Now" opens its permit page (`permitUrl`) and it isn't booked on CLP. */
+  government?: boolean;
+  permitUrl?: string;
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
@@ -323,6 +326,8 @@ export const toItem = (l: Listing): AddedItem => ({
   capacity: l.capacity,
   waitlist: l.waitlist,
   whatToBring: l.whatToBring,
+  government: l.government,
+  permitUrl: l.permitUrl,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,
@@ -466,8 +471,9 @@ export async function moreListings(
 
 // --- Booking requests ("Book Now"; the bookings API, clp-api src/bookings.mjs) ---------------------------------------
 
-/** Whether a listing is booked on CLP ("Book Now"): CLP's own and its partners' listings. Others link out. */
-export const isBookable = (item: { provider?: Provider }) => item.provider === 'partner' || item.provider === 'clp';
+/** Whether a listing is booked on CLP ("Book Now"): CLP's own and its partners' listings, never a government facility
+ *  (it needs a permit). Others link out. */
+export const isBookable = (item: { provider?: Provider; government?: boolean }) => (item.provider === 'partner' || item.provider === 'clp') && !item.government;
 
 /**
  * What a card shows besides the listing's fields (listingDisplay.json, shared with the admin and the API): the units a

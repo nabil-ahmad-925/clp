@@ -124,11 +124,13 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
     </>
   ) : undefined;
   const noPrice = variant === 'listing' && <span className={styles.noPrice}>Contact for pricing</span>;
-  // CLP's and its partners' listings are booked on CLP; the others' details link out.
-  const book = Boolean(onBook) && (card.provider === 'partner' || card.provider === 'clp');
+  // A government facility needs a permit: "Permit Now" opens its permit page.
+  const permit = variant === 'facility' && card.government && card.permitUrl ? card.permitUrl : undefined;
+  // CLP's and its partners' listings are booked on CLP, and every other facility too; the others' details link out.
+  const book = !permit && Boolean(onBook) && (card.provider === 'partner' || card.provider === 'clp' || variant === 'facility');
   // Sold out with a waitlist: join it (or, once joined, see the place in line).
   const waitlist = book && Boolean(soldOut) && Boolean(onWaitlist);
-  const ctaLabel = book ? 'Book Now' : 'Learn More';
+  const ctaLabel = permit ? 'Permit Now' : book ? 'Book Now' : 'Learn More';
   const learnMore = waitlist ? (
     place ? (
       <Link
@@ -152,6 +154,17 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         Join Waitlist
       </button>
     )
+  ) : permit ? (
+    <a
+      href={permit}
+      target="_blank"
+      rel="noopener"
+      className={`${styles.cta} ${facility ? styles.ctaWide : ''}`}
+      aria-label={`${ctaLabel}: ${[card.subtitle, card.title].filter(Boolean).join(' – ')} (opens in a new tab)`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {ctaLabel}
+    </a>
   ) : (
     <button
       type="button"

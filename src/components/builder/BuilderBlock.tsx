@@ -34,7 +34,8 @@ export default function BuilderBlock({ block, listing }: { block: Block; listing
         </div>
       );
     case 'serviceNav':
-      return <ServiceNav previous={block.previous} next={block.next} />;
+      // The first and last service's one link sits in the middle of the band.
+      return <ServiceNav previous={block.previous} next={block.next} centerLone />;
     case 'booking':
       return (
         <div>
@@ -67,7 +68,7 @@ export default function BuilderBlock({ block, listing }: { block: Block; listing
       return (
         <div>
           {block.title && <h2 className={styles.faqTitle}>{block.title}</h2>}
-          <Faq bare compact={block.compact} items={block.items} />
+          <Faq bare items={block.items} />
           {block.viewAll && (
             <div className={styles.faqViewAll}>
               <a href={block.viewAll.href} target={block.viewAll.newTab ? '_blank' : undefined} rel={block.viewAll.newTab ? 'noopener' : undefined}>

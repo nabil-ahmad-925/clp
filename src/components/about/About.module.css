@@ -220,7 +220,7 @@
   padding-top: 20px;
 }
 
-/* The Creator (light) and The Outlaw (black): on hover the light one turns black and the black one white. */
+/* The Creator (light) and The Outlaw (black): on hover both are black (the light one turns black, the black one stays). */
 .trait {
   display: flex;
   flex-direction: column;
@@ -244,12 +244,6 @@
   color: var(--white);
 }
 
-.traitDark:hover {
-  background: var(--white);
-  color: #111;
-  box-shadow: inset 0 0 0 1px #e2dfd8;
-}
-
 .traitName {
   font-family: var(--font-display);
   font-size: 34px;
@@ -264,10 +258,6 @@
 .trait:hover .traitText,
 .traitDark .traitText {
   color: #bbb;
-}
-
-.traitDark:hover .traitText {
-  color: #555;
 }
 
 .closing {

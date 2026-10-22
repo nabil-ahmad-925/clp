@@ -1,0 +1,97 @@
+/*
+ * The FAQ's questions (the new design, FAQ.html): rows between thin lines, each opening on its own, with a gold
+ * circled "+" / "−". Shared by the FAQ page and the FAQ sections of the other pages.
+ */
+.list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #e5e5e2;
+}
+
+.item {
+  border-bottom: 1px solid #e5e5e2;
+}
+
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 22px 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.question:focus-visible {
+  outline: 2px solid #dcbd7d;
+  outline-offset: 2px;
+}
+
+.questionText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tag {
+  color: #8a6f33;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.q {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sign {
+  display: flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid #dcbd7d;
+  border-radius: 50%;
+  color: #8a6f33;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.answer {
+  padding: 0 52px 24px 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.answer p,
+.answer ul {
+  margin: 0;
+}
+
+.answer > * + * {
+  margin-top: 10px;
+}
+
+.answer ul {
+  padding-left: 22px;
+}
+
+@media (max-width: 639px) {
+  .q {
+    font-size: 16px;
+  }
+
+  .answer {
+    padding-right: 0;
+  }
+}

@@ -14,6 +14,7 @@ import { partnerWays, partnershipsDisclaimer } from '@/content/partnerships';
 import t from '@/components/sections/TeamDirectory.module.css';
 import BecomePartner from './BecomePartner';
 import { PartnerCard } from './PartnerDirectory';
+import rows from '@/components/faq/FaqRows.module.css';
 import s from './partnerships.module.css';
 
 type Filters = { cats: string[]; types: string[]; sports: string[] };
@@ -402,10 +403,10 @@ function FeaturedBand({ items, onViewAll }: { items: PartnerCardData[]; onViewAl
   );
 }
 
-/** "Ways to partner with CLP": who you are (the switch), its questions (one open at a time) and what you get. */
+/** "Ways to partner with CLP": who you are (the switch), its questions (the FAQ's rows, each opening on its own) and what you get. */
 function WaysToPartner() {
   const [way, setWay] = useState(partnerWays[2].id);
-  const [openQ, setOpenQ] = useState(0);
+  const [opened, setOpened] = useState<Set<number>>(new Set());
   const current = partnerWays.find((w) => w.id === way) ?? partnerWays[0];
   return (
     <section className={s.ways}>
@@ -423,7 +424,7 @@ function WaysToPartner() {
             aria-pressed={w.id === way}
             onClick={() => {
               setWay(w.id);
-              setOpenQ(0);
+              setOpened(new Set());
             }}
           >
             {w.label}
@@ -431,18 +432,33 @@ function WaysToPartner() {
         ))}
       </div>
       <div className={s.waysBody}>
-        <div className={s.qs}>
-          {current.questions.map((x, i) => (
-            <div key={x.q} className={s.q}>
-              <button type="button" className={s.qBtn} aria-expanded={i === openQ} onClick={() => setOpenQ(i === openQ ? -1 : i)}>
-                <span className={s.qText}>{x.q}</span>
-                <span className={s.qSign} aria-hidden>
-                  {i === openQ ? '−' : '+'}
-                </span>
-              </button>
-              {i === openQ && <div className={s.qAnswer}>{x.a}</div>}
-            </div>
-          ))}
+        <div className={rows.list}>
+          {current.questions.map((x, i) => {
+            const isOpen = opened.has(i);
+            return (
+              <div key={x.q} className={rows.item}>
+                <button
+                  type="button"
+                  className={rows.question}
+                  aria-expanded={isOpen}
+                  onClick={() => {
+                    const next = new Set(opened);
+                    if (isOpen) next.delete(i);
+                    else next.add(i);
+                    setOpened(next);
+                  }}
+                >
+                  <span className={rows.questionText}>
+                    <span className={rows.q}>{x.q}</span>
+                  </span>
+                  <span className={rows.sign} aria-hidden>
+                    {isOpen ? '−' : '+'}
+                  </span>
+                </button>
+                {isOpen && <div className={rows.answer}>{x.a}</div>}
+              </div>
+            );
+          })}
         </div>
         <div className={s.perks}>
           <span className={s.perksTitle}>WHAT YOU GET</span>

@@ -21,6 +21,8 @@ type Props = {
   by?: string;
   /** Their partner page ("Photographed by" links to it). */
   byHref?: string;
+  /** The owner's partner page slug (a partner's album): its print products. */
+  partner?: string;
   images: GalleryImage[];
   index: number;
   /** The side panel's tab on opening (the album's "Prints & products" filter opens on prints). */
@@ -291,13 +293,12 @@ export function Mockup({
  * (content/gallery.ts), then a product's options with a live preview, the quantity and "Add to cart". Arrow keys and
  * swipes step through the album, Esc or × closes it.
  */
-export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, byHref, images, index, startTab = 'digital', onIndex, onClose, onOpenCart, paged }: Props) {
+export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, byHref, partner, images, index, startTab = 'digital', onIndex, onClose, onOpenCart, paged }: Props) {
   const [tab, setTab] = useState<'digital' | 'print'>(startTab);
   const [product, setProduct] = useState<PrintProduct | null>(null);
   // The products CLP offers on this album's photos (Photo products): its photographer's partner page decides the
   // partners-only ones.
-  const partnerSlug = byHref?.startsWith('/partner/') ? (new URLSearchParams(byHref.split('?')[1] ?? '').get('p') ?? undefined) : undefined;
-  const { products, ready } = usePrintProducts(partnerSlug);
+  const { products, ready } = usePrintProducts(partner);
   const [chosen, setChosen] = useState<Record<string, string>>({});
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);

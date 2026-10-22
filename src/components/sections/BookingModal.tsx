@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { downloadCalendarFile } from '@/content/calendar';
 import { agePolicy, bookingPageHref, CANCEL_TIME, directionsHref, fetchAvailability, requestBooking, type NewBooking } from '@/content/listings';
 import { footerLinks } from '@/content/site';
-import type { DirectoryItem } from '@/content/types';
+import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './BookingModal.module.css';
 
@@ -30,6 +30,14 @@ const MAX_DAYS = 21;
 /** Free cancellation by the guest: up to this many days before (as the bookings API's CANCEL_DAYS). */
 const CANCEL_DAYS = 2;
 const MAX_PEOPLE = 20;
+/** Who hosts it, on the photo and under "Hosted by" (a facility without a partner is booked through CLP). */
+const BADGE: Record<Provider, string> = { clp: 'COMPETE LIKE PROS', partner: 'CLP PARTNER', community: 'COMMUNITY', sponsored: 'SPONSORED' };
+const HOST_META: Record<Provider, string> = {
+  clp: 'Compete Like Pros · verified',
+  partner: 'CLP Partner · verified',
+  community: 'Booked through Compete Like Pros',
+  sponsored: 'Sponsored · booked through Compete Like Pros',
+};
 
 /** Today in US Eastern time ("YYYY-MM-DD"), as the bookings API checks dates. */
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
@@ -235,7 +243,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
           {item.image && <Image className={styles.photoImage} src={item.image} alt="" fill sizes="(max-width: 767px) 100vw, 460px" />}
           <span className={styles.photoShade} aria-hidden />
           <div className={styles.photoText}>
-            <span className={styles.badge}>{item.provider === 'clp' ? 'COMPETE LIKE PROS' : 'CLP PARTNER'}</span>
+            <span className={styles.badge}>{BADGE[item.provider ?? 'partner']}</span>
             {item.subtitle && <span className={styles.photoProvider}>{item.subtitle}</span>}
             <span className={styles.photoTitle}>{item.title}</span>
             {(facts.city || facts.ages) && <span className={styles.photoMeta}>{[facts.city, facts.ages].filter(Boolean).join(' · ')}</span>}
@@ -297,7 +305,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                   <div className={styles.hosted}>
                     <span className={styles.kicker}>HOSTED BY</span>
                     <span className={styles.hostName}>{host}</span>
-                    <span className={styles.hostMeta}>{item.provider === 'clp' ? 'Compete Like Pros · verified' : 'CLP Partner · verified'}</span>
+                    <span className={styles.hostMeta}>{HOST_META[item.provider ?? 'partner']}</span>
                   </div>
                   {ended && <p className={styles.error}>This experience has ended. Check back for new dates.</p>}
                 </div>

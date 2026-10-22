@@ -147,9 +147,9 @@ const CHIPS: Record<string, Chip> = {
 
 /**
  * Resources categories whose level filter (Academies/Clubs, High School, Pro Athletes/Teams…) is the providers' coaching
- * experience: Dieting & Nutrition, Mental Health & Resilience and Injury Prevention & Recovery.
+ * experience: Dieting & Nutrition, Mental Health & Resilience, Injury Prevention & Recovery and Strength & Conditioning.
  */
-const COACHING_EXPERIENCE_WIDGETS = [40, 39, 16];
+const COACHING_EXPERIENCE_WIDGETS = [40, 39, 16, 33];
 /** Groups & Private Lessons: its "Skill Level" filter (Licensed Coach, Former/Current Pro…) is the coach's experience. */
 const GROUPS_PRIVATE_WIDGET = 6;
 

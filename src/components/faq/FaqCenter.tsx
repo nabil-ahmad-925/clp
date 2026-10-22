@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { FAQ_EMAIL, faqHref, faqPlace, faqTopics, type FaqItem } from '@/content/faq';
+import rows from './FaqRows.module.css';
 import styles from './FaqCenter.module.css';
 
 const ROLES = ['I’m an athlete', 'I’m a parent or guardian', 'I’m a fan', 'I’m a partner or organizer', 'I’m a brand'];
@@ -38,7 +39,7 @@ function Answer({ blocks }: { blocks: string[] }) {
     }
   });
   flush();
-  return <div className={styles.answer}>{out}</div>;
+  return <div className={rows.answer}>{out}</div>;
 }
 
 /**
@@ -143,24 +144,24 @@ export default function FaqCenter({ topic: initialTopic, sub: initialSub }: { to
         )}
 
         {shown.length > 0 ? (
-          <div className={styles.list}>
+          <div className={rows.list}>
             {shown.map((e) => {
               const isOpen = Boolean(open[e.key]);
               const id = `faq-${e.key.replace(/[^a-z0-9]+/gi, '-')}`;
               return (
-                <div key={e.key} className={styles.item}>
+                <div key={e.key} className={rows.item}>
                   <button
                     type="button"
-                    className={styles.question}
+                    className={rows.question}
                     aria-expanded={isOpen}
                     aria-controls={id}
                     onClick={() => setOpen({ ...open, [e.key]: !isOpen })}
                   >
-                    <span className={styles.questionText}>
-                      {e.tag && <span className={styles.tag}>{e.tag}</span>}
-                      <span className={styles.q}>{e.q}</span>
+                    <span className={rows.questionText}>
+                      {e.tag && <span className={rows.tag}>{e.tag}</span>}
+                      <span className={rows.q}>{e.q}</span>
                     </span>
-                    <span className={styles.sign} aria-hidden>
+                    <span className={rows.sign} aria-hidden>
                       {isOpen ? '−' : '+'}
                     </span>
                   </button>

@@ -71,6 +71,9 @@ export type DirectoryItem = FacilityCard & {
   whatToBring?: string[];
   /** Its waitlist when a day is sold out (see content/listings ListingWaitlist). */
   waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
+  /** A government facility: "Permit Now" (its permit page, `permitUrl`) instead of "Book Now". */
+  government?: boolean;
+  permitUrl?: string;
 };
 
 /** Who provides a listing (the listings API's `provider`): CLP Partner, Compete Like Pros, Community or Sponsored. */

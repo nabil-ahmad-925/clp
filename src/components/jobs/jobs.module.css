@@ -112,12 +112,31 @@
   outline-offset: 2px;
 }
 
-/* The small box on the photo's bottom edge (as the partners' cards). */
-.cardMark {
-  position: absolute;
-  bottom: -28px;
-  left: 16px;
-  z-index: 1;
+/* Under the photo: the poster's logo half over its edge, their name and how they're verified beside it. */
+.cardHead {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: -32px;
+  padding: 0 20px;
+}
+
+.cardOrg {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  /* Below the photo's edge, beside the logo's lower half. */
+  padding-top: 38px;
+  line-height: 1.35;
+}
+
+.cardOrg strong {
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mark {
@@ -129,6 +148,7 @@
   overflow: hidden;
   border: 3px solid var(--white);
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   color: var(--white);
   font-family: var(--font-archivo), 'Archivo', sans-serif;
   font-size: 15px;
@@ -160,8 +180,7 @@
   flex: 1;
   flex-direction: column;
   gap: 10px;
-  /* Clear of the small box over the photo's edge. */
-  padding: 42px 20px 0;
+  padding: 16px 20px 0;
 }
 
 .kind {
@@ -458,8 +477,11 @@
 .join {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  /* Everything in the middle of the card, across and down. */
+  align-items: center;
+  justify-content: center;
   gap: 12px;
+  text-align: center;
   min-height: 340px;
   padding: 28px 24px;
   border-radius: 16px;
@@ -491,7 +513,7 @@
 }
 
 .joinCta {
-  align-self: flex-start;
+  align-self: center;
   margin-top: 8px;
   padding: 11px 18px;
   border: 0;
@@ -515,19 +537,19 @@
   min-height: 0;
 }
 
-/* ---- A role's panel (the design's drawer): its photo, who, the role, its facts, the lists, Save and Apply ---- */
+/* ---- A role's popup: its photo, who, the role, its facts, the lists, Save and Apply ---- */
+/* In the middle of the screen at every size; a long role scrolls inside the popup. */
 .overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  /* On the right of the page's content (1440px wide, 48px in). */
-  padding: 24px max(24px, calc((100vw - 1440px) / 2 + 48px));
-  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 24px;
   overscroll-behavior: contain;
-  background: rgba(17, 17, 17, 0.35);
+  background: rgba(17, 17, 17, 0.45);
   font-family: var(--font-body);
 }
 
@@ -538,7 +560,10 @@
   flex-direction: column;
   width: 680px;
   max-width: 100%;
-  overflow: hidden;
+  max-height: calc(100dvh - 48px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-radius: 18px;
   background: var(--white);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
@@ -762,36 +787,43 @@ a.panelOrg:hover {
   color: inherit;
 }
 
-@media (max-width: 639px) {
-  .overlay {
-    align-items: flex-end;
-    padding: 0;
-  }
-
-  .panel {
-    width: 100%;
-    max-height: 92dvh;
-    overflow-y: auto;
-    border-radius: 14px 14px 0 0;
-  }
-
-  .panelPhoto {
-    height: 160px;
-  }
-
-  .panelBody {
-    padding: 0 20px 24px;
-  }
-
-  .panelTitle {
-    font-size: 24px;
-  }
-
+/* Tablets: the facts in two columns. */
+@media (max-width: 767px) {
   .factGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .lists {
+/* Phones: still in the middle, close to the edges, everything in one column. */
+@media (max-width: 639px) {
+  .overlay {
+    padding: 12px;
+  }
+
+  .panel {
+    max-height: calc(100dvh - 24px);
+    border-radius: 14px;
+  }
+
+  .panelPhoto {
+    height: 150px;
+  }
+
+  .panelBody {
+    gap: 12px;
+    padding: 0 18px 20px;
+  }
+
+  .panelTitle {
+    font-size: 22px;
+  }
+
+  .factCell {
+    padding: 10px 12px;
+  }
+
+  .lists,
+  .panelActions {
     grid-template-columns: 1fr;
   }
 }

@@ -975,6 +975,7 @@
   flex-direction: column;
   overflow: hidden;
   padding: 0;
+  text-decoration: none;
   border: 1px solid #e7e5e0;
   border-radius: 14px;
   background: #fff;
@@ -1011,6 +1012,28 @@
   color: #fff;
   font-size: 12px;
   font-weight: 700;
+}
+
+/* An album's photo count (the design's bottom-right badge) and a private album's blurred cover. */
+.contentBadge {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.contentMedia img.contentLocked {
+  filter: blur(14px);
+  transform: scale(1.1);
 }
 
 .contentText {

@@ -23,7 +23,7 @@ import { ProductDetail, type DetailStore } from '@/components/shop/ShopView';
 import { articleDate, storyCard } from '@/content/articles';
 import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
-import { albumTypeName } from '@/content/albums';
+import { albumDates, albumTypeName, fetchAllAlbums, type LiveAlbum } from '@/content/albums';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
 import { categoryName, isBookable, toItem, waitlistPageHref, type SavedPlace } from '@/content/listings';
@@ -172,6 +172,19 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const type = partnerType(page.type);
   const palette = useMemo(() => paletteOf(page.color || type.color, page.colorMode), [page.color, type.color, page.colorMode]);
   const sectionOn = (id: string) => page.sections.find((x) => x.id === id)?.on !== false;
+  // The Content tab: the partner's own photo albums (each opens its gallery) and their YouTube videos (played here).
+  const [albums, setAlbums] = useState<LiveAlbum[]>([]);
+  useEffect(() => {
+    let live = true;
+    fetchAllAlbums().then(
+      (items) => live && setAlbums(items.filter((a) => a.partner === page.slug)),
+      () => {},
+    );
+    return () => {
+      live = false;
+    };
+  }, [page.slug]);
+  const youtube = (page.videos ?? []).filter((v) => v.source === 'youtube');
 
   // Their open roles (the jobs board's, posted by this partner).
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -191,7 +204,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const tabs = (
     [
       ['about', 'About', 0, true],
-      ['content', 'Content', page.photos.length + (page.videos?.length ?? 0), sectionOn('photos') && page.photos.length + (page.videos?.length ?? 0) > 0],
+      ['content', 'Content', albums.length + youtube.length, sectionOn('photos') && albums.length + youtube.length > 0],
       ['experiences', 'Experiences', experiences.length, sectionOn('experiences') && experiences.length > 0],
       ['jobs', 'Jobs', jobs.length, sectionOn('jobs') && jobs.length > 0],
       ['partnerships', 'Partnerships', collabs.length, sectionOn('partnerships') && collabs.length > 0],
@@ -228,7 +241,6 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const [dialog, setDialog] = useState<'follow' | 'question' | 'intro' | null>(null);
   // Who follows the page: the API's count, and the new one once the visitor follows (Follow or the sign-up card).
   const [followers, setFollowers] = useState(page.followers ?? 0);
-  const [photo, setPhoto] = useState<string | null>(null);
   const [booking, setBooking] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts } | null>(null);
   // A sold-out listing's waitlist being joined (its card, or a full day in the booking popup).
   const [waiting, setWaiting] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts; date?: string } | null>(null);
@@ -366,7 +378,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             {shown === 'about' && (
               <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />
             )}
-            {shown === 'content' && <Content page={page} onPhoto={setPhoto} onVideo={setVideo} />}
+            {shown === 'content' && <Content page={page} albums={albums} videos={youtube} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} waitOf={waitOf} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
             {shown === 'partnerships' && <Partnerships collabs={collabs} />}
@@ -419,17 +431,6 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           />
         )}
         {video && <VideoDialog video={video} onClose={() => setVideo(null)} />}
-        {photo && (
-          <Overlay onClose={() => setPhoto(null)} bare>
-            {/* A photo, full size: Close (as the video's) as well as Escape and a click outside. */}
-            <div className={s.lightboxWrap} role="dialog" aria-modal="true" aria-label={`${page.short} photo`}>
-              <img src={photo} alt="" className={s.lightbox} />
-              <button type="button" className={`${s.videoClose} ${s.lightboxClose}`} aria-label="Close" onClick={() => setPhoto(null)}>
-                ✕
-              </button>
-            </div>
-          </Overlay>
-        )}
         {cartOpen && <CartDrawer page={page} cart={cart} onClose={() => setCartOpen(false)} onShop={has('shop') ? () => pick('shop') : undefined} />}
         {booking && (
           <BookingModal
@@ -676,16 +677,19 @@ const titleCase = (text: string) =>
   text.replace(/\S+/g, (w, i: number) => (i > 0 && SMALL_WORDS.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)));
 const thumbOf = (v: PartnerVideo) => (v.source === 'youtube' && videoId(v) ? `https://i.ytimg.com/vi/${videoId(v)}/hqdefault.jpg` : '');
 
-function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (src: string) => void; onVideo: (v: PartnerVideo) => void }) {
-  const videos = page.videos ?? [];
+/**
+ * Content (the handoff's "Photos & videos"): the partner's photo albums, each opening its gallery page (its photos are
+ * never shown in a popup here), and their YouTube videos, played in the page. All, Photos and Videos filter them.
+ */
+function Content({ page, albums, videos, onVideo }: { page: PartnerPageData; albums: LiveAlbum[]; videos: PartnerVideo[]; onVideo: (v: PartnerVideo) => void }) {
   const [kind, setKind] = useState<'all' | 'photos' | 'videos'>('all');
   // Every kind its own tab (a kind with nothing in it says so).
   const filters = [
-    ['all', 'All', page.photos.length + videos.length],
-    ['photos', 'Photos', page.photos.length],
+    ['all', 'All', albums.length + videos.length],
+    ['photos', 'Photos', albums.length],
     ['videos', 'Videos', videos.length],
   ] as const;
-  const none = (kind === 'photos' ? page.photos.length : kind === 'videos' ? videos.length : 1) === 0;
+  const none = (kind === 'photos' ? albums.length : kind === 'videos' ? videos.length : albums.length + videos.length) === 0;
   return (
     <div className={s.stack}>
       <div className={s.sectionHead}>
@@ -699,16 +703,40 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
         </div>
       </div>
       <div className={s.grid3}>
+        {kind !== 'videos' &&
+          albums.map((a) => {
+            const open = Boolean(a.cover);
+            return (
+              <Link key={a.id} href={`/photos/?album=${encodeURIComponent(a.id)}`} className={s.contentCard}>
+                <span className={s.contentMedia}>
+                  {open ? (
+                    <img src={a.cover} alt="" loading="lazy" />
+                  ) : a.preview ? (
+                    <img src={a.preview} alt="" className={s.contentLocked} />
+                  ) : (
+                    <span className={s.videoBlank}>{page.mono}</span>
+                  )}
+                  <span className={s.contentSource}>{a.access === 'public' ? 'PHOTOS' : 'PRIVATE'}</span>
+                  <span className={s.contentBadge}>
+                    {a.count} {a.count === 1 ? 'photo' : 'photos'}
+                  </span>
+                </span>
+                <span className={s.contentText}>
+                  <strong>{titleCase(a.name)}</strong>
+                  <span>{['Album', albumDates(a), a.city].filter(Boolean).join(' · ')}</span>
+                </span>
+              </Link>
+            );
+          })}
         {kind !== 'photos' &&
           videos.map((v, i) => {
-            const src = VIDEO_SOURCES[v.source] ?? { label: 'VIDEO', bg: 'rgba(0,0,0,0.6)' };
             const thumb = thumbOf(v);
             return (
               <button key={v.id ?? `v-${i}-${v.url}`} type="button" className={s.contentCard} onClick={() => onVideo(v)}>
                 <span className={s.contentMedia}>
                   {thumb ? <img src={thumb} alt="" loading="lazy" /> : <span className={s.videoBlank}>{page.mono}</span>}
-                  <span className={s.contentSource} style={{ background: src.bg }}>
-                    {src.label}
+                  <span className={s.contentSource} style={{ background: VIDEO_SOURCES.youtube.bg }}>
+                    {VIDEO_SOURCES.youtube.label}
                   </span>
                   <span className={s.playMark} aria-hidden>
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="#111111">
@@ -719,28 +747,13 @@ function Content({ page, onPhoto, onVideo }: { page: PartnerPageData; onPhoto: (
                 <span className={s.contentText}>
                   <strong>{titleCase(v.title || `${page.short} video ${i + 1}`)}</strong>
                   {/* Its category, and who posted it when it was shared to this page. */}
-                  <span>
-                    {[albumTypeName(v.category) || 'Video', v.from ? `From ${v.from.name}` : src.label.charAt(0) + src.label.slice(1).toLowerCase()].join(' · ')}
-                  </span>
+                  <span>{[albumTypeName(v.category) || 'Video', v.from ? `From ${v.from.name}` : 'YouTube'].join(' · ')}</span>
                 </span>
               </button>
             );
           })}
-        {kind !== 'videos' &&
-          page.photos.map((ph, i) => (
-            <button key={`p-${i}-${ph.src}`} type="button" className={s.contentCard} onClick={() => onPhoto(ph.src)}>
-              <span className={s.contentMedia}>
-                <img src={ph.src} alt={ph.caption} loading="lazy" />
-                <span className={s.contentSource}>PHOTOS</span>
-              </span>
-              <span className={s.contentText}>
-                <strong>{titleCase(ph.caption || `${page.short} photo ${i + 1}`)}</strong>
-                <span>{page.name}</span>
-              </span>
-            </button>
-          ))}
       </div>
-      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : `No photos from ${page.short} yet.`}</div>}
+      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : kind === 'photos' ? `No albums from ${page.short} yet.` : `Nothing from ${page.short} yet.`}</div>}
       <div className={s.note}>Youth albums and videos are private to the families booked on that session. Download, print or license a photo from any public album.</div>
     </div>
   );

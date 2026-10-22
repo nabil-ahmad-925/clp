@@ -566,10 +566,12 @@
   cursor: pointer;
 }
 
-.switchOn {
-  background: var(--white);
+/* The chosen type: gold, as the FAQ's chosen part. */
+.switchOn,
+.switchOn:hover {
+  background: #dcbd7d;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-  color: #111;
+  color: #fff;
 }
 
 .switchBtn:focus-visible {
@@ -582,65 +584,6 @@
   grid-template-columns: minmax(0, 1fr) 260px;
   align-items: start;
   gap: 28px;
-}
-
-.qs {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid #e5e5e2;
-}
-
-.q {
-  border-bottom: 1px solid #e5e5e2;
-}
-
-.qBtn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  width: 100%;
-  padding: 22px 0;
-  border: 0;
-  background: transparent;
-  color: #111;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.qBtn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.qText {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.qSign {
-  display: flex;
-  flex: 0 0 32px;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 32px;
-  height: 32px;
-  border: 1.5px solid #dcbd7d;
-  border-radius: 50%;
-  color: #8a6f33;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.qAnswer {
-  padding: 0 52px 24px 0;
-  color: #444;
-  font-size: 16px;
-  line-height: 1.7;
 }
 
 .perks {
@@ -816,10 +759,6 @@
 
   .waysBody {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .qAnswer {
-    padding-right: 0;
   }
 
   .goldWrap {

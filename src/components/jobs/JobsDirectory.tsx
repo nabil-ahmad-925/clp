@@ -7,6 +7,7 @@ import { Suspense, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { LuArrowUpDown, LuBriefcase, LuBuilding2, LuMapPin, LuSearch, LuShapes, LuShieldCheck, LuVolleyball } from 'react-icons/lu';
 import BecomePartner from '@/components/partners/BecomePartner';
+import BioModal from '@/components/sections/BioModal';
 import { NO_SEARCH, fold, useSharedSearch, type Search } from '@/components/sections/DirectorySearch';
 import t from '@/components/sections/TeamDirectory.module.css';
 import FilterChip from '@/components/ui/FilterChip';
@@ -33,8 +34,9 @@ import {
   workplaceLabel,
   type Job,
 } from '@/content/jobs';
-import { ADMIN_URL, PARTNER_SPORTS, partnerHref } from '@/content/partnerPages';
+import { ADMIN_URL, PARTNER_SPORTS, fetchPartnerPage, partnerHref } from '@/content/partnerPages';
 import { site } from '@/content/site';
+import type { FacilityCard } from '@/content/types';
 import c from './jobs.module.css';
 import { JOB_STARTS, useJobApplication } from './useJobApplication';
 
@@ -168,6 +170,8 @@ function Directory() {
   const [view, setView] = useState<ResultsView>(() => (params.get('cards') === 'list' ? 'list' : 'grid'));
   const [page, setPage] = useState({ key: '', index: 0 });
   const [jobId, setJobId] = useState(() => params.get('job') ?? '');
+  // The partner whose Learn More is open (a click on their role's card).
+  const [about, setAbout] = useState('');
   const saved = useStoredIds('clp-saved-jobs');
   const applied = useStoredIds('clp-applied-jobs');
   const [toast, setToast] = useState({ text: '', n: 0 });
@@ -346,7 +350,16 @@ function Directory() {
         ) : (
           <div key={view} className={view === 'list' ? c.list : t.listingGrid}>
             {pageItems.map((j) => (
-              <JobCard key={j.id} job={j} view={view} saved={saved.has(j.id)} onSave={() => toggleSaved(j)} onOpen={() => openJob(j.id)} />
+              <JobCard
+                key={j.id}
+                job={j}
+                view={view}
+                saved={saved.has(j.id)}
+                onSave={() => toggleSaved(j)}
+                onOpen={() => openJob(j.id)}
+                // A partner's role: who they are (their Learn More); CLP's own: the role itself.
+                onCard={() => (j.partner ? setAbout(j.partner.slug) : openJob(j.id))}
+              />
             ))}
             {lastPage && <Hiring empty={items.length === 0} />}
           </div>
@@ -381,6 +394,7 @@ function Directory() {
           onClose={() => openJob('')}
         />
       )}
+      {about && <PartnerAbout slug={about} onClose={() => setAbout('')} onError={(text) => setToast((x) => ({ text, n: x.n + 1 }))} />}
       {toast.text && (
         <div className={c.toast} role="status">
           {toast.text}
@@ -469,12 +483,27 @@ function Tags({ job: j }: { job: Job }) {
 }
 
 /**
- * A role's card (the Jobs Board design): its photo with the small box on its bottom edge (as the partners' cards), who
- * posted it and how they're verified,
- * the kind of role, the title, its tags, where and the pay, then when it was posted, its deadline and View Job; in the
- * list view a row (photo, the role, then the pay, dates, View Job and Save).
+ * A role's card (the Jobs Board design): its photo, the poster's logo half over its bottom edge with their name and how
+ * they're verified beside it, the kind of role, the title, its tags, where and the pay, then when it was posted, its
+ * deadline and View Job; in the list view a row (photo, the role, then the pay, dates, View Job and Save). View Job opens
+ * the role; the rest of the card who posted it (a partner's Learn More, as the experiences').
  */
-function JobCard({ job: j, view, saved, onSave, onOpen }: { job: Job; view: ResultsView; saved: boolean; onSave: () => void; onOpen: () => void }) {
+function JobCard({
+  job: j,
+  view,
+  saved,
+  onSave,
+  onOpen,
+  onCard,
+}: {
+  job: Job;
+  view: ResultsView;
+  saved: boolean;
+  /** The heart; View Job (the role's popup); the rest of the card (its partner's Learn More). */
+  onSave: () => void;
+  onOpen: () => void;
+  onCard: () => void;
+}) {
   const badge = badgeOf(j);
   const paid = Boolean(payShort(j));
   const deadline = <span className={closingSoon(j) ? c.deadlineSoon : c.deadline}>{applyBy(j)}</span>;
@@ -496,7 +525,7 @@ function JobCard({ job: j, view, saved, onSave, onOpen }: { job: Job; view: Resu
   );
   if (view === 'list')
     return (
-      <article className={c.row} onClick={onOpen}>
+      <article className={c.row} onClick={onCard}>
         <JobPhoto job={j} saved={saved} onSave={onSave}>
           <span className={c.rowMark}>
             <OrgMark job={j} size={64} />
@@ -538,17 +567,17 @@ function JobCard({ job: j, view, saved, onSave, onOpen }: { job: Job; view: Resu
       </article>
     );
   return (
-    <article className={c.card} onClick={onOpen}>
-      <JobPhoto job={j} saved={saved} onSave={onSave}>
-        <span className={c.cardMark}>
-          <OrgMark job={j} size={64} />
-        </span>
-      </JobPhoto>
-      <span className={c.cardBody}>
-        <span className={c.rowOrg}>
+    <article className={c.card} onClick={onCard}>
+      <JobPhoto job={j} saved={saved} onSave={onSave} />
+      {/* The poster's logo half over the photo's edge, their name and how they're verified beside it (the design's). */}
+      <span className={c.cardHead}>
+        <OrgMark job={j} size={64} />
+        <span className={c.cardOrg}>
           <strong>{j.organization}</strong>
           {badge && <span className={c.badge}>✓ {badge}</span>}
         </span>
+      </span>
+      <span className={c.cardBody}>
         <span className={c.kind}>{jobCategoryLabel(j.category)}</span>
         <span className={c.title}>{j.title}</span>
         <Tags job={j} />
@@ -803,6 +832,56 @@ function JobPanel({
       </div>
     </div>,
     document.body,
+  );
+}
+
+/**
+ * Who a partner is (a click on their role's card): their Learn More, the experiences' full-screen popup, from their
+ * live page: their name, kind and area, about, photos and socials, with their profile to open.
+ */
+function PartnerAbout({ slug, onClose, onError }: { slug: string; onClose: () => void; onError: (text: string) => void }) {
+  const [card, setCard] = useState<FacilityCard | null>(null);
+  const done = useRef({ onClose, onError });
+  useEffect(() => {
+    done.current = { onClose, onError };
+  });
+  useEffect(() => {
+    let active = true;
+    const escape = (text: string) => text.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
+    fetchPartnerPage(slug).then(
+      ({ page: p }) =>
+        active &&
+        setCard({
+          image: p.logo || p.hero,
+          subtitle: [p.category, p.area].filter(Boolean).join(' · '),
+          title: p.name,
+          excerpt: '',
+          bio: '',
+          // The popup shows its buttons with a rich-text bio: their about, as paragraphs.
+          bioHtml: (p.about || `${p.name} is a CLP Partner.`)
+            .split(/\n{2,}/)
+            .map((para) => `<p>${escape(para)}</p>`)
+            .join(''),
+          bioImages: [p.hero, ...p.photos.map((x) => x.src)].filter(Boolean).slice(0, 8),
+          socials: p.socials,
+          buttons: [{ label: 'View Profile', href: partnerHref(p.slug) }],
+        }),
+      () => {
+        if (!active) return;
+        done.current.onError('Could not load this partner. Please try again.');
+        done.current.onClose();
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+  return card ? (
+    <BioModal card={card} variant="wps" onClose={onClose} />
+  ) : (
+    <div className={c.toast} role="status">
+      Loading…
+    </div>
   );
 }
 

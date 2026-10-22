@@ -88,7 +88,9 @@ export default function BuilderPageView({ page }: { page: BuilderPage }) {
         {page.rows.map((row, i) => (
           <Row key={i} row={row} listing={setup} />
         ))}
+        {/* The ways to be listed at a listing page's end (none on a service's page). */}
         {listing &&
+          listing.section !== 'services' &&
           (listing.kind === 'facilities' ? <HostCta /> : <ProgramPlans category={listing.category} section={listing.section === 'facilities' ? 'experiences' : listing.section} />)}
       </div>
       {page.portfolioNav && <PortfolioNav links={page.portfolioNav} />}

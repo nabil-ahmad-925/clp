@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { fetchSoldOut, type SavedPlace } from '@/content/listings';
+import { fetchSoldOut, isFacilitiesWidget, type SavedPlace } from '@/content/listings';
 import type { DirectoryItem } from '@/content/types';
 
 const subscribe = (fn: () => void) => {
@@ -23,10 +23,13 @@ const snapshot = () => {
 
 /**
  * The cards' waitlists: which of these listings are sold out with their waitlist open (people waiting), and the places
- * this device joined ("<widgetId>.<id>"). Only CLP Partner and Compete Like Pros listings with a waitlist are asked about.
+ * this device joined ("<widgetId>.<id>"). Only listings booked on CLP (CLP Partner and Compete Like Pros ones, and
+ * facilities but government ones) with a waitlist are asked about.
  */
 export function useWaitlists(items: DirectoryItem[], widgetOf: (item: DirectoryItem) => number | string | undefined) {
-  const asked = items.filter((i) => i.waitlist && i.capacity && (i.provider === 'partner' || i.provider === 'clp'));
+  const asked = items.filter(
+    (i) => i.waitlist && i.capacity && !i.government && (i.provider === 'partner' || i.provider === 'clp' || isFacilitiesWidget(Number(widgetOf(i)))),
+  );
   const key = asked.map((i) => `${widgetOf(i)}.${i.id}`).join(',');
   const [soldOut, setSoldOut] = useState<Record<string, { waiting: number }>>({});
   useEffect(() => {
