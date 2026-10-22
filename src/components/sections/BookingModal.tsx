@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import { createPortal } from 'react-dom';
 import { downloadCalendarFile } from '@/content/calendar';
 import { agePolicy, bookingPageHref, CANCEL_TIME, directionsHref, fetchAvailability, requestBooking, type NewBooking } from '@/content/listings';
-import { footerLinks } from '@/content/site';
+import { WAIVER_URL } from '@/content/documents';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './BookingModal.module.css';
@@ -23,7 +23,7 @@ type Props = {
 };
 
 /** The site's Waiver & Release (as in the footer) and Expectations & Commitment pages. */
-const WAIVER = footerLinks.flat().find((l) => /waiver/i.test(l.label))?.href ?? 'https://www.soxcessful.com/waiver-release';
+const WAIVER = WAIVER_URL;
 const EXPECTATIONS = '/our-expectations/';
 /** Days offered for a listing running over many days; people per booking. */
 const MAX_DAYS = 21;
@@ -31,7 +31,7 @@ const MAX_DAYS = 21;
 const CANCEL_DAYS = 2;
 const MAX_PEOPLE = 20;
 /** Who hosts it, on the photo and under "Hosted by" (a facility without a partner is booked through CLP). */
-const BADGE: Record<Provider, string> = { clp: 'COMPETE LIKE PROS', partner: 'CLP PARTNER', community: 'COMMUNITY', sponsored: 'SPONSORED' };
+export const BADGE: Record<Provider, string> = { clp: 'COMPETE LIKE PROS', partner: 'CLP PARTNER', community: 'COMMUNITY', sponsored: 'SPONSORED' };
 const HOST_META: Record<Provider, string> = {
   clp: 'Compete Like Pros · verified',
   partner: 'CLP Partner · verified',

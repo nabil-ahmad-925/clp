@@ -1,0 +1,136 @@
+/* An application's resume: the box to choose (or drop) the file, then the chosen file with Replace and Remove. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--font-body);
+}
+
+.label {
+  color: #111;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.optional {
+  color: #777;
+  font-weight: 400;
+}
+
+.input {
+  display: none;
+}
+
+.drop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px dashed #c9c5bc;
+  border-radius: 10px;
+  background: #faf9f6;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.drop svg {
+  flex: none;
+  font-size: 22px;
+  color: #8a6f33;
+}
+
+.drop span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drop strong {
+  font-size: 15px;
+}
+
+.drop span span {
+  color: #6b6b6b;
+  font-size: 13px;
+}
+
+.drop:hover,
+.dropOver {
+  border-color: #111;
+  background: #f3f1ec;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #ddddda;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #fbf1dd;
+  color: #8a6f33;
+  font-size: 20px;
+}
+
+.fileText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fileText strong {
+  overflow: hidden;
+  color: #111;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileText span {
+  color: #6b6b6b;
+  font-size: 13px;
+}
+
+.link {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.drop:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.drop:disabled,
+.link:disabled {
+  cursor: default;
+  opacity: 0.6;
+}

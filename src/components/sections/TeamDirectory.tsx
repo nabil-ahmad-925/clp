@@ -27,12 +27,13 @@ import MobileFilters, { type SheetDraft } from '@/components/ui/MobileFilters';
 import SortSelect, { SORTS, type Sort } from '@/components/ui/SortSelect';
 import ViewToggle from '@/components/ui/ViewToggle';
 import tagLabels from '@/content/data/listingTags.json';
-import { FIRST_LOAD_TIMEOUT_MS, SPORT_FILTER, unitLabel, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
+import { FIRST_LOAD_TIMEOUT_MS, SERVICE_FILTER, SPORT_FILTER, unitLabel, START_TIME_FILTER, startTimeFilterFor, addedOptions, listingTypeOf, countListings, hasValue, listingsEnabled, listingsPage, queryListings, searchPlaceholder, type AddedItem, type AddedOption, type ListingSetup, type ListingsOptions, type ListingsResult } from '@/content/listings';
 import { mainNav } from '@/content/site';
 import type { DirectoryFilter, DirectoryItem, DirectoryLayout, Provider } from '@/content/types';
 import BioModal from './BioModal';
 import BookingModal from './BookingModal';
 import ClaimModal from './ClaimModal';
+import RequestModal from './RequestModal';
 import DirectoryRow, { type RowFacts } from './DirectoryRow';
 import DirectorySearch, { NO_SEARCH, fold, useSharedSearch, type Place, type Search } from './DirectorySearch';
 import ListingCard, { SponsoredStrip } from './ListingCard';
@@ -525,6 +526,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
   const [booking, setBooking] = useState<DirectoryItem | null>(null);
   // The community listing being claimed ("Claim this listing").
   const [claiming, setClaiming] = useState<DirectoryItem | null>(null);
+  // A request being sent: a service's "Start a New Project" or a government facility's "Permit Now".
+  const [requesting, setRequesting] = useState<{ kind: 'project' | 'permit'; item: DirectoryItem } | null>(null);
   // A sold-out listing's waitlist being joined (from its card, or a full day in the booking popup).
   const [waiting, setWaiting] = useState<{ item: DirectoryItem; date?: string } | null>(null);
   const { soldOut, places: waitPlaces } = useWaitlists(pageItems, () => widgetId ?? undefined);
@@ -873,6 +876,8 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
             fallbackImage={(item as AddedItem).fallbackImage}
             onOpen={() => setOpen(item)}
             onBook={() => setBooking(item)}
+            onProject={() => setRequesting({ kind: 'project', item })}
+            onPermit={() => setRequesting({ kind: 'permit', item })}
             onClaim={() => setClaiming(item)}
             soldOut={soldOut[`${widgetId}.${item.id}`]}
             place={waitPlaces[`${widgetId}.${item.id}`]}
@@ -1188,6 +1193,16 @@ export default function TeamDirectory({ layout, filters: pageFilters, items: bui
         <WaitlistModal item={waiting.item} widgetId={widgetId} facts={rowFacts(waiting.item, filters, prices)} date={waiting.date} onClose={() => setWaiting(null)} />
       )}
       {claiming && widgetId != null && <ClaimModal item={claiming} widgetId={widgetId} onClose={() => setClaiming(null)} />}
+      {requesting && widgetId != null && (
+        <RequestModal
+          kind={requesting.kind}
+          item={requesting.item}
+          widgetId={widgetId}
+          facts={rowFacts(requesting.item, filters, prices)}
+          services={filters.find((f) => f.key === SERVICE_FILTER)?.options.filter((o) => o.value) ?? []}
+          onClose={() => setRequesting(null)}
+        />
+      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@ import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, r
 import tagLabels from '@/content/data/listingTags.json';
 import { albumDates, albumTypeName, fetchAllAlbums, type LiveAlbum } from '@/content/albums';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
+import ResumeField from '@/components/jobs/ResumeField';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
 import { categoryName, isBookable, toItem, waitlistPageHref, type SavedPlace } from '@/content/listings';
 import { useWaitlists } from '@/components/sections/useWaitlists';
@@ -1125,10 +1126,7 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
               ? `Your application for ${job.title} is with ${page.short}. Their reply comes to your conversation in CLP Messages.`
               : `${page.short} usually replies within a few days. The conversation lives in your CLP Messages.`}
           </span>
-          <Link className={`${s.btnAccent} ${s.btnLg}`} href={app.sent.path}>
-            Open the conversation
-          </Link>
-          <button type="button" className={s.btnOutlineDark} onClick={onClose}>
+          <button type="button" className={`${s.btnAccent} ${s.btnLg}`} onClick={onClose}>
             Back to {page.short}
           </button>
         </div>
@@ -1150,9 +1148,10 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
               <input type="tel" autoComplete="tel" maxLength={40} value={form.phone} onChange={set('phone')} />
             </label>
           </div>
+          <ResumeField file={app.resume} onChoose={app.chooseResume} onRemove={app.removeResume} disabled={Boolean(app.busy) || page.preview} />
           <label className={s.applyField}>
             <span>
-              Resume or portfolio link <span className={s.optional}>(optional)</span>
+              Portfolio or LinkedIn link <span className={s.optional}>(optional)</span>
             </span>
             <input type="url" inputMode="url" placeholder="https://" maxLength={500} value={form.link} onChange={set('link')} />
           </label>
@@ -1178,8 +1177,8 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
             <button type="button" className={s.applyBack} onClick={() => setApplying(false)}>
               Back
             </button>
-            <button type="submit" className={`${s.btnAccent} ${s.applySend}`} disabled={app.busy || page.preview}>
-              {app.busy ? 'Sending…' : 'Send application'}
+            <button type="submit" className={`${s.btnAccent} ${s.applySend}`} disabled={Boolean(app.busy) || page.preview}>
+              {app.busy === 'uploading' ? 'Uploading resume…' : app.busy ? 'Sending…' : 'Send application'}
             </button>
           </div>
         </form>

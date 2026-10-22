@@ -1,0 +1,23 @@
+/* The request forms' own bits, next to the booking popup's styles: a field's error, the reference, the permit link. */
+.fieldError {
+  color: #9a3324;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reference {
+  color: #555;
+  font-size: 14px;
+}
+
+.reference strong {
+  color: #111;
+  letter-spacing: 1px;
+}
+
+.link {
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

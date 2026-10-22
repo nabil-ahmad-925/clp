@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
-import { agePolicy, cornerTagLabel, waitlistPageHref, type SavedPlace } from '@/content/listings';
+import { agePolicy, cornerTagLabel, isBookable, waitlistPageHref, type SavedPlace } from '@/content/listings';
+import { DEFAULT_CARD_BUTTON } from '@/content/requests';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './ListingCard.module.css';
@@ -21,8 +22,12 @@ type Props = {
    */
   variant?: 'listing' | 'facility';
   onOpen: () => void;
-  /** "Book Now" (CLP Partner and Compete Like Pros listings): opens the booking popup instead of "Learn More". */
+  /** "Book Now" (listings booked on CLP, see isBookable): opens the booking popup instead of "Learn More". */
   onBook?: () => void;
+  /** A service's "Start a New Project" (its card button, see DirectoryItem cardButton): opens the project form. */
+  onProject?: () => void;
+  /** A government facility's "Permit Now": opens the permit request form. */
+  onPermit?: () => void;
   /** "Claim this listing" (Community listings): opens the claim form (else the partnerships page). */
   onClaim?: () => void;
   /** Sold out with its waitlist open (how many wait): "Join Waitlist" (opens `onWaitlist`) instead of Book Now. */
@@ -83,7 +88,7 @@ function ProviderBadge({ provider }: { provider?: Provider }) {
  * A listing in the new design's results: photo, provider, title, when and where, the ages, and the price with
  * "Learn More" (which opens the listing's full-screen bio, as a click anywhere on the card does).
  */
-export default function ListingCard({ card, facts, view, variant = 'listing', onOpen, onBook, onClaim, soldOut, onWaitlist, place, fallbackImage, eager }: Props) {
+export default function ListingCard({ card, facts, view, variant = 'listing', onOpen, onBook, onProject, onPermit, onClaim, soldOut, onWaitlist, place, fallbackImage, eager }: Props) {
   const [failed, setFailed] = useState(false);
   const src = (failed ? fallbackImage : card.image) || fallbackImage;
   const facility = view === 'grid';
@@ -124,13 +129,17 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
     </>
   ) : undefined;
   const noPrice = variant === 'listing' && <span className={styles.noPrice}>Contact for pricing</span>;
-  // A government facility needs a permit: "Permit Now" opens its permit page.
-  const permit = variant === 'facility' && card.government && card.permitUrl ? card.permitUrl : undefined;
-  // CLP's and its partners' listings are booked on CLP, and every other facility too; the others' details link out.
-  const book = !permit && Boolean(onBook) && (card.provider === 'partner' || card.provider === 'clp' || variant === 'facility');
+  // One button, whatever the listing: a government facility's "Permit Now" (its permit request form); "Book Now" on
+  // what is booked on CLP (CLP's and its partners' listings, every other facility); a service's own button (its
+  // project form, or its details, with the text CLP gave it); else "Learn More" (its details).
+  const permit = variant === 'facility' && Boolean(card.government) && Boolean(onPermit);
+  const book = Boolean(onBook) && isBookable(card);
+  const serviceButton = card.listingType === 'services' ? (card.cardButton ?? DEFAULT_CARD_BUTTON) : undefined;
+  const project = serviceButton?.action === 'project' && Boolean(onProject);
   // Sold out with a waitlist: join it (or, once joined, see the place in line).
   const waitlist = book && Boolean(soldOut) && Boolean(onWaitlist);
-  const ctaLabel = permit ? 'Permit Now' : book ? 'Book Now' : 'Learn More';
+  const ctaLabel = permit ? 'Permit Now' : book ? 'Book Now' : serviceButton && (project || serviceButton.action === 'details') ? serviceButton.label : 'Learn More';
+  const named = [card.subtitle, card.title].filter(Boolean).join(' – ');
   const learnMore = waitlist ? (
     place ? (
       <Link
@@ -154,26 +163,17 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         Join Waitlist
       </button>
     )
-  ) : permit ? (
-    <a
-      href={permit}
-      target="_blank"
-      rel="noopener"
-      className={`${styles.cta} ${facility ? styles.ctaWide : ''}`}
-      aria-label={`${ctaLabel}: ${[card.subtitle, card.title].filter(Boolean).join(' – ')} (opens in a new tab)`}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {ctaLabel}
-    </a>
   ) : (
     <button
       type="button"
       className={`${styles.cta} ${facility ? styles.ctaWide : ''}`}
       aria-haspopup="dialog"
-      aria-label={`${ctaLabel}: ${[card.subtitle, card.title].filter(Boolean).join(' – ')}`}
+      aria-label={`${ctaLabel}: ${named}`}
       onClick={(e) => {
         e.stopPropagation();
-        if (book) onBook!();
+        if (permit) onPermit!();
+        else if (book) onBook!();
+        else if (project) onProject!();
         else onOpen();
       }}
     >

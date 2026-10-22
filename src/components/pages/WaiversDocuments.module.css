@@ -1,0 +1,242 @@
+/* Waivers & Documents: the search on the hero's edge, the kinds, the "Sign once" banner and the documents' rows. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px 72px;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+}
+
+/* On the hero's lower edge, over it. */
+.search {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -36px;
+  padding: 0 18px;
+  height: 64px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  color: #777;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: #111;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.kind {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kindOn {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+}
+
+.banner strong {
+  font-size: 16px;
+}
+
+.banner span {
+  color: #d6d3cc;
+  font-size: 14px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px solid #e8e6e1;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #f3eee4;
+  color: #8a6f33;
+  font-size: 20px;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.titleLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleLine strong {
+  color: #111;
+  font-size: 17px;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tagRequired {
+  background: #fbe9e7;
+  color: #b03a2e;
+}
+
+.tagRecommended {
+  background: #fbf1dd;
+  color: #8a6f33;
+}
+
+.tagPlain {
+  background: #f0eee9;
+  color: #555;
+}
+
+.about {
+  color: #444;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.meta {
+  color: #888;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn,
+.btnDark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btnDark {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.btn:hover {
+  border-color: #111;
+}
+
+.soon {
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kind:focus-visible,
+.btn:focus-visible,
+.btnDark:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.empty {
+  margin: 0;
+  padding: 32px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  color: #666;
+  text-align: center;
+}
+
+.note {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 639px) {
+  .row {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .actions {
+    width: 100%;
+    padding-left: 60px;
+  }
+}

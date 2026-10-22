@@ -71,10 +71,18 @@ export type DirectoryItem = FacilityCard & {
   whatToBring?: string[];
   /** Its waitlist when a day is sold out (see content/listings ListingWaitlist). */
   waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
-  /** A government facility: "Permit Now" (its permit page, `permitUrl`) instead of "Book Now". */
+  /** A government facility: "Permit Now" (the permit request form) instead of "Book Now"; `permitUrl`, its permit
+   *  office's page (linked from the form), when it has one. */
   government?: boolean;
   permitUrl?: string;
+  /** Its menu or directory (listings from the admin; see content/listings ListingType). */
+  listingType?: 'experiences' | 'resources' | 'facilities' | 'services';
+  /** A service's card button: "Start a New Project" (the project form) or its details (Learn More), and the
+   *  button's text. None: the project form's button (content/requests DEFAULT_CARD_BUTTON). */
+  cardButton?: CardButton;
 };
+
+export type CardButton = { action: 'project' | 'details'; label: string };
 
 /** Who provides a listing (the listings API's `provider`): CLP Partner, Compete Like Pros, Community or Sponsored. */
 export type Provider = 'partner' | 'clp' | 'community' | 'sponsored';

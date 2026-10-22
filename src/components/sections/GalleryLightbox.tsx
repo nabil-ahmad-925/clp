@@ -296,6 +296,20 @@ export function Mockup({
 export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, byHref, partner, images, index, startTab = 'digital', onIndex, onClose, onOpenCart, paged }: Props) {
   const [tab, setTab] = useState<'digital' | 'print'>(startTab);
   const [product, setProduct] = useState<PrintProduct | null>(null);
+  // The product's side in its preview: its front (the photo on it) or its back.
+  const [side, setSide] = useState<'front' | 'back'>('front');
+  // The preview's mockup fits its box, clear of its FRONT / BACK label and its hint, up to 300 px.
+  const [previewSize, setPreviewSize] = useState(220);
+  const previewBox = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const el = previewBox.current;
+    if (!el) return;
+    const fit = () => setPreviewSize(Math.max(140, Math.min(300, Math.floor(Math.min(el.clientWidth - 48, el.clientHeight - 96)))));
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [product]);
   // The products CLP offers on this album's photos (Photo products): its photographer's partner page decides the
   // partners-only ones.
   const { products, ready } = usePrintProducts(partner);
@@ -378,6 +392,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
   };
   const openProduct = (p: PrintProduct) => {
     setProduct(p);
+    setSide('front');
     setChosen(defaults(p));
     setQty(1);
     setAdded(false);
@@ -596,18 +611,40 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
             >
               <span className="glyph" aria-hidden>←</span> All Products
             </button>
-            {/* Its front and its back, side by side in the same frame. */}
-            <div className={styles.preview}>
-              <div className={styles.sides}>
-                {[false, true].map((back) => (
-                  <figure key={String(back)} className={styles.sideView}>
-                    <span className={styles.sideFrame}>
-                      <Mockup product={product} chosen={chosen} src={image.src} max={140} back={back} backPhoto={back ? backs[printBackKey(product, chosen) ?? ''] : undefined} />
-                    </span>
-                    <figcaption>{back ? 'Back' : 'Front'}</figcaption>
-                  </figure>
-                ))}
-              </div>
+            {/* Its front or its back, large: a click on it turns it over, as the switch under it does. */}
+            <button
+              ref={previewBox}
+              type="button"
+              className={styles.preview}
+              aria-label={side === 'front' ? `Show the back of the ${product.name}` : `Show the front of the ${product.name}`}
+              onClick={() => setSide(side === 'front' ? 'back' : 'front')}
+            >
+              <span className={styles.previewSide}>{side === 'front' ? 'FRONT' : 'BACK'}</span>
+              <span key={`${side}-${product.id}`} className={styles.previewTurn}>
+                <Mockup
+                  product={product}
+                  chosen={chosen}
+                  src={image.src}
+                  max={previewSize}
+                  back={side === 'back'}
+                  backPhoto={side === 'back' ? backs[printBackKey(product, chosen) ?? ''] : undefined}
+                />
+              </span>
+              <span className={styles.previewHint} aria-hidden>
+                ↻ {side === 'front' ? 'See the back' : 'See the front'}
+              </span>
+            </button>
+            <div className={styles.sideSwitch} role="radiogroup" aria-label="Side">
+              {(
+                [
+                  ['front', 'Front · your photo'],
+                  ['back', 'Back'],
+                ] as const
+              ).map(([v, label]) => (
+                <button key={v} type="button" role="radio" aria-checked={side === v} className={`${styles.sideBtn} ${side === v ? styles.sideOn : ''}`} onClick={() => setSide(v)}>
+                  {label}
+                </button>
+              ))}
             </div>
             <div className={styles.productHead}>
               <span className={styles.productName}>{product.name}</span>

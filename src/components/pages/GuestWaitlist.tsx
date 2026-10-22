@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import ListingHero from '@/components/sections/ListingHero';
-import { footerLinks } from '@/content/site';
+import { WAIVER_URL } from '@/content/documents';
 import { bookingPageHref, claimWaitlistSpot, fetchWaitlistPlace, forgetPlace, leaveWaitlist, savedPlaces, type WaitlistPlace } from '@/content/listings';
 import styles from './GuestBooking.module.css';
 
 /** The site's Waiver & Release (as in the footer) and Expectations & Commitment pages, as the booking popup's. */
-const WAIVER = footerLinks.flat().find((l) => /waiver/i.test(l.label))?.href ?? 'https://www.soxcessful.com/waiver-release';
+const WAIVER = WAIVER_URL;
 const EXPECTATIONS = '/our-expectations/';
 const longDay = (day: string) => new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 const clock = (t: string) => {

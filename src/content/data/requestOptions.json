@@ -1,0 +1,8 @@
+{
+  "kinds": ["project", "permit"],
+  "actions": ["project", "details"],
+  "labels": { "project": "Start a New Project", "details": "Learn More" },
+  "budgets": ["$499 or Less", "$500 - $999", "$1,000 - $2,499", "$2,500 - $4,999", "$5,000 - $9,999", "$10k +"],
+  "activities": ["Practice", "Game or match", "Tournament", "Camp or clinic", "Pickup or open play", "Event", "Other"],
+  "statuses": ["new", "contacted", "closed"]
+}

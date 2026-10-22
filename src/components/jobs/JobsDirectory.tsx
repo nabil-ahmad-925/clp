@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { LuArrowUpDown, LuBriefcase, LuBuilding2, LuMapPin, LuSearch, LuShapes, LuShieldCheck, LuVolleyball } from 'react-icons/lu';
+import { LuArrowUpDown, LuBriefcase, LuBuilding2, LuHeart, LuMapPin, LuSearch, LuShapes, LuShieldCheck, LuVolleyball } from 'react-icons/lu';
 import BecomePartner from '@/components/partners/BecomePartner';
 import BioModal from '@/components/sections/BioModal';
 import { NO_SEARCH, fold, useSharedSearch, type Search } from '@/components/sections/DirectorySearch';
@@ -38,6 +38,7 @@ import { ADMIN_URL, PARTNER_SPORTS, fetchPartnerPage, partnerHref } from '@/cont
 import { site } from '@/content/site';
 import type { FacilityCard } from '@/content/types';
 import c from './jobs.module.css';
+import ResumeField from './ResumeField';
 import { JOB_STARTS, useJobApplication } from './useJobApplication';
 
 const PAGE_SIZES = [12, 24, 48];
@@ -114,15 +115,24 @@ function useStoredIds(key: string) {
       return [];
     }
   });
-  const write = (next: string[]) => {
-    setIds(next);
-    try {
-      window.localStorage.setItem(key, JSON.stringify(next));
-    } catch {
-      // Private mode or storage full: kept for this visit only.
-    }
+  // From the latest list (an Undo in the toast runs after other saves).
+  const write = (change: (prev: string[]) => string[]) =>
+    setIds((prev) => {
+      const next = change(prev);
+      try {
+        window.localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        // Private mode or storage full: kept for this visit only.
+      }
+      return next;
+    });
+  return {
+    ids,
+    has: (id: string) => ids.includes(id),
+    toggle: (id: string) => write((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])),
+    add: (id: string) => write((prev) => (prev.includes(id) ? prev : [...prev, id])),
+    drop: (gone: string[]) => write((prev) => prev.filter((x) => !gone.includes(x))),
   };
-  return { ids, has: (id: string) => ids.includes(id), toggle: (id: string) => write(ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]), add: (id: string) => !ids.includes(id) && write([...ids, id]) };
 }
 
 /**
@@ -130,7 +140,8 @@ function useStoredIds(key: string) {
  * (role, organization; city, or "Remote"), Sport, Job Type, Role and Workplace filters (?sport=<id> picks the sport, as
  * each sport's Resources page links here), the sort and the grid / list switch, the roles as photo cards (saved with
  * the heart, on this device), the pager, and a role opening in its panel (?job=<id>, to share). The last page ends with
- * "Hiring?" (posting as a CLP partner).
+ * "Hiring?" (posting as a CLP partner). Saved (the heart's count, beside the sort) shows the saved roles alone
+ * (?saved=1), as a food app's favourites: the same cards, each opening its role.
  */
 export default function JobsDirectory() {
   return (
@@ -174,7 +185,9 @@ function Directory() {
   const [about, setAbout] = useState('');
   const saved = useStoredIds('clp-saved-jobs');
   const applied = useStoredIds('clp-applied-jobs');
-  const [toast, setToast] = useState({ text: '', n: 0 });
+  // Only the saved roles (Saved, ?saved=1).
+  const [savedOnly, setSavedOnly] = useState(() => params.get('saved') === '1');
+  const [toast, setToast] = useState<{ text: string; n: number; action?: { label: string; run: () => void } }>({ text: '', n: 0 });
   const top = useRef<HTMLDivElement>(null);
 
   const setPlaces = shared?.setPlaces;
@@ -201,17 +214,28 @@ function Directory() {
 
   const register = shared?.register;
   const setSearch = shared?.setSearch;
-  useEffect(() => register?.((next) => setSearch?.(next)), [register, setSearch]);
+  useEffect(
+    () =>
+      register?.((next) => {
+        setSearch?.(next);
+        // A search is across all the roles: back from Saved.
+        setSavedOnly(false);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('saved');
+        window.history.replaceState(null, '', url);
+      }),
+    [register, setSearch],
+  );
 
-  // A saved / removed note, gone after a moment.
+  // A saved / removed note, gone after a moment (a little longer with its button).
   useEffect(() => {
     if (!toast.text) return;
-    const timer = window.setTimeout(() => setToast((x) => (x.n === toast.n ? { text: '', n: x.n } : x)), 2400);
+    const timer = window.setTimeout(() => setToast((x) => (x.n === toast.n ? { text: '', n: x.n } : x)), toast.action ? 4000 : 2400);
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  /** The address keeps the filters, sort, view and open role, to share or come back to. */
-  const remember = (f: Filters, s: JobSort, v: ResultsView, job: string) => {
+  /** The address keeps the filters, sort, view, open role and Saved, to share or come back to. */
+  const remember = (f: Filters, s: JobSort, v: ResultsView, job: string, only = savedOnly) => {
     const url = new URL(window.location.href);
     (Object.keys(PARAMS) as (keyof Filters)[]).forEach((k) => {
       url.searchParams.delete(PARAMS[k]);
@@ -223,6 +247,8 @@ function Directory() {
     else url.searchParams.delete('cards');
     if (job) url.searchParams.set('job', job);
     else url.searchParams.delete('job');
+    if (only) url.searchParams.set('saved', '1');
+    else url.searchParams.delete('saved');
     window.history.replaceState(null, '', url);
   };
   const apply = (next: Filters) => {
@@ -242,16 +268,33 @@ function Directory() {
     setJobId(id);
     remember(filters, sort, view, id);
   };
+  /** Saved on (the saved roles alone, from the top) or off (the board); an open role closes. */
+  const showSaved = (on: boolean) => {
+    setSavedOnly(on);
+    setOpen(null);
+    setJobId('');
+    setToast((x) => ({ text: '', n: x.n }));
+    remember(filters, sort, view, '', on);
+    top.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const toggleSaved = (j: Job) => {
     const was = saved.has(j.id);
     saved.toggle(j.id);
-    setToast((x) => ({ text: was ? 'Removed from saved jobs' : 'Job saved', n: x.n + 1 }));
+    setToast((x) => ({
+      text: was ? 'Removed from saved jobs' : 'Job saved',
+      n: x.n + 1,
+      // A removal can be undone. A save, on the board, links to Saved.
+      action: was ? { label: 'Undo', run: () => saved.add(j.id) } : savedOnly ? undefined : { label: 'View Saved', run: () => showSaved(true) },
+    }));
   };
 
   if (!items) return <Skeleton />;
-  const shown = items.filter((j) => matches(j, filters, search)).sort(ORDER[sort]);
+  const savedJobs = items.filter((j) => saved.has(j.id));
+  // Saved roles no longer on the board (filled, or past their deadline).
+  const closed = failed ? [] : saved.ids.filter((id) => !items.some((j) => j.id === id));
+  const shown = (savedOnly ? savedJobs : items.filter((j) => matches(j, filters, search))).sort(ORDER[sort]);
   const count = (f: Filters) => items.filter((j) => matches(j, f, search)).length;
-  const key = JSON.stringify([filters, search, size, sort]);
+  const key = JSON.stringify([filters, search, size, sort, savedOnly]);
   const pageCount = Math.max(1, Math.ceil(shown.length / size));
   const index = page.key === key ? Math.min(page.index, pageCount - 1) : 0;
   const pageItems = shown.slice(index * size, (index + 1) * size);
@@ -288,45 +331,79 @@ function Directory() {
     <div ref={top} className={`${t.directory} ${t.listing}`} data-listing="">
       <div className={t.bar}>
         <div className={t.barRow}>
-          <div className={t.filters}>
-            {chips.map((ch) => (
-              <FilterChip
-                key={ch.k}
-                name={ch.name}
-                heading={ch.heading}
-                icon={ch.icon}
-                plural={ch.plural}
-                options={ch.options}
-                value={filters[ch.k]}
-                open={open === ch.k}
-                onOpenChange={(o) => setOpen(o ? ch.k : null)}
-                resultsFor={(draft) => count({ ...filters, [ch.k]: draft })}
-                onApply={(v) => apply({ ...filters, [ch.k]: v })}
-              />
-            ))}
-            {search.q && <AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => setSearch?.({ ...search, q: '' })} />}
-            {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => setSearch?.({ ...search, loc: '' })} />}
-            {anyChosen && (
-              <button type="button" className={t.clearAll} onClick={clearAll}>
-                Clear All
+          {savedOnly ? (
+            <div className={c.savedHead}>
+              <button type="button" className={c.savedBack} onClick={() => showSaved(false)}>
+                <span className="glyph" aria-hidden>
+                  ←
+                </span>{' '}
+                All Jobs
+              </button>
+              <span className={c.savedTitle}>
+                <h2>Saved Jobs</h2>
+                <span>Kept on This Device</span>
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className={t.filters}>
+                {chips.map((ch) => (
+                  <FilterChip
+                    key={ch.k}
+                    name={ch.name}
+                    heading={ch.heading}
+                    icon={ch.icon}
+                    plural={ch.plural}
+                    options={ch.options}
+                    value={filters[ch.k]}
+                    open={open === ch.k}
+                    onOpenChange={(o) => setOpen(o ? ch.k : null)}
+                    resultsFor={(draft) => count({ ...filters, [ch.k]: draft })}
+                    onApply={(v) => apply({ ...filters, [ch.k]: v })}
+                  />
+                ))}
+                {search.q && <AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => setSearch?.({ ...search, q: '' })} />}
+                {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => setSearch?.({ ...search, loc: '' })} />}
+                {anyChosen && (
+                  <button type="button" className={t.clearAll} onClick={clearAll}>
+                    Clear All
+                  </button>
+                )}
+              </div>
+              <div className={t.mobileFilters}>
+                <MobileFilters
+                  sections={chips.map((ch) => ({ id: ch.k, heading: ch.heading, options: ch.options, value: filters[ch.k] }))}
+                  applied={Object.values(filters).filter((v) => v.length > 0).length}
+                  sort={{ value: sort, options: SORTS }}
+                  countFor={(draft) =>
+                    count({ sports: draft.sports ?? [], types: draft.types ?? [], roles: draft.roles ?? [], workplaces: draft.workplaces ?? [] })
+                  }
+                  onApply={(draft, nextSort) => {
+                    apply({ sports: draft.sports ?? [], types: draft.types ?? [], roles: draft.roles ?? [], workplaces: draft.workplaces ?? [] });
+                    if (nextSort && nextSort !== sort) chooseSort(nextSort as JobSort);
+                  }}
+                />
+              </div>
+            </>
+          )}
+          <div className={t.sortSlot}>
+            {!savedOnly && (
+              <button
+                type="button"
+                className={`${c.savedBtn} ${savedJobs.length ? c.savedBtnOn : ''}`}
+                aria-label={`Saved jobs, ${savedJobs.length}`}
+                onClick={() => showSaved(true)}
+              >
+                <LuHeart aria-hidden />
+                <span className={c.savedLabel}>Saved</span>
+                {savedJobs.length > 0 && (
+                  // Keyed by the count: it pops on each save.
+                  <span key={savedJobs.length} className={c.savedCount}>
+                    {savedJobs.length}
+                  </span>
+                )}
               </button>
             )}
-          </div>
-          <div className={t.mobileFilters}>
-            <MobileFilters
-              sections={chips.map((ch) => ({ id: ch.k, heading: ch.heading, options: ch.options, value: filters[ch.k] }))}
-              applied={Object.values(filters).filter((v) => v.length > 0).length}
-              sort={{ value: sort, options: SORTS }}
-              countFor={(draft) =>
-                count({ sports: draft.sports ?? [], types: draft.types ?? [], roles: draft.roles ?? [], workplaces: draft.workplaces ?? [] })
-              }
-              onApply={(draft, nextSort) => {
-                apply({ sports: draft.sports ?? [], types: draft.types ?? [], roles: draft.roles ?? [], workplaces: draft.workplaces ?? [] });
-                if (nextSort && nextSort !== sort) chooseSort(nextSort as JobSort);
-              }}
-            />
-          </div>
-          <div className={t.sortSlot}>
             <span className={t.sortDesktop}>
               <PillSelect value={sort} options={SORTS} onChange={chooseSort} label="Sort" icon={<LuArrowUpDown />} />
             </span>
@@ -336,9 +413,28 @@ function Directory() {
       </div>
 
       <div className={c.results}>
+        {savedOnly && closed.length > 0 && (
+          <div className={c.savedClosed} role="status">
+            {closed.length === 1 ? 'A job you saved is no longer open.' : `${closed.length} jobs you saved are no longer open.`}
+            <button type="button" className={t.listingClear} onClick={() => saved.drop(closed)}>
+              Remove {closed.length === 1 ? 'It' : 'Them'}
+            </button>
+          </div>
+        )}
         {failed ? (
           <div className={t.listingEmpty} role="alert">
             {failed}
+          </div>
+        ) : savedOnly && shown.length === 0 ? (
+          <div className={c.savedEmpty} role="status">
+            <span className={c.savedEmptyHeart} aria-hidden>
+              <LuHeart />
+            </span>
+            <strong>No Saved Jobs Yet</strong>
+            <span>Tap the heart on any job to keep it here, then come back to apply.</span>
+            <button type="button" className={c.panelApply} onClick={() => showSaved(false)}>
+              Browse Jobs
+            </button>
           </div>
         ) : shown.length === 0 && items.length > 0 ? (
           <div className={t.listingEmpty} role="status">
@@ -361,7 +457,7 @@ function Directory() {
                 onCard={() => (j.partner ? setAbout(j.partner.slug) : openJob(j.id))}
               />
             ))}
-            {lastPage && <Hiring empty={items.length === 0} />}
+            {lastPage && !savedOnly && <Hiring empty={items.length === 0} />}
           </div>
         )}
 
@@ -398,6 +494,18 @@ function Directory() {
       {toast.text && (
         <div className={c.toast} role="status">
           {toast.text}
+          {toast.action && (
+            <button
+              type="button"
+              className={c.toastAction}
+              onClick={() => {
+                toast.action?.run();
+                setToast((x) => ({ text: '', n: x.n }));
+              }}
+            >
+              {toast.action.label}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -908,10 +1016,7 @@ function ApplyWithClp({ job, onBack, onClose, onSent }: { job: Job; onBack: () =
             ? `Your application for ${job.title} is with ${job.organization}. Their reply comes to your conversation in CLP Messages.`
             : `${job.organization} usually replies within a few days. The conversation lives in your CLP Messages.`}
         </p>
-        <Link className={c.apply} href={app.sent.path}>
-          Open the conversation
-        </Link>
-        <button type="button" className={c.applySecondary} onClick={onClose}>
+        <button type="button" className={c.apply} onClick={onClose}>
           Back to jobs
         </button>
       </div>
@@ -937,9 +1042,10 @@ function ApplyWithClp({ job, onBack, onClose, onSent }: { job: Job; onBack: () =
             <input type="tel" autoComplete="tel" maxLength={40} value={form.phone} onChange={set('phone')} />
           </label>
         </div>
+        <ResumeField file={app.resume} onChoose={app.chooseResume} onRemove={app.removeResume} disabled={Boolean(app.busy)} />
         <label className={c.applyField}>
           <span>
-            Resume or portfolio link <span className={c.optional}>(optional)</span>
+            Portfolio or LinkedIn link <span className={c.optional}>(optional)</span>
           </span>
           <input type="url" inputMode="url" placeholder="https://" maxLength={500} value={form.link} onChange={set('link')} />
         </label>
@@ -966,8 +1072,8 @@ function ApplyWithClp({ job, onBack, onClose, onSent }: { job: Job; onBack: () =
         <button type="button" className={c.applySecondary} onClick={onBack}>
           Back
         </button>
-        <button type="submit" className={c.apply} disabled={app.busy}>
-          {app.busy ? 'Sending…' : 'Send application'}
+        <button type="submit" className={c.apply} disabled={Boolean(app.busy)}>
+          {app.busy === 'uploading' ? 'Uploading resume…' : app.busy ? 'Sending…' : 'Send application'}
         </button>
       </div>
     </form>

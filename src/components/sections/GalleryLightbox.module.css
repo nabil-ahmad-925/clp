@@ -609,39 +609,6 @@
 }
 
 /* A product's front and back, side by side in the preview, each with its label under it. */
-.sides {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  width: 100%;
-  height: 100%;
-}
-
-.sideView {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  margin: 0;
-}
-
-.sideFrame {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-}
-
-.sideView figcaption {
-  color: #555;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-}
-
 /* ---- Configurator ---- */
 .back {
   align-self: flex-start;
@@ -659,13 +626,108 @@
 }
 
 .preview {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 260px;
-  padding: 20px;
+  width: 100%;
+  height: 340px;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  border: 0;
   border-radius: 10px;
-  background: #f2f1ee;
+  background: #ece8df;
+  font: inherit;
+  cursor: pointer;
+  perspective: 900px;
+}
+
+.preview:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* FRONT / BACK, in its top left corner. */
+.previewSide {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  color: #6b6458;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+/* "↻ See the back", in its bottom right corner (stronger on hover). */
+.previewHint {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  color: #6b6458;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
+}
+
+.preview:hover .previewHint {
+  opacity: 1;
+}
+
+/* The mockup, turned over into view when the side changes. */
+.previewTurn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+  animation: previewTurn 0.35s ease;
+}
+
+@keyframes previewTurn {
+  from {
+    opacity: 0.2;
+    transform: rotateY(-80deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewTurn {
+    animation: none;
+  }
+}
+
+/* Front · your photo / Back (the photo page's switch). */
+.sideSwitch {
+  display: inline-flex;
+  align-self: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #efede8;
+}
+
+.sideBtn {
+  height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sideOn {
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.sideBtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .productHead {

@@ -37,8 +37,30 @@ export const askQuestion = (input: { slug: string; name: string; email: string; 
   call<{ link: string; threadId: string }>('/messages/question', { method: 'POST', body: JSON.stringify(input) }).then(link);
 export const sendIntro = (input: { slug: string; name: string; organization: string; email: string; partnerKind: string; text: string; website?: string }) =>
   call<{ link: string; threadId: string }>('/messages/intro', { method: 'POST', body: JSON.stringify(input) }).then(link);
+/** An application's resume as the API keeps it (POST /messages/job/resume signs it for the role). */
+export type ResumeUpload = { key: string; name: string; size: number; type: string; token: string };
+/** The resume files an application takes (the API's): PDF or Word, 10 MB at most. */
+export const RESUME_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+export const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+
+/** Uploads a resume for an application to `jobId` (to CLP's storage, straight from the browser); what to apply with. */
+export async function uploadResume(jobId: string, file: File): Promise<ResumeUpload> {
+  const r = await call<{ uploadUrl: string; headers: Record<string, string>; resume: ResumeUpload }>('/messages/job/resume', {
+    method: 'POST',
+    body: JSON.stringify({ jobId, name: file.name, type: file.type, size: file.size }),
+  });
+  let res: Response;
+  try {
+    res = await fetch(r.uploadUrl, { method: 'PUT', headers: r.headers, body: file, signal: AbortSignal.timeout(120_000) });
+  } catch {
+    throw new Error('Your resume didn’t upload. Check your connection and try again.');
+  }
+  if (!res.ok) throw new Error('Your resume didn’t upload. Try again.');
+  return r.resume;
+}
+
 /** "Apply with CLP": the application's conversation (`already`: they had applied, it's that one). */
-export const applyToJob = (input: { jobId: string; name: string; email: string; phone: string; link: string; note: string; start: string; website?: string }) =>
+export const applyToJob = (input: { jobId: string; name: string; email: string; phone: string; link: string; resume?: ResumeUpload; note: string; start: string; website?: string }) =>
   call<{ link: string; threadId: string; already?: boolean }>('/messages/job', { method: 'POST', body: JSON.stringify(input) });
 export const messageHost = (bookingId: string, token: string) =>
   call<{ link: string; threadId: string }>('/messages/booking', { method: 'POST', body: JSON.stringify({ bookingId, token }) }).then(link);

@@ -1,5 +1,5 @@
 /* Jobs & Internships (the Jobs Board design): a role's card (its photo, the poster's logo on its edge) and its list row,
-   the "Hiring?" card, a role's panel, and the saved note. */
+   the "Hiring?" card, a role's panel, the saved note, and Saved (the saved roles alone). */
 .results {
   padding-top: 32px;
 }
@@ -834,6 +834,9 @@ a.panelOrg:hover {
   bottom: 28px;
   left: 50%;
   z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   padding: 14px 20px;
   border-radius: 10px;
   background: #111;
@@ -944,6 +947,12 @@ button.apply:disabled {
   min-height: 0;
 }
 
+/* A long form scrolls between the popup's top and its Back / Send, which stay in view. */
+.applyForm .dialogBody {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .applyContact {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1031,5 +1040,210 @@ button.apply:disabled {
 @media (max-width: 639px) {
   .applyContact {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Saved: the heart's pill beside the sort (its count), the saved roles' heading, and their notes ---- */
+.savedBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.savedBtn svg {
+  flex: none;
+  font-size: 18px;
+}
+
+.savedBtn:hover {
+  border-color: #111;
+}
+
+.savedBtnOn svg {
+  color: #b03a2e;
+  fill: currentColor;
+}
+
+.savedCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 11px;
+  background: #b03a2e;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+  animation: savedPop 0.3s ease;
+}
+
+@keyframes savedPop {
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+.savedHead {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.savedBack {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 22px;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.savedBack:hover {
+  border-color: #111;
+}
+
+.savedTitle {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--font-body);
+}
+
+.savedTitle h2 {
+  margin: 0;
+  color: #111;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.savedTitle span {
+  color: #6b6b6b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.savedBtn:focus-visible,
+.savedBack:focus-visible,
+.toastAction:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.savedClosed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #f5f3ee;
+  color: #444;
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.savedEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 56px 24px;
+  border: 1px dashed #ccc;
+  border-radius: 16px;
+  color: #666;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.savedEmpty strong {
+  color: #111;
+  font-size: 20px;
+}
+
+.savedEmpty .panelApply {
+  height: 48px;
+  margin-top: 8px;
+  padding: 0 24px;
+}
+
+.savedEmptyHeart {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fbeceb;
+  color: #b03a2e;
+  font-size: 28px;
+}
+
+.toastAction {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .savedCount {
+    animation: none;
+  }
+}
+
+/* Phones: the heart and its count alone, the heading smaller. */
+@media (max-width: 639px) {
+  .savedLabel {
+    display: none;
+  }
+
+  .savedBtn {
+    padding: 0 12px;
+  }
+
+  .savedHead {
+    gap: 10px;
+  }
+
+  .savedTitle h2 {
+    font-size: 18px;
   }
 }

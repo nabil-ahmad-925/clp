@@ -6,6 +6,7 @@ import TileCarousel from '@/components/sections/TileCarousel';
 import Faq from '@/components/sections/Faq';
 import Button from '@/components/ui/Button';
 import { Container } from '@/components/ui/Section';
+import { SERVICE_FILTER } from '@/content/listings';
 import { serviceArea } from '@/content/serviceDirectories';
 import type { ServicePage } from '@/content/types';
 import styles from './SportPageView.module.css';
@@ -21,7 +22,11 @@ export default function ServicePageView({ page }: { page: ServicePage }) {
       <StatementBand text={intro} />
 
       <SectionHeading title={support.title} text={support.text} textItalic={support.italic} spaced />
-      <FacilityCards items={services.items} live={area ? { widgetId: area.widgetId, groups: area.filters.map(() => []) } : undefined} />
+      <FacilityCards
+        items={services.items}
+        live={area ? { widgetId: area.widgetId, groups: area.filters.map(() => []) } : undefined}
+        services={area?.filters.find((f) => f.key === SERVICE_FILTER)?.options.filter((o) => o.value)}
+      />
       {services.viewAll && (
         <section className={styles.viewAll} data-header-tone="dark">
           <Container>

@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/our-expectations/',
     '/faq/',
     '/jobs/',
+    '/waivers-documents/',
     ...faqTopics.flatMap((t) => [faqHref(t.id), ...t.subs.map((s) => faqHref(t.id, s.id))]),
     ...sportPages.map((p) => `/${p.section}/${p.slug}/`),
     ...servicePages.map((p) => `/${p.slug}/`),

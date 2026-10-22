@@ -93,7 +93,7 @@ export const footerLinks: NavItem[][] = [
     { label: 'PRIVACY & COOKIES', href: '/privacy-cookies/' },
     { label: 'EXPECTATIONS & COMMITMENT', href: '/our-expectations/' },
     { label: 'CA SUPPLY CHAINS ACT', href: '/ca-supply-chains-act/' },
-    { label: 'WAIVER & RELEASE', href: 'https://www.soxcessful.com/waiver-release', external: true },
+    { label: 'WAIVERS & DOCUMENTS', href: '/waivers-documents/' },
     { label: 'SMS & EMAIL ALERTS', href: 'https://www.soxcessful.com/sms-emails', external: true },
   ],
 ];

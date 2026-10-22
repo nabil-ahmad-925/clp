@@ -1,4 +1,4 @@
-import type { Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
+import type { CardButton, Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
 import display from './data/listingDisplay.json';
 
 /**
@@ -222,9 +222,12 @@ export type Listing = {
    *  in line, everyone told and the first to book wins, or the host picks). None: no waitlist. */
   waitlist?: { claimHours: number; mode: 'next' | 'all' | 'pick' };
   whatToBring?: string[];
-  /** A facility run by a city, county or state: "Permit Now" opens its permit page (`permitUrl`) and it isn't booked on CLP. */
+  /** A facility run by a city, county or state: "Permit Now" opens the permit request form (linking to `permitUrl`, its
+   *  permit office's page, when it has one) and it isn't booked on CLP. */
   government?: boolean;
   permitUrl?: string;
+  /** A service's card button (the project form or its details) and its text. */
+  cardButton?: CardButton;
   buttons: Cta[];
   socials: { network: string; href: string }[];
 };
@@ -328,6 +331,8 @@ export const toItem = (l: Listing): AddedItem => ({
   whatToBring: l.whatToBring,
   government: l.government,
   permitUrl: l.permitUrl,
+  listingType: l.widgetId ? listingTypeOf(Number(l.widgetId)) : undefined,
+  cardButton: l.cardButton,
   image: l.image,
   subtitle: l.subtitle,
   title: l.title,
@@ -342,6 +347,8 @@ export const toItem = (l: Listing): AddedItem => ({
 
 /** The directories' Sport filter (each sport page presets it to its sport). */
 export const SPORT_FILTER = 'extra-one';
+/** The services areas' Service filter (the "Start a New Project" form's services). */
+export const SERVICE_FILTER = 'service';
 
 /** A directory widget's listing type (the site menu it is under), or undefined for widgets without listings. */
 export const listingTypeOf = (widgetId: number): ListingType | undefined => WIDGET_TYPES[widgetId];
@@ -471,9 +478,13 @@ export async function moreListings(
 
 // --- Booking requests ("Book Now"; the bookings API, clp-api src/bookings.mjs) ---------------------------------------
 
-/** Whether a listing is booked on CLP ("Book Now"): CLP's own and its partners' listings, never a government facility
- *  (it needs a permit). Others link out. */
-export const isBookable = (item: { provider?: Provider; government?: boolean }) => (item.provider === 'partner' || item.provider === 'clp') && !item.government;
+/**
+ * Whether a listing is booked on CLP ("Book Now"), as the bookings API decides: CLP's own and its partners' listings,
+ * and every facility (one without a partner through CLP). Never a government facility (it needs a permit) or a service
+ * (its card starts a project or shows its details). Others link out.
+ */
+export const isBookable = (item: Pick<DirectoryItem, 'provider' | 'government' | 'listingType'>) =>
+  !item.government && item.listingType !== 'services' && (item.provider === 'partner' || item.provider === 'clp' || item.listingType === 'facilities');
 
 /**
  * What a card shows besides the listing's fields (listingDisplay.json, shared with the admin and the API): the units a
