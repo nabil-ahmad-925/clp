@@ -4,18 +4,12 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { LuBox, LuFactory, LuPalette, LuShapes, LuTag } from 'react-icons/lu';
 import { createPortal } from 'react-dom';
-import { LuBox, LuClock, LuLayers, LuPalette, LuShapes } from 'react-icons/lu';
 import BecomePartner from '@/components/partners/BecomePartner';
-import lc from '@/components/sections/ListingCard.module.css';
-import t from '@/components/sections/TeamDirectory.module.css';
-import Pager from '@/components/ui/Pager';
 import { type ResultsView } from '@/components/ui/ViewToggle';
 import {
-  BULK_CATEGORIES,
-  BULK_ITEMS,
   CUSTOM_ITEM,
-  DECORATIONS,
   PRIORITIES,
   VIEWS,
   bulkItem,
@@ -26,7 +20,6 @@ import {
   guestRequestAction,
   guestRequests,
   isApparel,
-  leadWeeks,
   myDesigns,
   sendGuestQuote,
   uploadGuestImage,
@@ -38,58 +31,35 @@ import {
 } from '@/content/bulk';
 import { partnerSignOut, uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
+import { SRC, WS_BRANDS, WS_CATS, WS_DECOS, WS_ITEMS, WS_SOURCES, wsItem, type WsItem, type WsSource } from '@/content/wholesale';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
-import { LockIcon } from './shopIcons';
-import { CardGrid, LIST_SIZES, ListToolbar, ShopSearch, hasWords, titleCase, type ListChip } from './shopListing';
+import { BrandAssetsBar } from './BrandAssets';
+import WholesaleCard, { CustomCard } from './WholesaleCard';
+import WholesaleItem from './WholesaleItem';
+import WholesaleRequests, { needsYou as wsNeedsYou } from './WholesaleRequests';
+import { useWholesale } from './wholesaleStore';
+import { ListToolbar, ShopSearch, titleCase, type ListChip } from './shopListing';
 import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
+import w from './wholesale.module.css';
 
 /** The bulk tiles' colours (a partner's brand colours first, when they have any). */
 const DEFAULT_SWATCHES = ['#111111', '#FFFFFF', '#0B2A5B', '#7A1F2B', '#1D6363', '#C8102E', '#2E7D32', '#DCBD7D'];
 /** A request without a design (sent before guests could add their logo) in the requests list. */
 const GUEST_FILL = '#1F2A44';
 
-/** The list's filters besides its category: each pill's "All …" name, its panel heading, icon and options. */
-const FILTERS = {
-  src: { name: 'All Availability', heading: 'Availability', icon: <LuBox />, plural: 'options', options: [['clp', 'Made to Order'], ['stock', 'In Stock · Ships Faster']] },
-  deco: { name: 'All Decorations', heading: 'Decoration', icon: <LuPalette />, plural: 'decorations', options: DECORATIONS.map((d) => [d.id, d.label]) },
-  lead: { name: 'All Lead Times', heading: 'Lead Time', icon: <LuClock />, plural: 'lead times', options: [['fast', '2 Weeks or Less'], ['mid', '3–4 Weeks'], ['long', '5+ Weeks']] },
-  min: { name: 'All Minimums', heading: 'Minimum Order', icon: <LuLayers />, plural: 'minimums', options: [['one', 'Single Units'], ['small', '24 or Less'], ['mid', '100 or Less']] },
-} as const;
-type FilterKey = keyof typeof FILTERS;
-type Filters = Record<FilterKey | 'cat', string>;
-
-const matches = (it: BulkItem, f: Filters, q: string) => {
-  if (f.cat && it.category !== f.cat) return false;
-  if (f.src === 'clp' && it.stock) return false;
-  if (f.src === 'stock' && !it.stock) return false;
-  if (f.deco && !it.decoration.some((d) => d.toLowerCase().includes(f.deco))) return false;
-  const wk = leadWeeks(it.lead);
-  if (f.lead === 'fast' && wk > 2) return false;
-  if (f.lead === 'mid' && (wk <= 2 || wk > 4)) return false;
-  if (f.lead === 'long' && wk <= 4) return false;
-  if (f.min === 'one' && it.min !== 1) return false;
-  if (f.min === 'small' && it.min > 24) return false;
-  if (f.min === 'mid' && it.min > 100) return false;
-  return hasWords(`${it.name} ${it.description} ${it.material} ${it.decoration.join(' ')} ${categoryOf(it.category)?.label ?? ''}`, q);
-};
-
-type BulkSort = 'recommended' | 'lead' | 'min' | 'az';
-const BULK_SORTS: { value: BulkSort; label: string }[] = [
-  { value: 'recommended', label: 'Recommended' },
-  { value: 'lead', label: 'Fastest Lead Time' },
-  { value: 'min', label: 'Lowest Minimum' },
+/** Wholesale's sorts (the board's), in the site's sort menu. */
+type WsSort = 'rec' | 'fast' | 'low' | 'high' | 'az';
+const WS_SORTS: { value: WsSort; label: string }[] = [
+  { value: 'rec', label: 'Recommended' },
+  { value: 'fast', label: 'Ships Fastest' },
+  { value: 'low', label: 'Price: Low to High' },
+  { value: 'high', label: 'Price: High to Low' },
   { value: 'az', label: 'A–Z' },
 ];
-const bulkSortBy = (sort: BulkSort) => (a: BulkItem, b2: BulkItem) =>
-  sort === 'lead' ? leadWeeks(a.lead) - leadWeeks(b2.lead) : sort === 'min' ? a.min - b2.min : sort === 'az' ? a.name.localeCompare(b2.name) : 0;
 
-/** The address of an item's page (with the destination searched, its quote's delivery place). */
-const itemHref = (id: string, loc: string) => shopHref({ view: 'bulk', item: id, loc });
-
-const KIND_LABEL: Record<BulkKind, string> = { saved: 'Saved ✓', quote: 'Quote requested ✓', order: 'Ordered ✓' };
 const STATUS: Record<string, [string, string, string]> = {
   saved: ['Saved design', '#F0EEE9', '#444444'],
   quote: ['Preparing your quote', '#F2F1ED', '#444444'],
@@ -160,77 +130,67 @@ export default function ShopBulk() {
   const [reqsOpen, setReqsOpen] = useState(false);
   const [signIn, setSignIn] = useState(false);
   const reqs = useRequests(partner, !studio.loading);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const ws = useWholesale();
   const topRef = useRef<HTMLElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
+  const [newFolder, setNewFolder] = useState('');
 
+  // The catalog's search, filters, sort and view live in the address.
   const q = get('q');
   const loc = get('loc');
-  const filters: Filters = {
-    cat: BULK_CATEGORIES.some((c) => c.id === get('cat')) ? get('cat') : '',
-    ...(Object.fromEntries((Object.keys(FILTERS) as FilterKey[]).map((k) => [k, FILTERS[k].options.some(([v]) => v === get(k)) ? get(k) : ''])) as Record<FilterKey, string>),
-  };
-  const sort: BulkSort = BULK_SORTS.some((o) => o.value === get('sort')) ? (get('sort') as BulkSort) : 'recommended';
+  const f = { cat: get('wcat'), src: get('src'), brand: get('brand'), deco: get('deco'), stock: get('stock') };
+  const sort: WsSort = WS_SORTS.some((o) => o.value === get('sort')) ? (get('sort') as WsSort) : 'rec';
   const view: ResultsView = get('cards') === 'list' ? 'list' : 'grid';
-  const per = (LIST_SIZES as readonly number[]).includes(Number(get('per'))) ? Number(get('per')) : LIST_SIZES[0];
-  const matching = (f: Filters) => BULK_ITEMS.filter((it) => matches(it, f, q));
-  const items = matching(filters).sort(bulkSortBy(sort));
-  const any = Boolean(q || Object.values(filters).some(Boolean));
-  // The whole catalog leads with the fully custom product, counted in its first page.
-  const list = any ? items : [CUSTOM_ITEM, ...items];
-  const pageCount = Math.max(1, Math.ceil(list.length / per));
-  const page = Math.min(Math.max(0, (Number(get('page')) || 1) - 1), pageCount - 1);
-  const onPage = list.slice(page * per, page * per + per);
-  const latest = (id: string) => reqs.items.find((r) => r.itemId === id);
-  const swatches = studio.kit.locked && studio.kit.colors.length ? studio.kit.colors : studio.kit.colors.length ? [...new Set([...studio.kit.colors, ...DEFAULT_SWATCHES])].slice(0, 8) : DEFAULT_SWATCHES;
-  const chip = (id: FilterKey | 'cat', name: string, heading: string, icon: ReactNode, plural: string, options: [string, string][]): ListChip => ({
-    id,
+  const words = q.toLowerCase();
+  const passWith = (ff: typeof f, i: WsItem) =>
+    (!words || `${i.name} ${i.cat} ${i.brand} ${i.deco.join(' ')} ${SRC[i.src]}`.toLowerCase().includes(words)) &&
+    (!ff.cat || i.cat === ff.cat) &&
+    (!ff.src || i.src === ff.src) &&
+    (!ff.brand || i.brand === ff.brand) &&
+    (!ff.deco || i.deco.includes(ff.deco)) &&
+    (!ff.stock || i.stock === ff.stock);
+  const pass = (i: WsItem) => passWith(f, i);
+  const sorter = (x: WsItem, y: WsItem) =>
+    sort === 'low' ? x.price - y.price : sort === 'high' ? y.price - x.price : sort === 'fast' ? (x.stock === 'in' ? 0 : 1) - (y.stock === 'in' ? 0 : 1) : sort === 'az' ? x.name.localeCompare(y.name) : 0;
+  const items = WS_ITEMS.filter(pass).sort(sorter);
+  // How many a filter's choice would show (the dropdown's counts and "Show N results").
+  const countWith = (k: keyof typeof f, v: string) => WS_ITEMS.filter((i) => passWith({ ...f, [k]: v }, i)).length;
+  const any = Boolean(q || loc || Object.values(f).some(Boolean));
+  const favCount = WS_ITEMS.filter((i) => ws.isFav(i.id)).length;
+  const hrefOf = (it: WsItem) => shopHref({ view: 'bulk', item: it.id });
+  const keyOf = (k: keyof typeof f) => (k === 'cat' ? 'wcat' : k);
+  // The board's filters (Products, Source, Brand, Decoration, Availability) in the site's filter dropdowns.
+  const chip = (k: keyof typeof f, name: string, heading: string, icon: ReactNode, plural: string, options: [string, string][]): ListChip => ({
+    id: k,
     name,
     heading,
     icon,
     plural,
-    options: options.map(([value, label]) => ({ value, label, count: matching({ ...filters, [id]: value }).length })),
-    value: filters[id],
-    onChange: (v) => set({ [id]: v }),
-    count: (v) => matching({ ...filters, [id]: v }).length,
+    options: options.map(([value, label]) => ({ value, label, count: countWith(k, value) })),
+    value: f[k],
+    onChange: (v) => set({ [keyOf(k)]: v }),
+    count: (v) => countWith(k, v),
   });
   const chips = [
-    chip('cat', 'All Categories', 'Category', <LuShapes />, 'categories', BULK_CATEGORIES.map((c) => [c.id, c.label] as [string, string]).sort((a, z) => a[1].localeCompare(z[1]))),
-    ...(Object.keys(FILTERS) as FilterKey[]).map((k) => chip(k, FILTERS[k].name, FILTERS[k].heading, FILTERS[k].icon, FILTERS[k].plural, FILTERS[k].options.map(([v, l]) => [v, l] as [string, string]))),
+    chip('cat', 'All Products', 'Product Type', <LuShapes />, 'products', WS_CATS.map((x) => [x, x])),
+    chip('src', 'All Sources', 'Source', <LuFactory />, 'sources', (Object.keys(SRC) as WsSource[]).map((k) => [k, SRC[k]])),
+    chip('brand', 'All Brands', 'Brand', <LuTag />, 'brands', WS_BRANDS.map((x) => [x, x])),
+    chip('deco', 'All Decorations', 'Decoration', <LuPalette />, 'decorations', WS_DECOS.map((x) => [x, x])),
+    chip('stock', 'All Availability', 'Availability', <LuBox />, 'options', [
+      ['in', 'In Stock · Ships Fast'],
+      ['mto', 'Made to Order'],
+    ]),
   ];
 
-  const onLogo = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-    setUploading(true);
-    setUploadError('');
-    try {
-      studio.setLogo(await studio.upload(file));
-    } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Could not upload your logo.');
-    } finally {
-      setUploading(false);
-    }
-  };
-  // A partner designs a catalog item in the studio; anyone else (and the custom item) opens its page.
-  // Every catalog item opens its design studio page (guests ask for a quote there); the fully custom one its own page.
-  const hrefOf = (it: BulkItem) => (it.id !== 'custom' ? shopHref({ view: 'studio', item: it.id }) : itemHref(it.id, loc));
   const reqTitle = partner ? 'My designs' : 'My quote requests';
   const drawers = (
     <>
-      {(reqsOpen || get('requests') === '1') && (
+      {reqsOpen && (
         <Requests
           title={reqTitle}
           partner={partner}
           items={reqs.items}
           onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))}
-          onClose={() => {
-            setReqsOpen(false);
-            // Opened from an e-mail's link (?requests=1): the address goes back to the list.
-            if (get('requests')) set({ requests: '' });
-          }}
+          onClose={() => setReqsOpen(false)}
           onOpen={(r) => router.push(shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
           onRemove={async (r) => {
             await deleteDesign(r.id);
@@ -242,22 +202,28 @@ export default function ShopBulk() {
     </>
   );
 
-  // An item's own page.
+  // An item's own page: a Wholesale item, or the fully custom request.
   const itemId = get('item');
   if (itemId) {
-    const it = bulkItem(itemId);
+    const wsIt = wsItem(itemId);
+    const it = wsIt ? undefined : bulkItem(itemId);
     return (
       <div className={b.bulk}>
-        {it ? (
+        {wsIt ? (
+          <>
+            <section className={s.thinBand} data-header-tone="light" />
+            <WholesaleItem key={wsIt.id} item={wsIt} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
+          </>
+        ) : it ? (
           <BulkItemPage
             key={it.id}
             item={it}
             studio={studio}
-            swatches={swatches}
+            swatches={DEFAULT_SWATCHES}
             loc={loc}
             onBack={() => router.push(shopHref({ view: 'bulk', loc }))}
             onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])}
-            onShowRequests={() => setReqsOpen(true)}
+            onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))}
             onSignIn={() => setSignIn(true)}
           />
         ) : (
@@ -267,13 +233,105 @@ export default function ShopBulk() {
               <div className={s.empty}>
                 This item isn&rsquo;t in the catalog anymore.
                 <Link href={shopHref({ view: 'bulk' })} className={s.btnDark}>
-                  Back to Bulk &amp; Operations
+                  Back to Wholesale
                 </Link>
               </div>
             </div>
             <div className={s.bottomSpace} />
           </>
         )}
+        {drawers}
+      </div>
+    );
+  }
+
+  // Favorites (the board's): the folders on the side, the saved items in the one picked.
+  // Quote Requests (the board's page): from the button, the item pages and the e-mails' links (?requests=1).
+  if (get('reqs') === '1' || get('requests') === '1') {
+    return (
+      <div className={b.bulk}>
+        <section className={s.thinBand} data-header-tone="light" />
+        <div className={w.subBar}>
+          <Link href={shopHref({ view: 'bulk' })} className={w.backLink}>
+            ← Back to Wholesale
+          </Link>
+        </div>
+        <WholesaleRequests items={reqs.items} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
+        {drawers}
+      </div>
+    );
+  }
+
+  if (get('favs') === '1') {
+    const fsel = get('fsel') || 'all';
+    const nIn = (fid: string) => WS_ITEMS.filter((i) => (ws.favs[i.id] ?? []).includes(fid)).length;
+    const fItems = WS_ITEMS.filter((i) => ws.isFav(i.id) && (fsel === 'all' || (ws.favs[i.id] ?? []).includes(fsel)));
+    const fName = fsel === 'all' ? 'All saved' : (ws.folders.find((x) => x.id === fsel)?.name ?? 'Folder');
+    const addFolder = () => {
+      const n = newFolder.trim();
+      if (!n) return;
+      const id = `f${Date.now()}`;
+      ws.update((st) => ({ folders: [...st.folders, { id, name: n.slice(0, 40) }] }));
+      setNewFolder('');
+      set({ fsel: id });
+    };
+    return (
+      <div className={b.bulk}>
+        <section className={s.thinBand} data-header-tone="light" />
+        <div className={w.subBar}>
+          <Link href={shopHref({ view: 'bulk' })} className={w.backLink}>
+            ← Back to Wholesale
+          </Link>
+        </div>
+        <section className={w.favs}>
+          <aside className={w.favSide}>
+            <h2>Favorites</h2>
+            {[{ id: 'all', name: 'All saved', n: favCount }, ...ws.folders.map((x) => ({ id: x.id, name: x.name, n: nIn(x.id) }))].map((x) => (
+              <button key={x.id} type="button" aria-pressed={fsel === x.id} onClick={() => set({ fsel: x.id === 'all' ? '' : x.id })}>
+                <span>{x.name}</span>
+                <span>{x.n}</span>
+              </button>
+            ))}
+            <span className={w.favNew}>
+              <input value={newFolder} maxLength={40} aria-label="New folder name" placeholder="New folder name" onChange={(e) => setNewFolder(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addFolder()} />
+              <button type="button" onClick={addFolder}>
+                Add
+              </button>
+            </span>
+          </aside>
+          <div className={w.favMain}>
+            <div className={w.favHead}>
+              <span>
+                <span className={w.kicker}>FOLDER</span>
+                <strong>{fName}</strong>
+                <span>
+                  {fItems.length} {fItems.length === 1 ? 'item' : 'items'}
+                  {fsel === 'all' ? ` across ${ws.folders.length} folders` : ''}
+                </span>
+              </span>
+              {fItems.length > 0 && (
+                <Link href={shopHref({ view: 'bulk', item: 'custom' })} className={w.favQuote}>
+                  Request a quote for this folder
+                </Link>
+              )}
+            </div>
+            {fItems.length ? (
+              <div className={w.favGrid}>
+                {fItems.map((i) => (
+                  <WholesaleCard key={i.id} item={i} href={hrefOf(i)} ws={ws} />
+                ))}
+              </div>
+            ) : (
+              <div className={w.empty}>
+                <strong>Nothing saved here yet</strong>
+                <span>Tap the heart on any item to save it to this folder.</span>
+                <span className={w.emptyBtns}>
+                  <Link href={shopHref({ view: 'bulk' })}>Browse wholesale</Link>
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
         {drawers}
       </div>
     );
@@ -286,7 +344,7 @@ export default function ShopBulk() {
           <div className={b.heroTop}>
             <nav className={s.crumbs} aria-label="Breadcrumb">
               <Link href={shopHref()}>Shop</Link>
-              {'  ›  '}Bulk &amp; Operations
+              {'  ›  '}Wholesale
             </nav>
             <span className={b.who}>
               {partner ? `SIGNED IN AS · ${studio.name || 'PARTNER'}` : 'CLP PARTNER?'}
@@ -305,111 +363,83 @@ export default function ShopBulk() {
           </div>
           <div className={s.headCenter}>
             <h1 className={b.heroTitle}>Outfit Your Team, Staff or Event</h1>
-            <p className={b.heroText}>
-              {partner
-                ? 'Design team kits, staff gear, event supplies and more in the CLP studio, then save, buy at partner pricing or get a quote.'
-                : 'Team kits, staff gear, event supplies, inflatables and promo, made direct from our factories and shipped in bulk. Request a quote on anything.'}
-            </p>
-            <span className={s.kicker}>BULK &amp; OPERATIONS</span>
+            <p className={b.heroText}>Name brands, made-for-you items and distributor partner stock. See your logo on everything before you order.</p>
+            <span className={s.kicker}>CLP WHOLESALE</span>
           </div>
         </div>
       </section>
-      <ShopSearch q={q} loc={loc} places={[]} placeholder="Search jerseys, socks, tents, medals…" label="Bulk items" onSearch={(nq, nloc) => set({ q: nq, loc: nloc })} />
+      <ShopSearch q={q} loc={loc} places={[]} placeholder="Search jerseys, socks, tents, medals…" label="Wholesale" onSearch={(nq, nloc) => set({ q: nq, loc: nloc })} />
 
-      <section ref={topRef} className={b.wrap} data-listing="">
+      <section ref={topRef} className={`${b.wrap} ${w.catalog}`} data-listing="">
+        <BrandAssetsBar studio={studio} ws={ws} />
+        {!any && (
+          <div className={w.sources}>
+            {WS_SOURCES.map(([k, kicker, desc]) => (
+              <button key={k} type="button" className={w.source} onClick={() => set({ src: k })}>
+                <span>
+                  <span className={w.kicker}>{kicker}</span>
+                  <span>{WS_ITEMS.filter((i) => i.src === k).length} items</span>
+                </span>
+                <strong>{SRC[k]}</strong>
+                <span>{desc}</span>
+              </button>
+            ))}
+          </div>
+        )}
         <ListToolbar
           chips={chips}
-          sort={{ value: sort, options: BULK_SORTS, onChange: (v) => set({ sort: v === 'recommended' ? '' : v }) }}
+          sort={{ value: sort, options: WS_SORTS, onChange: (v) => set({ sort: v === 'rec' ? '' : v }) }}
           view={view}
-          onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })}
+          onView={(v) => set({ cards: v === 'list' ? 'list' : '' })}
         />
-        <div className={b.kit}>
-          <span className={b.kitLabel}>YOUR BRAND KIT</span>
-          {/* Once the partner's page has loaded: their name, never a placeholder in the meantime. */}
-          {partner && !studio.loading && (
-            <span className={b.kitFor}>
-              For <strong>{studio.name || 'your team'}</strong>
-            </span>
-          )}
-          {studio.kit.locked && (
-            <span className={b.locked}>
-              <LockIcon size={14} stroke="currentColor" />
-              Guidelines on
-            </span>
-          )}
-          <span className={b.kitLogo}>
-            <span className={b.logoBox} style={{ background: studio.logo ? studio.color : '#FBFAF7' }}>
-              {studio.logo ? <img src={studio.logo} alt="Your logo" /> : <span>LOGO</span>}
-            </span>
-            {!studio.kit.locked && (
-              <>
-                <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={uploading}>
-                  {uploading ? 'Adding…' : studio.logo ? 'Change logo' : 'Upload logo'}
-                </button>
-                <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
-                <button type="button" className={b.sampleBtn} onClick={studio.trySample}>
-                  Try sample
-                </button>
-              </>
-            )}
-            {studio.kit.logos.length > 1 && (
-              <select className={b.kitSelect} value={studio.logo} onChange={(e) => studio.setLogo(e.target.value)} aria-label="Brand logo">
-                {studio.kit.logos.map((l) => (
-                  <option key={l.src} value={l.src}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            )}
+        <div className={w.countRow}>
+          <span className={w.count}>
+            <strong>
+              {items.length} {items.length === 1 ? 'item' : 'items'}
+            </strong>{' '}
+            {f.src ? `from ${SRC[f.src as WsSource].toLowerCase()}` : 'across brands, makers and distributor partners'}
+            {loc ? ` · shipping to ${loc}` : ''}
           </span>
-          <span className={b.kitRule} />
-          <span className={b.kitSwatches}>
-            {swatches.map((c) => (
-              <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.kitSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
-            ))}
-          </span>
-          <span className={`${b.kitNote} ${uploadError ? b.kitError : ''}`} role={uploadError ? 'alert' : undefined}>
-            {uploadError || (partner ? 'Every item previews with your brand. Open one to design it in the studio.' : 'Every item previews with your logo and color. Send them with your quote request.')}
+          <span className={w.countBtns}>
+          <Link href={shopHref({ view: 'bulk', favs: '1' })} className={w.favBtn}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#B03A2E" aria-hidden>
+              <path d="M12 21 3.5 12.7A5 5 0 0 1 12 6a5 5 0 0 1 8.5 6.7z" />
+            </svg>
+            Favorites
+            <span>{favCount}</span>
+          </Link>
+          <Link href={shopHref({ view: 'bulk', reqs: '1' })} className={w.favBtn}>
+            Quote Requests
+            <span data-alert={reqs.items.some(wsNeedsYou)}>{reqs.items.filter((r) => r.kind !== 'saved').length}</span>
+          </Link>
           </span>
         </div>
       </section>
 
       <section className={b.gridWrap} data-listing="">
         {items.length === 0 ? (
-          <div className={b.empty}>
-            No items match. Try other words or filters.
-            <button type="button" onClick={() => set({ q: '', cat: '', src: '', deco: '', lead: '', min: '' })}>
-              Clear All
-            </button>
+          <div className={w.empty}>
+            <strong>{q ? `We don’t list “${q}” yet` : 'Nothing matches yet'}</strong>
+            <span>Try fewer filters, or tell us what you need. Our makers can build almost anything to order.</span>
+            <span className={w.emptyBtns}>
+              <button type="button" onClick={() => set({ q: '', loc: '', wcat: '', src: '', brand: '', deco: '', stock: '' })}>
+                Clear filters
+              </button>
+              <Link href={shopHref({ view: 'bulk', item: 'custom' })}>Have us find it</Link>
+            </span>
+          </div>
+        ) : view === 'list' ? (
+          <div className={w.list}>
+            {items.map((it) => (
+              <WholesaleCard key={it.id} item={it} href={hrefOf(it)} ws={ws} list />
+            ))}
           </div>
         ) : (
-          <CardGrid view={view}>
-            {onPage.map((it) => (
-              <div key={it.id} className={t.listingItem}>
-                {it.id === 'custom' ? (
-                  <BulkCard item={it} href={itemHref('custom', loc)} partner={partner} studio={studio} view={view} custom />
-                ) : (
-                  <BulkCard item={it} href={hrefOf(it)} partner={partner} studio={studio} view={view} sent={latest(it.id)?.kind} />
-                )}
-              </div>
+          <div className={w.grid}>
+            {items.map((it) => (
+              <WholesaleCard key={it.id} item={it} href={hrefOf(it)} ws={ws} />
             ))}
-          </CardGrid>
-        )}
-        {list.length > LIST_SIZES[0] && (
-          <div data-listing className={s.pager}>
-            <Pager
-              page={page}
-              pageCount={pageCount}
-              total={list.length}
-              shown={onPage.length}
-              pageSize={per}
-              sizes={LIST_SIZES}
-              onPage={(n) => {
-                set({ page: n ? String(n + 1) : '' }, true);
-                topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              onPageSize={(n) => set({ per: n === LIST_SIZES[0] ? '' : String(n) })}
-            />
+            <CustomCard href={shopHref({ view: 'bulk', item: 'custom' })} />
           </div>
         )}
       </section>
@@ -423,19 +453,13 @@ export default function ShopBulk() {
             <span className={s.kicker}>HOW IT WORKS</span>
           </div>
           <ol className={b.steps}>
-            {(partner
-              ? [
-                  ['Mock it up', 'Design on CLP-made items and in-stock blanks.'],
-                  ['Approve your proof', 'Save, share with your team and sign off.'],
-                  ['We produce it', 'Our team handles sourcing and production.'],
-                  ['Shipped & tracked', 'Tracking and status sync back to your account.'],
-                ]
-              : [
-                  ['Pick items & styles', 'Choose what you need and how many.'],
-                  ['Send a quote request', 'Add your logo, then tell us your idea and date.'],
-                  ['Get a custom quote', 'Direct from manufacturing, with 2–3 options to compare.'],
-                  ['Made & shipped in bulk', 'With a proof to approve before production.'],
-                ]
+            {(
+              [
+                ['Browse & save', 'Filter by brand, maker or what’s in stock. Save items into folders for each team or event.'],
+                ['See your logo on it', 'Pick a logo from your approved brand assets or upload new art. Every item previews instantly.'],
+                ['Approve, order or quote', 'New artwork gets a quick check. In-stock items order right away, and everything else gets a quote.'],
+                ['We make it', 'The CLP team or a maker partner gets print-ready artwork, sends a proof and ships it.'],
+              ] as const
             ).map(([title, text], i) => (
               <li key={title} className={b.step}>
                 <span className={b.stepN} aria-hidden>
@@ -451,77 +475,6 @@ export default function ShopBulk() {
 
       {drawers}
     </div>
-  );
-}
-
-/**
- * A catalog item as the experiences' card: its mockup (in the partner's or guest's logo and colour) with its maker's
- * badge and what was sent for it, its category, name, In stock, styles, minimum and lead time, and Request a Quote
- * (Mock It Up for a partner). The fully custom product: a dark card that starts a design or a quote.
- */
-function BulkCard({
-  item,
-  href,
-  partner,
-  studio,
-  view,
-  sent,
-  custom = false,
-}: {
-  item: BulkItem;
-  href: string;
-  partner: boolean;
-  studio: StudioBrand;
-  view: ResultsView;
-  sent?: BulkKind;
-  custom?: boolean;
-}) {
-  return (
-    <Link href={href} className={[lc.card, view === 'list' && lc.list, b.card].filter(Boolean).join(' ')}>
-      <span className={`${lc.media} ${b.cardMedia} ${custom ? b.cardMediaCustom : ''}`}>
-        {custom ? (
-          <span className={b.cardCustom}>
-            <span className={b.customPlus}>+</span>
-            <span className={b.customKicker}>DIRECT FROM MANUFACTURING</span>
-            <span className={b.cardCustomTitle}>Design something new</span>
-          </span>
-        ) : (
-          <Mockup shape={item.shape} base={studio.color} logo={studio.logo || undefined} placeholder place="front" className={b.cardSvg} />
-        )}
-        {!custom && item.badge && <span className={b.badge}>{item.badge}</span>}
-        {sent && <span className={b.onLabel}>{KIND_LABEL[sent]}</span>}
-      </span>
-      <span className={lc.body}>
-        <span className={lc.provider}>{custom ? 'Fully Custom' : titleCase(categoryOf(item.category)?.label ?? '')}</span>
-        <span className={lc.title}>{custom ? 'Bring us your idea' : item.name}</span>
-        {custom ? (
-          <span className={b.cardLine}>Custom patterns, colors, materials and shapes. Our designers and factories make it from scratch.</span>
-        ) : (
-          <>
-            {item.stock && (
-              <span className={b.stock}>
-                <span />
-                In stock · ready to decorate
-              </span>
-            )}
-            <span className={b.itemMeta}>
-              <span>{item.styles.length} styles</span>
-              <span className={b.metaRule} />
-              <span>
-                Min {item.min} {item.unit}
-              </span>
-              <span className={b.metaRule} />
-              <span>{item.lead}</span>
-            </span>
-          </>
-        )}
-        {/* A row of the list: the button on the right of its foot, as the experiences' rows. */}
-        <span className={view === 'list' ? lc.footer : lc.facilityFooter}>
-          {view === 'list' && <span />}
-          <span className={`${lc.cta} ${view === 'list' ? '' : lc.ctaWide}`}>{custom ? (partner ? 'Start a Design' : 'Request a Quote') : partner ? 'Mock It Up' : 'Request a Quote'}</span>
-        </span>
-      </span>
-    </Link>
   );
 }
 
@@ -753,7 +706,7 @@ function BulkItemPage({
         <nav className={`${s.crumbs} ${s.crumbsLight}`} aria-label="Breadcrumb">
           <Link href={shopHref()}>Shop</Link>
           {'  ›  '}
-          <Link href={shopHref({ view: 'bulk', loc })}>Bulk &amp; Operations</Link>
+          <Link href={shopHref({ view: 'bulk', loc })}>Wholesale</Link>
           {category && (
             <>
               {'  ›  '}

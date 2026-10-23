@@ -463,7 +463,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
       <div className={st.bar}>
         <div className={st.barInner}>
           <Link href={shopHref({ view: 'bulk' })} className={st.back}>
-            ‹ Bulk &amp; Operations
+            ‹ Wholesale
           </Link>
           <span className={st.itemNav}>
             <button type="button" className={st.round} aria-label="Previous product" onClick={() => step(-1)}>
@@ -889,7 +889,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                     Keep designing
                   </button>
                   <Link className={st.darkBtn} href={shopHref({ view: 'bulk' })}>
-                    Back to Bulk
+                    Back to Wholesale
                   </Link>
                 </div>
                 <Link className={st.doneLink} href={shopHref({ view: 'bulk', requests: '1' })}>
