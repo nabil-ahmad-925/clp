@@ -61,6 +61,8 @@ export type PartnerVideo = {
   source: 'youtube' | 'instagram' | 'tiktok' | 'vimeo' | '';
   category?: string;
   from?: { name: string; slug: string };
+  /** Its site's picture (TikTok, Vimeo, an imported YouTube video's). */
+  thumb?: string;
 };
 
 export type PartnerPageData = PartnerCardData & {
