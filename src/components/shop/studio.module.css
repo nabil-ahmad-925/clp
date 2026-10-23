@@ -1018,6 +1018,13 @@
   padding: 0 20px;
 }
 
+.doneLink {
+  color: #8a6f33;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .views {
   display: flex;
   flex-wrap: wrap;

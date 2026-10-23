@@ -892,6 +892,9 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                     Back to Bulk
                   </Link>
                 </div>
+                <Link className={st.doneLink} href={shopHref({ view: 'bulk', requests: '1' })}>
+                  {guest ? 'View my quote requests' : 'View my designs, quotes and orders'}
+                </Link>
               </div>
             )}
           </div>

@@ -22,6 +22,8 @@ import {
   categoryOf,
   createDesign,
   deleteDesign,
+  designAction,
+  guestRequestAction,
   guestRequests,
   isApparel,
   leadWeeks,
@@ -31,6 +33,8 @@ import {
   type BulkItem,
   type BulkKind,
   type BulkRequest,
+  type RequestAction,
+  type RequestActionInput,
 } from '@/content/bulk';
 import { partnerSignOut, uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
@@ -88,14 +92,31 @@ const itemHref = (id: string, loc: string) => shopHref({ view: 'bulk', item: id,
 const KIND_LABEL: Record<BulkKind, string> = { saved: 'Saved ✓', quote: 'Quote requested ✓', order: 'Ordered ✓' };
 const STATUS: Record<string, [string, string, string]> = {
   saved: ['Saved design', '#F0EEE9', '#444444'],
-  quote: ['Quote requested', '#E6F2E9', '#1E5B33'],
+  quote: ['Preparing your quote', '#F2F1ED', '#444444'],
   order: ['Ordered', '#FBF0D6', '#7A5A12'],
-  quoted: ['Quote sent', '#E6F2E9', '#1E5B33'],
-  'in-production': ['In production', '#FBF0D6', '#7A5A12'],
+  updating: ['Updating your quote', '#F2F1ED', '#444444'],
+  art: ['Artwork in review', '#FBF3E2', '#8A6F33'],
+  changes: ['Changes requested', '#FBEAE8', '#B03A2E'],
+  quoted: ['Quote ready', '#111111', '#FFFFFF'],
+  expired: ['Quote expired', '#F0EEE9', '#666666'],
+  'in-production': ['In production', '#E7F3EC', '#1E7A45'],
   shipped: ['Shipped', '#E6EEF8', '#1B4F8C'],
+  declined: ['Declined', '#F0EEE9', '#666666'],
   closed: ['Closed', '#F0EEE9', '#666666'],
 };
-const statusOf = (r: BulkRequest) => STATUS[r.kind === 'saved' ? 'saved' : r.status !== 'new' ? r.status : r.kind] ?? STATUS.quote;
+/** CLP's desk steps while it prices the request (a maker's cost…) read as preparing the quote (or, for an order, ordered). */
+const PRICING = ['new', 'quote', 'maker', 'maker-in'];
+const expired = (r: BulkRequest) => r.status === 'quoted' && Boolean(r.quote) && new Date(r.quote!.validUntil).getTime() < Date.now();
+const statusKey = (r: BulkRequest) => {
+  if (r.kind === 'saved') return 'saved';
+  if (PRICING.includes(r.status)) return r.reply?.kind === 'changes' ? 'updating' : r.kind === 'order' ? 'order' : 'quote';
+  if (r.status === 'quoted') return expired(r) ? 'expired' : 'quoted';
+  if (r.status === 'closed' && r.reply?.kind === 'declined') return 'declined';
+  return r.status;
+};
+const statusOf = (r: BulkRequest) => STATUS[statusKey(r)] ?? STATUS.quote;
+/** What needs the requester: a quote to approve, or new artwork to send. */
+const needsYou = (r: BulkRequest) => r.status === 'changes' || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
 
 /** The partner's or guest's requests (saved designs, quotes, orders), loaded again when they sign in or out. */
 function useRequests(partner: boolean, ready: boolean) {
@@ -199,12 +220,17 @@ export default function ShopBulk() {
   const reqTitle = partner ? 'My designs' : 'My quote requests';
   const drawers = (
     <>
-      {reqsOpen && (
+      {(reqsOpen || get('requests') === '1') && (
         <Requests
           title={reqTitle}
           partner={partner}
           items={reqs.items}
-          onClose={() => setReqsOpen(false)}
+          onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))}
+          onClose={() => {
+            setReqsOpen(false);
+            // Opened from an e-mail's link (?requests=1): the address goes back to the list.
+            if (get('requests')) set({ requests: '' });
+          }}
           onOpen={(r) => router.push(shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
           onRemove={async (r) => {
             await deleteDesign(r.id);
@@ -1003,6 +1029,18 @@ function BulkItemPage({
 
 /* ---------------------------------------------------------------- my designs / requests */
 
+const TRACK_URLS: Record<string, string> = {
+  UPS: 'https://www.ups.com/track?tracknum=',
+  FedEx: 'https://www.fedex.com/fedextrack/?trknbr=',
+  USPS: 'https://tools.usps.com/go/TrackConfirmAction?tLabels=',
+  DHL: 'https://www.dhl.com/us-en/home/tracking/tracking-express.html?tracking-id=',
+};
+const money = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+/** Where a request is on its way: requested, quoted, in production, shipped. */
+const STEPS = ['Requested', 'Quote', 'Production', 'Shipped'];
+const stepOf = (r: BulkRequest) => (r.status === 'shipped' ? 3 : r.status === 'in-production' ? 2 : r.status === 'quoted' ? 1 : 0);
+
 function Requests({
   title,
   partner,
@@ -1010,6 +1048,7 @@ function Requests({
   onClose,
   onOpen,
   onRemove,
+  onChange,
 }: {
   title: string;
   partner: boolean;
@@ -1017,6 +1056,7 @@ function Requests({
   onClose: () => void;
   onOpen: (r: BulkRequest) => void;
   onRemove: (r: BulkRequest) => Promise<void>;
+  onChange: (r: BulkRequest) => void;
 }) {
   const [tab, setTab] = useState<'all' | BulkKind>('all');
   useEffect(() => {
@@ -1029,6 +1069,7 @@ function Requests({
     };
   }, [onClose]);
   const list = useMemo(() => items.filter((r) => !partner || tab === 'all' || r.kind === tab), [items, partner, tab]);
+  const waiting = items.filter(needsYou).length;
   const tabs: ['all' | BulkKind, string][] = [
     ['all', 'All'],
     ['saved', 'Saved'],
@@ -1045,6 +1086,9 @@ function Requests({
               ×
             </button>
           </div>
+          {items.some((r) => r.kind !== 'saved') && (
+            <span className={waiting ? b.reqAttention : b.reqCalm}>{waiting ? `${waiting} ${waiting === 1 ? 'needs' : 'need'} your attention` : 'Nothing needs you right now'}</span>
+          )}
           {partner && (
             <div className={b.reqTabs}>
               {tabs.map(([id, label]) => (
@@ -1061,34 +1105,45 @@ function Requests({
             const it = bulkItem(r.itemId) ?? CUSTOM_ITEM;
             const [label, bg, fg] = statusOf(r);
             return (
-              <div key={r.id} className={b.reqRow}>
-                <span className={b.reqThumb}>
-                  {r.mockup ? (
-                    <img src={r.mockup} alt="" />
-                  ) : (
-                    <Mockup shape={it.shape} base={r.design?.base ?? GUEST_FILL} accent={r.design?.accent} pattern={r.design?.pattern} logo={r.design?.logo || undefined} placeholder={Boolean(r.design)} place={r.design?.place} />
-                  )}
-                </span>
-                <span className={b.reqText}>
-                  <strong>{r.itemName}</strong>
-                  <span>{r.styles.length ? `${r.styles.length} ${r.styles.length === 1 ? 'style' : 'styles'} · Qty ${r.qty}` : r.itemId === 'custom' ? 'New product idea' : `Qty ${r.qty}`}</span>
-                  <span className={b.reqChips}>
-                    <span style={{ background: bg, color: fg }}>{label}</span>
-                    {r.mode === 'design' && <span className={b.reqBrief}>Designer brief</span>}
-                  </span>
-                </span>
-                {partner && r.kind === 'saved' && (
-                  <span className={b.reqActions}>
-                    {r.itemId !== 'custom' && (
-                      <button type="button" onClick={() => onOpen(r)}>
-                        Open
-                      </button>
+              <div key={r.id} className={`${b.reqItem} ${needsYou(r) ? b.reqItemOn : ''}`}>
+                <div className={b.reqRow}>
+                  <span className={b.reqThumb}>
+                    {r.mockup ? (
+                      <img src={r.mockup} alt="" />
+                    ) : (
+                      <Mockup shape={it.shape} base={r.design?.base ?? GUEST_FILL} accent={r.design?.accent} pattern={r.design?.pattern} logo={r.design?.logo || undefined} placeholder={Boolean(r.design)} place={r.design?.place} />
                     )}
-                    <button type="button" className={b.reqRemove} onClick={() => onRemove(r)}>
-                      Remove
-                    </button>
                   </span>
-                )}
+                  <span className={b.reqText}>
+                    <strong>{r.itemName}</strong>
+                    <span>
+                      {[
+                        r.ref,
+                        r.styles.length ? `${r.styles.length} ${r.styles.length === 1 ? 'style' : 'styles'} · Qty ${r.qty}` : r.itemId === 'custom' ? 'New product idea' : `Qty ${r.qty}`,
+                        r.kind !== 'saved' && `Sent ${day(r.createdAt)}`,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                    <span className={b.reqChips}>
+                      <span style={{ background: bg, color: fg }}>{label}</span>
+                      {r.mode === 'design' && <span className={b.reqBrief}>Designer brief</span>}
+                    </span>
+                  </span>
+                  {partner && r.kind === 'saved' && (
+                    <span className={b.reqActions}>
+                      {r.itemId !== 'custom' && (
+                        <button type="button" onClick={() => onOpen(r)}>
+                          Open
+                        </button>
+                      )}
+                      <button type="button" className={b.reqRemove} onClick={() => onRemove(r)}>
+                        Remove
+                      </button>
+                    </span>
+                  )}
+                </div>
+                {r.kind !== 'saved' && <RequestDetail r={r} partner={partner} onChange={onChange} />}
               </div>
             );
           })}
@@ -1106,5 +1161,195 @@ function Requests({
       </aside>
     </div>,
     document.body,
+  );
+}
+
+/**
+ * A quote request or order in My quote requests: how far along it is, and what CLP sent. Its quote (per piece,
+ * total, when it's ready, until when it holds) to approve, change or decline; CLP's artwork note with a way to send a
+ * new file; the approval; each box's tracking once it ships.
+ */
+function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: boolean; onChange: (r: BulkRequest) => void }) {
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+  const [open, setOpen] = useState<'' | 'changes' | 'decline'>('');
+  const [note, setNote] = useState('');
+  const [link, setLink] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+  const act = async (action: RequestAction, input: RequestActionInput = {}) => {
+    setBusy(action);
+    setError('');
+    try {
+      onChange(await (partner ? designAction : guestRequestAction)(r.id, action, input));
+      setOpen('');
+      setNote('');
+      setLink('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'That didn’t go through. Please try again.');
+    } finally {
+      setBusy('');
+    }
+  };
+  const sendFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setBusy('new-artwork');
+    setError('');
+    try {
+      const logo = partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1500));
+      await act('new-artwork', { logo, note: note.trim() });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'That file didn’t upload. Try a PNG or JPG.');
+      setBusy('');
+    }
+  };
+  const q = r.quote;
+  const step = stepOf(r);
+  const closed = r.status === 'closed';
+  return (
+    <div className={b.reqDetail}>
+      {!closed && (
+        <div className={b.reqSteps} aria-label={`Step ${step + 1} of 4: ${STEPS[step]}`}>
+          {STEPS.map((label, i) => (
+            <span key={label} data-on={i <= step}>
+              <i />
+              {label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {r.status === 'changes' && (
+        <div className={b.reqNoteRed}>
+          <span className={b.reqWho}>FROM THE CLP TEAM · {r.art ? day(r.art.at).toUpperCase() : ''}</span>
+          <span>{r.art?.note || 'Your artwork needs a change before production.'}</span>
+          <label className={b.reqField}>
+            Note for our team (optional)
+            <textarea rows={2} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
+          </label>
+          <div className={b.reqBtns}>
+            <button type="button" className={b.reqDark} disabled={Boolean(busy)} onClick={() => fileRef.current?.click()}>
+              {busy === 'new-artwork' ? 'Sending…' : 'Upload a new file'}
+            </button>
+            <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={sendFile} />
+          </div>
+          <label className={b.reqField}>
+            Or paste a link to a vector file (AI, EPS, SVG, PDF)
+            <span className={b.reqLinkRow}>
+              <input type="url" inputMode="url" placeholder="https://" value={link} maxLength={490} onChange={(e) => setLink(e.target.value)} />
+              <button type="button" className={b.reqLight} disabled={Boolean(busy) || !link.trim()} onClick={() => act('new-artwork', { link: link.trim(), note: note.trim() })}>
+                Send link
+              </button>
+            </span>
+          </label>
+        </div>
+      )}
+
+      {r.status === 'art' && r.art?.state === 'resubmitted' && <div className={b.reqNote}>New file sent {day(r.art.at)}. Our team is checking it, usually the same day.</div>}
+      {r.status === 'art' && r.art?.state !== 'resubmitted' && <div className={b.reqNote}>Our team is checking your artwork before we price it.</div>}
+      {PRICING.includes(r.status) &&
+        (r.art?.state === 'resubmitted' ? (
+          <div className={b.reqNote}>New file sent {day(r.art.at)}. We’re checking it and preparing your quote.</div>
+        ) : r.reply?.kind === 'changes' ? (
+          <div className={b.reqNote}>
+            You asked for changes {day(r.reply.at)}: “{r.reply.note}”. We’ll send an updated quote.
+          </div>
+        ) : (
+          <div className={b.reqNote}>{r.kind === 'order' ? 'Our team is confirming your order. You’ll get a final price to approve before production.' : 'We’re preparing your quote. Expect it within 2 business days.'}</div>
+        ))}
+
+      {r.status === 'quoted' && !q && <div className={b.reqNote}>We e-mailed you your quote. Reply to that e-mail to approve it or ask for changes.</div>}
+      {r.status === 'quoted' && q && (
+        <div className={b.reqQuote}>
+          <span className={b.reqWho}>QUOTE FROM THE CLP TEAM · {day(q.sentAt).toUpperCase()}</span>
+          <div className={b.reqQuoteRows}>
+            <span>Per piece</span>
+            <strong>{money(q.unitPrice)}</strong>
+            <span>
+              {q.qty} {q.qty === 1 ? 'piece' : 'pieces'}
+            </span>
+            <strong>{money(q.total)}</strong>
+            {q.lead && (
+              <>
+                <span>Ready in</span>
+                <span>{q.lead}</span>
+              </>
+            )}
+            <span>{expired(r) ? 'Expired' : 'Valid until'}</span>
+            <span>{day(q.validUntil)}</span>
+          </div>
+          {expired(r) && <span className={b.reqWarn}>This quote has expired. Ask for changes and we’ll send an updated one.</span>}
+          <div className={b.reqBtns}>
+            {!expired(r) && (
+              <button type="button" className={b.reqGold} disabled={Boolean(busy)} onClick={() => act('approve-quote')}>
+                {busy === 'approve-quote' ? 'Approving…' : `Approve quote · ${money(q.total)}`}
+              </button>
+            )}
+            <button type="button" className={b.reqLight} aria-expanded={open === 'changes'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'changes' ? '' : 'changes')}>
+              Ask for changes
+            </button>
+            <button type="button" className={b.reqText2} aria-expanded={open === 'decline'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'decline' ? '' : 'decline')}>
+              Decline
+            </button>
+          </div>
+          {open && (
+            <div className={b.reqAsk}>
+              <label className={b.reqField}>
+                {open === 'changes' ? 'What should we change? Quantity, sizes, price, timing…' : 'Why are you declining? (optional)'}
+                <textarea rows={3} maxLength={1000} value={note} autoFocus onChange={(e) => setNote(e.target.value)} />
+              </label>
+              <div className={b.reqBtns}>
+                <button
+                  type="button"
+                  className={b.reqDark}
+                  disabled={Boolean(busy) || (open === 'changes' && !note.trim())}
+                  onClick={() => act(open === 'changes' ? 'ask-changes' : 'decline', { note: note.trim() })}
+                >
+                  {busy ? 'Sending…' : open === 'changes' ? 'Send to our team' : 'Decline quote'}
+                </button>
+                <button type="button" className={b.reqText2} onClick={() => setOpen('')}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+          {!expired(r) && <span className={b.reqFine}>Approving starts production. We’ll send the invoice and a final proof by e-mail.</span>}
+        </div>
+      )}
+
+      {(r.status === 'in-production' || r.status === 'shipped') && (
+        <div className={b.reqNoteGreen}>
+          {r.approvedAt ? `Approved ${day(r.approvedAt)}` : 'Approved'}
+          {q ? ` · ${money(q.total)}` : ''}.{' '}
+          {r.status === 'in-production' ? `It’s being made${q?.lead ? `, ready in ${q.lead}` : ''}. We’ll e-mail you the tracking when it ships.` : `Shipped ${r.shipping ? day(r.shipping.shippedAt) : ''}.`}
+        </div>
+      )}
+
+      {r.status === 'shipped' && r.shipping && (
+        <div className={b.reqTrack}>
+          <span className={b.reqWho}>TRACKING</span>
+          {r.shipping.boxes.map((x, i) => (
+            <span key={i} className={b.reqBox}>
+              <span>
+                Box {i + 1} of {r.shipping!.boxes.length} · {x.carrier} · {x.number}
+              </span>
+              {TRACK_URLS[x.carrier] && (
+                <a href={TRACK_URLS[x.carrier] + encodeURIComponent(x.number)} target="_blank" rel="noopener noreferrer">
+                  Track ↗
+                </a>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {closed && <div className={b.reqNote}>{r.reply?.kind === 'declined' ? `You declined this quote ${day(r.reply.at)}.` : 'This request is closed. Contact us if you’d like to pick it up again.'}</div>}
+      {error && (
+        <span className={b.reqWarn} role="alert">
+          {error}
+        </span>
+      )}
+    </div>
   );
 }

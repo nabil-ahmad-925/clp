@@ -1514,6 +1514,259 @@ button.item {
   line-height: 1.55;
 }
 
+/* A quote request or order: its row, then where it is and what CLP sent (the Wholesale board's Quote Requests). */
+.reqAttention,
+.reqCalm {
+  margin-top: -6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reqAttention {
+  color: #b03a2e;
+}
+
+.reqCalm {
+  color: #888;
+  font-weight: 400;
+}
+
+.reqItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0eee9;
+}
+
+.reqItem .reqRow {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.reqItemOn .reqThumb {
+  box-shadow: 0 0 0 2px #111;
+}
+
+.reqDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.reqSteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.reqSteps span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #999;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.reqSteps i {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: #e5e5e2;
+}
+
+.reqSteps span[data-on='true'] {
+  color: #111;
+}
+
+.reqSteps span[data-on='true'] i {
+  background: #1e7a45;
+}
+
+.reqNote,
+.reqNoteGreen,
+.reqNoteRed,
+.reqQuote,
+.reqTrack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7f6f3;
+  color: #444;
+}
+
+.reqNoteGreen {
+  background: #e7f3ec;
+  color: #1e5a35;
+}
+
+.reqNoteRed {
+  background: #fbeae8;
+  color: #6e231b;
+}
+
+.reqQuote {
+  border: 1.5px solid #111;
+  background: var(--white);
+  color: #111;
+}
+
+.reqTrack {
+  border: 1px solid #ecebe7;
+  background: var(--white);
+}
+
+.reqWho {
+  color: #8a6f33;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.reqNoteRed .reqWho {
+  color: #b03a2e;
+}
+
+.reqQuoteRows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  font-size: 14px;
+}
+
+/* Label, value pairs: the labels grey on the left, the values on the right. */
+.reqQuoteRows > :nth-child(odd) {
+  color: #666;
+}
+
+.reqQuoteRows > :nth-child(even) {
+  color: #111;
+  text-align: right;
+}
+
+.reqBtns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.reqGold,
+.reqDark,
+.reqLight {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reqGold {
+  background: #dcbd7d;
+  color: #000;
+}
+
+.reqDark {
+  background: #111;
+  color: var(--white);
+}
+
+.reqLight {
+  border: 1px solid #ddddda;
+  background: var(--white);
+  color: #111;
+}
+
+.reqText2 {
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: #666;
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.reqGold:disabled,
+.reqDark:disabled,
+.reqLight:disabled,
+.reqText2:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.reqAsk {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reqField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reqField textarea,
+.reqField input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #ddddda;
+  border-radius: 8px;
+  background: var(--white);
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  resize: vertical;
+}
+
+.reqLinkRow {
+  display: flex;
+  gap: 8px;
+}
+
+.reqLinkRow input {
+  flex: 1;
+  height: 40px;
+}
+
+.reqWarn {
+  color: #b03a2e;
+  font-size: 13px;
+}
+
+.reqFine {
+  color: #888;
+  font-size: 12px;
+}
+
+.reqBox {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.reqBox a {
+  flex: none;
+  color: #1b4f8c;
+  font-weight: 700;
+}
+
 /* ---- Smaller screens ---- */
 @media (max-width: 1100px) {
   .grid {

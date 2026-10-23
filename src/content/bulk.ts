@@ -113,7 +113,20 @@ export type BulkRequest = {
   status: string;
   createdAt: string;
   contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string } | null;
+  /** Its reference (R-1A2B3C), as CLP's e-mails give it. */
+  ref?: string;
+  /** CLP's quote: per piece, total, when it's ready, how long the quote holds. */
+  quote?: { unitPrice: number; total: number; qty: number; lead: string; validUntil: string; sentAt: string };
+  /** CLP's artwork check: sent back with a note, or approved; "resubmitted" once they sent a new file. */
+  art?: { state: 'approved' | 'changes' | 'resubmitted'; note: string; at: string; reply?: string };
+  /** What they said about the quote: asked for changes, or declined it. */
+  reply?: { kind: 'changes' | 'declined'; note: string; at: string };
+  approvedAt?: string;
+  shipping?: { boxes: { carrier: string; number: string }[]; shippedAt: string };
 };
+/** What a requester does with their quote request or order (My quote requests). */
+export type RequestAction = 'approve-quote' | 'ask-changes' | 'decline' | 'new-artwork';
+export type RequestActionInput = { note?: string; logo?: string; link?: string };
 export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'createdAt' | 'design' | 'mockup' | 'brief' | 'addons' | 'mode' | 'contact'> & {
   mode?: 'logo' | 'design';
   brief?: string;
@@ -130,9 +143,16 @@ export const sendGuestQuote = (input: BulkInput) => call<{ item: BulkRequest }>(
 export const uploadGuestImage = (image: string) =>
   call<{ url: string }>(`/cart/${cartId()}/images`, { method: 'POST', body: JSON.stringify({ image }) }).then((r) => r.url);
 
+/** A guest approves or declines their quote, asks for changes, or sends new artwork. */
+export const guestRequestAction = (id: string, action: RequestAction, input: RequestActionInput = {}) =>
+  call<{ item: BulkRequest }>(`/cart/${cartId()}/bulk/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ action, ...input }) }).then((r) => r.item);
+
 /** A signed-in partner's designs, quote requests and orders. */
 export const myDesigns = () => partnerCall<{ items: BulkRequest[] }>('/my/designs').then((r) => r.items);
 export const createDesign = (input: BulkInput) => partnerCall<{ item: BulkRequest }>('/my/designs', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
 export const updateDesign = (id: string, input: BulkInput) =>
   partnerCall<{ item: BulkRequest }>(`/my/designs/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(input) }).then((r) => r.item);
+/** A partner approves or declines their quote, asks for changes, or sends new artwork. */
+export const designAction = (id: string, action: RequestAction, input: RequestActionInput = {}) =>
+  partnerCall<{ item: BulkRequest }>(`/my/designs/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ action, ...input }) }).then((r) => r.item);
 export const deleteDesign = (id: string) => partnerCall<{ deleted: true }>(`/my/designs/${encodeURIComponent(id)}`, { method: 'DELETE' });

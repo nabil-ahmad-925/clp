@@ -75,7 +75,17 @@ fi
 
 # 5. CloudFront Function (create or update, then publish) ---------------------------------------------------
 log "CloudFront Function $NAME-router"
-FN_CODE="fileb://$ROOT/scripts/aws/cloudfront-function.js"
+# The admin's redirects (clp-api src/seo.mjs keeps them): filled into the ADMIN_REDIRECTS line so a deploy keeps them.
+FN_FILE="$(mktemp)"
+cp "$ROOT/scripts/aws/cloudfront-function.js" "$FN_FILE"
+if [ -n "${NEXT_PUBLIC_LISTINGS_API_URL:-}" ] && SEO_SITE="$(curl -fsS "${NEXT_PUBLIC_LISTINGS_API_URL%/}/seo/site")"; then
+  LINE="var ADMIN_REDIRECTS = $(jq -c '[.redirects[] | {key: .from, value: [.to, .code]}] | from_entries' <<<"$SEO_SITE"); // ADMIN_REDIRECTS: the admin's SEO page fills this line"
+  LINE="$LINE" node -e 'const fs=require("fs");const f=process.argv[1];fs.writeFileSync(f,fs.readFileSync(f,"utf8").replace(/^var ADMIN_REDIRECTS = .*$/m,()=>process.env.LINE))' "$FN_FILE"
+  echo "admin redirects: $(jq '.redirects | length' <<<"$SEO_SITE")"
+else
+  echo "admin redirects: not read (NEXT_PUBLIC_LISTINGS_API_URL unset or the SEO API didn't answer), the line stays empty" >&2
+fi
+FN_CODE="fileb://$FN_FILE"
 FN_CONFIG="Comment=$NAME redirects and index.html,Runtime=cloudfront-js-2.0"
 if FN_ETAG="$(aws cloudfront describe-function --name "$NAME-router" --query ETag --output text 2>/dev/null)"; then
   FN_ETAG="$(aws cloudfront update-function --name "$NAME-router" --if-match "$FN_ETAG" \
