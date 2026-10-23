@@ -29,7 +29,7 @@ import {
   type RequestAction,
   type RequestActionInput,
 } from '@/content/bulk';
-import { partnerSignOut, uploadImage } from '@/content/partnerSession';
+import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import { SRC, WS_BRANDS, WS_CATS, WS_DECOS, WS_ITEMS, WS_SOURCES, wsItem, type WsItem, type WsSource } from '@/content/wholesale';
 import Mockup, { mockupPng, saveFile } from './Mockup';
@@ -346,20 +346,6 @@ export default function ShopBulk() {
               <Link href={shopHref()}>Shop</Link>
               {'  ›  '}Wholesale
             </nav>
-            <span className={b.who}>
-              {partner ? `SIGNED IN AS · ${studio.name || 'PARTNER'}` : 'CLP PARTNER?'}
-              <span className={b.whoPill}>
-                {partner ? (
-                  <button type="button" onClick={() => partnerSignOut()}>
-                    Sign out
-                  </button>
-                ) : (
-                  <button type="button" className={b.whoOn} onClick={() => setSignIn(true)}>
-                    Partner sign in
-                  </button>
-                )}
-              </span>
-            </span>
           </div>
           <div className={s.headCenter}>
             <h1 className={b.heroTitle}>Outfit Your Team, Staff or Event</h1>
