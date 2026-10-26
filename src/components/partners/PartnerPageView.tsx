@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- the partner's photos are their own uploads (the media bucket), shown as they are. */
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import BookingModal from '@/components/sections/BookingModal';
@@ -25,7 +25,7 @@ import { ProductDetail, type DetailStore } from '@/components/shop/ShopView';
 import { articleDate, fetchArticle, storyCard, type Article } from '@/content/articles';
 import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
-import { albumDates, albumTypeName, fetchAllAlbums, type LiveAlbum } from '@/content/albums';
+import { fetchAllAlbums, type LiveAlbum } from '@/content/albums';
 import { fetchJobs, jobTypeLabel, payText, placeText, postedAgo, type Job } from '@/content/jobs';
 import ResumeField from '@/components/jobs/ResumeField';
 import { JOB_STARTS, useJobApplication } from '@/components/jobs/useJobApplication';
@@ -52,6 +52,10 @@ import lc from '@/components/sections/ListingCard.module.css';
 import t from '@/components/sections/TeamDirectory.module.css';
 import pf from '@/components/sections/PostFilter.module.css';
 import s from './partnerPage.module.css';
+import PartnerContent, { contentCount } from './content/PartnerContent';
+import { Overlay, PaletteContext } from './page/Overlay';
+import { titleCase } from './page/titleCase';
+import { VIDEO_SOURCES, embedOf } from './page/videos';
 
 type Experience = PartnerPageResponse['experiences'][number];
 type TabId = 'about' | 'content' | 'experiences' | 'jobs' | 'partnerships' | 'reviews' | 'shop' | 'news';
@@ -119,7 +123,6 @@ function paletteOf(color: string, mode: 'little' | 'off' = 'little') {
 }
 
 /** The page's colours, for the popups: they render in a portal outside the page, where its variables aren't set. */
-const PaletteContext = createContext<CSSProperties>({});
 
 // --- Icons --------------------------------------------------------------------------------------------------------------
 
@@ -189,7 +192,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const type = partnerType(page.type);
   const palette = useMemo(() => paletteOf(page.color || type.color, page.colorMode), [page.color, type.color, page.colorMode]);
   const sectionOn = (id: string) => page.sections.find((x) => x.id === id)?.on !== false;
-  // The Content tab: the partner's own photo albums (each opens its gallery) and their YouTube videos (played here).
+  // The Content tab: the partner's photo albums (each opens its gallery), their own photos and their YouTube videos.
   const [albums, setAlbums] = useState<LiveAlbum[]>([]);
   useEffect(() => {
     let live = true;
@@ -222,7 +225,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const tabs = (
     [
       ['about', 'About', 0, true],
-      ['content', 'Content', albums.length + youtube.length, sectionOn('photos') && albums.length + youtube.length > 0],
+      ['content', 'Content', contentCount(page, albums, youtube), sectionOn('photos') && contentCount(page, albums, youtube) > 0],
       ['experiences', 'Experiences', experiences.length, sectionOn('experiences') && experiences.length > 0],
       ['jobs', 'Jobs', jobs.length, sectionOn('jobs') && jobs.length > 0],
       ['partnerships', 'Partnerships', collabs.length, sectionOn('partnerships') && collabs.length > 0],
@@ -400,7 +403,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             {shown === 'about' && (
               <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />
             )}
-            {shown === 'content' && <Content page={page} albums={albums} videos={youtube} onVideo={setVideo} />}
+            {shown === 'content' && <PartnerContent page={page} albums={albums} videos={youtube} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} waitOf={waitOf} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
             {shown === 'partnerships' && <Partnerships collabs={collabs} />}
@@ -657,128 +660,6 @@ function SignupCard({ page, onFollowed }: { page: PartnerPageData; onFollowed: (
         </>
       )}
     </form>
-  );
-}
-
-// --- Content ------------------------------------------------------------------------------------------------------------
-
-const VIDEO_SOURCES: Record<string, { label: string; bg: string }> = {
-  youtube: { label: 'YOUTUBE', bg: '#C4302B' },
-  instagram: { label: 'INSTAGRAM', bg: '#8A3AB9' },
-  tiktok: { label: 'TIKTOK', bg: '#111111' },
-  vimeo: { label: 'VIMEO', bg: '#1A7FB5' },
-};
-/** A video's id on its site, from its link. */
-const videoId = (v: PartnerVideo) => {
-  try {
-    const url = new URL(v.url);
-    const path = url.pathname.split('/').filter(Boolean);
-    if (v.source === 'youtube') return url.hostname.endsWith('youtu.be') ? path[0] : (url.searchParams.get('v') ?? (['shorts', 'embed', 'live'].includes(path[0]) ? path[1] : ''));
-    if (v.source === 'vimeo') return path.find((x) => /^\d+$/.test(x)) ?? '';
-    if (v.source === 'tiktok') return path.includes('video') ? path[path.indexOf('video') + 1] : '';
-    if (v.source === 'instagram') return ['p', 'reel', 'tv'].includes(path[0]) ? path[1] : '';
-  } catch {
-    return '';
-  }
-  return '';
-};
-/** The player that plays a video on the page (visitors stay on CLP), or '' when its link can't be played here. */
-const embedOf = (v: PartnerVideo) => {
-  const id = videoId(v);
-  if (!id) return '';
-  return {
-    youtube: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`,
-    vimeo: `https://player.vimeo.com/video/${id}?autoplay=1`,
-    tiktok: `https://www.tiktok.com/embed/v2/${id}`,
-    instagram: `https://www.instagram.com/p/${id}/embed`,
-    '': '',
-  }[v.source];
-};
-/** A heading in Title Case ("Game Day", "Teams in Action"): each word capitalised, the short joining words kept small. */
-const SMALL_WORDS = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'with']);
-const titleCase = (text: string) =>
-  text.replace(/\S+/g, (w, i: number) => (i > 0 && SMALL_WORDS.has(w.toLowerCase()) ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1)));
-const thumbOf = (v: PartnerVideo) => v.thumb || (v.source === 'youtube' && videoId(v) ? `https://i.ytimg.com/vi/${videoId(v)}/hqdefault.jpg` : '');
-
-/**
- * Content (the handoff's "Photos & videos"): the partner's photo albums, each opening its gallery page (its photos are
- * never shown in a popup here), and their YouTube videos, played in the page. All, Photos and Videos filter them.
- */
-function Content({ page, albums, videos, onVideo }: { page: PartnerPageData; albums: LiveAlbum[]; videos: PartnerVideo[]; onVideo: (v: PartnerVideo) => void }) {
-  const [kind, setKind] = useState<'all' | 'albums' | 'videos'>('all');
-  // Every kind its own tab (a kind with nothing in it says so).
-  const filters = [
-    ['all', 'All', albums.length + videos.length],
-    ['albums', 'Albums', albums.length],
-    ['videos', 'Videos', videos.length],
-  ] as const;
-  const none = (kind === 'albums' ? albums.length : kind === 'videos' ? videos.length : albums.length + videos.length) === 0;
-  return (
-    <div className={s.stack}>
-      <div className={s.sectionHead}>
-        <h2 className={s.cardTitle}>Photos &amp; Videos</h2>
-        <div className={s.pills}>
-          {filters.map(([id, label, n]) => (
-            <button key={id} type="button" className={`${s.pill} ${kind === id ? s.pillOn : ''}`} aria-pressed={kind === id} onClick={() => setKind(id)}>
-              {label} <span>{n}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className={s.grid3}>
-        {kind !== 'videos' &&
-          albums.map((a) => {
-            const open = Boolean(a.cover);
-            return (
-              <Link key={a.id} href={`/photos/?album=${encodeURIComponent(a.id)}`} className={s.contentCard}>
-                <span className={s.contentMedia}>
-                  {open ? (
-                    <img src={a.cover} alt="" loading="lazy" />
-                  ) : a.preview ? (
-                    <img src={a.preview} alt="" className={s.contentLocked} />
-                  ) : (
-                    <span className={s.videoBlank}>{page.mono}</span>
-                  )}
-                  <span className={s.contentSource}>{a.access === 'public' ? 'PHOTOS' : 'PRIVATE'}</span>
-                  <span className={s.contentBadge}>
-                    {a.count} {a.count === 1 ? 'photo' : 'photos'}
-                  </span>
-                </span>
-                <span className={s.contentText}>
-                  <strong>{titleCase(a.name)}</strong>
-                  <span>{['Album', albumDates(a), a.city].filter(Boolean).join(' · ')}</span>
-                </span>
-              </Link>
-            );
-          })}
-        {kind !== 'albums' &&
-          videos.map((v, i) => {
-            const thumb = thumbOf(v);
-            return (
-              <button key={v.id ?? `v-${i}-${v.url}`} type="button" className={s.contentCard} onClick={() => onVideo(v)}>
-                <span className={s.contentMedia}>
-                  {thumb ? <img src={thumb} alt="" loading="lazy" /> : <span className={s.videoBlank}>{page.mono}</span>}
-                  <span className={s.contentSource} style={{ background: VIDEO_SOURCES.youtube.bg }}>
-                    {VIDEO_SOURCES.youtube.label}
-                  </span>
-                  <span className={s.playMark} aria-hidden>
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#111111">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
-                </span>
-                <span className={s.contentText}>
-                  <strong>{titleCase(v.title || `${page.short} video ${i + 1}`)}</strong>
-                  {/* Its category, and who posted it when it was shared to this page. */}
-                  <span>{[albumTypeName(v.category) || 'Video', v.from ? `From ${v.from.name}` : 'YouTube'].join(' · ')}</span>
-                </span>
-              </button>
-            );
-          })}
-      </div>
-      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : kind === 'albums' ? `No albums from ${page.short} yet.` : `Nothing from ${page.short} yet.`}</div>}
-      <div className={s.note}>Youth albums and videos are private to the families booked on that session. Download, print or license a photo from any public album.</div>
-    </div>
   );
 }
 
@@ -1707,31 +1588,6 @@ function News({ posts, onOpen }: { posts: Post[]; onOpen: (p: Post) => void }) {
 }
 
 // --- Dialogs ------------------------------------------------------------------------------------------------------------
-
-function Overlay({ children, onClose, width = 560, bare, label }: { children: ReactNode; onClose: () => void; width?: number; bare?: boolean; label?: string }) {
-  const palette = useContext(PaletteContext);
-  useEffect(() => {
-    document.body.classList.add('menu-open');
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.classList.remove('menu-open');
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onClose]);
-  return createPortal(
-    <div className={s.overlay} style={palette} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      {bare ? (
-        children
-      ) : (
-        <div className={s.dialog} role="dialog" aria-modal="true" aria-label={label} style={{ maxWidth: width }}>
-          {children}
-        </div>
-      )}
-    </div>,
-    document.body,
-  );
-}
 
 function CloseButton({ onClose, label = 'Close' }: { onClose: () => void; label?: string }) {
   return (

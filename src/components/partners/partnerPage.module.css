@@ -1703,6 +1703,10 @@ article:hover .productCardMedia > img {
   font-family: var(--font-body);
 }
 
+.overlayDark {
+  background: rgba(10, 10, 10, 0.94);
+}
+
 .dialog {
   box-sizing: border-box;
   display: flex;
