@@ -89,6 +89,7 @@
 .cobrandShop {
   gap: 18px;
   color: #dcbd7d;
+  text-decoration: none;
   font-family: var(--font-body);
   letter-spacing: 4px;
 }

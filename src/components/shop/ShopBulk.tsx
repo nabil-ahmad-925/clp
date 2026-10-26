@@ -434,17 +434,17 @@ export default function ShopBulk() {
       <section className={b.howWrap}>
         <div className={b.how}>
           <div className={b.howHead}>
-            <h2 className={b.howTitle}>{partner ? 'Design to doorstep' : 'Request, quote, deliver'}</h2>
+            <h2 className={b.howTitle}>{partner ? 'Design to Doorstep' : 'Request, Quote, Deliver'}</h2>
             <p className={b.howText}>Every order is quoted direct from manufacturing, with options from value to premium so you get the best fit.</p>
             <span className={s.kicker}>HOW IT WORKS</span>
           </div>
           <ol className={b.steps}>
             {(
               [
-                ['Browse & save', 'Filter by brand, maker or what’s in stock. Save items into folders for each team or event.'],
-                ['See your logo on it', 'Pick a logo from your approved brand assets or upload new art. Every item previews instantly.'],
-                ['Approve, order or quote', 'New artwork gets a quick check. In-stock items order right away, and everything else gets a quote.'],
-                ['We make it', 'The CLP team or a maker partner gets print-ready artwork, sends a proof and ships it.'],
+                ['Browse & Save', 'Filter by brand, maker or what’s in stock. Save items into folders for each team or event.'],
+                ['See Your Logo on It', 'Pick a logo from your approved brand assets or upload new art. Every item previews instantly.'],
+                ['Approve, Order or Quote', 'New artwork gets a quick check. In-stock items order right away, and everything else gets a quote.'],
+                ['We Make It', 'The CLP team or a maker partner gets print-ready artwork, sends a proof and ships it.'],
               ] as const
             ).map(([title, text], i) => (
               <li key={title} className={b.step}>

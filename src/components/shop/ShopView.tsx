@@ -3,14 +3,14 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
 import { PartnerCard } from '@/components/partners/PartnerDirectory';
 import t from '@/components/sections/TeamDirectory.module.css';
 import Pager from '@/components/ui/Pager';
 import { type ResultsView } from '@/components/ui/ViewToggle';
-import { LuShapes, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
+import { LuDollarSign, LuShapes, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
 import { BULK_CATEGORIES } from '@/content/bulk';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, money, removeLine, setLineQty, type Cart } from '@/content/cart';
 import { partnerHref, partnerType } from '@/content/partnerPages';
@@ -57,9 +57,10 @@ const SORTS: { value: Sort; label: string }[] = [
 const sortBy = (sort: Sort) => (a: ShopProduct, b: ShopProduct) =>
   sort === 'price-asc' ? a.price - b.price : sort === 'price-desc' ? b.price - a.price : sort === 'newest' ? (b.addedAt ?? '').localeCompare(a.addedAt ?? '') : 0;
 
-/** How many stores the home's "Shop by partner" shows (two rows of tiles), new arrivals and exclusives (a row), stores per menu column. */
+/** How many stores the home's "Shop by partner" shows (two rows of tiles), new arrivals and exclusives (a row), all products (two rows). */
 const HOME_STORES = 12;
 const HOME_ROW = 4;
+const HOME_ALL = HOME_ROW * 2;
 /** The "Shop by partner" tabs: the store groups A to Z. */
 const GROUP_TABS = [...SHOP_GROUPS].sort((a, b) => a.label.localeCompare(b.label));
 
@@ -94,7 +95,7 @@ const sizeOf = (asked: string) => ((LIST_SIZES as readonly number[]).includes(Nu
 /**
  * The shop (/shop/, the "Shop" design), under the site header co-branded "CLP │ SHOP" with the cart. The address says
  * what shows: the home; ?view=partners[&group=] (every store, by group); ?view=exclusives[&sport=|&drop=] (CLP's own);
- * ?view=new (new arrivals); ?view=search&q=&group= (a search); ?view=bulk (Bulk & Operations) and ?view=studio&item=
+ * ?view=new (new arrivals); ?view=all (every public product); ?view=search&q=&group= (a search); ?view=bulk (Bulk & Operations) and ?view=studio&item=
  * (its design studio, partners); ?store=<slug>[&key=<invite>] (a store; a private one behind its password) and
  * &product=<id> (a product). The cart drawer checks out the whole cart (/checkout/).
  */
@@ -145,7 +146,7 @@ export default function ShopView() {
   else if (store) body = <StoreRoute key={store.slug} data={data} store={store} productId={productId} inviteKey={params.get('key') ?? ''} onViewCart={() => setCartOpen(true)} />;
   else if (view === 'partners') body = <Directory data={data} />;
   else if (view === 'exclusives') body = <Exclusives data={data} />;
-  else if (view === 'new' || view === 'search') body = <Collection data={data} view={view} />;
+  else if (view === 'new' || view === 'search' || view === 'all') body = <Collection data={data} view={view} />;
   else body = <Home data={data} go={go} />;
 
   return (
@@ -282,7 +283,8 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
     .sort((a, b) => (b.addedAt ?? '').localeCompare(a.addedAt ?? ''))
     .slice(0, HOME_ROW);
   const exclusive = exclusivesOf(data).products.slice(0, HOME_ROW);
-  const everything = mixStores(data.products.filter((p) => publicSlugs.has(p.slug)));
+  // Two rows of every public store's products (the stores taking turns), the rest on ?view=all.
+  const everything = mixStores(data.products.filter((p) => publicSlugs.has(p.slug))).slice(0, HOME_ALL);
   return (
     <>
       <section className={`${s.hero} ${s.heroFirst}`} data-header-tone="light">
@@ -324,44 +326,36 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
         </section>
       )}
 
-      {newItems.length > 0 && (
+      {everything.length > 0 && (
         <section className={`${s.section} ${s.spaced}`}>
-          <div className={s.headRow}>
-            <h2 className={s.rowTitle}>New arrivals</h2>
+          <div className={s.headCenter}>
+            <h2 className={s.rowTitle}>All products</h2>
+            <span className={s.muted}>Every item from every store on CLP, in one place.</span>
           </div>
-          <ProductGrid products={newItems} stores={data.stores} />
-          <ViewAll href={shopHref({ view: 'new' })} label="View All" />
+          <ProductGrid products={everything} stores={data.stores} />
+          <ViewAll href={shopHref({ view: 'all' })} label="View All Products" />
         </section>
       )}
 
       {exclusive.length > 0 && (
         <section className={`${s.section} ${s.spaced}`}>
-          <div className={s.headRow}>
-            <div className={s.headStack}>
-              <h2 className={s.rowTitle}>CLP Exclusives</h2>
-              <span className={s.kickerDeep}>ONLY ON CLP</span>
-            </div>
+          <div className={s.headCenter}>
+            <h2 className={s.rowTitle}>CLP Exclusives</h2>
+            <span className={s.muted}>ONLY ON CLP</span>
           </div>
           <ProductGrid products={exclusive} stores={data.stores} />
           <ViewAll href={shopHref({ view: 'exclusives' })} label="View All Exclusives" />
         </section>
       )}
 
-      {everything.length > 0 && (
-        <Products
-          id="all-products"
-          products={everything}
-          stores={data.stores}
-          title={
-            <div className={s.headRow}>
-              <div className={s.headStack}>
-                <h2 className={s.rowTitle}>All products</h2>
-                <span className={s.kickerDeep}>SHOP ALL</span>
-              </div>
-              <span className={s.muted}>Every item from every store on CLP, in one place.</span>
-            </div>
-          }
-        />
+      {newItems.length > 0 && (
+        <section className={`${s.section} ${s.spaced}`}>
+          <div className={s.headCenter}>
+            <h2 className={s.rowTitle}>New arrivals</h2>
+          </div>
+          <ProductGrid products={newItems} stores={data.stores} />
+          <ViewAll href={shopHref({ view: 'new' })} label="View All" />
+        </section>
       )}
 
       <section className={`${s.section} ${s.bulkBandWrap}`}>
@@ -415,8 +409,10 @@ function Directory({ data }: { data: ShopData }) {
   const per = sizeOf(get('per'));
   const all = partnerStores(data.stores);
   const searched = all.filter((x) => inPlace(x, loc) && hasWords([x.name, x.short, x.category, x.area, typeLabel(x.type)].join(' '), q));
-  const inGroup = (grp: string) => searched.filter((x) => !grp || groupOf(x.type).id === grp);
-  const stores = inGroup(group).sort(storeSortBy(sort));
+  const sports = [...new Set(all.flatMap((x) => x.sports))].map((id) => ({ value: id, label: sportLabel(id) })).sort((a, b) => a.label.localeCompare(b.label));
+  const sport = sports.some((o) => o.value === get('sport')) ? get('sport') : '';
+  const matching = (grp: string, sp: string) => searched.filter((x) => (!grp || groupOf(x.type).id === grp) && (!sp || x.sports.includes(sp)));
+  const stores = matching(group, sport).sort(storeSortBy(sort));
   const pageCount = Math.max(1, Math.ceil(stores.length / per));
   const page = Math.min(Math.max(0, (Number(get('page')) || 1) - 1), pageCount - 1);
   const onPage = stores.slice(page * per, page * per + per);
@@ -427,23 +423,33 @@ function Directory({ data }: { data: ShopData }) {
     heading: 'Partner Type',
     icon: <LuUsers />,
     plural: 'types',
-    options: GROUP_TABS.map((x) => ({ value: x.id, label: x.label, count: inGroup(x.id).length })),
+    options: GROUP_TABS.map((x) => ({ value: x.id, label: x.label, count: matching(x.id, sport).length })),
     value: group,
     onChange: (v) => set({ group: v }),
-    count: (v) => inGroup(v).length,
+    count: (v) => matching(v, sport).length,
+  };
+  const sportChip: ListChip = {
+    id: 'sport',
+    name: 'All Sports',
+    heading: 'Sport',
+    icon: <LuVolleyball />,
+    plural: 'sports',
+    options: sports.map((o) => ({ ...o, count: matching(group, o.value).length })),
+    value: sport,
+    onChange: (v) => set({ sport: v }),
+    count: (v) => matching(group, v).length,
   };
   return (
     <>
       <ListBand
-        crumb="Shop by Partner"
+        crumbs={[{ label: 'Shop by Partner', href: shopHref({ view: 'partners' }) }]}
         name={name}
-        kicker="SHOP BY PARTNER"
         sub={g ? 'Pick a store to shop their official gear. Every order supports them.' : 'Every official store on CLP, A to Z. Every order supports them.'}
       />
       <ShopSearch q={q} loc={loc} places={storePlaces(all)} placeholder="Search athletes, clubs, schools, organizations…" label="Store" onSearch={(nq, nloc) => set({ q: nq, loc: nloc })} onGrey />
       <div className={s.listingBand} data-listing="">
         <section ref={topRef} className={`${s.section} ${s.list}`}>
-          <ListToolbar chips={[groupChip]} sort={{ value: sort, options: STORE_SORTS, onChange: (v) => set({ sort: v === 'az' ? '' : v }) }} view={view} onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })} />
+          <ListToolbar chips={sports.length ? [sportChip, groupChip] : [groupChip]} sort={{ value: sort, options: STORE_SORTS, onChange: (v) => set({ sort: v === 'az' ? '' : v }) }} view={view} onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })} />
           {stores.length === 0 ? (
             <p className={s.empty}>No stores match. Try other words, another place or another partner type.</p>
           ) : (
@@ -489,11 +495,31 @@ type ProductFilter = Omit<ListChip, 'options' | 'value' | 'onChange' | 'count'> 
   test: (p: ShopProduct, value: string) => boolean;
 };
 
+/** The Price filter's ranges (in dollars, the top one open). */
+const PRICE_RANGES = [
+  { value: '0-25', label: 'Under $25', min: 0, max: 25 },
+  { value: '25-50', label: '$25 to $50', min: 25, max: 50 },
+  { value: '50-100', label: '$50 to $100', min: 50, max: 100 },
+  { value: '100-', label: '$100 & Up', min: 100, max: Infinity },
+];
+const PRICE_FILTER: ProductFilter = {
+  id: 'price',
+  name: 'Price',
+  heading: 'Price Range',
+  icon: <LuDollarSign />,
+  plural: 'ranges',
+  options: PRICE_RANGES.map(({ value, label }) => ({ value, label })),
+  test: (p, v) => {
+    const r = PRICE_RANGES.find((x) => x.value === v);
+    return !r || (p.price >= r.min && p.price < r.max);
+  },
+};
+
 /**
  * Products with the experiences' bar (All Categories and any other filters, the sort, grid or list) and pages (rows of
  * four). Its settings live in the address (?category=&sort=&page=&per=&cards=, and each filter's own).
  */
-function Products({ products, stores, filters = [], title, id }: { products: ShopProduct[]; stores: ShopStore[]; filters?: ProductFilter[]; title?: ReactNode; id?: string }) {
+function Products({ products, stores, filters = [] }: { products: ShopProduct[]; stores: ShopStore[]; filters?: ProductFilter[] }) {
   const { get, set } = useAddress();
   const topRef = useRef<HTMLElement>(null);
   const cats = [...new Set(products.map((p) => p.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -520,8 +546,7 @@ function Products({ products, stores, filters = [], title, id }: { products: Sho
 
   return (
     <div className={s.listingBand} data-listing="">
-      <section ref={topRef} id={id} className={`${s.section} ${s.products} ${title ? s.productsHome : ''}`}>
-        {title}
+      <section ref={topRef} className={`${s.section} ${s.products}`}>
         <ListToolbar chips={chips} sort={{ value: sort, options: SORTS, onChange: (v) => set({ sort: v === 'featured' ? '' : v }) }} view={view} onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })} />
         {shown.length === 0 ? (
           <p className={s.empty}>{products.length ? 'No products match. Try another filter.' : 'No products here yet.'}</p>
@@ -552,27 +577,36 @@ function Products({ products, stores, filters = [], title, id }: { products: Sho
   );
 }
 
-/** A list's black heading (new arrivals, a search, CLP Exclusives): breadcrumb, Playfair title, line and kicker. */
-function ListBand({ crumb, name, kicker, sub }: { crumb: string; name: string; kicker: string; sub: string }) {
+/** A crumb of a list's breadcrumb, a link when it has somewhere to go. */
+type Crumb = { label: string; href?: string };
+
+/**
+ * A list's black heading (every store, new arrivals, all products, a search, CLP Exclusives): the Playfair title, its line
+ * and the breadcrumb under them (as the gallery's: gold links, the page itself in grey).
+ */
+function ListBand({ crumbs, name, sub }: { crumbs: Crumb[]; name: string; sub: string }) {
+  const trail: Crumb[] = [{ label: 'Shop', href: shopHref() }, ...crumbs, { label: name }];
   return (
-    <>
-      <section className={s.band} data-header-tone="light">
-        <div className={`${s.bandInner} ${s.bandList}`}>
-          <nav className={s.crumbs} aria-label="Breadcrumb">
-            <Link href={shopHref()}>Shop</Link>
-            {'  ›  '}
-            {crumb}
-            {'  ›  '}
-            {name}
+    <section className={s.band} data-header-tone="light">
+      <div className={`${s.bandInner} ${s.bandList}`}>
+        <div className={s.headCenter}>
+          <h1 className={s.listTitle}>{name}</h1>
+          <p className={s.heroText}>{sub}</p>
+          <nav className={s.bandCrumbs} aria-label="Breadcrumb">
+            {trail.map((c, i) => (
+              <Fragment key={i}>
+                {i > 0 && (
+                  <span className={s.bandCrumbSep} aria-hidden>
+                    ›
+                  </span>
+                )}
+                {c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current={i === trail.length - 1 ? 'page' : undefined}>{c.label}</span>}
+              </Fragment>
+            ))}
           </nav>
-          <div className={s.headCenter}>
-            <h1 className={s.listTitle}>{name}</h1>
-            <p className={s.heroText}>{sub}</p>
-            <span className={s.kicker}>{kicker}</span>
-          </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
 
@@ -580,8 +614,8 @@ function ListBand({ crumb, name, kicker, sub }: { crumb: string; name: string; k
 const productText = (p: ShopProduct, st?: ShopStore) => [p.title, p.category, p.collection, p.description, st?.name, st?.short, st?.category, typeLabel(st?.type ?? '')].join(' ');
 
 /**
- * New Arrivals (the public stores' products added in the last 30 days, newest first) or a search of every public
- * product: the shop's search, then the list.
+ * New Arrivals (the public stores' products added in the last 30 days, newest first), All Products (every public
+ * product, the stores taking turns as on the home) or a search of every public product: the shop's search, then the list.
  */
 function Collection({ data, view }: { data: ShopData; view: string }) {
   const { get, set } = useAddress();
@@ -590,7 +624,7 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
   const g = groupById(get('group'));
   const storeOf = (p: ShopProduct) => data.stores.find((x) => x.slug === p.slug);
   const publicProducts = data.products.filter((p) => !storeOf(p)?.shop.private);
-  const products = publicProducts
+  const found = publicProducts
     .filter((p) => {
       const st = storeOf(p);
       if (g && (!st || st.shop.exclusive || groupOf(st.type).id !== g.id)) return false;
@@ -598,14 +632,14 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
       return inPlace(st, loc) && hasWords(productText(p, st), q);
     })
     .sort((a, b) => (view === 'new' ? (b.addedAt ?? '').localeCompare(a.addedAt ?? '') : 0));
-  const name = view === 'new' ? 'New Arrivals' : q ? `“${q}”` : loc ? `Near ${loc}` : g ? g.label : 'All Products';
+  const products = view === 'all' ? mixStores(found) : found;
+  const name = view === 'new' ? 'New Arrivals' : view === 'all' ? 'All Products' : q ? `“${q}”` : loc ? `Near ${loc}` : g ? g.label : 'All Products';
   return (
     <>
       <ListBand
-        crumb={view === 'new' ? 'Collections' : g ? 'Shop by Partner' : 'Search'}
+        crumbs={view === 'new' || view === 'all' ? [{ label: 'Collections' }] : g ? [{ label: 'Shop by Partner', href: shopHref({ view: 'partners' }) }] : [{ label: 'Search' }]}
         name={name}
-        kicker={view === 'new' ? 'JUST DROPPED' : g ? 'SHOP BY PARTNER' : 'SEARCH'}
-        sub={view === 'new' ? 'The latest from CLP and our partners.' : g ? `Every store for ${g.label.toLowerCase()} on CLP.` : 'Products across the CLP shop.'}
+        sub={view === 'new' ? 'The latest from CLP and our partners.' : view === 'all' ? 'Every item from every store on CLP, in one place.' : g ? `Every store for ${g.label.toLowerCase()} on CLP.` : 'Products across the CLP shop.'}
       />
       <ShopSearch
         q={q}
@@ -616,7 +650,7 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
         onSearch={(nq, nloc) => set({ q: nq, loc: nloc })}
         onGrey
       />
-      <Products products={products} stores={data.stores} />
+      <Products products={products} stores={data.stores} filters={view === 'all' ? [PRICE_FILTER] : []} />
       <div className={s.bottomSpace} />
     </>
   );
@@ -650,10 +684,11 @@ function Exclusives({ data }: { data: ShopData }) {
       options: ex.drops.map((d) => ({ value: d, label: d })).sort((a, b) => a.label.localeCompare(b.label)),
       test: (p, v) => p.collection === v,
     },
+    PRICE_FILTER,
   ];
   return (
     <>
-      <ListBand crumb="Collections" name="CLP Exclusives" kicker="ONLY ON CLP" sub="The Footprints Collection and everything made by Compete Like Pros." />
+      <ListBand crumbs={[{ label: 'Collections' }]} name="CLP Exclusives" sub="The Footprints Collection and everything made by Compete Like Pros." />
       <ShopSearch q={q} loc="" places={[]} placeholder="Search CLP Exclusives…" label="Products" onSearch={(nq) => set({ q: nq })} onGrey={ex.products.length > 0} />
       {ex.products.length === 0 ? (
         <section className={`${s.section} ${s.products}`}>

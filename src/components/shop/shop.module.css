@@ -918,6 +918,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 20px 10px;
   border: 1px solid #262626;
@@ -983,6 +984,27 @@
 
 .crumbs a:hover {
   text-decoration: underline;
+}
+
+/* A list band's breadcrumb under its line (as the gallery's): gold links, the page itself in grey. */
+.bandCrumbs {
+  color: #999;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bandCrumbs a {
+  color: #dcbd7d !important;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bandCrumbs a:hover {
+  text-decoration: underline;
+}
+
+.bandCrumbSep {
+  padding: 0 0.35em;
 }
 
 .crumbsLight {
@@ -1366,27 +1388,9 @@
   padding-top: 40px;
 }
 
-/* The home's "All products": spaced as its other rows, its heading above the pills. A new page scrolls here, clear of the header. */
+/* A new page scrolls here, clear of the header. */
 .products {
   scroll-margin-top: 96px;
-}
-
-.productsHome {
-  padding-top: 56px;
-}
-
-/* Its filters right under its heading (the list bar's own top margin dropped): the same 28px as above the cards. */
-.productsHome > .headRow + * {
-  margin-top: 0;
-}
-
-/* Phones: its line under the heading, not squeezed beside it. */
-@media (max-width: 767px) {
-  .productsHome > .headRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
 }
 
 .pager {
