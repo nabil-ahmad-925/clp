@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { LiveAlbum } from '@/content/albums';
 import type { PartnerPageData, PartnerVideo } from '@/content/partnerPages';
 import s from '../partnerPage.module.css';
@@ -24,6 +24,7 @@ export const contentCount = (page: PartnerPageData, albums: LiveAlbum[], videos:
 export default function PartnerContent({ page, albums, videos, onVideo }: Props) {
   const [kind, setKind] = useState<Kind>('all');
   const [open, setOpen] = useState<number | null>(null);
+  const close = useCallback(() => setOpen(null), []);
   const photos = photosAtoZ(page.photos, page.short);
   const filters: [Kind, string, number][] = [
     ['all', 'All', albums.length + photos.length + videos.length],
@@ -54,7 +55,7 @@ export default function PartnerContent({ page, albums, videos, onVideo }: Props)
       </div>
       {none && <div className={s.emptyCard}>{kind === 'all' ? `Nothing from ${page.short} yet.` : `No ${what} from ${page.short} yet.`}</div>}
       <div className={s.note}>Youth albums and videos are private to the families booked on that session. Download, print or license a photo from any public album.</div>
-      {open !== null && photos[open] && <PhotoViewer photos={photos} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />}
+      {open !== null && photos[open] && <PhotoViewer photos={photos} index={open} onIndex={setOpen} onClose={close} />}
     </div>
   );
 }

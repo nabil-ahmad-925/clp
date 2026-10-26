@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- the partner's photos are their own uploads (the media bucket), shown as they are. */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Overlay } from '../page/Overlay';
 import type { PagePhoto } from './photos';
 import v from './photoViewer.module.css';
@@ -14,9 +14,18 @@ const Arrow = ({ back }: { back?: boolean }) => (
   </svg>
 );
 
-/** A partner photo large: its caption, "3 of 12", the previous and next ones (arrows, ← → keys), Escape closes. */
+/**
+ * A partner photo large: its caption, "3 of 12", the previous and next ones (arrows, ← → keys), Escape closes. Focus
+ * moves into it on opening (so Enter can't reopen the card behind) and back to the card that opened it on closing.
+ */
 export default function PhotoViewer({ photos, index, onIndex, onClose }: Props) {
   const count = photos.length;
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+    return () => opener?.focus();
+  }, []);
   const step = (by: number) => onIndex((index + by + count) % count);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -37,7 +46,7 @@ export default function PhotoViewer({ photos, index, onIndex, onClose }: Props) 
               {index + 1} of {count}
             </span>
           </span>
-          <button type="button" className={v.close} aria-label="Close" onClick={onClose}>
+          <button ref={closeRef} type="button" className={v.close} aria-label="Close" onClick={onClose}>
             ✕
           </button>
         </div>
