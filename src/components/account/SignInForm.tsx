@@ -16,6 +16,7 @@ import {
 } from '@/content/partnerSession';
 import own from './account.module.css';
 import auth from './authLook.module.css';
+import CodeStep, { useCodeStep } from './CodeStep';
 import { PasswordField, useCooldown } from './authParts';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -33,7 +34,15 @@ type Step = 'signin' | 'new-password' | 'forgot' | 'reset' | 'confirm';
  * is signed out again). `look="page"`: the Sign In page's look (the admin's sign-in card, authLook.module.css), with
  * Show/Hide on passwords.
  */
-export default function SignInForm({ studio = false, look = 'popup', onSignedIn }: { studio?: boolean; look?: 'page' | 'popup'; onSignedIn?: (user: PartnerUser) => void }) {
+type Props = {
+  studio?: boolean;
+  look?: 'page' | 'popup';
+  onSignedIn?: (user: PartnerUser) => void;
+  /** While the e-mail code step shows (the Sign In page then shows only the form). */
+  onCodeStep?: (on: boolean) => void;
+};
+
+export default function SignInForm({ studio = false, look = 'popup', onSignedIn, onCodeStep }: Props) {
   const page = look === 'page';
   const s = page ? auth : claim;
   const o = page ? auth : own;
@@ -47,6 +56,8 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  useCodeStep(step === 'confirm', onCodeStep);
+  const address = email.trim().toLowerCase();
 
   const go = (s: Step) => {
     setStep(s);
@@ -66,7 +77,6 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    const address = email.trim().toLowerCase();
     setError('');
     setNotice('');
     if (step !== 'new-password' && !EMAIL.test(address)) return setError('Enter a valid email address.');
@@ -90,7 +100,6 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
       if (step === 'forgot') {
         await partnerForgotPassword(address);
         setStep('reset');
-        setNotice(`If ${address} has a CLP account, we’ve emailed it a 6-digit code.`);
       } else if (step === 'reset') {
         await partnerResetPassword(address, code.replace(/\s+/g, ''), next);
         setPassword('');
@@ -113,7 +122,6 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
         startWait();
         setCode('');
         setStep('confirm');
-        setNotice(`Confirm your email first. We sent a 6-digit code to ${address}.`);
       } else setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setBusy(false);
     }
@@ -122,9 +130,9 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
   const resend = async () => {
     setError('');
     try {
-      await resendConfirmation(email.trim().toLowerCase());
+      await resendConfirmation(address);
       startWait();
-      setNotice(`We sent a new code to ${email.trim().toLowerCase()}. Check your spam folder too.`);
+      setNotice('We sent a new code. Check your spam folder too.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send a new code. Please try again.');
     }
@@ -144,8 +152,8 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
       button: 'Save and Sign In',
     },
     forgot: { title: 'Reset Your Password', text: 'Enter your account’s email and we’ll send you a 6-digit code to choose a new password.', button: 'Send Code' },
-    reset: { title: 'Choose a New Password', text: 'Enter the code from the email and your new password.', button: 'Save Password' },
-    confirm: { title: 'Confirm Your Email', text: 'Enter the 6-digit code we emailed you. It’s valid for 24 hours.', button: 'Confirm and Sign In' },
+    reset: { title: 'Choose a New Password', text: `If ${address} has a CLP account, we’ve emailed it a 6-digit code. Enter it and your new password.`, button: 'Save Password' },
+    confirm: { title: 'Confirm Your Email', text: `Your email isn’t confirmed yet. Enter the 6-digit code we sent to ${address}.`, button: 'Confirm and Sign In' },
   }[step];
 
   const emailField = (
@@ -157,7 +165,7 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
   const newPasswordField = <PasswordField look={s} label="New password" autoComplete="new-password" value={next} onChange={setNext} hint={PASSWORD_HINT} />;
   const codeField = (
     <label className={s.field}>
-      Code from the email
+      6-digit code
       <input
         className={`${s.input} ${page ? auth.code : ''}`}
         inputMode="numeric"
@@ -182,39 +190,34 @@ export default function SignInForm({ studio = false, look = 'popup', onSignedIn 
               {notice}
             </span>
           )}
-          <div className={s.fields} style={page ? undefined : { gridTemplateColumns: '1fr' }}>
-            {step === 'signin' && (
-              <>
-                {emailField}
-                <PasswordField look={s} label="Password" autoComplete="current-password" value={password} onChange={setPassword} />
-                <button type="button" className={o.link} onClick={() => go('forgot')}>
-                  Forgot Your Password?
+          {step === 'confirm' ? (
+            <CodeStep look={page ? auth : { ...claim, link: own.link }} large={page} code={code} onCode={setCode} wait={wait} onResend={resend} backLabel="Back to Sign In" onBack={() => go('signin')} />
+          ) : (
+            <div className={s.fields} style={page ? undefined : { gridTemplateColumns: '1fr' }}>
+              {step === 'signin' && (
+                <>
+                  {emailField}
+                  <PasswordField look={s} label="Password" autoComplete="current-password" value={password} onChange={setPassword} />
+                  <button type="button" className={o.link} onClick={() => go('forgot')}>
+                    Forgot Your Password?
+                  </button>
+                </>
+              )}
+              {step === 'new-password' && newPasswordField}
+              {step === 'forgot' && emailField}
+              {step === 'reset' && (
+                <>
+                  {codeField}
+                  {newPasswordField}
+                </>
+              )}
+              {(step === 'forgot' || step === 'reset') && (
+                <button type="button" className={o.link} onClick={() => go('signin')}>
+                  Back to Sign In
                 </button>
-              </>
-            )}
-            {step === 'new-password' && newPasswordField}
-            {step === 'forgot' && emailField}
-            {step === 'reset' && (
-              <>
-                {emailField}
-                {codeField}
-                {newPasswordField}
-              </>
-            )}
-            {step === 'confirm' && (
-              <>
-                {codeField}
-                <button type="button" className={o.link} onClick={resend} disabled={wait > 0}>
-                  {wait > 0 ? `Send a New Code in ${wait}s` : 'Send a New Code'}
-                </button>
-              </>
-            )}
-            {(step === 'forgot' || step === 'reset' || step === 'confirm') && (
-              <button type="button" className={o.link} onClick={() => go('signin')}>
-                Back to Sign In
-              </button>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className={s.footer}>

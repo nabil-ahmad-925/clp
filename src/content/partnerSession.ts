@@ -101,7 +101,12 @@ export async function partnerFirstPassword(email: string, session: string, passw
  */
 export const memberSignUp = (name: string, email: string, password: string) =>
   call<{ needsConfirmation: true; email: string }>('/auth/signup', { method: 'POST', body: JSON.stringify({ name, email, password }) });
-export const confirmEmail = (email: string, code: string) => call<{ confirmed: true }>('/auth/confirm', { method: 'POST', body: JSON.stringify({ email, code }) });
+/** Confirms the address with its code. Already confirmed (an earlier try got that far) counts as done. */
+export const confirmEmail = (email: string, code: string) =>
+  call<{ confirmed: true }>('/auth/confirm', { method: 'POST', body: JSON.stringify({ email, code }) }).catch((err: unknown) => {
+    if (err instanceof PartnerApiError && err.code === 'ALREADY_CONFIRMED') return { confirmed: true as const };
+    throw err;
+  });
 /** A new confirmation code (the same answer whether or not the address has an account). */
 export const resendConfirmation = (email: string) => call<{ sent: true }>('/auth/resend', { method: 'POST', body: JSON.stringify({ email }) });
 
