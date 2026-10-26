@@ -3,8 +3,8 @@
 import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 
-/** Pages that end without the site footer on the original: the partner directory and profiles. */
-const NO_FOOTER = ['/clp-partners/'];
+/** Pages that end without the site footer: the partner directory and profiles (as the original), and Sign In / Sign Up. */
+const NO_FOOTER = ['/clp-partners/', '/sign-in/'];
 
 export default function FooterGate({ children }: { children: ReactNode }) {
   const pathname = usePathname();

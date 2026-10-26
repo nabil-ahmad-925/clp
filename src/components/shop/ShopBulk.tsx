@@ -31,14 +31,14 @@ import {
 } from '@/content/bulk';
 import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
-import { SRC, WS_BRANDS, WS_CATS, WS_DECOS, WS_ITEMS, WS_SOURCES, wsItem, type WsItem, type WsSource } from '@/content/wholesale';
+import { SRC, WS_DECOS, WS_SOURCES, type WsItem, type WsSource } from '@/content/wholesale';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
 import { BrandAssetsBar } from './BrandAssets';
 import WholesaleCard, { CustomCard } from './WholesaleCard';
 import WholesaleItem from './WholesaleItem';
 import WholesaleRequests, { needsYou as wsNeedsYou } from './WholesaleRequests';
-import { useWholesale } from './wholesaleStore';
+import { useWholesale, useWholesaleCatalog } from './wholesaleStore';
 import { ListToolbar, ShopSearch, nextQuery, titleCase, type ListChip } from './shopListing';
 import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
@@ -125,6 +125,10 @@ export default function ShopBulk() {
   const [signIn, setSignIn] = useState(false);
   const reqs = useRequests(partner, !studio.loading);
   const ws = useWholesale();
+  // The live catalog (CLP's Manufacturing › Catalog & suppliers): its items, and the categories and brands they use.
+  const catalog = useWholesaleCatalog();
+  const ALL = catalog.data?.items ?? [];
+  const byId = (id: string) => ALL.find((i) => i.id === id);
   const topRef = useRef<HTMLElement>(null);
   const [newFolder, setNewFolder] = useState('');
 
@@ -145,11 +149,11 @@ export default function ShopBulk() {
   const pass = (i: WsItem) => passWith(f, i);
   const sorter = (x: WsItem, y: WsItem) =>
     sort === 'low' ? x.price - y.price : sort === 'high' ? y.price - x.price : sort === 'fast' ? (x.stock === 'in' ? 0 : 1) - (y.stock === 'in' ? 0 : 1) : sort === 'az' ? x.name.localeCompare(y.name) : 0;
-  const items = WS_ITEMS.filter(pass).sort(sorter);
+  const items = ALL.filter(pass).sort(sorter);
   // How many a filter's choice would show (the dropdown's counts and "Show N results").
-  const countWith = (k: keyof typeof f, v: string) => WS_ITEMS.filter((i) => passWith({ ...f, [k]: v }, i)).length;
+  const countWith = (k: keyof typeof f, v: string) => ALL.filter((i) => passWith({ ...f, [k]: v }, i)).length;
   const any = Boolean(q || loc || Object.values(f).some(Boolean));
-  const favCount = WS_ITEMS.filter((i) => ws.isFav(i.id)).length;
+  const favCount = ALL.filter((i) => ws.isFav(i.id)).length;
   const hrefOf = (it: WsItem) => shopHref({ view: 'bulk', item: it.id });
   const keyOf = (k: keyof typeof f) => (k === 'cat' ? 'wcat' : k);
   // The board's filters (Products, Source, Brand, Decoration, Availability) in the site's filter dropdowns.
@@ -165,10 +169,10 @@ export default function ShopBulk() {
     count: (v) => countWith(k, v),
   });
   const chips = [
-    chip('cat', 'All Products', 'Product Type', <LuShapes />, 'products', WS_CATS.map((x) => [x, x])),
+    chip('cat', 'All Products', 'Product Type', <LuShapes />, 'products', (catalog.data?.categories ?? []).map((x) => [x, x])),
     chip('src', 'All Sources', 'Source', <LuFactory />, 'sources', (Object.keys(SRC) as WsSource[]).map((k) => [k, SRC[k]])),
-    chip('brand', 'All Brands', 'Brand', <LuTag />, 'brands', WS_BRANDS.map((x) => [x, x])),
-    chip('deco', 'All Decorations', 'Decoration', <LuPalette />, 'decorations', WS_DECOS.map((x) => [x, x])),
+    chip('brand', 'All Brands', 'Brand', <LuTag />, 'brands', (catalog.data?.brands ?? []).map((x) => [x, x])),
+    chip('deco', 'All Decorations', 'Decoration', <LuPalette />, 'decorations', WS_DECOS.filter((d) => ALL.some((i) => i.deco.includes(d))).map((x) => [x, x])),
     chip('stock', 'All Availability', 'Availability', <LuBox />, 'options', [
       ['in', 'In Stock · Ships Fast'],
       ['mto', 'Made to Order'],
@@ -185,7 +189,8 @@ export default function ShopBulk() {
           items={reqs.items}
           onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))}
           onClose={() => setReqsOpen(false)}
-          onOpen={(r) => router.push(shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
+          // A catalog item's design opens its Wholesale page; one from the older bulk list, the older studio.
+          onOpen={(r) => router.push(byId(r.itemId) ? shopHref({ view: 'bulk', item: r.itemId }) : shopHref({ view: 'studio', item: r.itemId, design: r.id }))}
           onRemove={async (r) => {
             await deleteDesign(r.id);
             reqs.setItems((list) => list.filter((x) => x.id !== r.id));
@@ -196,17 +201,61 @@ export default function ShopBulk() {
     </>
   );
 
+  // Favorites (the board's): the folders on the side, the saved items in the one picked.
+  // Quote Requests (the board's page): from the button, the item pages and the e-mails' links (?requests=1).
+  if (get('reqs') === '1' || get('requests') === '1') {
+    return (
+      <div className={b.bulk}>
+        <section className={s.thinBand} data-header-tone="light" />
+        <div className={w.subBar}>
+          <Link href={shopHref({ view: 'bulk' })} className={w.backLink}>
+            ← Back to Wholesale
+          </Link>
+        </div>
+        <WholesaleRequests items={reqs.items} catalog={ALL} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
+        {drawers}
+      </div>
+    );
+  }
+
+  // The catalog is still loading (or couldn't): the page waits for it (Quote Requests above doesn't need it).
+  if (!catalog.data) {
+    return (
+      <div className={b.bulk}>
+        <section className={s.thinBand} data-header-tone="light" />
+        <div className={`${s.section} ${s.spacedSm}`}>
+          {catalog.failed ? (
+            <div className={s.empty}>
+              Wholesale couldn&rsquo;t load. Check your connection and try again.
+              <button type="button" className={s.btnDark} onClick={catalog.retry}>
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <div className={s.grid4} aria-hidden>
+              {Array.from({ length: 8 }, (_, i) => (
+                <span key={i} className={`${s.skeleton} ${s.skeletonTile}`} />
+              ))}
+            </div>
+          )}
+        </div>
+        <div className={s.bottomSpace} />
+        {drawers}
+      </div>
+    );
+  }
+
   // An item's own page: a Wholesale item, or the fully custom request.
   const itemId = get('item');
   if (itemId) {
-    const wsIt = wsItem(itemId);
+    const wsIt = byId(itemId);
     const it = wsIt ? undefined : bulkItem(itemId);
     return (
       <div className={b.bulk}>
         {wsIt ? (
           <>
             <section className={s.thinBand} data-header-tone="light" />
-            <WholesaleItem key={wsIt.id} item={wsIt} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
+            <WholesaleItem key={wsIt.id} item={wsIt} all={ALL} notify={catalog.data.notify} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
           </>
         ) : it ? (
           <BulkItemPage
@@ -239,27 +288,10 @@ export default function ShopBulk() {
     );
   }
 
-  // Favorites (the board's): the folders on the side, the saved items in the one picked.
-  // Quote Requests (the board's page): from the button, the item pages and the e-mails' links (?requests=1).
-  if (get('reqs') === '1' || get('requests') === '1') {
-    return (
-      <div className={b.bulk}>
-        <section className={s.thinBand} data-header-tone="light" />
-        <div className={w.subBar}>
-          <Link href={shopHref({ view: 'bulk' })} className={w.backLink}>
-            ← Back to Wholesale
-          </Link>
-        </div>
-        <WholesaleRequests items={reqs.items} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
-        {drawers}
-      </div>
-    );
-  }
-
   if (get('favs') === '1') {
     const fsel = get('fsel') || 'all';
-    const nIn = (fid: string) => WS_ITEMS.filter((i) => (ws.favs[i.id] ?? []).includes(fid)).length;
-    const fItems = WS_ITEMS.filter((i) => ws.isFav(i.id) && (fsel === 'all' || (ws.favs[i.id] ?? []).includes(fsel)));
+    const nIn = (fid: string) => ALL.filter((i) => (ws.favs[i.id] ?? []).includes(fid)).length;
+    const fItems = ALL.filter((i) => ws.isFav(i.id) && (fsel === 'all' || (ws.favs[i.id] ?? []).includes(fsel)));
     const fName = fsel === 'all' ? 'All saved' : (ws.folders.find((x) => x.id === fsel)?.name ?? 'Folder');
     const addFolder = () => {
       const n = newFolder.trim();
@@ -359,7 +391,7 @@ export default function ShopBulk() {
               <button key={k} type="button" className={w.source} onClick={() => set({ src: k })}>
                 <span>
                   <span className={w.kicker}>{kicker}</span>
-                  <span>{WS_ITEMS.filter((i) => i.src === k).length} items</span>
+                  <span>{ALL.filter((i) => i.src === k).length} items</span>
                 </span>
                 <strong>{SRC[k]}</strong>
                 <span>{desc}</span>

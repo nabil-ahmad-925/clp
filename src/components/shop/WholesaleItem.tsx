@@ -4,22 +4,26 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { createDesign, sendGuestQuote, uploadGuestImage, type BulkKind, type BulkRequest, type StudioDesign } from '@/content/bulk';
 import { uploadImage } from '@/content/partnerSession';
+import { ADMIN_URL } from '@/content/partnerPages';
 import { shopHref } from '@/content/storefront';
 import {
   APPAREL,
   LOCN,
   METALS,
   SHAPES,
-  SIZED,
-  SIZES,
-  WS_COLORS,
-  WS_ITEMS,
   amountOf,
+  backDay,
   breaksOf,
+  colorFor,
+  colorsOf,
   firstLoc,
   handlerOf,
   money,
+  notifyWhenBack,
+  programOf,
+  sellInMyStore,
   tierOf,
+  type WsProgram,
   type WsAsset,
   type WsItem,
 } from '@/content/wholesale';
@@ -40,10 +44,29 @@ const TRACK = ['Submitted', 'Artwork check', 'Quote / proof', 'In production', '
  * An item's page (the Wholesale board's): its mockup with the print spots under it, the item's price breaks, then item
  * colour, artwork for each spot, quantities by size and notes for our designers, a guest's details, and a check of
  * what's ready before Place order (approved art, in stock) or Request a quote. Design now opens the full-screen studio.
- * Under it, items teams add and more like it. A request goes to CLP's Wholesale desk as a custom request carrying the
- * item, sizes, design and mockup (the catalog is the board's sample until the API has it).
+ * Under it, items teams add and more like it (`all`: the catalog). A request goes to CLP's Wholesale desk with the
+ * catalog item, its sizes and quantities, the design and the mockup.
  */
-export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, onShowRequests }: { item: WsItem; studio: StudioBrand; ws: Wholesale; loc: string; onSent: (r: BulkRequest) => void; onShowRequests: () => void }) {
+export default function WholesaleItem({
+  item,
+  all,
+  notify,
+  studio,
+  ws,
+  loc: shipTo,
+  onSent,
+  onShowRequests,
+}: {
+  item: WsItem;
+  all: WsItem[];
+  /** CLP takes "Notify me" on back-ordered items. */
+  notify: boolean;
+  studio: StudioBrand;
+  ws: Wholesale;
+  loc: string;
+  onSent: (r: BulkRequest) => void;
+  onShowRequests: () => void;
+}) {
   const partner = studio.partner;
   const sh = SHAPES[item.shape];
   const locs = locsOf(item);
@@ -65,12 +88,20 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
   const [studioOpen, setStudioOpen] = useState<false | string>(false);
   const [qty, setQty] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState('');
-  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', deliverTo: shipTo });
+  // A signed-in CLP member's name and email to start with (a guest types theirs).
+  const [contact, setContact] = useState({ name: studio.user?.name ?? '', organization: '', email: studio.user?.email ?? '', inHands: '', deliverTo: shipTo });
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState<BulkKind | ''>('');
   const [error, setError] = useState('');
   const [done, setDone] = useState<{ kind: BulkKind; ref: string } | null>(null);
   const mockRef = useRef<HTMLSpanElement>(null);
+  // How a partner wants it, on items CLP lets them sell to their members: Buy wholesale, or Sell to members.
+  const [mode, setMode] = useState<'ws' | 'sell'>('ws');
+  const [prog, setProg] = useState<WsProgram>(item.programs[0] ?? 'pod');
+  const [retailText, setRetailText] = useState(String(item.retail ?? ''));
+  const [selling, setSelling] = useState(false);
+  const [sellError, setSellError] = useState('');
+  const [sold, setSold] = useState<Partial<Record<WsProgram, boolean>>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
   /** A change to the design, undoable in the studio. */
@@ -93,10 +124,12 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
   };
   const { upload, busy: uploading, error: uploadError } = useUpload(studio, ws, (a) => change({ art: { ...design.art, [loc]: a.id } }));
 
-  const color = sh.fixed ? metal : ws.ic;
+  // The item's colours (a medal's metals); the one in use across Wholesale when the item has it, else its first.
+  const palette = sh.fixed ? METALS : colorsOf(item);
+  const color = sh.fixed ? metal : colorFor(item, ws.ic);
   const players = rosterOf(rost);
   const player = players[Math.min(rIdx, Math.max(0, players.length - 1))] ?? { name: 'NAME', num: '00' };
-  const sizes = SIZED.includes(item.shape) ? SIZES : ['Qty'];
+  const sizes = item.sizes.length ? item.sizes : ['Qty'];
   const total = sizes.reduce((n, z) => n + (Number(qty[z]) || 0), 0);
   const enough = total >= item.min;
   const over = item.stock === 'in' && total > item.avail;
@@ -106,12 +139,27 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
   const amount = amountOf(item, total, Math.max(1, uniq.length));
   const tier = tierOf(item, total);
   const [stockDot, stockTxt] = item.back
-    ? ['#B03A2E', `Back-ordered at the supplier · back about ${item.back} · min ${item.min}`]
+    ? ['#B03A2E', `Back-ordered at the supplier · back about ${backDay(item.back)} · min ${item.min}`]
     : item.stock === 'in'
       ? ['#1E7A45', `${item.avail} in stock · ships in ${item.lead} · min ${item.min}`]
       : ['#C9A44C', `Made to order · ${item.lead} · min ${item.min}`];
   const tagLine = item.src === 'brand' ? `${item.brand.toUpperCase()} · NAME BRAND` : item.src === 'direct' ? 'CLP DIRECT · MADE BY A MAKER PARTNER' : 'DISTRIBUTOR PARTNER · IN STOCK';
   const canOrder = partner && enough && !pend.length && uniq.length > 0 && item.stock === 'in' && !item.back && !over;
+  // Sell to members (partners, on items with a program): the retail price they set (never under the lowest) and their share.
+  const canSell = partner && item.programs.length > 0;
+  const sell = canSell && mode === 'sell';
+  const program = programOf(prog);
+  const retailMin = item.retailMin ?? 0;
+  const retailAsked = Number(retailText.replace(/[^0-9.]/g, '')) || 0;
+  const retailLow = retailAsked < retailMin;
+  const earn = (retailLow ? retailMin : retailAsked) * program.share;
+  const pctOf = (id: WsProgram) => `${Math.round(programOf(id).share * 100)}%`;
+  const sellText =
+    item.programs.length > 1
+      ? `Add it to your store and earn ${pctOf('pod')} on every sale, or run a pre-order and earn ${pctOf('pre')}. CLP makes and ships it.`
+      : item.programs[0] === 'pod'
+        ? `Add it to your store and earn ${pctOf('pod')} on every sale. CLP makes and ships each order to the buyer.`
+        : `Run a pre-order and earn ${pctOf('pre')}. CLP makes everything in one batch and ships it to you to hand out.`;
   const fav = ws.isFav(item.id);
 
   // The checks before sending, as the board's box shows them.
@@ -148,7 +196,7 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
         }
       }
       const sizeLine = sizes.filter((z) => Number(qty[z]) > 0).map((z) => (z === 'Qty' ? `${qty[z]}` : `${z} ${qty[z]}`)).join(' · ');
-      const colorName = (sh.fixed ? METALS : WS_COLORS).find(([c]) => c === color)?.[1] ?? color;
+      const colorName = palette.find(([c]) => c === color)?.[1] ?? color;
       const brief = [
         `${item.name} (${item.brand}) · ${colorName} · ${total} pieces${sizeLine && sizes.length > 1 ? ` (${sizeLine})` : ''}`,
         `Design: ${designSummary(item, design, ws.asset, players.length) || 'no artwork yet'}`,
@@ -160,9 +208,10 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
         .join('\n');
       const deliverTo = contact.deliverTo.trim();
       const input = {
-        itemId: 'custom',
+        itemId: item.id,
         kind,
-        styles: [],
+        // Its sizes and how many of each (an item without sizes: the total).
+        styles: sizes.filter((z) => z !== 'Qty' && Number(qty[z]) > 0).map((z) => ({ name: z, qty: Number(qty[z]) })),
         qty: total,
         priorities: [],
         mode: 'design' as const,
@@ -186,6 +235,26 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
     }
   };
 
+  /** Add to my store: the item with this artwork and colour as a print-on-demand product of theirs (CLP checks it first). */
+  const sellIt = async () => {
+    setSellError('');
+    if (!uniq.length) return setSellError('Choose your artwork first.');
+    if (retailLow) return setSellError(`The lowest retail price for this item is ${money(retailMin)}.`);
+    const svg = mockRef.current?.querySelector('svg');
+    if (!svg) return setSellError('The mockup isn’t ready yet. Try again in a moment.');
+    setSelling(true);
+    try {
+      const mockup = await uploadImage(await mockupPng(svg as SVGSVGElement));
+      const logo = uniq.find((a) => a.kind === 'img' && a.src && /^https:\/\//.test(a.src))?.src ?? '';
+      await sellInMyStore({ itemId: item.id, program: prog, price: Math.round(retailAsked * 100) / 100, mockup, color, logo, spots: used });
+      setSold((s) => ({ ...s, [prog]: true }));
+    } catch (err) {
+      setSellError(err instanceof Error ? err.message : 'Could not add it. Please try again.');
+    } finally {
+      setSelling(false);
+    }
+  };
+
   // What the box's buttons do: a request's kind, or nothing yet (a disabled button).
   let primary: [string, BulkKind | null] = ['Request a quote', 'quote'];
   let secondary: [string, BulkKind] | null = null;
@@ -204,11 +273,11 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
     fine = 'We send a final proof before anything is made. Taxes and shipping on your invoice.';
   } else fine = `${item.stock === 'mto' ? 'Made to order. ' : pend.length ? 'New artwork is checked with your quote. ' : 'More than we have in stock. '}Quoted by ${handlerOf(item)} within 2 business days.`;
 
-  const rel = WS_ITEMS.filter((x) => x.id !== item.id && x.cat === item.cat).slice(0, 4);
-  const relWith = WS_ITEMS.filter((x) => x.id !== item.id && x.cat !== item.cat).slice(0, 4);
+  const rel = all.filter((x) => x.id !== item.id && x.cat === item.cat).slice(0, 4);
+  const relWith = all.filter((x) => x.id !== item.id && x.cat !== item.cat).slice(0, 4);
   const rows: [string, string, WsItem[], string, string][] = [
     ['Often ordered together', 'Teams that order this usually add these', relWith, 'Shop all', shopHref({ view: 'bulk' })],
-    ['More like this', `Similar ${item.cat.toLowerCase()} from our brands and makers`, rel.length ? rel : WS_ITEMS.filter((x) => x.id !== item.id).slice(4, 8), `See all ${item.cat.toLowerCase()}`, shopHref({ view: 'bulk', wcat: item.cat })],
+    ['More like this', `Similar ${item.cat.toLowerCase()} from our brands and makers`, rel.length ? rel : all.filter((x) => x.id !== item.id).slice(4, 8), `See all ${item.cat.toLowerCase()}`, shopHref({ view: 'bulk', wcat: item.cat })],
   ];
   const assetChips = [...ws.assets.filter((a) => a.id === design.art[loc]), ...ws.assets.filter((a) => a.id !== design.art[loc]).slice(0, design.art[loc] ? 1 : 2)];
   const summary = designSummary(item, design, ws.asset, players.length);
@@ -259,27 +328,60 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
                 <span style={{ background: stockDot }} />
                 {stockTxt}
               </span>
-              {item.back && (
+              {item.back && notify && (
                 <div className={w.backBox}>
                   <span>Get an email the day it’s back in stock. You can still request a quote now and we’ll hold your spot in line.</span>
+                  <NotifyBack itemId={item.id} email={studio.user?.email ?? ''} />
                 </div>
               )}
               <span className={w.itemDesc}>{item.desc}</span>
-              <div className={w.breaks}>
-                {breaksOf(item).map(([q, f]) => (
-                  <div key={q} data-on={tier === f && total > 0}>
-                    <span>{q}+ pcs</span>
-                    <strong>
-                      {money(item.price * f)}
-                      <span> /ea</span>
-                    </strong>
+              {canSell && (
+                <div className={w.modes} role="group" aria-label="How you want it">
+                  <button type="button" aria-pressed={!sell} onClick={() => setMode('ws')}>
+                    <strong>Buy Wholesale</strong>
+                    <span>For your team. Yours to use however you like.</span>
+                  </button>
+                  <button type="button" aria-pressed={sell} onClick={() => setMode('sell')}>
+                    <strong>Sell to Members</strong>
+                    <span>Retail price. You earn {item.programs.map(pctOf).join(' or ')}.</span>
+                  </button>
+                </div>
+              )}
+              {sell ? (
+                <>
+                  <div className={w.retail}>
+                    <div>
+                      <span>Members pay (retail)</span>
+                      <strong>{money(retailAsked || item.retail || 0)} each</strong>
+                    </div>
+                    <div>
+                      <span>You earn per piece</span>
+                      <strong>
+                        {money(earn)} ({pctOf(prog)})
+                      </strong>
+                    </div>
                   </div>
-                ))}
-              </div>
-              <span className={w.priceNote}>
-                <span className={w.decoChip}>{item.deco[0]} included</span>
-                {item.stock === 'in' ? 'Wholesale price per piece with one print spot. Each extra spot adds about 12%.' : 'Estimated wholesale price per piece. Your quote confirms it.'} Yours to use however you like: hand out, give away or resell.
-              </span>
+                  <span className={w.retailNote}>{program.note}</span>
+                </>
+              ) : (
+                <>
+                <div className={w.breaks}>
+                  {breaksOf(item).map(([q, f]) => (
+                    <div key={q} data-on={tier === f && total > 0}>
+                      <span>{q}+ pcs</span>
+                      <strong>
+                        {money(item.price * f)}
+                        <span> /ea</span>
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+                <span className={w.priceNote}>
+                  <span className={w.decoChip}>{item.deco[0]} included</span>
+                  {item.stock === 'in' ? 'Wholesale price per piece with one print spot. Each extra spot adds about 12%.' : 'Estimated wholesale price per piece. Your quote confirms it.'} Yours to use however you like: hand out, give away or resell.
+                </span>
+                </>
+              )}
             </div>
 
             <div className={w.step}>
@@ -288,7 +390,7 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
                 <strong>Item color</strong>
               </span>
               <div className={w.colorChips}>
-                {(sh.fixed ? METALS : WS_COLORS).map(([c, name]) => (
+                {palette.map(([c, name]) => (
                   <button key={c} type="button" className={w.colorChip} aria-pressed={color === c} onClick={() => (sh.fixed ? setMetal(c) : ws.update({ ic: c }))}>
                     <span style={{ background: c }} />
                     {name}
@@ -336,43 +438,71 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
               </div>
             </div>
 
-            <div className={w.step}>
-              <span className={w.stepHead}>
-                <span className={w.stepN}>3</span>
-                <strong>Quantity</strong>
-              </span>
-              <div className={w.qtyGrid} style={{ gridTemplateColumns: `repeat(${sizes.length > 1 ? sizes.length : 5}, minmax(0, 1fr))` }}>
-                {sizes.map((z) => (
-                  <label key={z} className={w.qtyCell}>
-                    <span>{z}</span>
-                    <input type="text" inputMode="numeric" value={qty[z] ?? ''} placeholder="0" aria-label={`Quantity ${z}`} onChange={(e) => setQty({ ...qty, [z]: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
-                  </label>
-                ))}
-              </div>
-              <span className={w.qtyFoot}>
-                <span data-short={total > 0 && !enough}>
-                  {total && !enough ? `Minimum ${item.min} pieces` : over ? 'Over stock: we’ll quote the extra' : `Minimum ${item.min} ${item.min === 1 ? 'piece' : 'pieces'}${sizes.length > 1 ? ' · mix sizes freely' : ''}`}
+            {!sell && (
+              <div className={w.step}>
+                <span className={w.stepHead}>
+                  <span className={w.stepN}>3</span>
+                  <strong>Quantity</strong>
                 </span>
-                <strong>
-                  {total} {total === 1 ? 'piece' : 'pieces'}
-                  {total ? ` · ${money(amount)}` : ''}
-                </strong>
-              </span>
-            </div>
+                <div className={w.qtyGrid} style={{ gridTemplateColumns: `repeat(${sizes.length > 1 ? sizes.length : 5}, minmax(0, 1fr))` }}>
+                  {sizes.map((z) => (
+                    <label key={z} className={w.qtyCell}>
+                      <span>{z}</span>
+                      <input type="text" inputMode="numeric" value={qty[z] ?? ''} placeholder="0" aria-label={`Quantity ${z}`} onChange={(e) => setQty({ ...qty, [z]: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
+                    </label>
+                  ))}
+                </div>
+                <span className={w.qtyFoot}>
+                  <span data-short={total > 0 && !enough}>
+                    {total && !enough ? `Minimum ${item.min} pieces` : over ? 'Over stock: we’ll quote the extra' : `Minimum ${item.min} ${item.min === 1 ? 'piece' : 'pieces'}${sizes.length > 1 ? ' · mix sizes freely' : ''}`}
+                  </span>
+                  <strong>
+                    {total} {total === 1 ? 'piece' : 'pieces'}
+                    {total ? ` · ${money(amount)}` : ''}
+                  </strong>
+                </span>
+              </div>
+            )}
 
-            <div className={w.step}>
-              <span className={w.stepHead}>
-                <span className={w.stepN}>4</span>
-                <strong>Notes for our designers</strong>
-              </span>
-              <textarea className={w.textarea} rows={3} maxLength={1500} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Placement details, names and numbers, deadline, event date…" />
-              {partner && (
-                <label className={w.field}>
-                  Deliver to
-                  <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or ZIP" />
-                </label>
-              )}
-            </div>
+            {!sell && (
+              <div className={w.step}>
+                <span className={w.stepHead}>
+                  <span className={w.stepN}>4</span>
+                  <strong>Notes for our designers</strong>
+                </span>
+                <textarea className={w.textarea} rows={3} maxLength={1500} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Placement details, names and numbers, deadline, event date…" />
+                {partner && (
+                  <label className={w.field}>
+                    Deliver to
+                    <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or ZIP" />
+                  </label>
+                )}
+              </div>
+            )}
+
+            {canSell && !sell && (
+              <button
+                type="button"
+                className={w.sellCard}
+                onClick={() => {
+                  setMode('sell');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <span className={w.sellCardText}>
+                  <strong>Selling to your members instead?</strong>
+                  <span>{sellText}</span>
+                  <span className={w.sellTags}>
+                    {item.programs.map((id) => (
+                      <span key={id} data-pre={id === 'pre'}>
+                        {programOf(id).label} · {pctOf(id)}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+                <span className={w.sellCardGo}>See Retail Pricing →</span>
+              </button>
+            )}
 
             {!partner && (
               <div className={w.step}>
@@ -405,7 +535,59 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
               </div>
             )}
 
-            {done ? (
+            {sell ? (
+              <div className={w.sellBox}>
+                <span className={w.sellKicker}>SELL TO YOUR MEMBERS</span>
+                <div className={w.progs}>
+                  {item.programs.map((id) => (
+                    <button key={id} type="button" aria-pressed={prog === id} onClick={() => (setProg(id), setSellError(''))}>
+                      <span className={w.progHead}>
+                        <strong>{programOf(id).label}</strong>
+                        <strong>{pctOf(id)}</strong>
+                      </span>
+                      <span>{programOf(id).blurb}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className={w.priceRow}>
+                  <label>
+                    Retail price members pay
+                    <input type="text" inputMode="decimal" aria-label="Retail price" value={retailText} onChange={(e) => setRetailText(e.target.value.replace(/[^0-9.]/g, '').slice(0, 8))} />
+                  </label>
+                  <span className={w.earn}>
+                    <span>You earn per sale</span>
+                    <strong>{money(earn)}</strong>
+                    <span className={w.earnNote} data-low={retailLow}>
+                      {retailLow
+                        ? `Minimum price for this item is ${money(retailMin)}. You can go higher, not lower.`
+                        : `${pctOf(prog)} of ${money(retailAsked)} · suggested ${money(item.retail ?? 0)}, minimum ${money(retailMin)}. Price it higher to earn more.`}
+                    </span>
+                  </span>
+                </div>
+                {pend.length > 0 && <span className={w.sellWarn}>Your artwork needs a quick approval before it goes live. We’ll check it as soon as you add it.</span>}
+                {sellError && (
+                  <span className={w.sellError} role="alert">
+                    {sellError}
+                  </span>
+                )}
+                {prog === 'pre' ? (
+                  <span className={w.sellWarn}>Pre-orders open with Sell & earn, coming next. Choose print on demand to sell it now.</span>
+                ) : sold.pod ? (
+                  <span className={w.sellDone} role="status">
+                    ✓ Added to your store. CLP checks the artwork, then you publish it from My Store.
+                  </span>
+                ) : null}
+                <div className={w.sellBtns}>
+                  <button type="button" className={w.sellGo} disabled={selling || prog === 'pre' || Boolean(sold[prog])} onClick={sellIt}>
+                    {selling ? 'Adding…' : sold[prog] ? '✓ Added to Your Store' : prog === 'pod' ? 'Add to My Store' : 'Add to a Pre-Order'}
+                  </button>
+                  <a className={w.sellManage} href={`${ADMIN_URL}/store/`} target="_blank" rel="noopener">
+                    Manage in My Store →
+                  </a>
+                </div>
+                <span className={w.sellFine}>Members pay the retail price and CLP handles checkout, making and shipping. Your share is paid out to you. Buying wholesale instead? Switch to Buy Wholesale above.</span>
+              </div>
+            ) : done ? (
               <div className={w.done}>
                 <span className={w.doneHead}>
                   <span className={w.doneMark}>✓</span>
@@ -514,5 +696,37 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
         />
       )}
     </>
+  );
+}
+
+/** "Notify me": an email (a signed-in partner's to start with) for the day a back-ordered item is back. */
+function NotifyBack({ itemId, email: start }: { itemId: string; email: string }) {
+  const [email, setEmail] = useState(start);
+  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
+  const [error, setError] = useState('');
+  if (state === 'done') return <strong className={w.backDone}>✓ We’ll email {email.trim()} the day it’s back.</strong>;
+  return (
+    <form
+      className={w.backForm}
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!EMAIL.test(email.trim())) return setError('Enter a valid email.');
+        setState('busy');
+        setError('');
+        try {
+          await notifyWhenBack(itemId, email.trim());
+          setState('done');
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Could not save that. Please try again.');
+          setState('idle');
+        }
+      }}
+    >
+      <input type="email" aria-label="Your email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <button type="submit" disabled={state === 'busy'}>
+        {state === 'busy' ? 'Saving…' : 'Notify Me'}
+      </button>
+      {error && <span className={w.backError}>{error}</span>}
+    </form>
   );
 }

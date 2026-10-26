@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { GICON, LOCN, METALS, SHAPES, TEXT_COLORS, WS_ASSETS, WS_COLORS, WS_FONTS, money, type WsItem } from '@/content/wholesale';
+import { GICON, LOCN, METALS, SHAPES, TEXT_COLORS, WS_ASSETS, WS_FONTS, colorsOf, money, type WsItem } from '@/content/wholesale';
 import { ACCEPT, AssetStatus, useUpload } from './BrandAssets';
 import type { StudioBrand } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
@@ -357,7 +357,7 @@ export default function WholesaleStudio({
           <div className={w.stCanvas}>
             {allc ? (
               <div className={w.allColors}>
-                {WS_COLORS.map(([c, name]) => (
+                {colorsOf(item).map(([c, name]) => (
                   <button
                     key={c}
                     type="button"
@@ -774,7 +774,7 @@ export default function WholesaleStudio({
 
           <div className={w.stColors}>
             <strong>Item color</strong>
-            <Swatches list={sh.fixed ? METALS : WS_COLORS} value={color} onPick={setColor} />
+            <Swatches list={sh.fixed ? METALS : colorsOf(item)} value={color} onPick={setColor} />
           </div>
           <button
             type="button"

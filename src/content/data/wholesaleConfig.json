@@ -1,0 +1,296 @@
+{
+  "_comment": "Wholesale (the shop's ?view=bulk, CLP admin Manufacturing › Catalog & suppliers, clp-api wholesale): the fixed lists the catalog uses. Products, suppliers, and which categories and brands are on live in the clp-wholesale table. Copied to the admin by scripts/sync-widgets.mjs.",
+  "sources": [
+    {
+      "id": "brand",
+      "label": "Name brands",
+      "kicker": "SHOP BY BRAND",
+      "blurb": "Nike, Adidas, New Balance, Under Armour, Champion and more."
+    },
+    {
+      "id": "direct",
+      "label": "Direct from manufacturing",
+      "kicker": "MADE FOR YOU",
+      "blurb": "Custom kits, knit socks, medals, tents and inflatables from CLP maker partners."
+    },
+    {
+      "id": "dist",
+      "label": "Distributor partners",
+      "kicker": "IN STOCK, FAST",
+      "blurb": "Everyday team basics from our distributor partners. Most ship in a week."
+    }
+  ],
+  "shapes": [
+    {
+      "id": "tee",
+      "label": "T-shirt"
+    },
+    {
+      "id": "hood",
+      "label": "Hoodie"
+    },
+    {
+      "id": "polo",
+      "label": "Polo"
+    },
+    {
+      "id": "jersey",
+      "label": "Jersey"
+    },
+    {
+      "id": "jacket",
+      "label": "Jacket or quarter-zip"
+    },
+    {
+      "id": "pinnie",
+      "label": "Pinnie"
+    },
+    {
+      "id": "short",
+      "label": "Shorts"
+    },
+    {
+      "id": "sock",
+      "label": "Sock"
+    },
+    {
+      "id": "hat",
+      "label": "Hat"
+    },
+    {
+      "id": "bag",
+      "label": "Bag"
+    },
+    {
+      "id": "bottle",
+      "label": "Bottle"
+    },
+    {
+      "id": "medal",
+      "label": "Medal"
+    },
+    {
+      "id": "tent",
+      "label": "Tent"
+    },
+    {
+      "id": "arch",
+      "label": "Inflatable arch"
+    },
+    {
+      "id": "banner",
+      "label": "Banner"
+    },
+    {
+      "id": "flag",
+      "label": "Feather flag"
+    }
+  ],
+  "decorations": [
+    "Screen print",
+    "Embroidery",
+    "Heat transfer",
+    "Sublimation",
+    "Knit-in",
+    "Laser engrave",
+    "Full-color print",
+    "Die-cast",
+    "Print"
+  ],
+  "sizes": [
+    "YS",
+    "YM",
+    "YL",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "2XL",
+    "3XL"
+  ],
+  "markupGroups": [
+    {
+      "id": "apparel",
+      "label": "Apparel markup %",
+      "default": 45
+    },
+    {
+      "id": "head",
+      "label": "Headwear markup %",
+      "default": 50
+    },
+    {
+      "id": "bags",
+      "label": "Bags markup %",
+      "default": 40
+    },
+    {
+      "id": "hard",
+      "label": "Hard goods markup %",
+      "default": 35
+    }
+  ],
+  "categories": [
+    {
+      "name": "Apparel",
+      "group": "apparel"
+    },
+    {
+      "name": "Socks",
+      "group": "apparel"
+    },
+    {
+      "name": "Headwear",
+      "group": "head"
+    },
+    {
+      "name": "Bags",
+      "group": "bags"
+    },
+    {
+      "name": "Drinkware",
+      "group": "hard"
+    },
+    {
+      "name": "Awards",
+      "group": "hard"
+    },
+    {
+      "name": "Event supplies",
+      "group": "hard"
+    },
+    {
+      "name": "Inflatables",
+      "group": "hard"
+    },
+    {
+      "name": "Signage",
+      "group": "hard"
+    }
+  ],
+  "sellAs": [
+    {
+      "id": "ws",
+      "label": "Wholesale only"
+    },
+    {
+      "id": "pod",
+      "label": "POD 25%"
+    },
+    {
+      "id": "pre",
+      "label": "Pre-order 50%"
+    },
+    {
+      "id": "both",
+      "label": "Both"
+    }
+  ],
+  "supplierTypes": [
+    "Blanks",
+    "Hard goods",
+    "Print & promo"
+  ],
+  "connections": [
+    {
+      "id": "api",
+      "label": "API · live",
+      "note": "Best. Live stock and prices. They have an API."
+    },
+    {
+      "id": "csv",
+      "label": "CSV feed",
+      "note": "A file they send on a schedule. Stock can lag."
+    },
+    {
+      "id": "site",
+      "label": "Read website",
+      "note": "Last resort. We read their pages. Check prices by hand."
+    },
+    {
+      "id": "email",
+      "label": "Email price list",
+      "note": "They email a price list. Enter or import it by hand."
+    }
+  ],
+  "frequencies": [
+    {
+      "id": "hourly",
+      "label": "Every hour"
+    },
+    {
+      "id": "daily",
+      "label": "Daily"
+    },
+    {
+      "id": "weekly",
+      "label": "Weekly"
+    },
+    {
+      "id": "manual",
+      "label": "By hand"
+    }
+  ],
+  "rules": [
+    {
+      "id": "hideLow",
+      "label": "Hide products with under 50 in stock",
+      "default": true
+    },
+    {
+      "id": "sizes3",
+      "label": "Only show colors with 3+ sizes in stock",
+      "default": true
+    },
+    {
+      "id": "autoAdd",
+      "label": "Auto-add new products in turned-on categories",
+      "default": false
+    }
+  ],
+  "backorder": [
+    {
+      "id": "notify",
+      "label": "Show “Notify me” on back-ordered items",
+      "default": true
+    },
+    {
+      "id": "autoEmail",
+      "label": "Email everyone waiting the day it’s back",
+      "default": true
+    },
+    {
+      "id": "suggestAlt",
+      "label": "Suggest a similar in-stock item",
+      "default": true
+    }
+  ],
+  "lowStock": 50,
+  "programs": [
+    {
+      "id": "pod",
+      "label": "Print on demand",
+      "share": 0.25,
+      "blurb": "In your store, always open. CLP makes and ships each order to the buyer. Nothing for you to do.",
+      "note": "Print on demand: members order any time, CLP makes and ships each one to them."
+    },
+    {
+      "id": "pre",
+      "label": "Pre-order",
+      "share": 0.5,
+      "blurb": "Collect orders by a date. One delivery to you, hand out at your event. Download who ordered what.",
+      "note": "Pre-order: orders close on your date, CLP makes them in one batch and ships to you to hand out."
+    }
+  ],
+  "storeCategory": {
+    "Apparel": "Apparel",
+    "Socks": "Apparel",
+    "Headwear": "Headwear",
+    "Drinkware": "Drinkware",
+    "Bags": "Accessories",
+    "Awards": "Team gear",
+    "Event supplies": "Team gear",
+    "Inflatables": "Team gear",
+    "Signage": "Team gear"
+  }
+}

@@ -879,11 +879,12 @@
   padding-bottom: 120px;
 }
 
+/* The text centred on top, the category cards four to a row under it, then the button, all centred. */
 .bulkBand {
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 48px;
+  gap: 40px;
   padding: 56px;
   border-radius: 16px;
   background: #0a0a0a;
@@ -893,7 +894,10 @@
 .bulkBandText {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 14px;
+  max-width: 720px;
+  text-align: center;
 }
 
 .bulkBandTitle {
@@ -912,6 +916,13 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+  width: 100%;
+  max-width: 760px;
+}
+
+/* Its button, centred under the cards. */
+.bulkBandButton {
+  align-self: center;
 }
 
 .bulkBandCat {
@@ -2428,7 +2439,6 @@
   }
 
   .bulkBand {
-    grid-template-columns: minmax(0, 1fr);
     gap: 32px;
   }
 }

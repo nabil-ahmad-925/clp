@@ -365,10 +365,8 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
             <span className={s.kicker}>BULK &amp; OPERATIONS</span>
             <span className={s.bulkBandTitle}>Outfit Your Team, Staff or Event</span>
             <span className={s.bulkBandLine}>Uniforms, socks, pinnies, tents, inflatables, medals and more. Made to order with your logo and shipped in bulk.</span>
-            <Link href={shopHref({ view: 'bulk' })} className={s.btnGold}>
-              Start a Bulk Order
-            </Link>
           </div>
+          {/* The categories four to a row, then the button under them. */}
           <div className={s.bulkBandGrid}>
             {BULK_CATEGORIES.map((c) => (
               <Link key={c.id} href={shopHref({ view: 'bulk', cat: c.id })} className={s.bulkBandCat}>
@@ -377,6 +375,9 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
               </Link>
             ))}
           </div>
+          <Link href={shopHref({ view: 'bulk' })} className={`${s.btnGold} ${s.bulkBandButton}`}>
+            Start a Bulk Order
+          </Link>
         </div>
       </section>
     </>

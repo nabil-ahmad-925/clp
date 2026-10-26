@@ -3,6 +3,7 @@ import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import FooterGate from '@/components/layout/FooterGate';
 import BackToTop from '@/components/layout/BackToTop';
+import AccountSync from '@/components/account/AccountSync';
 import { SITE_URL, site } from '@/content/site';
 import { fontVariables } from './fonts';
 import '@/styles/globals.css';
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <SiteFooter />
         </FooterGate>
         <BackToTop />
+        <AccountSync />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 import { call, read } from './partnerPages';
+import { partnerCall } from './partnerSession';
 
 /**
  * The partner stores' cart (clp-api src/cart.mjs). The cart lives in the API: this browser keeps only its id (128 random
@@ -56,22 +57,38 @@ export type ShopOrder = {
 };
 
 const ID_KEY = 'clp-cart-id';
-/** This browser's cart id (made on first use). */
+const randomId = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+let sessionId: string | undefined;
+
+/** This browser's cart id (made on first use): a guest's own, or the signed-in account's (see switchCartId). */
 export function cartId() {
   try {
     let id = localStorage.getItem(ID_KEY);
     if (!id || !/^[0-9a-f]{32}$/.test(id)) {
-      const bytes = crypto.getRandomValues(new Uint8Array(16));
-      id = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+      id = randomId();
       localStorage.setItem(ID_KEY, id);
     }
     return id;
   } catch {
     // Storage blocked: a cart for this visit only.
-    return (sessionId ??= Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join(''));
+    return (sessionId ??= randomId());
   }
 }
-let sessionId: string | undefined;
+
+/** The cart this browser uses from now on: the account's once signed in (clp-api POST /my/cart), a new one once signed out. */
+export function switchCartId(id: string = randomId()) {
+  try {
+    localStorage.setItem(ID_KEY, id);
+  } catch {
+    sessionId = id;
+  }
+}
+
+/** Signing in: this browser's cart joins the account's, and this browser uses the account's from then on. */
+export async function joinAccountCart() {
+  const { cartId: mine } = await partnerCall<{ cartId: string }>('/my/cart', { method: 'POST', body: JSON.stringify({ cartId: cartId() }) });
+  switchCartId(mine);
+}
 
 const path = (rest = '') => `/cart/${cartId()}${rest}`;
 const slugQuery = (slug?: string) => (slug ? `?slug=${encodeURIComponent(slug)}` : '');

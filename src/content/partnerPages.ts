@@ -123,6 +123,8 @@ export class PartnerApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /** The API's code for it (NOT_CONFIRMED, EMAIL_EXISTS…), when it gave one. */
+    public code?: string,
   ) {
     super(message);
   }
@@ -142,7 +144,7 @@ export async function call<T>(path: string, init?: RequestInit): Promise<T> {
     throw new PartnerApiError(0, 'Could not reach CLP. Check your connection and try again.');
   }
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new PartnerApiError(res.status, body.error || 'Something went wrong. Please try again.');
+  if (!res.ok) throw new PartnerApiError(res.status, body.error || 'Something went wrong. Please try again.', body.code);
   return body as T;
 }
 

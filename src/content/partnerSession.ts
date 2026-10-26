@@ -10,7 +10,7 @@ export type PartnerUser = {
   email: string;
   name: string;
   role: string;
-  access?: { kind: 'super_admin' | 'owner' | 'staff' | 'team'; partnerId?: string; partnerName?: string; permissions?: Record<string, string[]> };
+  access?: { kind: 'super_admin' | 'owner' | 'staff' | 'team' | 'member'; partnerId?: string; partnerName?: string; permissions?: Record<string, string[]> };
 };
 type Session = { email: string; accessToken: string; refreshToken: string; expiresAt: number; user: PartnerUser };
 type Tokens = { accessToken: string; refreshToken: string; expiresIn: number };
@@ -38,6 +38,8 @@ function write(s: Session | null) {
 
 /** Who may use the studio: a partner (or their teammate) and CLP. */
 export const isStudioUser = (u: PartnerUser | null | undefined) => Boolean(u && ['owner', 'team', 'super_admin'].includes(u.access?.kind ?? ''));
+/** A CLP member (the site's own sign-up): signed in on the site, with no partner tools. */
+export const isMember = (u: PartnerUser | null | undefined) => u?.access?.kind === 'member';
 
 /** The signed-in partner, or null. */
 export const partnerUser = () => read()?.user ?? null;
@@ -93,6 +95,16 @@ export async function partnerFirstPassword(email: string, session: string, passw
   return r.user;
 }
 
+/**
+ * Sign up on the site: a CLP member account (never a partner's: partners apply). Cognito e-mails a 6-digit code to
+ * confirm the address; then they sign in.
+ */
+export const memberSignUp = (name: string, email: string, password: string) =>
+  call<{ needsConfirmation: true; email: string }>('/auth/signup', { method: 'POST', body: JSON.stringify({ name, email, password }) });
+export const confirmEmail = (email: string, code: string) => call<{ confirmed: true }>('/auth/confirm', { method: 'POST', body: JSON.stringify({ email, code }) });
+/** A new confirmation code (the same answer whether or not the address has an account). */
+export const resendConfirmation = (email: string) => call<{ sent: true }>('/auth/resend', { method: 'POST', body: JSON.stringify({ email }) });
+
 /** Forgot password: e-mails a 6-digit reset code (the same answer for an unknown address). */
 export const partnerForgotPassword = (email: string) => call<{ sent: true }>('/auth/forgot', { method: 'POST', body: JSON.stringify({ email }) });
 
@@ -125,7 +137,7 @@ function refresh(s: Session): Promise<Session | null> {
 /** A call as the signed-in partner (its token refreshed when about to expire). */
 export async function partnerCall<T>(path: string, init: RequestInit = {}): Promise<T> {
   let s = read();
-  if (!s) throw new PartnerApiError(401, 'Please sign in as a CLP partner.');
+  if (!s) throw new PartnerApiError(401, 'Please sign in first.');
   if (s.expiresAt - Date.now() < 60_000) s = await refresh(s);
   if (!s) throw new PartnerApiError(401, 'Please sign in again.');
   const send = (x: Session) => call<T>(path, { ...init, headers: { authorization: `Bearer ${x.accessToken}` } });
@@ -169,3 +181,7 @@ export async function uploadImage(file: Blob): Promise<string> {
   if (!res.ok) throw new PartnerApiError(res.status, 'The upload didn’t go through. Try again.');
   return url;
 }
+
+/** A signed-in account's new password (their current one first). */
+export const changePassword = (oldPassword: string, newPassword: string) =>
+  partnerCall<{ changed: true }>('/auth/password', { method: 'POST', body: JSON.stringify({ oldPassword, newPassword }) });

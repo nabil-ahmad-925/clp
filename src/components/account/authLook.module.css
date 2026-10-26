@@ -1,0 +1,297 @@
+/*
+ * The Sign In page's look (the CLP admin's sign-in pages: Compete-Like-Pros-Admin auth.module.css and ui.module.css):
+ * the forms' parts under the same names as the form popup's (ClaimModal.module.css), so one form wears either look.
+ */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.body,
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kicker {
+  display: none;
+}
+
+.title {
+  margin: 0;
+  color: #141414;
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.text {
+  margin: -8px 0 4px;
+  color: #6f6f6f;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+/* Long forms: two fields to a row (one on phones). */
+.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+  align-items: start;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  color: #141414;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #e4e1da;
+  border-radius: 8px;
+  background: #fff;
+  color: #141414;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.input:focus {
+  border-color: #bd8300;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(223, 190, 117, 0.35);
+}
+
+.input[aria-invalid='true'],
+.input[data-invalid='true'] {
+  border-color: #b42318;
+}
+
+.code {
+  font-size: 20px;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fieldError {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* The fields' own error line (under a field), not a box. */
+.field .fieldError {
+  padding: 0;
+  background: none;
+  font-size: 12px;
+}
+
+.notice {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #e7f5ec;
+  color: #1d7a46;
+  font-size: 14px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  margin-top: 4px;
+  padding: 0 18px;
+  border: 1px solid #dfbe75;
+  border-radius: 8px;
+  background: #dfbe75;
+  color: #141414;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary:hover {
+  border-color: #d4ad57;
+  background: #d4ad57;
+}
+
+.primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid #e4e1da;
+  border-radius: 8px;
+  background: transparent;
+  color: #141414 !important;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  border-color: #c9c4b8;
+  background: #fff;
+}
+
+.doneKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1d7a46;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.hint {
+  color: #6f6f6f;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #141414;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.small {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* "Running a club…": the way to apply as a partner instead. */
+.note {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid #e4e1da;
+  border-radius: 8px;
+  background: #faf8f3;
+  font-size: 13px;
+}
+
+.note span {
+  color: #6f6f6f;
+}
+
+/* The partner application's sport chips, as the admin's. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #e4e1da;
+  border-radius: 8px;
+  background: transparent;
+  color: #141414;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chipOn {
+  border-color: #dfbe75;
+  background: #dfbe75;
+}
+
+@media (max-width: 640px) {
+  .two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The card's head: the gold CLP wordmark (the admin's .brand). */
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.logo {
+  background: linear-gradient(180deg, #e1be6e, #8b5801);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.product {
+  color: #6f6f6f;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

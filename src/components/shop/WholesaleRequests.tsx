@@ -5,7 +5,7 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { designAction, guestRequestAction, uploadGuestImage, type BulkRequest, type RequestAction, type RequestActionInput } from '@/content/bulk';
 import { uploadImage } from '@/content/partnerSession';
-import { money, wsItem } from '@/content/wholesale';
+import { money, type WsItem } from '@/content/wholesale';
 import { imageDataUrl } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
 import WsMock from './WsMock';
@@ -59,7 +59,25 @@ function noteOf(r: BulkRequest): [string, string, string] | null {
  * team's note (the quote, an artwork change, the approval), tracking once it ships, and what to do next: approve the
  * quote, ask for changes, decline, send new artwork, or contact us.
  */
-export default function WholesaleRequests({ items, partner, ws, onChange, onSaved }: { items: BulkRequest[]; partner: boolean; ws: Wholesale; onChange: (r: BulkRequest) => void; onSaved?: () => void }) {
+/** A request's catalog item: by its item id, or (requests sent before the catalog API) the item its design names. */
+const itemOf = (r: BulkRequest, catalog: WsItem[]) => catalog.find((i) => i.id === r.itemId) ?? catalog.find((i) => i.id === (r.design as { wholesaleItem?: string } | null)?.wholesaleItem);
+
+export default function WholesaleRequests({
+  items,
+  catalog,
+  partner,
+  ws,
+  onChange,
+  onSaved,
+}: {
+  items: BulkRequest[];
+  /** The live catalog (empty while it loads: the requests show with their own names). */
+  catalog: WsItem[];
+  partner: boolean;
+  ws: Wholesale;
+  onChange: (r: BulkRequest) => void;
+  onSaved?: () => void;
+}) {
   const [contact, setContact] = useState<BulkRequest | 'general' | null>(null);
   const list = items.filter((r) => r.kind !== 'saved');
   const saved = items.length - list.length;
@@ -90,21 +108,20 @@ export default function WholesaleRequests({ items, partner, ws, onChange, onSave
         </div>
       )}
       {list.map((r) => (
-        <RequestCard key={r.id} r={r} partner={partner} ws={ws} onChange={onChange} onContact={() => setContact(r)} />
+        <RequestCard key={r.id} r={r} item={itemOf(r, catalog)} partner={partner} ws={ws} onChange={onChange} onContact={() => setContact(r)} />
       ))}
-      {contact && <ContactModal r={contact === 'general' ? null : contact} onClose={() => setContact(null)} />}
+      {contact && <ContactModal r={contact === 'general' ? null : contact} itemName={contact === 'general' ? '' : (itemOf(contact, catalog)?.name ?? contact.itemName)} onClose={() => setContact(null)} />}
     </section>
   );
 }
 
-function RequestCard({ r, partner, ws, onChange, onContact }: { r: BulkRequest; partner: boolean; ws: Wholesale; onChange: (r: BulkRequest) => void; onContact: () => void }) {
+function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: BulkRequest; item?: WsItem; partner: boolean; ws: Wholesale; onChange: (r: BulkRequest) => void; onContact: () => void }) {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [open, setOpen] = useState<'' | 'changes' | 'decline'>('');
   const [note, setNote] = useState('');
   const [link, setLink] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-  const it = wsItem(String((r.design as { wholesaleItem?: string } | null)?.wholesaleItem ?? ''));
   const [chip, bg, fg, step] = statusOf(r);
   const n = noteOf(r);
   const q = r.quote;
@@ -275,14 +292,14 @@ const TOPICS: [string, string, string, string, [string, string, string][]][] = [
 ];
 
 /** Contact Us (the board's): pick a topic, add the details and a message, and it opens as an e-mail to the CLP team. */
-function ContactModal({ r, onClose }: { r: BulkRequest | null; onClose: () => void }) {
+function ContactModal({ r, itemName, onClose }: { r: BulkRequest | null; itemName: string; onClose: () => void }) {
   const [topic, setTopic] = useState('');
   const [fields, setFields] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState('');
   const [reach, setReach] = useState('Email');
   const [sent, setSent] = useState(false);
   const t = TOPICS.find((x) => x[0] === topic);
-  const ref = r ? `${r.ref ?? ''} · ${wsItem(String((r.design as { wholesaleItem?: string } | null)?.wholesaleItem ?? ''))?.name ?? r.itemName}` : 'General question';
+  const ref = r ? `${r.ref ?? ''} · ${itemName}` : 'General question';
   const send = () => {
     const lines = [...(t?.[4] ?? []).filter(([k]) => fields[k]).map(([k, label]) => `${label} ${fields[k]}`), msg.trim(), `Best way to reach me: ${reach}`].filter(Boolean);
     const subject = `${r?.ref ? `${r.ref} · ` : ''}${t?.[2] ?? 'Question'}`;

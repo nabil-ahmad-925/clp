@@ -566,11 +566,14 @@
   font-size: 17px;
 }
 
+/* Can't find it? (the grid's last card): its text and button together, centred in the card. */
 .customCard {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
   min-height: 100%;
   padding: 28px;
   box-sizing: border-box;
@@ -607,7 +610,7 @@
 
 .customBtn {
   display: inline-flex;
-  align-self: flex-start;
+  align-self: center;
   align-items: center;
   height: 44px;
   padding: 0 18px;
@@ -1923,11 +1926,61 @@
 }
 
 .backBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding: 12px 14px;
   border-radius: 10px;
   background: #fbeae8;
   color: #7a2a22;
   font-size: 13px;
+}
+
+/* "Notify me": the email and its button on one line. */
+.backForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.backForm input {
+  flex: 1 1 200px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #e8b9b3;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+}
+
+.backForm button {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.backForm button:disabled {
+  opacity: 0.6;
+}
+
+.backError {
+  flex-basis: 100%;
+  color: #b03a2e;
+  font-weight: 600;
+}
+
+.backDone {
+  color: #1e5b33;
 }
 
 .breaks {
@@ -3562,5 +3615,333 @@
 
   .countBtns {
     width: 100%;
+  }
+}
+
+/* ---- An item's "How you want it" (partners, on items they can sell to members): Buy wholesale or Sell to members ---- */
+.modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #f2f1ed;
+}
+
+.modes button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modes button[aria-pressed='true'] {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.modes strong {
+  font-size: 14px;
+}
+
+.modes span {
+  color: #666;
+  font-size: 12px;
+}
+
+/* Sell to members: what members pay and what the partner earns, in place of the price breaks. */
+.retail {
+  display: flex;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 1px solid #e5e5e2;
+  border-radius: 12px;
+}
+
+.retail > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+}
+
+.retail > div:first-child {
+  border-right: 1px solid #e5e5e2;
+}
+
+.retail > div:last-child {
+  background: #f4f9f6;
+}
+
+.retail span {
+  color: #777;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.retail strong {
+  font-size: 17px;
+}
+
+.retail > div:last-child strong {
+  color: #1e7a45;
+}
+
+.retailNote {
+  color: #777;
+  font-size: 12px;
+}
+
+/* "Selling to your members instead?" (Buy wholesale, under the notes). */
+.sellCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e2;
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sellCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sellCardText strong {
+  font-size: 14px;
+}
+
+.sellCardText > span:first-of-type {
+  color: #666;
+  font-size: 13px;
+}
+
+.sellTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sellTags span {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: #f2f1ed;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sellTags span[data-pre='true'] {
+  background: #111;
+  color: #dcbd7d;
+}
+
+.sellCardGo {
+  flex: none;
+  color: #8a6f33;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* The Sell to your members box (in place of the order box). */
+.sellBox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 16px;
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.sellKicker {
+  color: #dcbd7d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.progs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.progs button {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1.5px solid #333;
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.progs button[aria-pressed='true'] {
+  border-color: #dcbd7d;
+  background: #1a1a1a;
+}
+
+.progHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.progHead strong:first-child {
+  font-size: 15px;
+}
+
+.progHead strong:last-child {
+  color: #dcbd7d;
+  font-size: 18px;
+}
+
+.progs button > span:last-child {
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.priceRow {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  align-items: end;
+  gap: 16px;
+}
+
+.priceRow label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #bbb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.priceRow input {
+  box-sizing: border-box;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.earn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.earn > span:first-child {
+  color: #bbb;
+  font-size: 12px;
+}
+
+.earn strong {
+  color: #dcbd7d;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.earnNote {
+  color: #999;
+  font-size: 12px;
+}
+
+.earnNote[data-low='true'] {
+  color: #f0a090;
+}
+
+.sellWarn {
+  color: #f0c9a0;
+  font-size: 13px;
+}
+
+.sellBtns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.sellGo {
+  height: 50px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 8px;
+  background: #dcbd7d;
+  color: #000;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sellGo:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.sellManage {
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.sellFine {
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.sellError {
+  color: #f0a090;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sellDone {
+  color: #9fd8b4;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .priceRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modes {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

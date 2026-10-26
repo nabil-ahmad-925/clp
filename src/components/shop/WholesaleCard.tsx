@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { firstLoc, money, stockOf, tagOf, type WsItem } from '@/content/wholesale';
+import { colorFor, firstLoc, money, stockOf, tagOf, type WsItem } from '@/content/wholesale';
 import type { Wholesale } from './wholesaleStore';
 import WsMock from './WsMock';
 import w from './wholesale.module.css';
@@ -24,7 +24,7 @@ export default function WholesaleCard({ item, href, ws, list = false }: { item: 
   const [tag, direct] = tagOf(item);
   const [stock, dot] = stockOf(item);
   const fav = ws.isFav(item.id);
-  const mock = <WsMock item={item} loc={firstLoc(item)} asset={ws.asset(ws.lg)} color={ws.ic} show={ws.mock} className={w.cardSvgFull} />;
+  const mock = <WsMock item={item} loc={firstLoc(item)} asset={ws.asset(ws.lg)} color={colorFor(item, ws.ic)} show={ws.mock} className={w.cardSvgFull} />;
   const heart = (
     <button type="button" className={list ? w.heartRow : w.heart} aria-label={`Save ${item.name} to favorites`} aria-pressed={fav} onClick={() => setSaving(true)}>
       <Heart on={fav} />

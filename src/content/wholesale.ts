@@ -1,7 +1,11 @@
+import config from './data/wholesaleConfig.json';
+import { call, read } from './partnerPages';
+import { partnerCall } from './partnerSession';
+
 /**
- * Wholesale (/shop/?view=bulk): the Wholesale board's catalog, brand assets and studio library, hardcoded as sample
- * data until the real catalog and brand assets come from the API (admin and backend later). Prices are the board's
- * "from" prices per piece with one print spot.
+ * Wholesale (/shop/?view=bulk): the catalog (from the API, see loadWholesale), its mockup drawings and the design
+ * studio's library. Prices are "from" prices per piece with one print spot. The sample brand assets stay until brand
+ * assets come from the partner's brand kit.
  */
 
 /** A product drawing on a 100×100 canvas, with its print spots: [x, y, width] of each spot's logo. */
@@ -45,7 +49,8 @@ export const SIZED = [...APPAREL, 'short'];
 export const SIZES = ['YS', 'YM', 'YL', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
 
 export type WsSource = 'brand' | 'direct' | 'dist';
-export const SRC: Record<WsSource, string> = { brand: 'Name brands', direct: 'Direct from manufacturing', dist: 'Distributor partners' };
+export const SRC: Record<WsSource, string> = Object.fromEntries(config.sources.map((s) => [s.id, s.label])) as Record<WsSource, string>;
+/** A catalog product as the site gets it (clp-api GET /wholesale/catalog; CLP manages them in Manufacturing › Catalog & suppliers). */
 export type WsItem = {
   id: string;
   name: string;
@@ -54,6 +59,10 @@ export type WsItem = {
   brand: string;
   shape: string;
   deco: string[];
+  /** The item colours to pick from (#RRGGBB; none: the studio's colours). */
+  colors: string[];
+  /** Its sizes (none: one size). */
+  sizes: string[];
   /** in: in stock, mto: made to order. */
   stock: 'in' | 'mto';
   min: number;
@@ -63,57 +72,50 @@ export type WsItem = {
   /** Pieces in stock (0 when made to order). */
   avail: number;
   desc: string;
-  /** Back-ordered at the supplier: back about this date. */
+  photos: string[];
+  /** Back-ordered at the supplier: back about this date (YYYY-MM-DD). */
   back?: string;
+  /** How partners can sell it to their members (none: wholesale only), and its suggested and lowest retail price. */
+  programs: WsProgram[];
+  retail?: number;
+  retailMin?: number;
 };
-const row = (r: [string, string, string, WsSource, string, string, string[], 'in' | 'mto', number, string, number, number, string], back?: string): WsItem => ({
-  id: r[0],
-  name: r[1],
-  cat: r[2],
-  src: r[3],
-  brand: r[4],
-  shape: r[5],
-  deco: r[6],
-  stock: r[7],
-  min: r[8],
-  lead: r[9],
-  price: r[10],
-  avail: r[11],
-  desc: r[12],
-  ...(back ? { back } : {}),
-});
-export const WS_ITEMS: WsItem[] = [
-  row(['nk-tee', 'Nike Legend Tee', 'Apparel', 'brand', 'Nike', 'tee', ['Screen print'], 'in', 12, '5–7 days', 24, 520, 'Lightweight, sweat-wicking performance tee. A team favorite for training and event staff.']),
-  row(['ad-jersey', 'Adidas Entrada 22 Jersey', 'Apparel', 'brand', 'Adidas', 'jersey', ['Heat transfer'], 'in', 12, '7–10 days', 28, 340, 'Classic match jersey with breathable fabric. Add names and numbers on the back.']),
-  row(['nb-qz', 'New Balance Tech Quarter-Zip', 'Apparel', 'brand', 'New Balance', 'jacket', ['Embroidery'], 'in', 12, '7–10 days', 52, 180, 'Coaches’ and staff layer with a clean left-chest logo.']),
-  row(['ua-polo', 'Under Armour Team Polo', 'Apparel', 'brand', 'Under Armour', 'polo', ['Embroidery'], 'in', 12, '7–10 days', 38, 260, 'Sharp polo for coaches, staff and volunteers on game day.']),
-  row(['ch-hood', 'Champion Powerblend Hoodie', 'Apparel', 'brand', 'Champion', 'hood', ['Screen print'], 'in', 12, '7–10 days', 42, 410, 'Heavyweight fleece hoodie. Great for team packs and fundraisers.'], 'Nov 2'),
-  row(['ad-short', 'Adidas Tiro Training Shorts', 'Apparel', 'brand', 'Adidas', 'short', ['Heat transfer'], 'in', 12, '7–10 days', 30, 300, 'Training shorts with a small logo on the leg.']),
-  row(['nk-cap', 'Nike Club Cap', 'Headwear', 'brand', 'Nike', 'hat', ['Embroidery'], 'in', 12, '7–10 days', 26, 220, 'Unstructured cap with an embroidered front logo.']),
-  row(['kit', 'Custom Sublimated Kit', 'Apparel', 'direct', 'CLP Made', 'jersey', ['Sublimation'], 'mto', 15, '3–4 weeks', 46, 0, 'Your colors, patterns and sponsors printed into the fabric. Designed with our team, made by a CLP maker partner.']),
-  row(['cs-socks', 'Custom Knit Crew Socks', 'Socks', 'direct', 'CLP Made', 'sock', ['Knit-in'], 'mto', 48, '3–4 weeks', 9, 0, 'Socks knit with your logo and colors. Made to order by a CLP maker partner.']),
-  row(['grip', 'Performance Grip Socks', 'Socks', 'dist', 'Team basics', 'sock', ['Print'], 'in', 24, '5–7 days', 12, 900, 'Non-slip grip socks with a printed cuff logo.']),
-  row(['pinnie', 'Reversible Mesh Pinnie', 'Apparel', 'dist', 'Team basics', 'pinnie', ['Screen print'], 'in', 12, '5–7 days', 9, 1200, 'Lightweight training pinnies. Order a set in two colors.']),
-  row(['snap', 'Structured Snapback', 'Headwear', 'dist', 'Team basics', 'hat', ['Embroidery'], 'in', 12, '5–7 days', 18, 640, 'Flat-brim snapback with front and side logo spots.']),
-  row(['bag', 'Team Drawstring Bag', 'Bags', 'dist', 'Team basics', 'bag', ['Screen print'], 'in', 24, '5–7 days', 8, 1500, 'Easy giveaway for camps, clinics and events.']),
-  row(['bottle', 'Insulated Bottle · 32 oz', 'Drinkware', 'dist', 'Team basics', 'bottle', ['Laser engrave'], 'in', 24, '5–7 days', 22, 480, 'Keeps drinks cold all game. Engraved or printed logo.']),
-  row(['medal', 'Custom Die-Cast Medal', 'Awards', 'direct', 'CLP Made', 'medal', ['Die-cast'], 'mto', 50, '2–3 weeks', 6, 0, 'Medals shaped and colored for your event, with a custom ribbon.']),
-  row(['tent', '10×10 Event Tent', 'Event supplies', 'direct', 'CLP Made', 'tent', ['Full-color print'], 'mto', 1, '2–3 weeks', 650, 0, 'Branded pop-up tent with printed canopy and valance.']),
-  row(['arch', 'Inflatable Finish Arch', 'Inflatables', 'direct', 'CLP Made', 'arch', ['Full-color print'], 'mto', 1, '3–4 weeks', 2400, 0, 'Custom inflatable arch for finish lines, entrances and game days.']),
-  row(['banner', 'Vinyl Field Banner · 3×8', 'Signage', 'dist', 'Team basics', 'banner', ['Full-color print'], 'in', 1, '5–7 days', 85, 60, 'Weatherproof banner with grommets for fences and tables.']),
-  row(['flag', 'Feather Flag', 'Signage', 'direct', 'CLP Made', 'flag', ['Full-color print'], 'mto', 2, '2–3 weeks', 140, 0, 'Tall feather flag with ground stake. Great for entrances.']),
-];
-export const wsItem = (id: string) => WS_ITEMS.find((i) => i.id === id);
-export const firstLoc = (it: WsItem) => Object.keys(SHAPES[it.shape].P)[0];
+export type WsProgram = 'pod' | 'pre';
+/** The programs partners sell with: print on demand (25% of each sale) and pre-order (50%). */
+export const PROGRAMS = config.programs as { id: WsProgram; label: string; share: number; blurb: string; note: string }[];
+export const programOf = (id: WsProgram) => PROGRAMS.find((p) => p.id === id)!;
 
-export const WS_CATS = ['Apparel', 'Socks', 'Headwear', 'Bags', 'Drinkware', 'Awards', 'Event supplies', 'Inflatables', 'Signage'];
-export const WS_BRANDS = ['Nike', 'Adidas', 'New Balance', 'Under Armour', 'Champion', 'CLP Made'];
-export const WS_DECOS = ['Screen print', 'Embroidery', 'Heat transfer', 'Sublimation', 'Knit-in', 'Laser engrave', 'Full-color print'];
-export const WS_SOURCES: [WsSource, string, string][] = [
-  ['brand', 'SHOP BY BRAND', 'Nike, Adidas, New Balance, Under Armour, Champion and more.'],
-  ['direct', 'MADE FOR YOU', 'Custom kits, knit socks, medals, tents and inflatables from CLP maker partners.'],
-  ['dist', 'IN STOCK, FAST', 'Everyday team basics from our distributor partners. Most ship in a week.'],
-];
+/**
+ * "Sell to members": the item with the partner's artwork as a print-on-demand product in their store (CLP checks the
+ * artwork, then they publish it in My store). `mockup`: the item's mockup, uploaded.
+ */
+export const sellInMyStore = (input: { itemId: string; program: WsProgram; price: number; mockup: string; color: string; logo: string; spots: string[] }) =>
+  partnerCall<{ item: { id: string; approval: string; status: string } }>('/my/partner/store/wholesale', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
+/** The catalog: its items, the categories and brands they use (the filters), and whether back-ordered items take "Notify me". */
+export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean };
+export const firstLoc = (it: WsItem) => Object.keys(SHAPES[it.shape]?.P ?? SHAPES.tee.P)[0];
+
+let catalog: Promise<WsCatalog> | null = null;
+/** The live catalog (read once a visit; a failed read is tried again next time). */
+export const loadWholesale = () =>
+  (catalog ??= read<WsCatalog>('/wholesale/catalog')
+    // Fields every item has on the site (an item without programs is wholesale only).
+    .then((c) => ({ ...c, items: c.items.map((i) => ({ ...i, colors: i.colors ?? [], sizes: i.sizes ?? [], photos: i.photos ?? [], programs: i.programs ?? [] })) }))
+    .catch((err) => {
+      catalog = null;
+      throw err;
+    }));
+/** A signed-in account's favorite folders and saved items (a member's or a partner's; a guest's stay in their browser). */
+export type WsFavorites = { folders: { id: string; name: string }[]; favs: Record<string, string[]> };
+export const getMyFavorites = () => partnerCall<WsFavorites>('/my/wholesale/favorites');
+export const saveMyFavorites = (f: WsFavorites) => partnerCall<WsFavorites>('/my/wholesale/favorites', { method: 'PUT', body: JSON.stringify(f) });
+
+/** "Notify me" when a back-ordered item is back. */
+export const notifyWhenBack = (id: string, email: string) => call<{ waiting: true }>(`/wholesale/products/${encodeURIComponent(id)}/notify`, { method: 'POST', body: JSON.stringify({ email }) });
+
+export const WS_DECOS = config.decorations;
+/** The three ways in (Shop by brand, Made for you, In stock fast): [source, kicker, line]. */
+export const WS_SOURCES: [WsSource, string, string][] = config.sources.map((s) => [s.id as WsSource, s.kicker, s.blurb]);
 
 /**
  * A brand asset: a badge (a monogram on a colour), a wordmark, or an image (an upload). Approved (ok), in review, or
@@ -146,6 +148,14 @@ export const WS_COLORS: [string, string][] = [
   ['#8C8C8C', 'Grey'],
   ['#1B3A6B', 'Navy'],
 ];
+/** An item's colours to pick from, named: its own (from the catalog), else the studio's. */
+export const colorsOf = (i: WsItem): [string, string][] =>
+  i.colors.length ? i.colors.map((c) => [c, WS_COLORS.find(([x]) => x.toUpperCase() === c.toUpperCase())?.[1] ?? c] as [string, string]) : WS_COLORS;
+/** The colour an item shows in: the one in use across Wholesale when the item comes in it, else its first. */
+export const colorFor = (i: WsItem, inUse: string) => {
+  const list = colorsOf(i);
+  return list.some(([c]) => c.toUpperCase() === inUse.toUpperCase()) ? inUse : list[0][0];
+};
 export const METALS: [string, string][] = [
   ['#C9A44C', 'Antique gold'],
   ['#B9BBBE', 'Silver'],
@@ -187,9 +197,11 @@ export const DEFAULT_ROSTER = 'RIVERA, 10\nCHEN, 7\nOKAFOR, 4\nMURPHY, 9\nSILVA,
 export const money = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 /** The card's tag: the brand, CLP direct, or a distributor partner. */
 export const tagOf = (i: WsItem): [string, boolean] => (i.src === 'brand' ? [i.brand.toUpperCase(), false] : i.src === 'direct' ? ['CLP DIRECT', true] : ['DISTRIBUTOR PARTNER', false]);
+/** A back-in-stock date as the cards say it ("Nov 2"). */
+export const backDay = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : iso);
 /** Stock, as the card says it, and its dot's colour. */
 export const stockOf = (i: WsItem): [string, string] =>
-  i.back ? [`Back-ordered · back about ${i.back}`, '#B03A2E'] : i.stock === 'in' ? [`In stock · ships in ${i.lead}`, '#1E7A45'] : [`Made to order · ${i.lead}`, '#C9A44C'];
+  i.back ? [`Back-ordered · back about ${backDay(i.back)}`, '#B03A2E'] : i.stock === 'in' ? [`In stock · ships in ${i.lead}`, '#1E7A45'] : [`Made to order · ${i.lead}`, '#C9A44C'];
 /** Who makes and quotes it. */
 export const handlerOf = (i: WsItem) => (i.src === 'direct' ? 'a CLP maker partner' : 'the CLP team');
 /** Quantity breaks: the minimum, then about 5× and 10× (48 and 144 for apparel-size minimums), 8% and 15% off. */
