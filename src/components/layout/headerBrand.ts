@@ -12,6 +12,8 @@ export type HeaderBrand = {
   onCart: () => void;
   /** The shop's header ("CLP │ SHOP"): the label in gold, without the "×". */
   shop?: boolean;
+  /** Where the shop's label leads (the shop's home; the wholesale's on Wholesale). */
+  href?: string;
 } | null;
 
 let current: HeaderBrand = null;

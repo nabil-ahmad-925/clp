@@ -54,7 +54,7 @@ function Row({ doc }: { doc: SiteDocument }) {
       </a>
     ) : (
       <Link className={doc.page ? d.btnDark : d.btn} href={doc.read}>
-        {doc.page ? 'Open page' : 'Read'}
+        {doc.page ? 'Open Page' : 'Read'}
       </Link>
     )
   ) : null;

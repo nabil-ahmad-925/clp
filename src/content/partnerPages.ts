@@ -106,7 +106,8 @@ export type PartnerProduct = {
   /** When the partner added it to their store (the "Newest" sort). */
   addedAt?: string;
 };
-export type PartnerReviewData = { id: string; rating: number; text: string; name: string; badge: string; session: string; date: string; reply?: { text: string; at: string }; createdAt: string };
+/** A verified review: from a checked-in booking, or (`orderId`) a shop order. */
+export type PartnerReviewData = { id: string; rating: number; text: string; name: string; badge: string; session: string; date: string; reply?: { text: string; at: string }; createdAt: string; orderId?: string };
 export type PartnerArticle = { slug: string; path: string; title: string; excerpt: string; image: string; publishedAt: string; readingTime: number; categories: string[] };
 
 export type PartnerPageResponse = {

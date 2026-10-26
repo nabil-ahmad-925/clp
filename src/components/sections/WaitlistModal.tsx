@@ -197,7 +197,7 @@ export default function WaitlistModal({ item, widgetId, facts, date: given, onCl
               </p>
             )}
             <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
-              {sending ? 'Joining…' : 'Join the waitlist'}
+              {sending ? 'Joining…' : 'Join the Waitlist'}
             </button>
             {missing && <span className={styles.hint}>{missing}</span>}
           </form>

@@ -515,7 +515,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                       {done.booking.checkInInstructions && <span className={styles.locationMuted}>{done.booking.checkInInstructions}</span>}
                       {done.booking.address && (
                         <a className={styles.directions} href={directionsHref(done.booking.address)} target="_blank" rel="noopener">
-                          Get directions <span className="glyph" aria-hidden>↗</span>
+                          Get Directions <span className="glyph" aria-hidden>↗</span>
                         </a>
                       )}
                     </span>

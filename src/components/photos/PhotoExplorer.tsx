@@ -297,7 +297,7 @@ export default function PhotoExplorer({ sport, albums, album, view }: Props) {
             </div>
           ) : liveNow.result?.status === 'missing' ? (
             <div className={styles.empty}>
-              This album isn&rsquo;t available (it may have closed). <Link href={sport.href}>See the other albums</Link>
+              This album isn&rsquo;t available (it may have closed). <Link href={sport.href}>See the Other Albums</Link>
             </div>
           ) : liveNow.result?.status === 'locked' ? (
             <section className={styles.album}>

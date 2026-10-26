@@ -147,7 +147,7 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         className={`${styles.cta} ${styles.ctaWait} ${facility ? styles.ctaWide : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
-        On the waitlist ✓
+        On the Waitlist ✓
       </Link>
     ) : (
       <button

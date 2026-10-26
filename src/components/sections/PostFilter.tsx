@@ -443,11 +443,25 @@ function DateBadge({ post }: { post: FilterPost }) {
 /**
  * An article in the results: its photo with the date, the title, then the reading time and the writer on one line
  * ("20 min read | By Nabil"); the whole card opens it, its text centred. The list view (`row`) lays the same out in a
- * row, left-aligned. `external`: another site's piece (press), opened in a new tab.
+ * row, left-aligned. `external`: another site's piece (press), opened in a new tab. `onOpen`: a click opens it in place
+ * (a partner page's popup); the link still opens it in a new tab.
  */
-export function ArticleCard({ post, eager, row, external }: { post: FilterPost; eager: boolean; row?: boolean; external?: boolean }) {
+export function ArticleCard({ post, eager, row, external, onOpen }: { post: FilterPost; eager: boolean; row?: boolean; external?: boolean; onOpen?: () => void }) {
   return (
-    <a href={post.href} className={row ? styles.row : styles.card} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+    <a
+      href={post.href}
+      className={row ? styles.row : styles.card}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      onClick={
+        onOpen &&
+        ((e) => {
+          // A plain click opens it in place; Ctrl/Cmd or the middle button keep the link's own new tab.
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+          e.preventDefault();
+          onOpen();
+        })
+      }
+    >
       <span className={styles.thumb}>
         {/* eslint-disable-next-line @next/next/no-img-element -- the article's cover */}
         {post.image && <img src={post.image} alt="" loading={eager ? 'eager' : 'lazy'} />}

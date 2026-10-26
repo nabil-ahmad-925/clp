@@ -18,9 +18,11 @@ import FilterChip from '@/components/ui/FilterChip';
 import ListingCard from '@/components/sections/ListingCard';
 import { ArticleCard } from '@/components/sections/PostFilter';
 import { listingFacts } from '@/components/sections/TeamDirectory';
+import RichText from '@/components/ui/RichText';
 import ResultsToggle, { type ResultsView } from '@/components/ui/ViewToggle';
+import pv from '@/components/pages/PostView.module.css';
 import { ProductDetail, type DetailStore } from '@/components/shop/ShopView';
-import { articleDate, storyCard } from '@/content/articles';
+import { articleDate, fetchArticle, storyCard, type Article } from '@/content/articles';
 import { CART_EVENT, cartChanged, checkoutHref, getCart, keepCodes, readCodes, removeLine, setLineQty, type Cart } from '@/content/cart';
 import tagLabels from '@/content/data/listingTags.json';
 import { albumDates, albumTypeName, fetchAllAlbums, type LiveAlbum } from '@/content/albums';
@@ -138,6 +140,20 @@ const BagIcon = () => (
     <path d="M9 7a3 3 0 0 1 6 0" />
   </svg>
 );
+/** The verified seal: a scalloped badge with a check (Instagram's shape), in CLP's gold and black, ringed in white. */
+const VerifiedSeal = () => (
+  <svg viewBox="-1.5 -1.5 27 27" width="100%" height="100%" aria-hidden>
+    <path
+      fill="#DCBD7D"
+      stroke="#fff"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+      d="M9.36 2.15 Q12 0 14.64 2.15 Q18 1.61 19.21 4.79 Q22.39 6 21.85 9.36 Q24 12 21.85 14.64 Q22.39 18 19.21 19.21 Q18 22.39 14.64 21.85 Q12 24 9.36 21.85 Q6 22.39 4.79 19.21 Q1.61 18 2.15 14.64 Q0 12 2.15 9.36 Q1.61 6 4.79 4.79 Q6 1.61 9.36 2.15Z"
+    />
+    <path d="M7.4 12.3l3.1 3.1 6.1-6.3" fill="none" stroke="#111" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const CloseIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
     <path d="M5 5l14 14M19 5 5 19" />
@@ -178,7 +194,8 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   useEffect(() => {
     let live = true;
     fetchAllAlbums().then(
-      (items) => live && setAlbums(items.filter((a) => a.partner === page.slug)),
+      // Their own albums, and the ones they photographed for others ("Photographed by").
+      (items) => live && setAlbums(items.filter((a) => a.partner === page.slug || a.byPartner === page.slug)),
       () => {},
     );
     return () => {
@@ -253,6 +270,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const [job, setJob] = useState<Job | null>(null);
   const [member, setMember] = useState<PartnerTeamMember | null>(null);
   const [video, setVideo] = useState<PartnerVideo | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
 
   // This store's part of the shopper's cart (kept by the API; any change on the page updates it everywhere).
@@ -318,10 +336,13 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             <span className={s.logo}>
               <LogoImage page={page} alt={`${page.name} logo`} />
             </span>
+            {/* Verified by CLP: the seal on the logo's corner (as Instagram's), outside its rounded clip. */}
+            <span className={s.verifiedMark} role="img" aria-label="Verified by CLP" title="Verified by CLP">
+              <VerifiedSeal />
+            </span>
             <div className={s.identityText}>
               <div className={s.badges}>
                 <span className={`${s.badge} ${s.badgeGold}`}>CLP PARTNER</span>
-                <span className={s.badge}>✓ Verified</span>
                 {featured && <span className={s.badge}>★ Featured on CLP</span>}
               </div>
               <h1 className={s.name}>{page.name}</h1>
@@ -344,7 +365,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             <div className={s.identityActions}>
               {has('experiences') && (
                 <button type="button" className={`${s.action} ${s.actionGold}`} onClick={() => pick('experiences')}>
-                  Book a session
+                  Book a Session
                 </button>
               )}
               <button type="button" className={`${s.action} ${s.actionLight}`} onClick={() => setDialog('question')}>
@@ -410,7 +431,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                   }}
                 />
               ))}
-            {shown === 'news' && <News posts={posts} />}
+            {shown === 'news' && <News posts={posts} onOpen={setPost} />}
           </div>
         </main>
 
@@ -432,6 +453,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           />
         )}
         {video && <VideoDialog video={video} onClose={() => setVideo(null)} />}
+        {post && <PostDialog page={page} post={post} onClose={() => setPost(null)} />}
         {cartOpen && <CartDrawer page={page} cart={cart} onClose={() => setCartOpen(false)} onShop={has('shop') ? () => pick('shop') : undefined} />}
         {booking && (
           <BookingModal
@@ -528,7 +550,7 @@ function About({
                     <span className={s.personText}>
                       <strong>{m.name}</strong>
                       <span>{m.role}</span>
-                      <span className={s.readBio}>Read bio →</span>
+                      <span className={s.readBio}>Read Bio →</span>
                     </span>
                     {youthCleared(m) && <span className={s.youthCleared}>✓ Youth cleared</span>}
                   </>
@@ -683,14 +705,14 @@ const thumbOf = (v: PartnerVideo) => v.thumb || (v.source === 'youtube' && video
  * never shown in a popup here), and their YouTube videos, played in the page. All, Photos and Videos filter them.
  */
 function Content({ page, albums, videos, onVideo }: { page: PartnerPageData; albums: LiveAlbum[]; videos: PartnerVideo[]; onVideo: (v: PartnerVideo) => void }) {
-  const [kind, setKind] = useState<'all' | 'photos' | 'videos'>('all');
+  const [kind, setKind] = useState<'all' | 'albums' | 'videos'>('all');
   // Every kind its own tab (a kind with nothing in it says so).
   const filters = [
     ['all', 'All', albums.length + videos.length],
-    ['photos', 'Photos', albums.length],
+    ['albums', 'Albums', albums.length],
     ['videos', 'Videos', videos.length],
   ] as const;
-  const none = (kind === 'photos' ? albums.length : kind === 'videos' ? videos.length : albums.length + videos.length) === 0;
+  const none = (kind === 'albums' ? albums.length : kind === 'videos' ? videos.length : albums.length + videos.length) === 0;
   return (
     <div className={s.stack}>
       <div className={s.sectionHead}>
@@ -729,7 +751,7 @@ function Content({ page, albums, videos, onVideo }: { page: PartnerPageData; alb
               </Link>
             );
           })}
-        {kind !== 'photos' &&
+        {kind !== 'albums' &&
           videos.map((v, i) => {
             const thumb = thumbOf(v);
             return (
@@ -754,7 +776,7 @@ function Content({ page, albums, videos, onVideo }: { page: PartnerPageData; alb
             );
           })}
       </div>
-      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : kind === 'photos' ? `No albums from ${page.short} yet.` : `Nothing from ${page.short} yet.`}</div>}
+      {none && <div className={s.emptyCard}>{kind === 'videos' ? `No videos from ${page.short} yet.` : kind === 'albums' ? `No albums from ${page.short} yet.` : `Nothing from ${page.short} yet.`}</div>}
       <div className={s.note}>Youth albums and videos are private to the families booked on that session. Download, print or license a photo from any public album.</div>
     </div>
   );
@@ -934,7 +956,7 @@ function Experiences({ page, items, onOpen, waitOf }: { page: PartnerPageData; i
                 <div className={s.resFoot}>
                   <strong>{priceOf(l) || 'Free'}</strong>
                   <button type="button" className={s.btnOutline} onClick={() => onOpen(l)}>
-                    {waitLabel(l, waitOf(l)) ?? (isBookable(toItem(l)) ? 'Book a session' : 'Details')}
+                    {waitLabel(l, waitOf(l)) ?? (isBookable(toItem(l)) ? 'Book a Session' : 'Details')}
                   </button>
                 </div>
               </div>
@@ -1178,7 +1200,7 @@ function JobDialog({ page, job, onClose }: { page: PartnerPageData; job: Job; on
               Back
             </button>
             <button type="submit" className={`${s.btnAccent} ${s.applySend}`} disabled={Boolean(app.busy) || page.preview}>
-              {app.busy === 'uploading' ? 'Uploading resume…' : app.busy ? 'Sending…' : 'Send application'}
+              {app.busy === 'uploading' ? 'Uploading Resume…' : app.busy ? 'Sending…' : 'Send Application'}
             </button>
           </div>
         </form>
@@ -1243,9 +1265,7 @@ function Partnerships({ collabs }: { collabs: PartnerCollab[] }) {
   return (
     <div className={s.stack} style={{ gap: 30 }}>
       <div className={`${s.listHead} ${s.listHeadCenter}`}>
-        <span className={s.bigTitle}>
-          All Partnerships <span className={s.countText}>{shown.length === collabs.length ? collabs.length : `${shown.length} of ${collabs.length}`}</span>
-        </span>
+        <h2 className={s.cardTitle}>All Partnerships</h2>
         <div className={`${s.listTools} ${s.listToolsRow}`}>
           <SearchPill label="Search partnerships" placeholder="Brand, title or dates" value={q} onChange={setQ} />
           <ChoiceChip
@@ -1297,7 +1317,12 @@ function Partnerships({ collabs }: { collabs: PartnerCollab[] }) {
 
 // --- Reviews ------------------------------------------------------------------------------------------------------------
 
+/** What a review is for: a booking (checked in), or a shop order. */
+const reviewKind = (r: PartnerReviewData) => (r.orderId ? 'shop' : 'booking');
+
 function Reviews({ page, reviews }: { page: PartnerPageData; reviews: PartnerReviewData[] }) {
+  const [kind, setKind] = useState<'all' | 'booking' | 'shop'>('all');
+  const shown = reviews.filter((r) => kind === 'all' || reviewKind(r) === kind);
   const total = reviews.length;
   const average = page.rating ?? (total ? Math.round((reviews.reduce((n, r) => n + r.rating, 0) / total) * 10) / 10 : 0);
   return (
@@ -1324,7 +1349,23 @@ function Reviews({ page, reviews }: { page: PartnerPageData; reviews: PartnerRev
         <div className={s.tintNote}>Only people who attended a session, or parents with a member account, can leave a review.</div>
       </div>
       <div className={s.stack} style={{ gap: 14 }}>
-        {reviews.map((r) => (
+        <div className={s.pills}>
+          {(
+            [
+              ['all', 'All Reviews'],
+              ['booking', 'Booking Reviews'],
+              ['shop', 'Shop Reviews'],
+            ] as const
+          ).map(([id, label]) => (
+            <button key={id} type="button" className={`${s.pill} ${kind === id ? s.pillOn : ''}`} aria-pressed={kind === id} onClick={() => setKind(id)}>
+              {label} <span>{id === 'all' ? reviews.length : reviews.filter((r) => reviewKind(r) === id).length}</span>
+            </button>
+          ))}
+        </div>
+        {shown.length === 0 && (
+          <div className={s.emptyCard}>{kind === 'shop' ? `No shop reviews for ${page.short} yet.` : kind === 'booking' ? `No booking reviews for ${page.short} yet.` : `No reviews for ${page.short} yet.`}</div>
+        )}
+        {shown.map((r) => (
           <div key={r.id} className={s.review}>
             <span className={s.reviewTop}>
               <span className={s.starsInk}>{stars(r.rating)}</span>
@@ -1379,10 +1420,26 @@ function ProductImage({ page, product, size }: { page: PartnerPageData; product:
 const subOf = (p: PartnerProduct) => [p.collection, p.optionGroups.find((g) => g.kind === 'Colors')?.values[0]].filter(Boolean).join(' · ');
 const isFresh = (p: PartnerProduct, now: number) => Boolean(p.addedAt) && now - Date.parse(p.addedAt!) < 30 * 86_400_000;
 
-/** A product as the experiences pages' card: the photo (NEW), its category, name, collection and colour, price and View Item. */
-function ProductCard({ page, product, fresh, onOpen }: { page: PartnerPageData; product: PartnerProduct; fresh: boolean; onOpen: () => void }) {
+/**
+ * A product as the experiences pages' card: the photo (NEW), its category, name, collection and colour, price and View
+ * Item; a row of the list in the list view (the price on the left of the foot, View Item on the right).
+ */
+function ProductCard({ page, product, fresh, onOpen, view = 'grid' }: { page: PartnerPageData; product: PartnerProduct; fresh: boolean; onOpen: () => void; view?: ResultsView }) {
+  const viewButton = (wide: boolean) => (
+    <button
+      type="button"
+      className={`${lc.cta} ${wide ? lc.ctaWide : ''}`}
+      aria-label={`View ${product.title}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        onOpen();
+      }}
+    >
+      View Item
+    </button>
+  );
   return (
-    <article className={`${lc.card} ${lc.verified}`} onClick={onOpen}>
+    <article className={[lc.card, view === 'list' && lc.list, lc.verified].filter(Boolean).join(' ')} onClick={onOpen}>
       <div className={`${lc.media} ${s.productCardMedia}`}>
         <ProductImage page={page} product={product} size={44} />
         {fresh && <span className={s.productTag}>New</span>}
@@ -1391,20 +1448,17 @@ function ProductCard({ page, product, fresh, onOpen }: { page: PartnerPageData; 
         {product.category && <span className={lc.provider}>{titleCase(product.category)}</span>}
         <h3 className={lc.title}>{product.title}</h3>
         {subOf(product) && <span className={s.mutedSmall}>{subOf(product)}</span>}
-        <span className={lc.bigPrice}>{dollars(product.price)}</span>
-        <div className={lc.facilityFooter}>
-          <button
-            type="button"
-            className={`${lc.cta} ${lc.ctaWide}`}
-            aria-label={`View ${product.title}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen();
-            }}
-          >
-            View Item
-          </button>
-        </div>
+        {view === 'list' ? (
+          <div className={lc.footer}>
+            <span className={lc.bigPrice}>{dollars(product.price)}</span>
+            {viewButton(false)}
+          </div>
+        ) : (
+          <>
+            <span className={lc.bigPrice}>{dollars(product.price)}</span>
+            <div className={lc.facilityFooter}>{viewButton(true)}</div>
+          </>
+        )}
       </div>
     </article>
   );
@@ -1413,6 +1467,7 @@ function ProductCard({ page, product, fresh, onOpen }: { page: PartnerPageData; 
 function Shop({ page, products, onOpen }: { page: PartnerPageData; products: PartnerProduct[]; onOpen: (p: PartnerProduct) => void }) {
   const [cat, setCat] = useState('');
   const [sort, setSort] = useState<Sort>('featured');
+  const [view, setView] = useState<ResultsView>('grid');
   const [chip, setChip] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
   const cats = [...new Set(products.map((p) => p.category).filter(Boolean))];
@@ -1444,12 +1499,16 @@ function Shop({ page, products, onOpen }: { page: PartnerPageData; products: Par
           count={(c) => products.filter((p) => !c || p.category === c).length}
           onChange={setCat}
         />
-        <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={SORTS.map(([value, label]) => ({ value, label }))} onChange={setSort} />
+        {/* The sort and the grid / list switch together on the right (as the shop's bar). */}
+        <span className={s.shopToolsEnd}>
+          <PillSelect label="Sort" icon={<LuArrowUpDown />} value={sort} options={SORTS.map(([value, label]) => ({ value, label }))} onChange={setSort} />
+          <ResultsToggle value={view} onChange={setView} />
+        </span>
       </div>
-      <div className={t.listingGrid}>
+      <div key={view} className={view === 'list' ? t.listingList : t.listingGrid}>
         {shown.map((p) => (
           <div key={p.id} className={t.listingItem}>
-            <ProductCard page={page} product={p} fresh={isFresh(p, now)} onOpen={() => onOpen(p)} />
+            <ProductCard page={page} product={p} fresh={isFresh(p, now)} onOpen={() => onOpen(p)} view={view} />
           </div>
         ))}
       </div>
@@ -1518,7 +1577,7 @@ function PrivateStore({ page }: { page: PartnerPageData }) {
         {page.shop?.until ? `, until ${dateText(page.shop.until)}` : ''}.
       </span>
       <a className={`${s.btnAccent} ${s.btnLg}`} href={storeHref(page.slug)}>
-        Open the store
+        Open the Store
       </a>
     </div>
   );
@@ -1526,7 +1585,19 @@ function PrivateStore({ page }: { page: PartnerPageData }) {
 
 // --- Updates & News -----------------------------------------------------------------------------------------------------
 
-type Post = { key: string; kind: 'update' | 'news'; title: string; excerpt: string; image: string; date: string; href: string; source: string; read?: string };
+/** `slug`: a CLP article's (an update, or press that is one), read in the popup. */
+type Post = { key: string; kind: 'update' | 'news'; title: string; excerpt: string; image: string; date: string; href: string; source: string; read?: string; slug?: string };
+
+/** The CLP site's own addresses: a press mention linking to one of its articles (its last path part, the slug). */
+const CLP_HOSTS = /(^|\.)competelikepros\.com$|\.cloudfront\.net$/;
+function clpSlug(href: string) {
+  try {
+    const url = new URL(href, 'https://competelikepros.com');
+    return CLP_HOSTS.test(url.hostname) ? url.pathname.split('/').filter(Boolean).pop() : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Their updates (articles on CLP) and press, newest first. */
 function postsOf(page: PartnerPageData, articles: PartnerPageResponse['articles']): Post[] {
@@ -1541,6 +1612,7 @@ function postsOf(page: PartnerPageData, articles: PartnerPageResponse['articles'
       href: a.path,
       source: page.name,
       read: a.readingTime ? `${a.readingTime} min read` : undefined,
+      slug: a.slug,
     })),
     ...page.press.map((p, i) => ({
       key: `press-${i}`,
@@ -1552,6 +1624,8 @@ function postsOf(page: PartnerPageData, articles: PartnerPageResponse['articles'
       href: p.href,
       source: p.source,
       read: p.readingTime ? `${p.readingTime} min read` : undefined,
+      // A CLP article (the API gives it its reading time) reads in the popup too.
+      slug: p.readingTime ? clpSlug(p.href) : undefined,
     })),
   ].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 }
@@ -1560,7 +1634,7 @@ function postsOf(page: PartnerPageData, articles: PartnerPageResponse['articles'
  * Updates & News: their updates and press as the site's article cards (the photo with its date, the title, then the
  * reading time and who wrote it), in a grid or the list's rows, with Recent / Updates / In the News, a search and a sort.
  */
-function News({ posts }: { posts: Post[] }) {
+function News({ posts, onOpen }: { posts: Post[]; onOpen: (p: Post) => void }) {
   // "Recent": all of them, newest first.
   const [kind, setKind] = useState<'recent' | Post['kind']>('recent');
   const [q, setQ] = useState('');
@@ -1607,6 +1681,7 @@ function News({ posts }: { posts: Post[] }) {
                   eager={false}
                   row={view === 'list'}
                   external={external(p)}
+                  onOpen={() => onOpen(p)}
                 />
               ))}
             </div>
@@ -1633,7 +1708,7 @@ function News({ posts }: { posts: Post[] }) {
 
 // --- Dialogs ------------------------------------------------------------------------------------------------------------
 
-function Overlay({ children, onClose, width = 560, bare }: { children: ReactNode; onClose: () => void; width?: number; bare?: boolean }) {
+function Overlay({ children, onClose, width = 560, bare, label }: { children: ReactNode; onClose: () => void; width?: number; bare?: boolean; label?: string }) {
   const palette = useContext(PaletteContext);
   useEffect(() => {
     document.body.classList.add('menu-open');
@@ -1649,7 +1724,7 @@ function Overlay({ children, onClose, width = 560, bare }: { children: ReactNode
       {bare ? (
         children
       ) : (
-        <div className={s.dialog} role="dialog" aria-modal="true" style={{ maxWidth: width }}>
+        <div className={s.dialog} role="dialog" aria-modal="true" aria-label={label} style={{ maxWidth: width }}>
           {children}
         </div>
       )}
@@ -1671,27 +1746,31 @@ const hasBio = (m: PartnerTeamMember) => Boolean(m.bio || m.runs?.length || m.ch
 /** Cleared to work with kids: CLP verified their SafeSport training and background check. */
 const youthCleared = (m: PartnerTeamMember) => Boolean(m.checks?.includes('safesport') && m.checks.includes('background'));
 
-/** A team member's bio: their photo, role and bio, the sessions they run, CLP's checks and their Instagram. */
+/**
+ * A team member's bio (the handoff's team bio): their photo beside their role (as they wrote it) and name, their bio,
+ * the sessions they run, CLP's checks, then "See Alana’s sessions" and their Instagram.
+ */
 function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamMember; onClose: () => void; onSessions?: () => void }) {
+  const first = m.name.trim().split(/\s+/)[0] || m.name;
   return (
-    <Overlay onClose={onClose} width={860}>
+    <Overlay onClose={onClose} width={860} label={m.name}>
       <div className={s.memberDialog}>
         <div className={s.memberPhoto}>{m.photo ? <img src={m.photo} alt={m.name} /> : <span className={s.personMono}>{initials(m.name)}</span>}</div>
         <div className={s.memberBody}>
           <div className={s.memberHead}>
             <span className={s.headStack} style={{ gap: 4 }}>
-              <span className={s.label}>{m.role.toUpperCase()}</span>
-              <strong className={s.cardTitle}>{m.name}</strong>
+              {m.role && <span className={s.label}>{m.role}</span>}
+              <strong className={`${s.cardTitle} ${s.memberName}`}>{m.name}</strong>
             </span>
             <CloseButton onClose={onClose} />
           </div>
-          {m.bio ? <p className={s.dialogText}>{m.bio}</p> : !hasBio(m) && <p className={s.mutedText}>{m.name} hasn’t added a bio yet.</p>}
+          {m.bio ? <p className={`${s.dialogText} ${s.memberBio}`}>{m.bio}</p> : !hasBio(m) && <p className={s.mutedText}>{m.name} hasn’t added a bio yet.</p>}
           {Boolean(m.runs?.length) && (
             <div className={s.headStack} style={{ gap: 8 }}>
               <span className={s.label}>RUNS</span>
               <div className={s.tags}>
                 {m.runs!.map((r) => (
-                  <span key={r} className={s.tag}>
+                  <span key={r} className={`${s.tag} ${s.memberTag}`}>
                     {r}
                   </span>
                 ))}
@@ -1703,7 +1782,7 @@ function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamM
               <span className={s.label}>VERIFIED BY CLP</span>
               <div className={s.tags}>
                 {m.checks!.map((c) => (
-                  <span key={c} className={s.cleared} style={{ height: 30 }}>
+                  <span key={c} className={`${s.cleared} ${s.memberTag}`}>
                     ✓ {TEAM_CHECK_LABELS[c]}
                   </span>
                 ))}
@@ -1713,7 +1792,7 @@ function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamM
           <div className={s.memberActions}>
             {onSessions && (
               <button type="button" className={s.btnAccent} onClick={onSessions}>
-                See upcoming sessions
+                See {first}’s Sessions
               </button>
             )}
             {m.instagram && (
@@ -1723,6 +1802,78 @@ function MemberDialog({ member: m, onClose, onSessions }: { member: PartnerTeamM
               </a>
             )}
           </div>
+        </div>
+      </div>
+    </Overlay>
+  );
+}
+
+/**
+ * An update or a news item read in place (visitors stay on the partner's page): its photo, kind and date, title, who and
+ * the reading time, then a CLP article's text (loaded when it opens) with Open Full Article, or another site's piece
+ * with its summary and Read It on <publication>.
+ */
+function PostDialog({ page, post, onClose }: { page: PartnerPageData; post: Post; onClose: () => void }) {
+  const [article, setArticle] = useState<Article | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!post.slug) return;
+    let live = true;
+    fetchArticle(post.slug).then(
+      (data) => {
+        if (!live) return;
+        if (data) setArticle(data.item);
+        else setFailed(true);
+      },
+      () => live && setFailed(true),
+    );
+    return () => {
+      live = false;
+    };
+  }, [post.slug]);
+  const image = article?.image || post.image;
+  const minutes = article?.readingTime ? `${article.readingTime} min read` : post.read;
+  const day = post.date ? articleDate(post.date.slice(0, 10)) : '';
+  return (
+    <Overlay onClose={onClose} width={760} label={post.title}>
+      <div className={s.dialogHead}>
+        <span className={s.label}>{[post.kind === 'update' ? 'UPDATE' : 'IN THE NEWS', day.toUpperCase()].filter(Boolean).join(' · ')}</span>
+        <CloseButton onClose={onClose} />
+      </div>
+      {image && (
+        <span className={s.postImage}>
+          <img src={image} alt="" />
+        </span>
+      )}
+      <div className={s.dialogBody} style={{ gap: 12 }}>
+        <strong className={s.cardTitle}>{post.title}</strong>
+        <span className={s.mutedSmall}>{[post.slug ? `By ${article?.authorName || post.source}` : post.source, minutes].filter(Boolean).join(' · ')}</span>
+        {post.slug ? (
+          article ? (
+            <RichText html={article.html} className={`${pv.content} ${s.postText}`} />
+          ) : failed ? (
+            <p className={s.mutedText}>This update couldn’t load here. Open it as a page instead.</p>
+          ) : (
+            <p className={s.mutedText}>Loading…</p>
+          )
+        ) : (
+          (post.excerpt || '') && <p className={s.dialogText}>{post.excerpt}</p>
+        )}
+        <div className={s.memberActions}>
+          {post.slug ? (
+            <Link className={s.btnOutlineDark} href={post.href}>
+              Open Full Article
+            </Link>
+          ) : (
+            post.href && (
+              <a className={s.btnAccent} href={post.href} target="_blank" rel="noopener noreferrer">
+                Read It on {post.source || 'Their Site'} ↗
+              </a>
+            )
+          )}
+          <button type="button" className={s.btnOutlineDark} onClick={onClose}>
+            Back to {page.short}
+          </button>
         </div>
       </div>
     </Overlay>
@@ -1761,12 +1912,15 @@ function VideoDialog({ video, onClose }: { video: PartnerVideo; onClose: () => v
   );
 }
 
+/** The intro's partner kinds, as the API takes them (clp-api shared/messages.mjs), shown in Title Case. */
 const PARTNER_KINDS = ['Brand', 'Photo & video', 'Facility', 'Service provider', 'Another club or team'];
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /**
- * "Message": a question about a session, or a partnership intro (brands, photographers, facilities, other
- * clubs) that the partner accepts before a conversation opens. Both start a conversation on CLP Messages: the sender
- * gets its private link (here and by e-mail), and nobody sees the other's e-mail or phone.
+ * "Message" (the handoff's message popup): Contact, a question about a session, or Partner, an intro from a brand,
+ * photographer, facility or another club that the partner accepts before a conversation opens. Each tab has its line,
+ * fields, message and the grey rule box. Both start a conversation on CLP Messages: the sender gets its private link
+ * (here and by e-mail), and nobody sees the other's e-mail or phone.
  */
 function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData; kind: 'question' | 'intro'; onKind: (k: 'question' | 'intro') => void; onClose: () => void }) {
   const intro = kind === 'intro';
@@ -1778,7 +1932,10 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
   const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [key]: e.target.value });
   const send = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim() || (intro && !form.organization.trim())) return setError('Fill in every field, please.');
+    if (!form.name.trim()) return setError('Enter your name.');
+    if (intro && !form.organization.trim()) return setError('Enter your brand or organization.');
+    if (!EMAIL_RE.test(form.email.trim())) return setError('Enter a valid email address.');
+    if (!form.message.trim()) return setError(intro ? 'Tell them about your idea.' : 'Write your message.');
     setBusy(true);
     setError('');
     try {
@@ -1810,7 +1967,7 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
               : `${page.short}’s reply comes to your conversation on CLP. It’s saved on this device under Messages, and its link opens it anywhere.`}
           </span>
           <Link className={`${s.btnAccent} ${s.btnLg}`} href={sent}>
-            Open the conversation
+            Open the Conversation
           </Link>
           <button type="button" className={s.btnOutlineDark} onClick={onClose}>
             Back to {page.short}
@@ -1821,24 +1978,29 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
           <div className={s.kinds}>
             {(
               [
-                ['question', 'A question'],
-                ['intro', 'Partnership intro'],
+                ['question', 'Contact'],
+                ['intro', 'Partner'],
               ] as const
             ).map(([id, label]) => (
-              <button key={id} type="button" className={kind === id ? s.kindOn : ''} aria-pressed={kind === id} onClick={() => onKind(id)}>
+              <button key={id} type="button" className={kind === id ? s.kindOn : ''} aria-pressed={kind === id}
+                onClick={() => {
+                  setError('');
+                  onKind(id);
+                }}
+              >
                 {label}
               </button>
             ))}
           </div>
           <span className={s.mutedText}>
             {intro
-              ? `Brands, photographers, facilities and other clubs: introduce yourself. ${page.short} decides whether to take it further.`
-              : `Ask about a session before you book. Already booked? Message ${page.short} from your booking’s page so they have the details.`}
+              ? `Brands, photographers, facilities and other clubs: introduce yourself. ${page.short} accepts before a conversation opens.`
+              : `Ask about a session before you book. Already booked? Message ${page.short} from your booking so they have the details.`}
           </span>
           {intro && (
             <div className={s.formField}>
               What kind of partner are you?
-              <FieldSelect label="What kind of partner are you?" value={form.partnerKind} options={PARTNER_KINDS.map((k) => ({ value: k, label: k }))} onChange={(partnerKind) => setForm({ ...form, partnerKind })} />
+              <FieldSelect label="What kind of partner are you?" className={s.selectField} value={form.partnerKind} options={PARTNER_KINDS.map((k) => ({ value: k, label: titleCase(k) }))} onChange={(partnerKind) => setForm({ ...form, partnerKind })} />
             </div>
           )}
           <div className={s.twoCols}>
@@ -1874,14 +2036,14 @@ function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData;
           />
           {/* A field people don't see: filled in, the request is a bot's. */}
           <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className={s.trap} value={form.website} onChange={set('website')} />
-          {/* <div className={s.rule2}>
+          <div className={s.rule2}>
             {intro
-              ? `Sent through CLP. ${page.short} sees your name and organization, never your e-mail. They accept before a conversation opens.`
-              : 'Sent through CLP. Your e-mail and phone stay private.'}
-          </div> */}
+              ? `Sent through CLP. Contact details are shared only if ${page.short} accepts.`
+              : 'For adults. Under 18? Ask a parent or guardian to reach out. Your email and phone stay private.'}
+          </div>
           {error && <span className={s.formError}>{error}</span>}
-          <button type="submit" className={`${s.btnAccent} ${s.btnLg}`} disabled={busy || page.preview}>
-            {busy ? 'Sending…' : intro ? 'Send intro request' : 'Send message'}
+          <button type="submit" className={`${s.btnAccent} ${s.btnSend}`} disabled={busy || page.preview}>
+            {busy ? 'Sending…' : intro ? 'Send Intro Request' : 'Send Message'}
           </button>
         </form>
       )}

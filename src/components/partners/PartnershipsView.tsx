@@ -301,7 +301,7 @@ function Empty({ category, onClear }: { category?: string; onClear: () => void }
       <div className={s.emptyActions}>
         <BecomePartner className={s.btnDark}>Apply to be a partner</BecomePartner>
         <button type="button" className={s.btnLight} onClick={onClear}>
-          See all partners
+          See All Partners
         </button>
       </div>
     </div>
@@ -349,7 +349,7 @@ function CategoryDirectory({ items }: { items: PartnerCardData[] | null }) {
                       </>
                     ))}
                 </span>
-                <span className={s.catGo}>{items && n === 0 ? 'Be the first →' : 'View all →'}</span>
+                <span className={s.catGo}>{items && n === 0 ? 'Be the First →' : 'View All →'}</span>
               </span>
             </Link>
           );

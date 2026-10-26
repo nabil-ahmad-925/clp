@@ -57,7 +57,7 @@ export default function ResumeField({ file, onChoose, onRemove, disabled }: { fi
         >
           <LuUpload aria-hidden />
           <span>
-            <strong>Upload your resume</strong>
+            <strong>Upload Your Resume</strong>
             <span>PDF or Word, up to 10 MB</span>
           </span>
         </button>

@@ -1017,7 +1017,7 @@ function ApplyWithClp({ job, onBack, onClose, onSent }: { job: Job; onBack: () =
             : `${job.organization} usually replies within a few days. The conversation lives in your CLP Messages.`}
         </p>
         <button type="button" className={c.apply} onClick={onClose}>
-          Back to jobs
+          Back to Jobs
         </button>
       </div>
     );
@@ -1073,7 +1073,7 @@ function ApplyWithClp({ job, onBack, onClose, onSent }: { job: Job; onBack: () =
           Back
         </button>
         <button type="submit" className={c.apply} disabled={Boolean(app.busy)}>
-          {app.busy === 'uploading' ? 'Uploading resume…' : app.busy ? 'Sending…' : 'Send application'}
+          {app.busy === 'uploading' ? 'Uploading Resume…' : app.busy ? 'Sending…' : 'Send Application'}
         </button>
       </div>
     </form>

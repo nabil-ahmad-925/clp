@@ -143,7 +143,7 @@ export default function OrderDone() {
               ))}
             </div>
             <Link className={styles.keep} href={shopHref()}>
-              Keep shopping
+              Keep Shopping
             </Link>
           </section>
         )}

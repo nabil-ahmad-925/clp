@@ -207,10 +207,10 @@ function Ask() {
         {state === 'closed' && (
           <div className={styles.askActions}>
             <button type="button" className={styles.askPrimary} onClick={() => setState('open')}>
-              Ask a question
+              Ask a Question
             </button>
             <a className={styles.askSecondary} href={`mailto:${FAQ_EMAIL}`}>
-              Email us
+              Email Us
             </a>
           </div>
         )}

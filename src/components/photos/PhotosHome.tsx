@@ -112,7 +112,7 @@ export default function PhotosHome() {
             <input type="text" placeholder="Album code" value={code} onChange={(e) => setCode(e.target.value)} aria-label="Album code" autoCapitalize="characters" spellCheck={false} maxLength={40} />
           </label>
           <button type="submit" className={s.find}>
-            Find photos
+            Find Photos
           </button>
         </form>
         <p className={s.note}>Your photographer gives you a link or album code at the game. Albums with players under 18 only open for their families.</p>

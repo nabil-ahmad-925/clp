@@ -90,6 +90,8 @@
   gap: 18px;
   color: #dcbd7d;
   text-decoration: none;
+  /* A link: clickable through the transparent header. */
+  pointer-events: auto;
   font-family: var(--font-body);
   letter-spacing: 4px;
 }

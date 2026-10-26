@@ -38,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en-US" className={fontVariables}>
       <body>
         <a href="#main" className="skip-link">
-          Skip to main content
+          Skip to Main Content
         </a>
         <SiteHeader />
         <main id="main">{children}</main>

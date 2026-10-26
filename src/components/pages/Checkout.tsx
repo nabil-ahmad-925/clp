@@ -157,7 +157,7 @@ export default function Checkout() {
           <div className={styles.card}>
             <h1 className={styles.title}>Your cart is empty</h1>
             <Link className={styles.primarySmall} href={shopHref()}>
-              Keep shopping
+              Keep Shopping
             </Link>
           </div>
         ) : (
@@ -241,7 +241,7 @@ export default function Checkout() {
                       <span />
                     </span>
                     <span className={styles.optionText}>
-                      <strong>Ship to me</strong>
+                      <strong>Ship to Me</strong>
                       <span>Standard shipping in the United States</span>
                     </span>
                     <strong>{ship ? (totals?.shipping ? money(totals.shipping) : 'Free') : ''}</strong>
@@ -252,7 +252,7 @@ export default function Checkout() {
                         <span />
                       </span>
                       <span className={styles.optionText}>
-                        <strong>Pick up from the team</strong>
+                        <strong>Pick Up from the Team</strong>
                         <span>{cart.stores?.map((st) => st.pickupNote).filter(Boolean).join(' · ') || 'Collect at practice or the next CLP event'}</span>
                       </span>
                       <strong>Free</strong>

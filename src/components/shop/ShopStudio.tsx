@@ -485,10 +485,10 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
               </span>
             )}
             <button type="button" className={st.startOver} onClick={() => set(freshDesign(item, brand))}>
-              Start over
+              Start Over
             </button>
             <button type="button" className={st.save} onClick={() => send('saved')} disabled={Boolean(busy)} title={guest ? 'Saved in this browser' : undefined}>
-              {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save design'}
+              {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save Design'}
             </button>
           </span>
         </div>
@@ -503,7 +503,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
             <span>
               <strong>{brand.name}</strong> · Only approved colors, templates, patterns, logos, fonts and text can be used.{kit.manager ? ` Set by ${kit.manager}.` : ''}
             </span>
-            <a href={`mailto:support@competelikepros.com?subject=${encodeURIComponent(`Brand exception: ${brand.name}`)}`}>Request an exception</a>
+            <a href={`mailto:support@competelikepros.com?subject=${encodeURIComponent(`Brand exception: ${brand.name}`)}`}>Request an Exception</a>
           </div>
         </div>
       )}
@@ -553,7 +553,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 ))}
               </div>
               <button type="button" className={st.outlineBtn} onClick={() => setPicker(true)}>
-                Change product
+                Change Product
               </button>
             </div>
           )}
@@ -566,7 +566,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <span className={st.tplHead}>
                   <span>{tplAll ? `Full library · ${TEMPLATES.length} templates` : `${templates.length} templates for ${categoryOf(item.category)?.label.toLowerCase()}`}</span>
                   <button type="button" onClick={() => setTplAll(!tplAll)}>
-                    {tplAll ? 'Show matches' : 'Full library'}
+                    {tplAll ? 'Show Matches' : 'Full Library'}
                   </button>
                 </span>
               )}
@@ -591,7 +591,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
               {approved}
               <div className={st.chips}>
                 <button type="button" className={sel(colorTarget === 'main')} onClick={() => setColorTarget('main')}>
-                  Main color
+                  Main Color
                 </button>
                 <button type="button" className={sel(colorTarget === 'acc')} onClick={() => setColorTarget('acc')}>
                   Accent &amp; trim
@@ -666,16 +666,16 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                     </span>
                     <span className={st.uploadBtns}>
                       <button type="button" className={st.darkBtn} onClick={() => fileRef.current?.click()}>
-                        Upload artwork
+                        Upload Artwork
                       </button>
                       <input ref={fileRef} type="file" accept=".ai,.eps,.pdf,.svg,.png,.jpg,.jpeg,.webp" hidden onChange={onArt} />
                       {brand.logo && brand.logo !== d.logo && (
                         <button type="button" className={st.linkBtn} onClick={() => set({ logo: brand.logo, logoOn: true })}>
-                          Use my brand logo
+                          Use My Brand Logo
                         </button>
                       )}
                       <button type="button" className={st.linkBtn} onClick={pickSample}>
-                        Use sample logo
+                        Use Sample Logo
                       </button>
                     </span>
                   </div>
@@ -726,7 +726,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <input type="checkbox" checked={d.logoOn} onChange={() => set({ logoOn: !d.logoOn })} /> Show logo
               </label>
               <div className={st.group}>
-                <strong>Print locations</strong>
+                <strong>Print Locations</strong>
                 <span className={st.always}>
                   <span>✓</span>
                   {shape === 'sock' ? 'Outer side (main)' : shape === 'tent' ? 'Front canopy (main)' : 'Front (main)'} · always on
@@ -748,7 +748,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <span className={st.note}>Each extra location may add to the price. Only locations this product allows are listed.</span>
               </div>
               <div className={st.group}>
-                <strong>Front placement</strong>
+                <strong>Front Placement</strong>
                 <div className={st.chips}>
                   {places.map((p) => (
                     <button key={p.id} type="button" className={sel(d.place === p.id)} onClick={() => set({ place: p.id, dx: 0, dy: 0 })}>
@@ -877,7 +877,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
         <div className={st.previewCol}>
           <div className={st.preview} ref={preview}>
             <Mockup {...mockProps} view={view} className={st.previewSvg} label={`${item.name}, ${viewLabel}`} />
-            {!printedOn(view) && <span className={st.viewEmpty}>Nothing printed on this side · turn it on in Logo → Print locations</span>}
+            {!printedOn(view) && <span className={st.viewEmpty}>Nothing printed on this side · turn it on in Logo → Print Locations</span>}
             <span className={st.viewTag}>{viewLabel} · Preview</span>
             {done && (
               <div className={st.done}>
@@ -886,14 +886,14 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <span>{done === 'order' ? 'Order received. We’ll send a production proof to approve, then it’s made and shipped in bulk.' : 'Our team will send your bulk quote within 2 business days.'}</span>
                 <div className={st.doneBtns}>
                   <button type="button" className={st.outlineBtn} onClick={() => setDone('')}>
-                    Keep designing
+                    Keep Designing
                   </button>
                   <Link className={st.darkBtn} href={shopHref({ view: 'bulk' })}>
                     Back to Wholesale
                   </Link>
                 </div>
                 <Link className={st.doneLink} href={shopHref({ view: 'bulk', requests: '1' })}>
-                  {guest ? 'View my quote requests' : 'View my designs, quotes and orders'}
+                  {guest ? 'View My Quote Requests' : 'View My Designs, Quotes and Orders'}
                 </Link>
               </div>
             )}
@@ -916,7 +916,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
               if (el) saveFile(await mockupPng(el), `${item.id}-${view}.png`);
             }}
           >
-            Download mockup
+            Download Mockup
           </button>
         </div>
 
@@ -1022,7 +1022,7 @@ function Picker({ current, base, logo, onPick, onClose }: { current: BulkItem; b
       <div className={st.picker} role="dialog" aria-modal="true" aria-label="Change product">
         <div className={st.pickerHead}>
           <span>
-            <strong>Change product</strong>
+            <strong>Change Product</strong>
             <span>Each product starts a fresh design with its own options.</span>
           </span>
           <button type="button" aria-label="Close" onClick={onClose}>

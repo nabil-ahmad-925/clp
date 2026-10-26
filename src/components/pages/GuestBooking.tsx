@@ -125,7 +125,7 @@ function GuestBookingView({ id, token }: { id: string; token: string }) {
                       {current.booking.address}
                       {current.booking.checkInInstructions && <span className={styles.checkIn}>{current.booking.checkInInstructions}</span>}
                       <a href={directionsHref(current.booking.address)} target="_blank" rel="noopener" className={styles.directions}>
-                        Get directions <span className="glyph" aria-hidden>↗</span>
+                        Get Directions <span className="glyph" aria-hidden>↗</span>
                       </a>
                     </dd>
                   </>

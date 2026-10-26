@@ -39,7 +39,7 @@ import WholesaleCard, { CustomCard } from './WholesaleCard';
 import WholesaleItem from './WholesaleItem';
 import WholesaleRequests, { needsYou as wsNeedsYou } from './WholesaleRequests';
 import { useWholesale } from './wholesaleStore';
-import { ListToolbar, ShopSearch, titleCase, type ListChip } from './shopListing';
+import { ListToolbar, ShopSearch, nextQuery, titleCase, type ListChip } from './shopListing';
 import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
@@ -116,13 +116,7 @@ export default function ShopBulk() {
   const { partner } = studio;
   const get = (key: string) => params.get(key) ?? '';
   const set = (next: Record<string, string>, step = false) => {
-    const q = new URLSearchParams(params.toString());
-    for (const [k, v] of Object.entries(next)) {
-      if (v) q.set(k, v);
-      else q.delete(k);
-    }
-    if (!('page' in next)) q.delete('page');
-    const query = q.toString();
+    const query = nextQuery(params.toString(), next);
     const href = `${window.location.pathname}${query ? `?${query}` : ''}`;
     if (step) router.push(href, { scroll: false });
     else router.replace(href, { scroll: false });
@@ -181,7 +175,7 @@ export default function ShopBulk() {
     ]),
   ];
 
-  const reqTitle = partner ? 'My designs' : 'My quote requests';
+  const reqTitle = partner ? 'My Designs' : 'My Quote Requests';
   const drawers = (
     <>
       {reqsOpen && (
@@ -311,7 +305,7 @@ export default function ShopBulk() {
               </span>
               {fItems.length > 0 && (
                 <Link href={shopHref({ view: 'bulk', item: 'custom' })} className={w.favQuote}>
-                  Request a quote for this folder
+                  Request a Quote for This Folder
                 </Link>
               )}
             </div>
@@ -326,7 +320,7 @@ export default function ShopBulk() {
                 <strong>Nothing saved here yet</strong>
                 <span>Tap the heart on any item to save it to this folder.</span>
                 <span className={w.emptyBtns}>
-                  <Link href={shopHref({ view: 'bulk' })}>Browse wholesale</Link>
+                  <Link href={shopHref({ view: 'bulk' })}>Browse Wholesale</Link>
                 </span>
               </div>
             )}
@@ -341,16 +335,17 @@ export default function ShopBulk() {
     <div className={b.bulk}>
       <section className={b.hero} data-header-tone="light">
         <div className={b.heroInner}>
-          <div className={b.heroTop}>
-            <nav className={s.crumbs} aria-label="Breadcrumb">
-              <Link href={shopHref()}>Shop</Link>
-              {'  ›  '}Wholesale
-            </nav>
-          </div>
           <div className={s.headCenter}>
             <h1 className={b.heroTitle}>Outfit Your Team, Staff or Event</h1>
             <p className={b.heroText}>Name brands, made-for-you items and distributor partner stock. See your logo on everything before you order.</p>
-            <span className={s.kicker}>CLP WHOLESALE</span>
+            {/* The breadcrumb under the line, as the shop's lists (the gallery's). */}
+            <nav className={s.bandCrumbs} aria-label="Breadcrumb">
+              <Link href={shopHref()}>Shop</Link>
+              <span className={s.bandCrumbSep} aria-hidden>
+                ›
+              </span>
+              <span aria-current="page">Wholesale</span>
+            </nav>
           </div>
         </div>
       </section>
@@ -409,9 +404,9 @@ export default function ShopBulk() {
             <span>Try fewer filters, or tell us what you need. Our makers can build almost anything to order.</span>
             <span className={w.emptyBtns}>
               <button type="button" onClick={() => set({ q: '', loc: '', wcat: '', src: '', brand: '', deco: '', stock: '' })}>
-                Clear filters
+                Clear Filters
               </button>
-              <Link href={shopHref({ view: 'bulk', item: 'custom' })}>Have us find it</Link>
+              <Link href={shopHref({ view: 'bulk', item: 'custom' })}>Have Us Find It</Link>
             </span>
           </div>
         ) : view === 'list' ? (
@@ -720,8 +715,8 @@ function BulkItemPage({
                 <div className={b.row}>
                   <span className={b.rowLabel}>Placement</span>
                   {[
-                    ['front', 'Front center'],
-                    ['chest', 'Left chest'],
+                    ['front', 'Front Center'],
+                    ['chest', 'Left Chest'],
                   ].map(([v, l]) => (
                     <button key={v} type="button" className={`${b.place} ${place === v ? b.placeOn : ''}`} aria-pressed={place === v} onClick={() => setPlace(v)}>
                       {l}
@@ -733,11 +728,11 @@ function BulkItemPage({
                 <div className={b.row}>
                   <span className={b.rowLabel}>Logo</span>
                   <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
-                    {busy === 'logo' ? 'Adding…' : studio.logo ? 'Change logo' : 'Upload logo'}
+                    {busy === 'logo' ? 'Adding…' : studio.logo ? 'Change Logo' : 'Upload Logo'}
                   </button>
                   <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={onLogo} />
                   <button type="button" className={b.sampleBtn} onClick={studio.trySample}>
-                    Try sample
+                    Try Sample
                   </button>
                   {studio.logo && (
                     <button type="button" className={b.sampleBtn} onClick={() => studio.setLogo('')}>
@@ -751,7 +746,7 @@ function BulkItemPage({
                 <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
               </div>
               <button type="button" className={b.underline} onClick={download}>
-                {downloaded ? 'Downloaded ✓' : 'Download mockup'}
+                {downloaded ? 'Downloaded ✓' : 'Download Mockup'}
               </button>
               {!partner && (
                 <div className={b.partnerBox}>
@@ -761,7 +756,7 @@ function BulkItemPage({
                   <span className={b.partnerBoxLinks}>
                     <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
                     <button type="button" onClick={onSignIn}>
-                      Partner sign in
+                      Partner Sign In
                     </button>
                   </span>
                 </div>
@@ -783,7 +778,7 @@ function BulkItemPage({
                 Keep Browsing
               </button>
               <button type="button" className={b.btnLight} onClick={onShowRequests}>
-                {partner ? 'My designs' : 'My quote requests'}
+                {partner ? 'My Designs' : 'My Quote Requests'}
               </button>
             </div>
           </div>
@@ -863,7 +858,7 @@ function BulkItemPage({
                   </div>
                   {mode === 'logo' && !custom && (
                     <Link href={shopHref({ view: 'studio', item: item.id })} className={b.studioLink}>
-                      Open the full design studio →
+                      Open the Full Design Studio →
                     </Link>
                   )}
                   {mode === 'design' && (
@@ -895,13 +890,13 @@ function BulkItemPage({
                 {error && <span className={b.error}>{error}</span>}
                 <div className={b.actions}>
                   <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('saved')}>
-                    {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save design'}
+                    {busy === 'saved' ? 'Saving…' : saved ? 'Saved ✓' : 'Save Design'}
                   </button>
                   <button type="button" className={b.btnLight} disabled={Boolean(busy)} onClick={() => send('quote')}>
-                    {busy === 'quote' ? 'Sending…' : 'Get a quote'}
+                    {busy === 'quote' ? 'Sending…' : 'Get a Quote'}
                   </button>
                   <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('order')}>
-                    {busy === 'order' ? 'Placing…' : 'Buy now'}
+                    {busy === 'order' ? 'Placing…' : 'Buy Now'}
                   </button>
                 </div>
                 <span className={b.finePrint}>Buy now places a production order at partner pricing. We confirm a final proof before anything is made.</span>
@@ -950,7 +945,7 @@ function BulkItemPage({
                 {error && <span className={b.error}>{error}</span>}
                 <div className={b.guestActions}>
                   <button type="button" className={b.btnDark} disabled={Boolean(busy)} onClick={() => send('quote')}>
-                    {busy ? 'Sending…' : 'Send quote request'}
+                    {busy ? 'Sending…' : 'Send Quote Request'}
                   </button>
                   <span className={b.finePrint}>Free to request. Our sourcing team replies within 2 business days.</span>
                 </div>
@@ -1094,7 +1089,7 @@ function Requests({
               : 'Our sourcing team reviews every request and emails a custom quote within 2 business days.'}
           </span>
           <button type="button" className={s.checkoutBtn} onClick={onClose}>
-            Keep browsing
+            Keep Browsing
           </button>
         </div>
       </aside>
@@ -1169,7 +1164,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
           </label>
           <div className={b.reqBtns}>
             <button type="button" className={b.reqDark} disabled={Boolean(busy)} onClick={() => fileRef.current?.click()}>
-              {busy === 'new-artwork' ? 'Sending…' : 'Upload a new file'}
+              {busy === 'new-artwork' ? 'Sending…' : 'Upload a New File'}
             </button>
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={sendFile} />
           </div>
@@ -1178,7 +1173,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
             <span className={b.reqLinkRow}>
               <input type="url" inputMode="url" placeholder="https://" value={link} maxLength={490} onChange={(e) => setLink(e.target.value)} />
               <button type="button" className={b.reqLight} disabled={Boolean(busy) || !link.trim()} onClick={() => act('new-artwork', { link: link.trim(), note: note.trim() })}>
-                Send link
+                Send Link
               </button>
             </span>
           </label>
@@ -1226,7 +1221,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
               </button>
             )}
             <button type="button" className={b.reqLight} aria-expanded={open === 'changes'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'changes' ? '' : 'changes')}>
-              Ask for changes
+              Ask for Changes
             </button>
             <button type="button" className={b.reqText2} aria-expanded={open === 'decline'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'decline' ? '' : 'decline')}>
               Decline
@@ -1245,7 +1240,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
                   disabled={Boolean(busy) || (open === 'changes' && !note.trim())}
                   onClick={() => act(open === 'changes' ? 'ask-changes' : 'decline', { note: note.trim() })}
                 >
-                  {busy ? 'Sending…' : open === 'changes' ? 'Send to our team' : 'Decline quote'}
+                  {busy ? 'Sending…' : open === 'changes' ? 'Send to Our Team' : 'Decline Quote'}
                 </button>
                 <button type="button" className={b.reqText2} onClick={() => setOpen('')}>
                   Cancel

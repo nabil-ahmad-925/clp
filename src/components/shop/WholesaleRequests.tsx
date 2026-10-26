@@ -200,12 +200,12 @@ function RequestCard({ r, partner, ws, onChange, onContact }: { r: BulkRequest; 
             </span>
             <span className={w.reqFileRow}>
               <button type="button" className={w.darkSm} disabled={Boolean(busy)} onClick={() => fileRef.current?.click()}>
-                {busy === 'new-artwork' ? 'Sending…' : 'Upload new file'}
+                {busy === 'new-artwork' ? 'Sending…' : 'Upload New File'}
               </button>
               <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden onChange={sendFile} />
               <input className={w.reqLink} type="url" placeholder="https://" value={link} maxLength={490} aria-label="Link to your file" onChange={(e) => setLink(e.target.value)} />
               <button type="button" className={w.lightSm} disabled={Boolean(busy) || !link.trim()} onClick={() => act('new-artwork', { link: link.trim() })}>
-                Send link
+                Send Link
               </button>
             </span>
           </div>
@@ -218,7 +218,7 @@ function RequestCard({ r, partner, ws, onChange, onContact }: { r: BulkRequest; 
             </label>
             <span className={w.reqActs}>
               <button type="button" className={w.darkSm} disabled={Boolean(busy) || (open === 'changes' && !note.trim())} onClick={() => act(open === 'changes' ? 'ask-changes' : 'decline', { note: note.trim() })}>
-                {busy ? 'Sending…' : open === 'changes' ? 'Send to our team' : 'Decline quote'}
+                {busy ? 'Sending…' : open === 'changes' ? 'Send to Our Team' : 'Decline Quote'}
               </button>
               <button type="button" className={w.textBtn} onClick={() => setOpen('')}>
                 Cancel
@@ -242,7 +242,7 @@ function RequestCard({ r, partner, ws, onChange, onContact }: { r: BulkRequest; 
             {r.status === 'quoted' && (
               <>
                 <button type="button" className={w.lightMd} aria-expanded={open === 'changes'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'changes' ? '' : 'changes')}>
-                  Ask for changes
+                  Ask for Changes
                 </button>
                 <button type="button" className={w.textBtn} aria-expanded={open === 'decline'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'decline' ? '' : 'decline')}>
                   Decline
@@ -330,7 +330,7 @@ function ContactModal({ r, onClose }: { r: BulkRequest | null; onClose: () => vo
                 {t[1]} {t[2]}
               </strong>
               <button type="button" className={w.textBtn} onClick={() => setTopic('')}>
-                Change topic
+                Change Topic
               </button>
             </span>
             {t[4].map(([k, label, ph]) => (
@@ -354,7 +354,7 @@ function ContactModal({ r, onClose }: { r: BulkRequest | null; onClose: () => vo
               </span>
             </span>
             <button type="button" className={w.doneDark} onClick={send}>
-              Send to the CLP team
+              Send to the CLP Team
             </button>
           </div>
         )}

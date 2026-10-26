@@ -54,7 +54,7 @@ function Saved() {
   return (
     <div className={styles.card}>
       <span className={styles.kicker}>CLP MESSAGES</span>
-      <h1 className={styles.title}>Your conversations</h1>
+      <h1 className={styles.title}>Your Conversations</h1>
       {list.length === 0 ? (
         <p className={styles.muted}>Conversations you start on CLP (a question to a partner, an intro, or a message about your booking) show here on this device. Each one also has its private link.</p>
       ) : (
@@ -131,7 +131,7 @@ function Conversation({ id, t }: { id: string; t: string }) {
         <h1 className={styles.title}>This conversation isn’t available</h1>
         <p className={styles.muted}>Its link may be incomplete. Open it again from your e-mail, or from the page where you started it.</p>
         <Link href="/messages/" className={styles.secondary}>
-          Your conversations
+          Your Conversations
         </Link>
       </div>
     );
@@ -159,7 +159,7 @@ function Conversation({ id, t }: { id: string; t: string }) {
         </span>
         {partner.slug && (
           <Link href={partnerHref(partner.slug)} className={styles.secondarySm}>
-            View page
+            View Page
           </Link>
         )}
       </div>
@@ -212,10 +212,10 @@ function Conversation({ id, t }: { id: string; t: string }) {
         )}
         <div className={styles.foot}>
           <span>
-            Your e-mail and phone stay private. Keep this page’s link to yourself: it opens your conversation. <Link href="/messages/">Your conversations</Link>
+            Your e-mail and phone stay private. Keep this page’s link to yourself: it opens your conversation. <Link href="/messages/">Your Conversations</Link>
           </span>
           <button type="button" className={styles.report} onClick={() => setReporting(true)}>
-            Report a concern to CLP
+            Report a Concern to CLP
           </button>
         </div>
       </div>
@@ -244,7 +244,7 @@ function ReportForm({ id, t, onClose }: { id: string; t: string; onClose: () => 
   return (
     <div className={styles.overlay} onMouseDown={(e) => e.target === e.currentTarget && state !== 'busy' && onClose()}>
       <form className={styles.dialog} role="dialog" aria-modal="true" aria-label="Report a concern to CLP" onSubmit={send}>
-        <strong className={styles.dialogTitle}>Report a concern to CLP</strong>
+        <strong className={styles.dialogTitle}>Report a Concern to CLP</strong>
         {state === 'done' ? (
           <>
             <p className={styles.muted}>Thanks. CLP Trust & Safety has your report and answers within 24 hours.</p>
@@ -262,7 +262,7 @@ function ReportForm({ id, t, onClose }: { id: string; t: string; onClose: () => 
                 Cancel
               </button>
               <button type="submit" className={styles.danger} disabled={state === 'busy' || !text.trim()}>
-                {state === 'busy' ? 'Sending…' : 'Send report'}
+                {state === 'busy' ? 'Sending…' : 'Send Report'}
               </button>
             </div>
           </>

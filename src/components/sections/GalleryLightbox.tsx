@@ -631,7 +631,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
                 />
               </span>
               <span className={styles.previewHint} aria-hidden>
-                ↻ {side === 'front' ? 'See the back' : 'See the front'}
+                ↻ {side === 'front' ? 'See the Back' : 'See the Front'}
               </span>
             </button>
             <div className={styles.sideSwitch} role="radiogroup" aria-label="Side">
@@ -717,7 +717,7 @@ export default function GalleryLightbox({ galleryId, albumTitle, shareable, by, 
                 </button>
               </span>
               <button type="button" className={styles.primary} onClick={addPrint}>
-                Add to cart · {dollars(unit * qty)}
+                Add to Cart · {dollars(unit * qty)}
               </button>
             </div>
             <span className={styles.muted}>Printed on demand and shipped by our print partner. Ships in {product.ships}.</span>

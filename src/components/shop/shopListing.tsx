@@ -3,13 +3,14 @@
 
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
-import { LuArrowUpDown } from 'react-icons/lu';
+import { LuArrowUpDown, LuDollarSign } from 'react-icons/lu';
 import DirectorySearch, { fold, type Place } from '@/components/sections/DirectorySearch';
 import ds from '@/components/sections/DirectorySearch.module.css';
 import lc from '@/components/sections/ListingCard.module.css';
 import t from '@/components/sections/TeamDirectory.module.css';
 import FilterChip, { type ChipOption } from '@/components/ui/FilterChip';
 import MobileFilters from '@/components/ui/MobileFilters';
+import PriceRangeChip, { type PriceRange } from '@/components/ui/PriceRangeChip';
 import PillSelect from '@/components/ui/PillSelect';
 import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
 import { money } from '@/content/cart';
@@ -76,6 +77,25 @@ export function ShopSearch({
   );
 }
 
+/**
+ * The query a list's change leads to (the change's keys set, or removed when empty; any change but a page's goes back
+ * to the first page). Several changes in one go (the phones' filter sheet applies each filter, in one click) each
+ * build on the one before, not on the address as it was when the page last drew.
+ */
+let pending: { from: string; query: string } | null = null;
+export function nextQuery(current: string, next: Record<string, string>) {
+  const q = new URLSearchParams(pending && pending.from === current ? pending.query : current);
+  for (const [k, v] of Object.entries(next)) {
+    if (v) q.set(k, v);
+    else q.delete(k);
+  }
+  if (!('page' in next)) q.delete('page');
+  const query = q.toString();
+  if (!pending) queueMicrotask(() => (pending = null));
+  pending = { from: current, query };
+  return query;
+}
+
 /** A filter of a list's bar: a pill (its icon and "All …" name) opening its options, one at a time. */
 export type ListChip = {
   id: string;
@@ -90,72 +110,136 @@ export type ListChip = {
   count: (value: string) => number;
 };
 
+/** A list's Price filter: the experiences' slider over the list's prices, its value a range ("25-80", "" for any). */
+export type ListPrice = {
+  bounds: PriceRange;
+  value: string;
+  onChange: (value: string) => void;
+  count: (value: string) => number;
+};
+
+/** The phones' sheet has no slider: its Price is these ranges (each a slider range), as the experiences' price options. */
+const priceOptions = ([, hi]: PriceRange) =>
+  [
+    { value: '0-24.99', label: 'Under $25' },
+    { value: '25-49.99', label: '$25 to $50' },
+    { value: '50-99.99', label: '$50 to $100' },
+    { value: `100-${Math.max(100, Math.ceil(hi))}`, label: '$100 & Up' },
+  ];
+
 /**
- * A list's bar, as the experiences': its filters (a sheet on phones), Clear All, then the sort and the grid / list
- * switch (and anything after them, `end`).
+ * A list's bar, as the experiences': its filters with Price among them, A to Z by name (as is each one's options; a
+ * sheet on phones), Clear All, then the sort and the grid / list switch (and anything after them, `end`).
  */
 export function ListToolbar<S extends string>({
   chips,
+  price,
   sort,
   view,
   onView,
   end,
 }: {
   chips: ListChip[];
+  price?: ListPrice;
   sort?: { value: S; options: readonly { value: S; label: string }[]; onChange: (value: S) => void };
   view?: ResultsView;
   onView?: (view: ResultsView) => void;
   end?: ReactNode;
 }) {
   const [open, setOpen] = useState<string | null>(null);
-  // Filters always read in Title Case, whatever the data says.
-  const shown = chips.filter((c) => c.options.length > 0).map((c) => ({ ...c, options: c.options.map((o) => ({ ...o, label: titleCase(o.label) })) }));
-  const applied = shown.filter((c) => c.value).length;
+  // Filters always read in Title Case, whatever the data says: the filters A to Z by name (their panel's heading),
+  // and their options A to Z.
+  const shown = chips
+    .filter((c) => c.options.length > 0)
+    .map((c) => ({ ...c, options: c.options.map((o) => ({ ...o, label: titleCase(o.label) })).sort((a, b) => a.label.localeCompare(b.label)) }))
+    .sort((a, b) => a.heading.localeCompare(b.heading));
+  // Price shows when the list's prices differ, in its A to Z place.
+  const priced = price && price.bounds[1] > price.bounds[0] ? price : undefined;
+  const priceAt = shown.filter((c) => c.heading.localeCompare('Price') < 0).length;
+  const sheetPrice = priced && {
+    id: 'price',
+    heading: 'Price',
+    options: priceOptions(priced.bounds).map((o) => ({ ...o, count: priced.count(o.value) })),
+    value: priced.value ? [priced.value] : [],
+    single: true,
+  };
+  // The phones' sheet in the same order.
+  const sections = shown.map((c) => ({ id: c.id, heading: c.heading, options: c.options, value: c.value ? [c.value] : [], single: true }));
+  const sheetSections = [...sections.slice(0, priceAt), ...(sheetPrice ? [sheetPrice] : []), ...sections.slice(priceAt)];
+  const applied = shown.filter((c) => c.value).length + (priced?.value ? 1 : 0);
+  const chipOf = (c: (typeof shown)[number]) => (
+    <FilterChip
+      key={c.id}
+      name={c.name}
+      heading={c.heading}
+      icon={c.icon}
+      plural={c.plural}
+      single
+      options={c.options}
+      value={c.value ? [c.value] : []}
+      open={open === c.id}
+      onOpenChange={(o) => setOpen(o ? c.id : null)}
+      resultsFor={(draft) => c.count(draft[0] ?? '')}
+      onApply={(values) => {
+        c.onChange(values[0] ?? '');
+        setOpen(null);
+      }}
+    />
+  );
   return (
     <div className={t.bar}>
       <div className={t.barRow}>
         <div className={t.filters}>
-          {shown.map((c) => (
-            <FilterChip
-              key={c.id}
-              name={c.name}
-              heading={c.heading}
-              icon={c.icon}
-              plural={c.plural}
-              single
-              options={c.options}
-              value={c.value ? [c.value] : []}
-              open={open === c.id}
-              onOpenChange={(o) => setOpen(o ? c.id : null)}
-              resultsFor={(draft) => c.count(draft[0] ?? '')}
-              onApply={(values) => {
-                c.onChange(values[0] ?? '');
+          {/* The pills A to Z, Price in its place. */}
+          {shown.slice(0, priceAt).map(chipOf)}
+          {priced && (
+            <PriceRangeChip
+              name="Price"
+              heading="Price Range"
+              icon={<LuDollarSign />}
+              bounds={priced.bounds}
+              value={priced.value}
+              open={open === 'price'}
+              onOpenChange={(o) => setOpen(o ? 'price' : null)}
+              count={priced.count}
+              onApply={(v) => {
+                priced.onChange(v);
                 setOpen(null);
               }}
             />
-          ))}
+          )}
+          {shown.slice(priceAt).map(chipOf)}
           {applied > 0 && (
-            <button type="button" className={t.clearAll} onClick={() => shown.forEach((c) => c.value && c.onChange(''))}>
+            <button
+              type="button"
+              className={t.clearAll}
+              onClick={() => {
+                shown.forEach((c) => c.value && c.onChange(''));
+                if (priced?.value) priced.onChange('');
+              }}
+            >
               Clear All
             </button>
           )}
         </div>
         {/* Phones: one Filters button (a sheet) in place of the pills and the sort menu. */}
-        {(shown.length > 0 || sort) && (
+        {(shown.length > 0 || priced || sort) && (
           <div className={t.mobileFilters}>
             <MobileFilters
-              sections={shown.map((c) => ({ id: c.id, heading: c.heading, options: c.options, value: c.value ? [c.value] : [], single: true }))}
+              sections={sheetSections}
               sort={sort}
               applied={applied}
               countFor={(draft) => {
                 const changed = shown.find((c) => (draft[c.id]?.[0] ?? '') !== c.value);
-                return changed ? changed.count(draft[changed.id]?.[0] ?? '') : null;
+                if (changed) return changed.count(draft[changed.id]?.[0] ?? '');
+                return priced && (draft.price?.[0] ?? '') !== priced.value ? priced.count(draft.price?.[0] ?? '') : null;
               }}
               onApply={(draft, nextSort) => {
                 shown.forEach((c) => {
                   const next = draft[c.id]?.[0] ?? '';
                   if (next !== c.value) c.onChange(next);
                 });
+                if (priced && (draft.price?.[0] ?? '') !== priced.value) priced.onChange(draft.price?.[0] ?? '');
                 if (sort && nextSort && nextSort !== sort.value) sort.onChange(nextSort as S);
               }}
             />

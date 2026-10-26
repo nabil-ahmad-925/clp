@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
+import { onPartnerSession, partnerSessionSnapshot, userFromSnapshot } from '@/content/partnerSession';
 import { mainNav, site } from '@/content/site';
 import type { NavItem } from '@/content/types';
 import styles from './FullscreenMenu.module.css';
@@ -15,6 +16,8 @@ const isCurrent = (item: NavItem, pathname: string) =>
 
 export default function FullscreenMenu({ open, onClose }: Props) {
   const pathname = usePathname();
+  // The CLP account signed in on this browser: Sign In, or My Account once signed in (both the Sign In page).
+  const signedIn = Boolean(userFromSnapshot(useSyncExternalStore(onPartnerSession, partnerSessionSnapshot, () => '')));
   // Index of the parent item whose sub-menu is shown (Salient's "sub-view" navigation).
   const [subview, setSubview] = useState<number | null>(null);
   // Always reopen at the top level.
@@ -51,9 +54,10 @@ export default function FullscreenMenu({ open, onClose }: Props) {
     setSubview(null);
   };
 
+  const account = { item: { label: signedIn ? 'MY ACCOUNT' : 'SIGN IN', href: '/sign-in/' } };
   const items: { item: NavItem; back?: boolean }[] =
     subview === null
-      ? mainNav.map((item) => ({ item }))
+      ? mainNav.flatMap((item) => (item.icon === 'cart' ? [account, { item }] : [{ item }]))
       : [{ item: { label: 'Back', href: '#' }, back: true }, ...(mainNav[subview].children ?? []).map((item) => ({ item }))];
 
   return (

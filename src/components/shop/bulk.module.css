@@ -28,14 +28,6 @@
   padding: 24px 48px 24px;
 }
 
-.heroTop {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
 /* Who's looking: a partner (signed in) or a guest, with the sign-in / sign-out switch. */
 .who {
   display: flex;

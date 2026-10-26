@@ -93,6 +93,13 @@ export async function partnerFirstPassword(email: string, session: string, passw
   return r.user;
 }
 
+/** Forgot password: e-mails a 6-digit reset code (the same answer for an unknown address). */
+export const partnerForgotPassword = (email: string) => call<{ sent: true }>('/auth/forgot', { method: 'POST', body: JSON.stringify({ email }) });
+
+/** A new password with the code from the forgot-password e-mail; then they sign in with it. */
+export const partnerResetPassword = (email: string, code: string, password: string) =>
+  call<{ reset: true }>('/auth/reset', { method: 'POST', body: JSON.stringify({ email, code, password }) });
+
 let refreshing: Promise<Session | null> | null = null;
 
 /** A fresh access token; null (and signed out) once the sign-in has ended. */

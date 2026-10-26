@@ -31,7 +31,7 @@ export default function BookingReview({ id, token }: { id: string; token: string
   const partner = state.partner;
   const link = partner?.live ? (
     <Link href={partnerHref(partner.slug)} className={s.link}>
-      {partner.name}’s page →
+      {partner.name}’s Page →
     </Link>
   ) : null;
 

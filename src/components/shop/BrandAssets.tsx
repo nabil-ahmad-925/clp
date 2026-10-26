@@ -103,7 +103,7 @@ export function BrandAssetsBar({ studio, ws }: { studio: StudioBrand; ws: Wholes
             <span className={w.track}>
               <span />
             </span>
-            Show mockups
+            Show Mockups
           </button>
         </span>
       </div>
@@ -160,7 +160,7 @@ export function AssetsPanel({ studio, ws, selected, onPick, onClose }: { studio:
       <div className={w.assetGrid}>
         <button type="button" className={w.uploadTile} disabled={busy} onClick={() => fileRef.current?.click()}>
           <span className={w.plus}>+</span>
-          {busy ? 'Adding…' : 'Upload logo or art'}
+          {busy ? 'Adding…' : 'Upload Logo or Art'}
           <span className={w.uploadHint}>PNG, JPG, WebP or SVG</span>
         </button>
         <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />

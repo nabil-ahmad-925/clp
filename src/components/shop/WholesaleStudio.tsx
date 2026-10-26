@@ -320,7 +320,7 @@ export default function WholesaleStudio({
         <div className={w.stRight}>
           {!sh.fixed && (
             <button type="button" className={w.stBtn} onClick={() => setAllc(!allc)}>
-              {allc ? 'Back to design' : 'See all colors'}
+              {allc ? 'Back to Design' : 'See All Colors'}
             </button>
           )}
           <button
@@ -335,7 +335,7 @@ export default function WholesaleStudio({
               setSaved(true);
             }}
           >
-            {saved ? '✓ Saved' : 'Save draft'}
+            {saved ? '✓ Saved' : 'Save Draft'}
           </button>
           <button type="button" className={w.stDone} onClick={onClose}>
             Done
@@ -414,17 +414,17 @@ export default function WholesaleStudio({
               </div>
               <button type="button" className={w.drop} disabled={busy} onClick={() => fileRef.current?.click()}>
                 <strong>{busy ? 'Adding…' : 'Drop a file or browse'}</strong>
-                <span>From this computer</span>
+                <span>From This Computer</span>
               </button>
               <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />
               <div className={w.upSources}>
                 <button type="button" aria-pressed={linkOpen} onClick={() => setLinkOpen(!linkOpen)}>
                   <span style={{ background: '#555555' }}>↗</span>
-                  Paste a link
+                  Paste a Link
                 </button>
                 <button type="button" onClick={() => setTool('brand')}>
                   <span style={{ background: '#8A6F33' }}>★</span>
-                  Brand assets
+                  Brand Assets
                 </button>
               </div>
               {linkOpen && (
@@ -460,7 +460,7 @@ export default function WholesaleStudio({
           {tool === 'brand' && (
             <div className={w.stSec}>
               <div className={w.stSecHead}>
-                <strong>Brand assets</strong>
+                <strong>Brand Assets</strong>
                 <span>
                   Pick artwork for <strong>{LOCN[loc]}</strong>.
                 </span>
@@ -573,7 +573,7 @@ export default function WholesaleStudio({
                   <Range label="Rotate" txt={`${t0.r}°`} min={-45} max={45} step={1} value={t0.r} onChange={(r) => setTf({ r })} />
                   {sel.kind === 'img' && (
                     <button type="button" className={w.switchRow} aria-pressed={Boolean(d.nobg[sel.id])} onClick={() => change({ nobg: { ...d.nobg, [sel.id]: !d.nobg[sel.id] } })}>
-                      Remove background
+                      Remove Background
                       <span className={w.track}>
                         <span />
                       </span>
@@ -585,10 +585,10 @@ export default function WholesaleStudio({
                   <span className={w.muted}>No logo on this spot yet.</span>
                   <span>
                     <button type="button" className={w.darkSm} onClick={() => setTool('brand')}>
-                      Use a brand asset
+                      Use a Brand Asset
                     </button>
                     <button type="button" className={w.lightSm} onClick={() => setTool('upload')}>
-                      Import a file
+                      Import a File
                     </button>
                   </span>
                 </div>
@@ -628,7 +628,7 @@ export default function WholesaleStudio({
                   <div className={w.posRow}>
                     <Pad go={(dx, dy, c) => setGfx(c ? { dx: 0, dy: 0 } : { dx: gfx.dx + dx * 1.2, dy: gfx.dy + dy * 1.2 })} />
                     <button type="button" className={w.removeLink} onClick={() => setGfx(null)}>
-                      Remove graphic
+                      Remove Graphic
                     </button>
                   </div>
                 </>
@@ -651,7 +651,7 @@ export default function WholesaleStudio({
                 }}
               >
                 <span>CLP</span>
-                {imported ? '✓ 14 players from your team roster' : 'Import from your CLP team roster'}
+                {imported ? '✓ 14 players from your team roster' : 'Import from Your CLP Team Roster'}
               </button>
               <label className={w.rostField}>
                 Or type one player per line: NAME, NUMBER

@@ -136,7 +136,7 @@ function LoginForm({ button, children }: { button: string; children?: ReactNode 
         </label>
       )}
       <button type="submit" className={styles.primary} disabled={busy}>
-        {busy ? 'One moment…' : step === 'signin' ? button : step === 'new' ? 'Save Password' : step === 'forgot' ? 'Send Code' : 'Reset Password'}
+        {busy ? 'One Moment…' : step === 'signin' ? button : step === 'new' ? 'Save Password' : step === 'forgot' ? 'Send Code' : 'Reset Password'}
       </button>
       {note && (
         <span className={styles.note} role="status">
@@ -145,11 +145,11 @@ function LoginForm({ button, children }: { button: string; children?: ReactNode 
       )}
       {step === 'signin' ? (
         <button type="button" className={styles.link} onClick={() => go('forgot')}>
-          Forgot your password?
+          Forgot Your Password?
         </button>
       ) : (
         <button type="button" className={styles.link} onClick={() => go('signin')}>
-          Back to sign in
+          Back to Sign In
         </button>
       )}
       {step === 'forgot' && <span className={styles.small}>Haven&rsquo;t signed in yet? Use the temporary password from your invitation email.</span>}

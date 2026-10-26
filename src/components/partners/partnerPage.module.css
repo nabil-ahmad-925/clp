@@ -1548,6 +1548,13 @@ a.collab:hover .collabImage img {
   gap: 12px;
 }
 
+.shopToolsEnd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
 /* A product card's photo (or the partner's mark) filling the card's 4:3 frame. */
 .productCardMedia > img {
   display: block;
@@ -1838,6 +1845,63 @@ article:hover .productCardMedia > img {
   height: auto;
   padding: 10px 12px;
   resize: vertical;
+}
+
+/* An update or news item read in the popup: its photo across the top, then the article's text. */
+.postImage {
+  display: block;
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
+  overflow: hidden;
+  background: #111;
+}
+
+.postImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.postText {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* Verified by CLP: the seal on the logo's lower right corner. */
+.verifiedMark {
+  position: absolute;
+  top: 46px;
+  left: 166px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* A form's drop-down (FieldSelect's trigger) as the handoff's select: the fields' 44px box, its choice in bold. */
+.selectField {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d9d7d2;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.selectField:focus-visible {
+  border-color: #111;
+  outline: none;
+}
+
+/* The message popup's send button (the handoff's 48px). */
+.btnSend {
+  height: 48px;
 }
 
 .rule2 {
@@ -2208,6 +2272,13 @@ article:hover .productCardMedia > img {
     font-size: 30px;
   }
 
+  .verifiedMark {
+    top: 32px;
+    left: 112px;
+    width: 28px;
+    height: 28px;
+  }
+
   .identityInner {
     grid-template-columns: minmax(0, 1fr);
     padding-top: 64px;
@@ -2372,6 +2443,21 @@ button.person {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: auto;
+  padding-top: 8px;
+}
+
+/* The handoff's bio: the name at 30px tight, the bio at 1.7, the runs and checks as 30px chips. */
+.memberName {
+  line-height: 1.1;
+}
+
+.memberBio {
+  line-height: 1.7;
+}
+
+.memberTag {
+  height: 30px;
+  font-size: 12px;
 }
 
 .videoBlank {
@@ -2475,8 +2561,6 @@ button.person {
     min-height: 280px;
   }
 }
-
-/* "A question": the adults-only confirmation. */
 
 /* ---- Apply with CLP (a job's application form, the handoff's) ---- */
 .applyForm {

@@ -42,7 +42,7 @@ export default function PartnerRoute() {
         <h1 className={s.sectionTitle}>Partner not found</h1>
         <p className={s.muted}>This partner page isn’t available. It may not be live yet.</p>
         <Link href="/clp-partners/" className={`${s.btn} ${s.btnDark}`}>
-          See all CLP Partners
+          See All CLP Partners
         </Link>
       </div>
     );
@@ -53,7 +53,7 @@ export default function PartnerRoute() {
       <div className={s.state} data-header-tone="dark">
         <p>{state.error}</p>
         <button type="button" className={`${s.btn} ${s.btnDark}`} onClick={() => window.location.reload()}>
-          Try again
+          Try Again
         </button>
       </div>
     );

@@ -331,7 +331,7 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
                   <span>{summary || 'Move, resize and rotate your logo, and add text, on each print spot.'}</span>
                 </span>
                 <button type="button" className={w.darkBtn} onClick={() => setStudioOpen('edit')}>
-                  Design now
+                  Design Now
                 </button>
               </div>
             </div>
@@ -427,10 +427,10 @@ export default function WholesaleItem({ item, studio, ws, loc: shipTo, onSent, o
                 </span>
                 <span className={w.doneBtns}>
                   <button type="button" className={w.goldBtn} onClick={onShowRequests}>
-                    View quote requests
+                    View Quote Requests
                   </button>
                   <Link href={shopHref({ view: 'bulk' })} className={w.ghostBtn}>
-                    Keep browsing
+                    Keep Browsing
                   </Link>
                 </span>
               </div>

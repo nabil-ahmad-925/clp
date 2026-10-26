@@ -9,8 +9,9 @@ import { setHeaderBrand } from '@/components/layout/headerBrand';
 import { PartnerCard } from '@/components/partners/PartnerDirectory';
 import t from '@/components/sections/TeamDirectory.module.css';
 import Pager from '@/components/ui/Pager';
+import { inPriceRange, parsePriceRange } from '@/components/ui/PriceRangeChip';
 import { type ResultsView } from '@/components/ui/ViewToggle';
-import { LuDollarSign, LuShapes, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
+import { LuShapes, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
 import { BULK_CATEGORIES } from '@/content/bulk';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, money, removeLine, setLineQty, type Cart } from '@/content/cart';
 import { partnerHref, partnerType } from '@/content/partnerPages';
@@ -43,7 +44,7 @@ import {
 } from '@/content/storefront';
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
-import { CardGrid, LIST_SIZES, ListToolbar, ProductCard, ShopSearch, ViewAll, hasWords, inPlace, storePlaces, type ListChip } from './shopListing';
+import { CardGrid, LIST_SIZES, ListToolbar, ProductCard, ShopSearch, ViewAll, hasWords, inPlace, nextQuery, storePlaces, type ListChip } from './shopListing';
 import { Arrow, CategoryIcon, LockIcon } from './shopIcons';
 import s from './shop.module.css';
 
@@ -74,13 +75,7 @@ function useAddress() {
   const router = useRouter();
   const get = (key: string) => params.get(key) ?? '';
   const set = (next: Record<string, string>, step = false) => {
-    const q = new URLSearchParams(params.toString());
-    for (const [k, v] of Object.entries(next)) {
-      if (v) q.set(k, v);
-      else q.delete(k);
-    }
-    if (!('page' in next)) q.delete('page');
-    const query = q.toString();
+    const query = nextQuery(params.toString(), next);
     const href = `${window.location.pathname}${query ? `?${query}` : ''}`;
     if (step) router.push(href, { scroll: false });
     else router.replace(href, { scroll: false });
@@ -126,9 +121,15 @@ export default function ShopView() {
   }, []);
 
   const cartCount = cart?.count ?? 0;
+  // Wholesale (its catalog and design studio) is "CLP │ WHOLESALE", leading to its own home.
+  const wholesale = params.get('view') === 'bulk' || params.get('view') === 'studio';
   useEffect(() => {
-    setHeaderBrand({ label: 'SHOP', shop: true, cartCount, onCart: () => setCartOpen(true) });
-  }, [cartCount]);
+    setHeaderBrand(
+      wholesale
+        ? { label: 'WHOLESALE', shop: true, href: shopHref({ view: 'bulk' }), cartCount, onCart: () => setCartOpen(true) }
+        : { label: 'SHOP', shop: true, href: shopHref(), cartCount, onCart: () => setCartOpen(true) },
+    );
+  }, [cartCount, wholesale]);
   useEffect(() => () => setHeaderBrand(null), []);
 
   const slug = params.get('store') ?? '';
@@ -197,7 +198,7 @@ function Notice({ text, back }: { text: string; back?: ShopStore }) {
         <div className={s.empty}>
           <p>{text}</p>
           <Link href={back ? partnerShopHref(back) : shopHref()} className={s.btnDark}>
-            {back ? `Back to ${back.name}` : 'Back to the shop'}
+            {back ? `Back to ${back.name}` : 'Back to the Shop'}
           </Link>
         </div>
       </div>
@@ -365,7 +366,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
             <span className={s.bulkBandTitle}>Outfit Your Team, Staff or Event</span>
             <span className={s.bulkBandLine}>Uniforms, socks, pinnies, tents, inflatables, medals and more. Made to order with your logo and shipped in bulk.</span>
             <Link href={shopHref({ view: 'bulk' })} className={s.btnGold}>
-              Start a bulk order
+              Start a Bulk Order
             </Link>
           </div>
           <div className={s.bulkBandGrid}>
@@ -430,7 +431,7 @@ function Directory({ data }: { data: ShopData }) {
   };
   const sportChip: ListChip = {
     id: 'sport',
-    name: 'All Sports',
+    name: 'Sports',
     heading: 'Sport',
     icon: <LuVolleyball />,
     plural: 'sports',
@@ -495,31 +496,12 @@ type ProductFilter = Omit<ListChip, 'options' | 'value' | 'onChange' | 'count'> 
   test: (p: ShopProduct, value: string) => boolean;
 };
 
-/** The Price filter's ranges (in dollars, the top one open). */
-const PRICE_RANGES = [
-  { value: '0-25', label: 'Under $25', min: 0, max: 25 },
-  { value: '25-50', label: '$25 to $50', min: 25, max: 50 },
-  { value: '50-100', label: '$50 to $100', min: 50, max: 100 },
-  { value: '100-', label: '$100 & Up', min: 100, max: Infinity },
-];
-const PRICE_FILTER: ProductFilter = {
-  id: 'price',
-  name: 'Price',
-  heading: 'Price Range',
-  icon: <LuDollarSign />,
-  plural: 'ranges',
-  options: PRICE_RANGES.map(({ value, label }) => ({ value, label })),
-  test: (p, v) => {
-    const r = PRICE_RANGES.find((x) => x.value === v);
-    return !r || (p.price >= r.min && p.price < r.max);
-  },
-};
-
 /**
- * Products with the experiences' bar (All Categories and any other filters, the sort, grid or list) and pages (rows of
- * four). Its settings live in the address (?category=&sort=&page=&per=&cards=, and each filter's own).
+ * Products with the experiences' bar (All Categories and any other filters, with `price` the experiences' Price slider,
+ * the sort, grid or list) and pages (rows of four). Its settings live in the address (?category=&price=&sort=&page=&per=
+ * &cards=, and each filter's own).
  */
-function Products({ products, stores, filters = [] }: { products: ShopProduct[]; stores: ShopStore[]; filters?: ProductFilter[] }) {
+function Products({ products, stores, filters = [], price = false }: { products: ShopProduct[]; stores: ShopStore[]; filters?: ProductFilter[]; price?: boolean }) {
   const { get, set } = useAddress();
   const topRef = useRef<HTMLElement>(null);
   const cats = [...new Set(products.map((p) => p.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
@@ -528,7 +510,10 @@ function Products({ products, stores, filters = [] }: { products: ShopProduct[];
     ...filters,
   ];
   const values = Object.fromEntries(all.map((f) => [f.id, f.options.some((o) => o.value === get(f.id)) ? get(f.id) : '']));
-  const matching = (vals: Record<string, string>) => products.filter((p) => all.every((f) => !vals[f.id] || f.test(p, vals[f.id])));
+  const priceValue = price && parsePriceRange(get('price')) ? get('price') : '';
+  const matching = (vals: Record<string, string>, pr = priceValue) =>
+    products.filter((p) => inPriceRange(p.price, pr) && all.every((f) => !vals[f.id] || f.test(p, vals[f.id])));
+  const prices = products.map((p) => p.price);
   const sort: Sort = SORTS.some((o) => o.value === get('sort')) ? (get('sort') as Sort) : 'featured';
   const view: ResultsView = get('cards') === 'list' ? 'list' : 'grid';
   const per = sizeOf(get('per'));
@@ -547,7 +532,14 @@ function Products({ products, stores, filters = [] }: { products: ShopProduct[];
   return (
     <div className={s.listingBand} data-listing="">
       <section ref={topRef} className={`${s.section} ${s.products}`}>
-        <ListToolbar chips={chips} sort={{ value: sort, options: SORTS, onChange: (v) => set({ sort: v === 'featured' ? '' : v }) }} view={view} onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })} />
+        <ListToolbar
+          chips={chips}
+          price={
+            price && prices.length
+              ? { bounds: [Math.min(...prices), Math.max(...prices)], value: priceValue, onChange: (v) => set({ price: v }), count: (v) => matching(values, v).length }
+              : undefined
+          }
+          sort={{ value: sort, options: SORTS, onChange: (v) => set({ sort: v === 'featured' ? '' : v }) }} view={view} onView={(v) => set({ cards: v === 'list' ? 'list' : '', page: get('page') })} />
         {shown.length === 0 ? (
           <p className={s.empty}>{products.length ? 'No products match. Try another filter.' : 'No products here yet.'}</p>
         ) : (
@@ -650,7 +642,7 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
         onSearch={(nq, nloc) => set({ q: nq, loc: nloc })}
         onGrey
       />
-      <Products products={products} stores={data.stores} filters={view === 'all' ? [PRICE_FILTER] : []} />
+      <Products products={products} stores={data.stores} price={view === 'all' || view === 'new'} />
       <div className={s.bottomSpace} />
     </>
   );
@@ -668,7 +660,7 @@ function Exclusives({ data }: { data: ShopData }) {
   const filters: ProductFilter[] = [
     {
       id: 'sport',
-      name: 'All Sports',
+      name: 'Sports',
       heading: 'Sport',
       icon: <LuVolleyball />,
       plural: 'sports',
@@ -684,7 +676,6 @@ function Exclusives({ data }: { data: ShopData }) {
       options: ex.drops.map((d) => ({ value: d, label: d })).sort((a, b) => a.label.localeCompare(b.label)),
       test: (p, v) => p.collection === v,
     },
-    PRICE_FILTER,
   ];
   return (
     <>
@@ -695,7 +686,7 @@ function Exclusives({ data }: { data: ShopData }) {
           <p className={s.empty}>CLP Exclusives are on their way. Check back soon.</p>
         </section>
       ) : (
-        <Products products={products} stores={data.stores} filters={filters} />
+        <Products products={products} stores={data.stores} filters={filters} price />
       )}
       <div className={s.bottomSpace} />
     </>
@@ -813,7 +804,7 @@ function Gate({ store, onOpen }: { store: ShopStore; onOpen: (products: ShopProd
           {error && <span className={s.gateError}>That password didn’t work. Check your invite and try again.</span>}
           <span className={s.gateRule} />
           <span className={s.gateFoot}>
-            Not invited? <Link href={partnerHref(store.slug)}>Contact {store.short || store.name}</Link> · <Link href={shopHref()}>Back to shop</Link>
+            Not invited? <Link href={partnerHref(store.slug)}>Contact {store.short || store.name}</Link> · <Link href={shopHref()}>Back to Shop</Link>
           </span>
         </form>
       </div>
@@ -861,11 +852,11 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
             </div>
             <div className={s.storeActions}>
               <button type="button" className={s.btnGhost} onClick={share}>
-                {copied ? 'Link copied ✓' : 'Share store'}
+                {copied ? 'Link Copied ✓' : 'Share Store'}
               </button>
               {!store.shop.exclusive && (
                 <Link href={partnerHref(store.slug)} className={s.btnWhite}>
-                  View full profile ↗
+                  View Full Profile ↗
                 </Link>
               )}
             </div>
@@ -928,7 +919,7 @@ function StorePage({ data, store }: { data: ShopData; store: ShopStore }) {
               <strong className={s.profileName}>{store.name}</strong>
               <span className={s.profileText}>The store is one part of {short} on CLP. See everything they offer, from programs and events to photos and news.</span>
               <Link href={partnerHref(store.slug)} className={s.btnWhite}>
-                View full profile ↗
+                View Full Profile ↗
               </Link>
             </div>
             <div className={s.profileLinks}>
@@ -1077,7 +1068,7 @@ export function ProductDetail({
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                 </svg>
-                View larger
+                View Larger
               </span>
             </>
           ) : (
@@ -1160,11 +1151,11 @@ export function ProductDetail({
             </button>
           </span>
           <button type="button" className={s.addBtn} disabled={Boolean(busy) || disabled} onClick={() => (added ? onViewCart() : add(false))}>
-            {busy === 'add' ? 'Adding…' : added ? 'Added ✓ · View cart' : 'Add to cart'}
+            {busy === 'add' ? 'Adding…' : added ? 'Added ✓ · View Cart' : 'Add to Cart'}
           </button>
         </div>
         <button type="button" className={s.buyNow} disabled={Boolean(busy) || disabled} onClick={() => add(true)}>
-          {busy === 'buy' ? 'Opening checkout…' : 'Buy now · one-step checkout'}
+          {busy === 'buy' ? 'Opening Checkout…' : 'Buy Now · One-Step Checkout'}
         </button>
         {error && (
           <p className={s.error} role="alert">
@@ -1205,7 +1196,7 @@ export function ProductDetail({
           ))}
         </div>
         <button type="button" className={s.shareLink} onClick={share}>
-          {copied ? 'Link copied ✓' : 'Share this product'}
+          {copied ? 'Link Copied ✓' : 'Share This Product'}
         </button>
       </div>
     </div>

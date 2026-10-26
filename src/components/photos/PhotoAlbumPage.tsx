@@ -121,7 +121,7 @@ export default function PhotoAlbumPage({ id, photoId }: { id: string; photoId: s
         <div className={s.page} data-header-tone="dark">
           <div className={s.head}>
             <Link href="/photos/" className={s.back}>
-              ← All albums
+              ← All Albums
             </Link>
             <p className={s.notice}>{state.kind === 'missing' ? 'This album isn’t available (it may have closed).' : state.message}</p>
           </div>
@@ -232,7 +232,7 @@ function AlbumHead({ album, filters }: { album: LiveAlbum; filters?: { label: st
   return (
     <div className={s.head}>
       <Link href="/photos/" className={s.back}>
-        ← All albums
+        ← All Albums
       </Link>
       <div className={s.headText}>
         <h2 className={s.title}>{album.name}</h2>
@@ -378,7 +378,7 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
         {photo.download && (
           <a className={s.option} href={photo.download} download>
             <span>
-              <strong>Free download</strong>
+              <strong>Free Download</strong>
               <span>Full resolution · free for personal use</span>
             </span>
             <strong>Free</strong>
@@ -431,7 +431,7 @@ function PhotoView({ album, photo, number, photos }: { album: LiveAlbum; photo: 
               <strong>{dollars(price)}</strong>
             </div>
             <button type="button" className={s.addCart} onClick={addPrint}>
-              Add to cart · {dollars(price)}
+              Add to Cart · {dollars(price)}
             </button>
             {added && (
               <p className={s.added} role="status">

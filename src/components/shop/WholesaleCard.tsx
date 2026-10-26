@@ -150,7 +150,7 @@ export function CustomCard({ href, list = false }: { href: string; list?: boolea
         <span className={w.customTitle}>Tell us what you need</span>
         <span className={w.customLine}>Send a photo, how many and when. We’ll find it through our makers and suppliers.</span>
       </span>
-      <span className={w.customBtn}>Start a request →</span>
+      <span className={w.customBtn}>Start a Request →</span>
     </Link>
   );
 }

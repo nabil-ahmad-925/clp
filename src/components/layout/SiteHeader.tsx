@@ -86,11 +86,11 @@ export default function SiteHeader() {
                 </>
               )}
             </Link>
-            {/* A partner's page: co-branded, "CLP │ × AFC" (the shop: "CLP │ SHOP", leading to the shop's home). */}
+            {/* A partner's page: co-branded, "CLP │ × AFC" (the shop: "CLP │ SHOP", leading to the shop's home, and Wholesale's to its own). */}
             {brand &&
               !menuOpen &&
               (brand.shop ? (
-                <Link href="/shop/" className={`${styles.cobrand} ${styles.cobrandShop}`}>
+                <Link href={brand.href ?? '/shop/'} className={`${styles.cobrand} ${styles.cobrandShop}`}>
                   <span className={styles.cobrandRule} aria-hidden />
                   {brand.label}
                 </Link>
