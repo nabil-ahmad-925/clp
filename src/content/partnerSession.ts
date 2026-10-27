@@ -186,7 +186,3 @@ export async function uploadImage(file: Blob): Promise<string> {
   if (!res.ok) throw new PartnerApiError(res.status, 'The upload didn’t go through. Try again.');
   return url;
 }
-
-/** A signed-in account's new password (their current one first). */
-export const changePassword = (oldPassword: string, newPassword: string) =>
-  partnerCall<{ changed: true }>('/auth/password', { method: 'POST', body: JSON.stringify({ oldPassword, newPassword }) });

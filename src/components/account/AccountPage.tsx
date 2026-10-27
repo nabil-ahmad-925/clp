@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useSyncExternalStore } from 'react';
 import PartnerApplicationForm from '@/components/partners/PartnerApplicationForm';
 import { isMember, onPartnerSession, partnerSessionSnapshot, userFromSnapshot } from '@/content/partnerSession';
+import { shopHref } from '@/content/storefront';
 import AccountView from './AccountView';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
@@ -20,7 +21,7 @@ const tabOf = (value: string | null): Tab => (value === 'signup' || value === 'p
  * account) and a CLP partner (Apply to Become a Partner: CLP approves the application and makes the account, or turns
  * a member's into a partner's). ?tab=signup is Sign Up, ?tab=partner the partner application. While a form asks for
  * the e-mail code, the page shows only that form (no tabs or links around it). Signed in, it shows the account
- * (AccountView). ?next=/path/ returns there after signing in.
+ * (AccountView). Signing in or up goes to the shop, or to ?next=/path/ when a page sent them here.
  */
 export default function AccountPage() {
   const params = useSearchParams();
@@ -36,7 +37,8 @@ export default function AccountPage() {
     const query = q.toString();
     router.replace(`/sign-in/${query ? `?${query}` : ''}`, { scroll: false });
   };
-  const signedIn = () => next && router.push(next);
+  // Signed in (or signed up): straight to the shop, or back to the page that sent them here.
+  const signedIn = () => router.push(next || shopHref());
 
   // A signed-in member applying to become a partner: the application, with their name and email.
   if (user && tab === 'partner' && isMember(user)) {

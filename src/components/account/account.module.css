@@ -115,17 +115,3 @@
     padding: 24px 20px;
   }
 }
-
-/* Signed in: a section of the account card (change password). */
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-top: 18px;
-  border-top: 1px solid #e4e1da;
-}
-
-.sectionTitle {
-  font-size: 15px;
-  font-weight: 700;
-}

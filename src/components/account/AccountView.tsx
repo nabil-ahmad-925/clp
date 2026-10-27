@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { ADMIN_URL } from '@/content/partnerPages';
 import { isMember, isStudioUser, partnerSignOut, type PartnerUser } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
-import ChangePassword from './ChangePassword';
 import { Brand } from './authParts';
 import own from './account.module.css';
 import auth from './authLook.module.css';
@@ -16,11 +14,9 @@ const Check = () => (
   </svg>
 );
 
-/** Signed in: who, what kind of account, where to go (back to `next`, the shop, a partner's tools), password, Sign Out. */
+/** Signed in: who, what kind of account, where to go (back to `next`, the shop, a partner's tools), Sign Out. */
 export default function AccountView({ user, next }: { user: PartnerUser; next: string }) {
   const partner = isStudioUser(user);
-  const [pwOpen, setPwOpen] = useState(false);
-  const [notice, setNotice] = useState('');
   return (
     <div className={own.page} data-header-tone="dark">
       <div className={own.card}>
@@ -36,11 +32,6 @@ export default function AccountView({ user, next }: { user: PartnerUser; next: s
               You’re signed in as <strong>{user.email}</strong>
               {user.access?.partnerName ? ` for ${user.access.partnerName}` : ''}.
             </span>
-            {notice && (
-              <span className={auth.notice} role="status">
-                {notice}
-              </span>
-            )}
           </div>
           <div className={auth.footer}>
             {next && (
@@ -62,14 +53,10 @@ export default function AccountView({ user, next }: { user: PartnerUser; next: s
                 Shop CLP
               </Link>
             )}
-            <button type="button" className={auth.secondary} onClick={() => setPwOpen(!pwOpen)}>
-              {pwOpen ? 'Cancel' : 'Change Password'}
-            </button>
             <button type="button" className={auth.secondary} onClick={() => void partnerSignOut()}>
               Sign Out
             </button>
           </div>
-          {pwOpen && <ChangePassword onDone={() => (setPwOpen(false), setNotice('Your password is changed.'))} />}
         </div>
       </div>
     </div>
