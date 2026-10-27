@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { GICON, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset } from '@/content/wsDrawing';
+import { GICON, METALS, SHAPES, WS_FONTS, drawnSpot, isLightColor, photoSpot, type PhotoItem, type WsAsset } from '@/content/wsDrawing';
 
 /** What's on a print spot: the logo's move and size, text, a graphic, a player's name and number. */
 export type SpotDesign = {
@@ -34,8 +34,8 @@ export default function WsMock({
   className,
   label,
 }: {
-  /** The item drawn (its shape). */
-  item: { shape: string };
+  /** The item drawn (its shape), or shown as its front or back photo with the logo at that photo's spot. */
+  item: PhotoItem;
   loc?: string;
   asset?: WsAsset | null;
   color: string;
@@ -50,16 +50,17 @@ export default function WsMock({
   // A medal is metal: gold, silver or bronze, never the item colour.
   const fill = sh.fixed ? (METALS.some(([c]) => c === color) ? color : sh.fixed) : color;
   const light = isLightColor(fill);
-  const p = sh.P[loc ?? ''] ?? sh.P[Object.keys(sh.P)[0]];
+  // The item's photo (front or back) when one shows this print spot (the logo at CLP's spot on it), else the drawing.
+  const photo = photoSpot(item, loc);
+  const { x: px, y: py, w: w0 } = photo ?? drawnSpot(item.shape, loc);
   const a = show && asset && !design.hideLogo ? asset : null;
   const t = { dx: 0, dy: 0, s: 100, r: 0, ...design.tf };
   const tt = { dx: 0, dy: 0, s: 100, ...design.ttf };
   const font = WS_FONTS[design.tfont ?? 'block'] ?? WS_FONTS.block;
-  const w0 = p[2] * 0.82;
   const w = w0 * (t.s / 100);
   const word = a?.kind === 'word';
-  const cx = 9 + 0.82 * p[0] + t.dx;
-  const cy = 9 + 0.82 * p[1] + t.dy;
+  const cx = px + t.dx;
+  const cy = py + t.dy;
   const aw = w0 * (word ? 2.1 : 1.8);
   const fg = light ? '#111111' : '#FFFFFF';
   const tcol = design.tcol || fg;
@@ -71,12 +72,17 @@ export default function WsMock({
   return (
     <svg viewBox="0 0 100 100" className={className} role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true} xmlns="http://www.w3.org/2000/svg">
       <rect width="100" height="100" fill={light ? '#E6E4DE' : '#F4F3F0'} />
-      <g transform="translate(9 9) scale(0.82)">
-        <path d={sh.d} fill={fill} stroke={light ? '#BDBAB2' : 'rgba(0,0,0,0.3)'} strokeWidth="0.8" strokeLinejoin="round" fillRule="evenodd" />
-        {sh.d2 && <path d={sh.d2} fill="none" stroke={light ? '#BDBAB2' : 'rgba(0,0,0,0.3)'} strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />}
-      </g>
+      {photo ? (
+        // Cropped to the square, as CLP placed the logo on it (Add Product › Wholesale item).
+        <image href={photo.src} width="100" height="100" preserveAspectRatio="xMidYMid slice" />
+      ) : (
+        <g transform="translate(9 9) scale(0.82)">
+          <path d={sh.d} fill={fill} stroke={light ? '#BDBAB2' : 'rgba(0,0,0,0.3)'} strokeWidth="0.8" strokeLinejoin="round" fillRule="evenodd" />
+          {sh.d2 && <path d={sh.d2} fill="none" stroke={light ? '#BDBAB2' : 'rgba(0,0,0,0.3)'} strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round" />}
+        </g>
+      )}
       {area && show && (
-        <rect x={9 + 0.82 * p[0] - aw / 2} y={9 + 0.82 * p[1] - aw * (word ? 0.32 : 0.5)} width={aw} height={word ? aw * 0.64 : aw} rx="1" fill="none" stroke="#DCBD7D" strokeWidth="0.5" strokeDasharray="1.6 1.2" />
+        <rect x={px - aw / 2} y={py - aw * (word ? 0.32 : 0.5)} width={aw} height={word ? aw * 0.64 : aw} rx="1" fill="none" stroke="#DCBD7D" strokeWidth="0.5" strokeDasharray="1.6 1.2" />
       )}
       {a && (
         <g transform={`rotate(${t.r} ${cx} ${cy})`}>
@@ -97,16 +103,16 @@ export default function WsMock({
         </g>
       )}
       {gfx && GICON[gfx.icon] && (
-        <g transform={`translate(${9 + 0.82 * p[0] + gfx.dx} ${9 + 0.82 * p[1] + gfx.dy}) rotate(${gfx.r || 0}) scale(${(w0 * 0.55 * (gfx.s / 100)) / 24}) translate(-12 -12)`}>
+        <g transform={`translate(${px + gfx.dx} ${py + gfx.dy}) rotate(${gfx.r || 0}) scale(${(w0 * 0.55 * (gfx.s / 100)) / 24}) translate(-12 -12)`}>
           <path d={GICON[gfx.icon][1]} fill={gfx.color || (light ? '#111111' : '#DCBD7D')} fillRule="evenodd" />
         </g>
       )}
       {roster && (
         <g fill={tcol} fontFamily={font[1]} fontStyle={font[2]} fontWeight={800} textAnchor="middle">
-          <text x={9 + 0.82 * p[0]} y={9 + 0.82 * p[1] + (a ? w * 0.75 : 0) - w0 * 0.2} fontSize={w0 * 0.16} style={{ letterSpacing: '0.08em' }}>
+          <text x={px} y={py + (a ? w * 0.75 : 0) - w0 * 0.2} fontSize={w0 * 0.16} style={{ letterSpacing: '0.08em' }}>
             {roster.name}
           </text>
-          <text x={9 + 0.82 * p[0]} y={9 + 0.82 * p[1] + (a ? w * 0.75 : 0) + w0 * 0.42} fontSize={w0 * 0.62}>
+          <text x={px} y={py + (a ? w * 0.75 : 0) + w0 * 0.42} fontSize={w0 * 0.62}>
             {roster.num}
           </text>
         </g>

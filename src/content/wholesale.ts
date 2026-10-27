@@ -1,9 +1,9 @@
 import config from './data/wholesaleConfig.json';
 import { call, read } from './partnerPages';
 import { partnerCall } from './partnerSession';
-import { SHAPES, type WsAsset } from './wsDrawing';
+import { SHAPES, frontSpotOf, type LogoSpot, type WsAsset } from './wsDrawing';
 
-export { GICON, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset, type WsShape } from './wsDrawing';
+export { GICON, LOCN, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset, type WsShape } from './wsDrawing';
 
 /**
  * Wholesale (/shop/?view=bulk): the catalog (from the API, see loadWholesale), its mockup drawings and the design
@@ -12,7 +12,6 @@ export { GICON, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset, type WsSha
  */
 
 /** Each print spot's name. */
-export const LOCN: Record<string, string> = { front: 'Front', back: 'Full back', sleeve: 'Left sleeve', leg: 'Left leg', cuff: 'Cuff', side: 'Side', valance: 'Valance', canopy: 'Canopy top', top: 'Top of arch' };
 export const APPAREL = ['tee', 'hood', 'polo', 'jersey', 'jacket', 'pinnie'];
 export const SIZED = [...APPAREL, 'short'];
 export const SIZES = ['YS', 'YM', 'YL', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
@@ -42,6 +41,11 @@ export type WsItem = {
   avail: number;
   desc: string;
   photos: string[];
+  /** Where the logo goes on its first photo (none: the drawing's print spot). */
+  logoSpot?: LogoSpot;
+  /** Its back photo, and where the logo goes on it (none: the back's print spot). */
+  backPhoto?: string;
+  backSpot?: LogoSpot;
   /** Back-ordered at the supplier: back about this date (YYYY-MM-DD). */
   back?: string;
   /** How partners can sell it to their members (none: wholesale only), and its suggested and lowest retail price. */
@@ -62,7 +66,8 @@ export const sellInMyStore = (input: { itemId: string; program: WsProgram; price
   partnerCall<{ item: { id: string; approval: string; status: string } }>('/my/partner/store/wholesale', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
 /** The catalog: its items, the categories and brands they use (the filters), and whether back-ordered items take "Notify me". */
 export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean };
-export const firstLoc = (it: WsItem) => Object.keys(SHAPES[it.shape]?.P ?? SHAPES.tee.P)[0];
+/** Its main print spot: the one its photo shows (CLP's logo spot), else the drawing's first. */
+export const firstLoc = (it: WsItem) => (it.photos[0] ? frontSpotOf(it).loc : Object.keys(SHAPES[it.shape]?.P ?? SHAPES.tee.P)[0]);
 
 let catalog: Promise<WsCatalog> | null = null;
 /** The live catalog (read once a visit; a failed read is tried again next time). */

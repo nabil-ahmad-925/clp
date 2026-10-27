@@ -1,0 +1,39 @@
+/* A Wholesale item's own photos (WsPhotos): on its card, large on its page, and the strip of thumbnails. */
+.fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.over {
+  position: absolute;
+  inset: 0;
+  background: #f4f3f0;
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.thumb {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  overflow: hidden;
+  border: 1.5px solid #e5e5e2;
+  border-radius: 10px;
+  background: #f4f3f0;
+  cursor: pointer;
+}
+
+.thumb[aria-pressed='true'] {
+  border-color: #111;
+}
+
+.thumb:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}

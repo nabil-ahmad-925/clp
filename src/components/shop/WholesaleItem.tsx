@@ -32,6 +32,7 @@ import { mockupPng } from './Mockup';
 import WholesaleCard, { SaveModal } from './WholesaleCard';
 import WholesaleStudio from './WholesaleStudio';
 import WsMock from './WsMock';
+import { LargePhoto, PhotoStrip } from './WsPhotos';
 import { imageDataUrl, type StudioBrand } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
 import { DEFAULT_PLAYERS, designSummary, emptyDesign, locsOf, rosterOf, spotOf, spotSummary, usedLocs, type WsDesign } from './wsDesign';
@@ -71,6 +72,8 @@ export default function WholesaleItem({
   const sh = SHAPES[item.shape];
   const locs = locsOf(item);
   const [loc, setLoc] = useState(firstLoc(item));
+  // One of CLP's photos of it shown large (-1: the mockup).
+  const [photo, setPhoto] = useState(-1);
   // A draft saved in the studio (this browser) comes back; else the logo in use on the first spot.
   const [draft] = useState<{ design?: WsDesign; rost?: string; color?: string } | null>(() => {
     try {
@@ -298,7 +301,8 @@ export default function WholesaleItem({
           <div className={w.itemLeft}>
             <span className={w.itemMock} ref={mockRef}>
               <WsMock item={item} loc={loc} asset={ws.asset(design.art[loc] ?? '')} color={color} design={spotOf(design, loc, player)} show={ws.mock} className={w.cardSvgFull} label={`${item.name}, ${LOCN[loc]}`} />
-              <span className={w.spotTag}>{LOCN[loc]}</span>
+              <LargePhoto item={item} index={photo} />
+              <span className={w.spotTag}>{photo < 0 ? LOCN[loc] : `Photo ${photo + 1}`}</span>
               <button type="button" className={w.saveFav} aria-pressed={fav} onClick={() => setSaving(true)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={fav ? '#B03A2E' : 'none'} stroke={fav ? '#B03A2E' : '#111111'} strokeWidth="2" strokeLinejoin="round" aria-hidden>
                   <path d="M12 21 3.5 12.7A5 5 0 0 1 12 6a5 5 0 0 1 8.5 6.7z" />
@@ -310,13 +314,23 @@ export default function WholesaleItem({
               {locs.map((l) => {
                 const s = spotSummary(design, l, ws.asset);
                 return (
-                  <button key={l} type="button" className={w.spot} aria-pressed={loc === l} onClick={() => setLoc(l)}>
+                  <button
+                    key={l}
+                    type="button"
+                    className={w.spot}
+                    aria-pressed={photo < 0 && loc === l}
+                    onClick={() => {
+                      setLoc(l);
+                      setPhoto(-1);
+                    }}
+                  >
                     <strong>{LOCN[l]}</strong>
                     <span data-has={s !== 'No artwork'}>{s}</span>
                   </button>
                 );
               })}
             </div>
+            <PhotoStrip item={item} picked={photo} onPick={setPhoto} />
             <span className={w.muted}>Mockups are previews. You get a final proof before anything is made.</span>
           </div>
 

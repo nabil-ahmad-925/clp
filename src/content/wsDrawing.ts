@@ -37,6 +37,44 @@ export const SHAPES: Record<string, WsShape> = {
   banner: { d: 'M12 24 L88 24 L88 70 L12 70 Z', d2: 'M12 24 L12 94 M88 24 L88 94', P: { front: [50, 47, 30] } },
   flag: { d: 'M38 8 Q72 8 68 48 L62 88 L38 88 Z', d2: 'M38 8 L38 96', P: { front: [52, 38, 20] } },
 };
+/** The print spots' names. */
+export const LOCN: Record<string, string> = { front: 'Front', back: 'Full back', sleeve: 'Left sleeve', leg: 'Left leg', cuff: 'Cuff', side: 'Side', valance: 'Valance', canopy: 'Canopy top', top: 'Top of arch' };
+/** Where the logo goes on one of an item's photos (CLP sets it): the print spot the photo shows, the logo's centre and width (% of the square photo). */
+export type LogoSpot = { loc: string; x: number; y: number; w: number };
+/** An item with CLP's photos: the front (its first photo) and the back, each with its logo spot. */
+export type PhotoItem = { shape: string; photos?: string[]; logoSpot?: LogoSpot | null; backPhoto?: string; backSpot?: LogoSpot | null };
+/** A print spot as it sits on the drawing (the 100×100 canvas): where a photo's logo goes until CLP moves it. */
+export const drawnSpot = (shape: string, loc?: string): LogoSpot => {
+  const P = (SHAPES[shape] ?? SHAPES.tee).P;
+  const at = loc && P[loc] ? loc : Object.keys(P)[0];
+  const [x, y, w] = P[at];
+  return { loc: at, x: 9 + 0.82 * x, y: 9 + 0.82 * y, w: 0.82 * w };
+};
+const spotsOf = (shape: string) => (SHAPES[shape] ?? SHAPES.tee).P;
+/** The front photo's logo spot: CLP's, else the drawing's first print spot. */
+export const frontSpotOf = (item: PhotoItem) => {
+  const P = spotsOf(item.shape);
+  return item.logoSpot && P[item.logoSpot.loc] ? item.logoSpot : drawnSpot(item.shape);
+};
+/** The print spots the back photo can show: the item's others (the front photo shows one). */
+export const backLocsOf = (item: PhotoItem) => Object.keys(spotsOf(item.shape)).filter((l) => l !== frontSpotOf(item).loc);
+/** The back photo's logo spot: CLP's, else the back (or the next print spot); none when the item has one print spot. */
+export const backSpotOf = (item: PhotoItem): LogoSpot | null => {
+  const locs = backLocsOf(item);
+  if (item.backSpot && locs.includes(item.backSpot.loc)) return item.backSpot;
+  const loc = locs.includes('back') ? 'back' : locs[0];
+  return loc ? drawnSpot(item.shape, loc) : null;
+};
+/** The photo showing print spot `loc` (the front or the back) and its logo spot (none: the drawing shows). */
+export const photoSpot = (item: PhotoItem, loc?: string) => {
+  const P = spotsOf(item.shape);
+  const at = loc && P[loc] ? loc : Object.keys(P)[0];
+  const front = frontSpotOf(item);
+  if (item.photos?.[0] && front.loc === at) return { src: item.photos[0], ...front };
+  const back = backSpotOf(item);
+  if (item.backPhoto && back?.loc === at) return { src: item.backPhoto, ...back };
+  return null;
+};
 /**
  * A brand asset: a badge (a monogram on a colour), a wordmark, or an image (an upload). Approved (ok), in review, or
  * new (needs approval).
