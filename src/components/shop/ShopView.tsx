@@ -15,7 +15,6 @@ import { LuShapes, LuSparkles, LuUsers, LuVolleyball } from 'react-icons/lu';
 import { BULK_CATEGORIES } from '@/content/bulk';
 import { CART_EVENT, addToCart, cartChanged, checkoutHref, getCart, money, removeLine, setLineQty, type Cart } from '@/content/cart';
 import { partnerHref, partnerType } from '@/content/partnerPages';
-import { site } from '@/content/site';
 import {
   SHOP_GROUPS,
   canPaint,
@@ -42,10 +41,11 @@ import {
   type ShopProduct,
   type ShopStore,
 } from '@/content/storefront';
+import ProductGallery from './ProductGallery';
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
 import { CardGrid, LIST_SIZES, ListToolbar, ProductCard, ShopSearch, ViewAll, hasWords, inPlace, nextQuery, storePlaces, type ListChip } from './shopListing';
-import { sportFilter, typeFilter, type ProductFilter } from './productFilters';
+import { sportFilter, type ProductFilter } from './productFilters';
 import { Arrow, CategoryIcon, LockIcon } from './shopIcons';
 import s from './shop.module.css';
 
@@ -638,11 +638,11 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
         onSearch={(nq, nloc) => set({ q: nq, loc: nloc })}
         onGrey
       />
-      {/* All Products and New Arrivals filter by sport and type too (a search stays as it was). */}
+      {/* All Products and New Arrivals filter by sport too (a search stays as it was). */}
       <Products
         products={products}
         stores={data.stores}
-        filters={view === 'search' ? [] : [sportFilter(products, data.stores), typeFilter(products, data.stores)]}
+        filters={view === 'search' ? [] : [sportFilter(products, data.stores)]}
         price={view === 'all' || view === 'new'}
       />
       <div className={s.bottomSpace} />
@@ -992,9 +992,6 @@ export function ProductDetail({
   disabled?: boolean;
 }) {
   const router = useRouter();
-  const images = product.images.length ? product.images : product.image ? [product.image] : [];
-  const [photo, setPhoto] = useState(0);
-  const [zoom, setZoom] = useState(false);
   const [choices, setChoices] = useState<Record<string, string>>(() => Object.fromEntries(product.optionGroups.map((g) => [g.kind, g.values[0]])));
   const [qty, setQty] = useState(1);
   const [busy, setBusy] = useState<'' | 'add' | 'buy'>('');
@@ -1043,39 +1040,18 @@ export function ProductDetail({
   );
 
   return (
-    <>
     <div className={s.productLayout}>
-      <div className={s.gallery}>
-        <div className={s.thumbs}>
-          {(images.length ? images : ['']).map((src, i) => (
-            <button key={`${src}-${i}`} type="button" className={`${s.thumb} ${i === photo ? s.thumbOn : ''}`} aria-label={`Photo ${i + 1}`} onClick={() => setPhoto(i)} style={{ background: src ? '#EEEEEB' : color }}>
-              {src && <img src={src} alt="" />}
-            </button>
-          ))}
-        </div>
-        <div className={s.mainPhoto} style={{ background: images.length ? '#EEEEEB' : color }}>
-          {images.length > 0 ? (
-            <>
-              <img src={images[photo]} alt={product.title} />
-              <button type="button" className={s.zoomHit} aria-label="View larger" onClick={() => setZoom(true)} />
-              <span className={s.zoomTag} aria-hidden>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                </svg>
-                View Larger
-              </span>
-            </>
-          ) : (
-            <span className={s.tileBlank}>
-              <img src={site.logo.light} alt="" style={{ opacity: exclusive ? 1 : 0.35 }} />
-            </span>
-          )}
-          <span className={s.photoTags}>
+      <ProductGallery
+        product={product}
+        color={color}
+        exclusive={exclusive}
+        tags={
+          <>
             {isNewProduct(product) && <span className={s.tag}>NEW</span>}
             {exclusive && <span className={`${s.tag} ${s.tagGold}`}>CLP EXCLUSIVE</span>}
-          </span>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <div className={s.buy}>
         {onStore ? (
@@ -1194,61 +1170,6 @@ export function ProductDetail({
         </button>
       </div>
     </div>
-      {zoom && images.length > 0 && <Lightbox images={images} start={photo} title={product.title} onClose={() => setZoom(false)} />}
-    </>
-  );
-}
-
-function Lightbox({ images, start, title, onClose }: { images: string[]; start: number; title: string; onClose: () => void }) {
-  const [i, setI] = useState(start);
-  const step = (d: number) => setI((n) => (n + d + images.length) % images.length);
-  const stepRef = useRef(step);
-  useEffect(() => {
-    stepRef.current = step;
-  });
-  useEffect(() => {
-    document.body.classList.add('menu-open');
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft') stepRef.current(-1);
-      if (e.key === 'ArrowRight') stepRef.current(1);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.classList.remove('menu-open');
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [onClose]);
-  return createPortal(
-    <div className={s.lightbox} role="dialog" aria-modal="true" aria-label="Image viewer">
-      <div className={s.lbHead}>
-        <span>
-          {i + 1} / {images.length} · {title}
-        </span>
-        <button type="button" className={s.lbClose} aria-label="Close" onClick={onClose}>
-          ×
-        </button>
-      </div>
-      <div className={s.lbStage}>
-        <button type="button" className={s.lbStep} aria-label="Previous image" onClick={() => step(-1)} disabled={images.length < 2}>
-          ‹
-        </button>
-        <div className={s.lbImage}>
-          <img src={images[i]} alt={title} />
-        </div>
-        <button type="button" className={s.lbStep} aria-label="Next image" onClick={() => step(1)} disabled={images.length < 2}>
-          ›
-        </button>
-      </div>
-      <div className={s.lbThumbs}>
-        {images.map((src, n) => (
-          <button key={`${src}-${n}`} type="button" className={`${s.lbThumb} ${n === i ? s.lbThumbOn : ''}`} aria-label={`Photo ${n + 1}`} onClick={() => setI(n)}>
-            <img src={src} alt="" />
-          </button>
-        ))}
-      </div>
-    </div>,
-    document.body,
   );
 }
 

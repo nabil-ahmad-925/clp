@@ -1,14 +1,14 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- the partner's photos are their own uploads (the media bucket), shown as they are. */
 
-import { useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import BookingModal from '@/components/sections/BookingModal';
 import BioModal from '@/components/sections/BioModal';
 import type { RowFacts } from '@/components/sections/DirectoryRow';
+import { useSiteUser } from '@/components/account/useSiteUser';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
-import FieldSelect from '@/components/ui/FieldSelect';
 import PillSelect from '@/components/ui/PillSelect';
 import type { IconType } from 'react-icons';
 import { FaFacebookF, FaGlobe, FaInstagram, FaLinkedinIn, FaTiktok, FaYoutube } from 'react-icons/fa';
@@ -35,7 +35,6 @@ import WaitlistModal from '@/components/sections/WaitlistModal';
 import {
   collabLabel,
   partnerType,
-  subscribeToPartner,
   TEAM_CHECK_LABELS,
   type PartnerCollab,
   type PartnerPageData,
@@ -45,7 +44,6 @@ import {
   type PartnerProduct,
   type PartnerReviewData,
 } from '@/content/partnerPages';
-import { askQuestion, saveConversation, sendIntro, sitePath } from '@/content/messages';
 import { storeHref } from '@/content/storefront';
 import type { DirectoryItem } from '@/content/types';
 import lc from '@/components/sections/ListingCard.module.css';
@@ -53,9 +51,15 @@ import t from '@/components/sections/TeamDirectory.module.css';
 import pf from '@/components/sections/PostFilter.module.css';
 import s from './partnerPage.module.css';
 import PartnerContent, { contentCount } from './content/PartnerContent';
+import ContactDialog from './contact/ContactDialog';
+import { clearDraft, draftFor, type ContactDraft } from './contact/contactDraft';
+import { CloseButton } from './page/CloseButton';
 import { Overlay, PaletteContext } from './page/Overlay';
+import { luminance, paletteOf, rgbOf } from './page/palette';
 import { titleCase } from './page/titleCase';
 import { VIDEO_SOURCES, embedOf } from './page/videos';
+import SubscribeButton from './subscribe/SubscribeButton';
+import SubscribeDialog from './subscribe/SubscribeDialog';
 
 type Experience = PartnerPageResponse['experiences'][number];
 type TabId = 'about' | 'content' | 'experiences' | 'jobs' | 'partnerships' | 'reviews' | 'shop' | 'news';
@@ -87,42 +91,6 @@ function LogoImage({ page, alt = '' }: { page: PartnerPageData; alt?: string }) 
   if (page.hero) return <img src={page.hero} alt={alt} className={s.logoPhoto} />;
   return <>{page.mono}</>;
 }
-
-// --- The partner's colours ----------------------------------------------------------------------------------------------
-
-const rgbOf = (color: string) => {
-  const m = /^#?([0-9a-f]{6})$/i.exec(color.trim());
-  return m ? [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16)) : null;
-};
-const luminance = (c: number[]) => {
-  const [r, g, b] = c.map((v) => {
-    const x = v / 255;
-    return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-};
-const mix = (c: number[], to: number[], t: number) => c.map((v, i) => Math.round(v + (to[i] - v) * t));
-const hexOf = (c: number[]) => `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
-
-/**
- * The page's colours from the partner's (the design's "A little"): their colour for tabs, labels, links and buttons
- * (darkened until white text on it reads at 4.5:1), a light tint for tags and a deep shade for the dark cards.
- */
-function paletteOf(color: string, mode: 'little' | 'off' = 'little') {
-  // "Off · CLP default": CLP's black and gold.
-  if (mode === 'off') return { '--accent': '#111111', '--accent-label': '#8A6F33', '--accent-tint': '#F3EFE4', '--accent-ink': '#333333', '--accent-deep': '#0A0A0A' } as CSSProperties;
-  let c = rgbOf(color) ?? [122, 31, 43];
-  for (let i = 0; i < 24 && 1.05 / (luminance(c) + 0.05) < 4.5; i++) c = mix(c, [0, 0, 0], 0.1);
-  return {
-    '--accent': hexOf(c),
-    '--accent-label': hexOf(c),
-    '--accent-tint': hexOf(mix(c, [255, 255, 255], 0.9)),
-    '--accent-ink': hexOf(mix(c, [0, 0, 0], 0.3)),
-    '--accent-deep': hexOf(mix(c, [0, 0, 0], 0.3)),
-  } as CSSProperties;
-}
-
-/** The page's colours, for the popups: they render in a portal outside the page, where its variables aren't set. */
 
 // --- Icons --------------------------------------------------------------------------------------------------------------
 
@@ -157,11 +125,6 @@ const VerifiedSeal = () => (
   </svg>
 );
 
-const CloseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
-    <path d="M5 5l14 14M19 5 5 19" />
-  </svg>
-);
 const stars = (n: number) => '★★★★★'.slice(0, Math.round(n)) + '☆☆☆☆☆'.slice(0, 5 - Math.round(n));
 
 // --- Experiences --------------------------------------------------------------------------------------------------------
@@ -183,14 +146,17 @@ const ctaOf = (l: Experience) => (!isBookable(toItem(l)) ? 'Details' : priceOf(l
 
 /**
  * A CLP Partner's page (the Partner page handoff, Oct 15): the clean hero photo, the partner on a white strip under it
- * (logo, badges, name, socials, Book a session / Message / Follow), the tabs in alphabetical order with their counts (an
+ * (logo, badges, name, socials, Book a Session / Contact / Subscribe), the tabs in alphabetical order with their counts (an
  * empty one hidden), and the partner's colours on the content. Content, Experiences, Jobs, Partnerships, Reviews, Shop
  * and Updates & News each show what the partner has on CLP.
  */
 export default function PartnerPageView({ data }: { data: PartnerPageResponse }) {
   const { page, collabs, products, reviews, experiences, articles } = data;
   const type = partnerType(page.type);
-  const palette = useMemo(() => paletteOf(page.color || type.color, page.colorMode), [page.color, type.color, page.colorMode]);
+  const palette = useMemo(
+    () => paletteOf(page.color || type.color, page.colorMode, page.buttonColor, page.buttonText),
+    [page.color, type.color, page.colorMode, page.buttonColor, page.buttonText],
+  );
   const sectionOn = (id: string) => page.sections.find((x) => x.id === id)?.on !== false;
   // The Content tab: the partner's photo albums (each opens its gallery), their own photos and their YouTube videos.
   const [albums, setAlbums] = useState<LiveAlbum[]>([]);
@@ -259,9 +225,20 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
     toTabs();
   };
 
-  const [dialog, setDialog] = useState<'follow' | 'question' | 'intro' | null>(null);
-  // Who follows the page: the API's count, and the new one once the visitor follows (Follow or the sign-up card).
-  const [followers, setFollowers] = useState(page.followers ?? 0);
+  // Contact (on a topic, or the form kept while its sender signed in) and Subscribe. Back from signing in to send a
+  // Contact message, its form opens again, filled in.
+  const signedIn = Boolean(useSiteUser());
+  const [contact, setContact] = useState<{ draft?: ContactDraft } | null>(() => {
+    const draft = signedIn ? draftFor(page.slug) : null;
+    return draft ? { draft } : null;
+  });
+  const closeContact = () => {
+    clearDraft();
+    setContact(null);
+  };
+  const [subscribing, setSubscribing] = useState(false);
+  // How many subscribed: the API's count, then the new one after subscribing or unsubscribing here.
+  const [subscribers, setSubscribers] = useState(page.subscribers ?? 0);
   const [booking, setBooking] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts } | null>(null);
   // A sold-out listing's waitlist being joined (its card, or a full day in the booking popup).
   const [waiting, setWaiting] = useState<{ item: DirectoryItem; widgetId: number; facts: RowFacts; date?: string } | null>(null);
@@ -345,7 +322,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             </span>
             <div className={s.identityText}>
               <div className={s.badges}>
-                <span className={`${s.badge} ${s.badgeGold}`}>CLP PARTNER</span>
+                <span className={`${s.badge} ${s.badgeBrand}`}>CLP PARTNER</span>
                 {featured && <span className={s.badge}>★ Featured on CLP</span>}
               </div>
               <h1 className={s.name}>{page.name}</h1>
@@ -353,7 +330,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                 <span>{[type.label, page.area].filter(Boolean).join(' · ')}</span>
                 <span className={s.dot} aria-hidden />
                 <span className={s.followers}>
-                  <strong>{followers.toLocaleString('en-US')}</strong> {followers === 1 ? 'follower' : 'followers'}
+                  <strong>{subscribers.toLocaleString('en-US')}</strong> {subscribers === 1 ? 'subscriber' : 'subscribers'}
                 </span>
                 {page.rating != null && sectionOn('reviews') && (
                   <>
@@ -367,16 +344,14 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             </div>
             <div className={s.identityActions}>
               {has('experiences') && (
-                <button type="button" className={`${s.action} ${s.actionGold}`} onClick={() => pick('experiences')}>
+                <button type="button" className={`${s.action} ${s.actionBrand}`} onClick={() => pick('experiences')}>
                   Book a Session
                 </button>
               )}
-              <button type="button" className={`${s.action} ${s.actionLight}`} onClick={() => setDialog('question')}>
-                Message
+              <button type="button" className={`${s.action} ${s.actionOutline}`} onClick={() => setContact({})}>
+                Contact
               </button>
-              <button type="button" className={`${s.action} ${s.actionOutline}`} onClick={() => setDialog('follow')}>
-                Follow
-              </button>
+              <SubscribeButton slug={page.slug} onOpen={() => setSubscribing(true)} />
             </div>
           </div>
         </section>
@@ -401,7 +376,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
         <main className={s.main} data-header-tone="dark" data-listing="">
           <div className={s.wrap}>
             {shown === 'about' && (
-              <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onFollowed={setFollowers} />
+              <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onSubscribe={() => setSubscribing(true)} />
             )}
             {shown === 'content' && <PartnerContent page={page} albums={albums} videos={youtube} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} waitOf={waitOf} />}
@@ -438,8 +413,16 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
           </div>
         </main>
 
-        {dialog === 'follow' && <FollowDialog page={page} onFollowed={setFollowers} onClose={() => setDialog(null)} />}
-        {(dialog === 'question' || dialog === 'intro') && <MessageDialog page={page} kind={dialog} onKind={setDialog} onClose={() => setDialog(null)} />}
+        {subscribing && <SubscribeDialog page={page} smsAddon={false} onCount={setSubscribers} onClose={() => setSubscribing(false)} />}
+        {contact && (
+          <ContactDialog
+            page={page}
+            experiences={exps}
+            roles={jobs}
+            start={contact.draft ? { topic: contact.draft.topic, draft: contact.draft } : undefined}
+            onClose={closeContact}
+          />
+        )}
         {job && <JobDialog page={page} job={job} onClose={() => setJob(null)} />}
         {member && (
           <MemberDialog
@@ -486,7 +469,7 @@ function About({
   waitOf,
   onAll,
   onMember,
-  onFollowed,
+  onSubscribe,
 }: {
   page: PartnerPageData;
   experiences: Experience[];
@@ -494,7 +477,7 @@ function About({
   waitOf: (l: Experience) => Wait;
   onAll?: () => void;
   onMember: (m: PartnerTeamMember) => void;
-  onFollowed: (followers: number) => void;
+  onSubscribe: () => void;
 }) {
   const [faq, setFaq] = useState(0);
   // Dated sessions first (soonest), then the ones booked any time.
@@ -619,47 +602,22 @@ function About({
             ))}
           </div>
         )}
-        <SignupCard page={page} onFollowed={onFollowed} />
+        <SignupCard page={page} onSubscribe={onSubscribe} />
       </aside>
     </div>
   );
 }
 
-/** "Get first dibs": the partner's e-mail list (adults and parents). */
-function SignupCard({ page, onFollowed }: { page: PartnerPageData; onFollowed: (followers: number) => void }) {
-  const [email, setEmail] = useState('');
-  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
-  const [error, setError] = useState('');
-  const join = async (e: FormEvent) => {
-    e.preventDefault();
-    setState('busy');
-    setError('');
-    try {
-      onFollowed((await subscribeToPartner(page.slug, email.trim())).followers);
-      setState('done');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not sign you up.');
-      setState('idle');
-    }
-  };
+/** "Get first dibs": Join opens the same Subscribe window as the header (one way to sign up). */
+function SignupCard({ page, onSubscribe }: { page: PartnerPageData; onSubscribe: () => void }) {
   return (
-    <form className={s.signup} onSubmit={join}>
+    <div className={s.signup}>
       <strong className={s.signupTitle}>Get first dibs</strong>
-      {state === 'done' ? (
-        <span className={s.signupText}>You’re on the {page.short} list. New dates, drops and events come to {email}.</span>
-      ) : (
-        <>
-          <span className={s.signupText}>New runs, drops and events from {page.short}. Adults and parents only.</span>
-          <div className={s.signupRow}>
-            <input type="email" required aria-label="Email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={page.preview} />
-            <button type="submit" className={s.btnGold} disabled={state === 'busy' || page.preview}>
-              {state === 'busy' ? 'Joining…' : 'Join'}
-            </button>
-          </div>
-          {error && <span className={s.signupError}>{error}</span>}
-        </>
-      )}
-    </form>
+      <span className={s.signupText}>New runs, drops and events from {page.short}. Adults and parents only.</span>
+      <button type="button" className={`${s.btnBrand} ${s.signupJoin}`} onClick={onSubscribe} disabled={page.preview}>
+        Join
+      </button>
+    </div>
   );
 }
 
@@ -986,7 +944,7 @@ function Jobs({ page, jobs, onOpen }: { page: PartnerPageData; jobs: Job[]; onOp
         </div>
       )}
       <div className={s.noteRow}>
-        <span>Not seeing a fit? Follow {page.short} to hear about new roles first.</span>
+        <span>Not seeing a fit? Subscribe to {page.short} to hear about new roles first.</span>
         <Link href="/jobs/">Also listed on CLP Jobs &amp; Internships</Link>
       </div>
     </div>
@@ -1590,14 +1548,6 @@ function News({ posts, onOpen }: { posts: Post[]; onOpen: (p: Post) => void }) {
 
 // --- Dialogs ------------------------------------------------------------------------------------------------------------
 
-function CloseButton({ onClose, label = 'Close' }: { onClose: () => void; label?: string }) {
-  return (
-    <button type="button" className={s.close} aria-label={label} onClick={onClose}>
-      <CloseIcon />
-    </button>
-  );
-}
-
 /** A team member's card opens a bio when there's more to read than their name and role. */
 const hasBio = (m: PartnerTeamMember) => Boolean(m.bio || m.runs?.length || m.checks?.length || m.instagram);
 /** Cleared to work with kids: CLP verified their SafeSport training and background check. */
@@ -1758,203 +1708,13 @@ function VideoDialog({ video, onClose }: { video: PartnerVideo; onClose: () => v
           {embed ? (
             <iframe src={embed} title={video.title || 'Video'} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
           ) : (
-            <a className={s.btnGold} href={video.url} target="_blank" rel="noopener noreferrer">
+            <a className={s.btnBrand} href={video.url} target="_blank" rel="noopener noreferrer">
               Watch on {name} ↗
             </a>
           )}
         </div>
         <span className={s.videoNote}>{embed ? `Plays from ${name} inside the page.` : 'This link can’t play inside the page.'}</span>
       </div>
-    </Overlay>
-  );
-}
-
-/** The intro's partner kinds, as the API takes them (clp-api shared/messages.mjs), shown in Title Case. */
-const PARTNER_KINDS = ['Brand', 'Photo & video', 'Facility', 'Service provider', 'Another club or team'];
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-/**
- * "Message" (the handoff's message popup): Contact, a question about a session, or Partner, an intro from a brand,
- * photographer, facility or another club that the partner accepts before a conversation opens. Each tab has its line,
- * fields, message and the grey rule box. Both start a conversation on CLP Messages: the sender gets its private link
- * (here and by e-mail), and nobody sees the other's e-mail or phone.
- */
-function MessageDialog({ page, kind, onKind, onClose }: { page: PartnerPageData; kind: 'question' | 'intro'; onKind: (k: 'question' | 'intro') => void; onClose: () => void }) {
-  const intro = kind === 'intro';
-  const [form, setForm] = useState({ name: '', organization: '', email: '', partnerKind: PARTNER_KINDS[0], message: '', website: '' });
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  // The conversation's page (/messages/?thread=…&t=…) once sent.
-  const [sent, setSent] = useState('');
-  const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [key]: e.target.value });
-  const send = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.name.trim()) return setError('Enter your name.');
-    if (intro && !form.organization.trim()) return setError('Enter your brand or organization.');
-    if (!EMAIL_RE.test(form.email.trim())) return setError('Enter a valid email address.');
-    if (!form.message.trim()) return setError(intro ? 'Tell them about your idea.' : 'Write your message.');
-    setBusy(true);
-    setError('');
-    try {
-      const link = intro
-        ? await sendIntro({ slug: page.slug, name: form.name.trim(), organization: form.organization.trim(), email: form.email.trim(), partnerKind: form.partnerKind, text: form.message.trim(), website: form.website })
-        : await askQuestion({ slug: page.slug, name: form.name.trim(), email: form.email.trim(), text: form.message.trim(), website: form.website });
-      const path = sitePath(link);
-      saveConversation({ path, name: page.name, subject: intro ? `Intro from ${form.organization.trim()}` : 'Your question', at: new Date().toISOString() });
-      setSent(path);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not send. Try again.');
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <Overlay onClose={onClose}>
-      <div className={s.dialogHead}>
-        <strong className={s.dialogTitle}>Message {page.name}</strong>
-        <CloseButton onClose={onClose} />
-      </div>
-      {sent ? (
-        <div className={`${s.dialogBody} ${s.done}`}>
-          <span className={s.doneMark}>✓</span>
-          <strong className={s.cardTitle}>{intro ? 'Intro sent' : 'Message sent'}</strong>
-          <span className={s.mutedText}>
-            {intro
-              ? `Once ${page.short} accepts it, you can message each other in your conversation on CLP.`
-              : `${page.short}’s reply comes to your conversation on CLP. It’s saved on this device under Messages, and its link opens it anywhere.`}
-          </span>
-          <Link className={`${s.btnAccent} ${s.btnLg}`} href={sent}>
-            Open the Conversation
-          </Link>
-          <button type="button" className={s.btnOutlineDark} onClick={onClose}>
-            Back to {page.short}
-          </button>
-        </div>
-      ) : (
-        <form className={s.dialogBody} onSubmit={send} noValidate>
-          <div className={s.kinds}>
-            {(
-              [
-                ['question', 'Contact'],
-                ['intro', 'Partner'],
-              ] as const
-            ).map(([id, label]) => (
-              <button key={id} type="button" className={kind === id ? s.kindOn : ''} aria-pressed={kind === id}
-                onClick={() => {
-                  setError('');
-                  onKind(id);
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <span className={s.mutedText}>
-            {intro
-              ? `Brands, photographers, facilities and other clubs: introduce yourself. ${page.short} accepts before a conversation opens.`
-              : `Ask about a session before you book. Already booked? Message ${page.short} from your booking so they have the details.`}
-          </span>
-          {intro && (
-            <div className={s.formField}>
-              What kind of partner are you?
-              <FieldSelect label="What kind of partner are you?" className={s.selectField} value={form.partnerKind} options={PARTNER_KINDS.map((k) => ({ value: k, label: titleCase(k) }))} onChange={(partnerKind) => setForm({ ...form, partnerKind })} />
-            </div>
-          )}
-          <div className={s.twoCols}>
-            <label className={s.formField}>
-              Your name
-              <input maxLength={120} autoComplete="name" value={form.name} onChange={set('name')} />
-            </label>
-            {intro ? (
-              <label className={s.formField}>
-                Brand or organization
-                <input maxLength={120} autoComplete="organization" value={form.organization} onChange={set('organization')} />
-              </label>
-            ) : (
-              <label className={s.formField}>
-                Your e-mail
-                <input type="email" maxLength={200} autoComplete="email" value={form.email} onChange={set('email')} />
-              </label>
-            )}
-          </div>
-          {intro && (
-            <label className={s.formField}>
-              Work e-mail
-              <input type="email" maxLength={200} autoComplete="email" value={form.email} onChange={set('email')} />
-            </label>
-          )}
-          <textarea
-            rows={4}
-            aria-label="Message"
-            maxLength={1900}
-            placeholder={intro ? 'Who you are, what you’d like to do together, and when.' : 'Hi! Do you run a women’s-only session?'}
-            value={form.message}
-            onChange={set('message')}
-          />
-          {/* A field people don't see: filled in, the request is a bot's. */}
-          <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className={s.trap} value={form.website} onChange={set('website')} />
-          <div className={s.rule2}>
-            {intro
-              ? `Sent through CLP. Contact details are shared only if ${page.short} accepts.`
-              : 'For adults. Under 18? Ask a parent or guardian to reach out. Your email and phone stay private.'}
-          </div>
-          {error && <span className={s.formError}>{error}</span>}
-          <button type="submit" className={`${s.btnAccent} ${s.btnSend}`} disabled={busy || page.preview}>
-            {busy ? 'Sending…' : intro ? 'Send Intro Request' : 'Send Message'}
-          </button>
-        </form>
-      )}
-    </Overlay>
-  );
-}
-
-/** "Follow": the partner's e-mail list (new dates, drops and events). */
-function FollowDialog({ page, onFollowed, onClose }: { page: PartnerPageData; onFollowed: (followers: number) => void; onClose: () => void }) {
-  const [email, setEmail] = useState('');
-  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
-  const [error, setError] = useState('');
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    setState('busy');
-    setError('');
-    try {
-      onFollowed((await subscribeToPartner(page.slug, email.trim())).followers);
-      setState('done');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not follow.');
-      setState('idle');
-    }
-  };
-  return (
-    <Overlay onClose={onClose} width={480}>
-      <div className={s.dialogHead}>
-        <strong className={s.dialogTitle}>Follow {page.name}</strong>
-        <CloseButton onClose={onClose} />
-      </div>
-      <form className={s.dialogBody} onSubmit={submit}>
-        {state === 'done' ? (
-          <>
-            <span className={s.mutedText}>
-              You’re following {page.short}. New dates, drops and updates come to {email}.
-            </span>
-            <button type="button" className={s.btnOutlineDark} onClick={onClose}>
-              Done
-            </button>
-          </>
-        ) : (
-          <>
-            <span className={s.mutedText}>New dates, drops and updates, by e-mail. Adults and parents only. Unfollow anytime.</span>
-            <label className={s.formField}>
-              Your e-mail
-              <input type="email" required placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            {error && <span className={s.formError}>{error}</span>}
-            <button type="submit" className={`${s.btnAccent} ${s.btnLg}`} disabled={state === 'busy' || page.preview}>
-              {state === 'busy' ? 'Following…' : 'Follow'}
-            </button>
-          </>
-        )}
-      </form>
     </Overlay>
   );
 }

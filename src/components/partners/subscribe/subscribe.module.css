@@ -1,0 +1,242 @@
+/* Subscribe (replaces Follow): who it's for, topics, details and how to reach them, the consent boxes, then confirmed. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* A fieldset's legend isn't a flex item: its own space below. */
+.legend,
+.sectionTitle {
+  padding: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.legend {
+  margin-bottom: 10px;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #dedcd7;
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice:has(input:checked) {
+  border-color: #111;
+  box-shadow: inset 0 0 0 1px #111;
+}
+
+.choice:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.choice input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: #111;
+}
+
+.choiceText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.choiceText strong {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.choiceText span {
+  color: #5e5e5e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.hint {
+  color: #6a6a6a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d4d2cd;
+  border-radius: 22px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle[aria-pressed='true'] {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #eceae6;
+  border-radius: 10px;
+  background: #faf9f6;
+}
+
+.box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.box input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: #111;
+}
+
+.divider {
+  height: 1px;
+  background: #e4e2dd;
+}
+
+.optional {
+  color: #6a6a6a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.already {
+  color: #4a4a4a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.already a,
+.legal a {
+  color: #1f4f8f;
+  font-weight: 700;
+}
+
+.legal {
+  color: #6a6a6a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.subscribe {
+  height: 54px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.subscribe:disabled {
+  background: #e4e2dd;
+  color: #6a6a6a;
+  cursor: default;
+}
+
+.subscribe:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.note {
+  max-width: 440px;
+  margin: 0;
+  color: #6a6a6a;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Done's own top margin (Contact's sent step) would push it below Unsubscribe here. */
+.actions > button {
+  margin-top: 0;
+}
+
+.unsubscribe {
+  height: 48px;
+  padding: 0 22px;
+  border: 0;
+  background: transparent;
+  color: #b03a2e;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.unsubscribe:disabled {
+  opacity: 0.5;
+}
+
+@media (max-width: 560px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The header's button once subscribed. */
+.subscribedAction {
+  border: 1.5px solid #111;
+  background: #111;
+  color: #fff;
+}

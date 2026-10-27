@@ -1,7 +1,8 @@
 import { call, read } from './partnerPages';
+import { partnerCall } from './partnerSession';
 
 /**
- * CLP Messages on the site (clp-api messages): a question or an intro from a partner's page, "Apply with CLP" on a
+ * CLP Messages on the site (clp-api messages): Contact on a partner's page, "Apply with CLP" on a
  * partner's job, "Message the host" from a booking, and the guest's own conversation at /messages/?thread=…&t=… (its private link; no account needed). The
  * conversations started on this device are kept here so the guest finds them again (/messages/).
  */
@@ -33,10 +34,16 @@ export const sitePath = (full: string) => {
   }
 };
 
-export const askQuestion = (input: { slug: string; name: string; email: string; text: string; website?: string }) =>
-  call<{ link: string; threadId: string }>('/messages/question', { method: 'POST', body: JSON.stringify(input) }).then(link);
-export const sendIntro = (input: { slug: string; name: string; organization: string; email: string; partnerKind: string; text: string; website?: string }) =>
-  call<{ link: string; threadId: string }>('/messages/intro', { method: 'POST', body: JSON.stringify(input) }).then(link);
+export type ContactInput = { slug: string; topic: string; fields: Record<string, string>; text: string; listingId?: string; name?: string; email?: string; website?: string };
+/**
+ * Contact on a partner's page: signed in, as the account (every topic); signed out, with a name and e-mail (only the
+ * topics that go to CLP Partnerships: the others answer 401 SIGN_IN).
+ */
+export const contactPartner = (input: ContactInput, signedIn: boolean) =>
+  (signedIn
+    ? partnerCall<{ link: string; threadId: string }>('/my/messages/contact', { method: 'POST', body: JSON.stringify(input) })
+    : call<{ link: string; threadId: string }>('/messages/contact', { method: 'POST', body: JSON.stringify(input) })
+  ).then(link);
 /** An application's resume as the API keeps it (POST /messages/job/resume signs it for the role). */
 export type ResumeUpload = { key: string; name: string; size: number; type: string; token: string };
 /** The resume files an application takes (the API's): PDF or Word, 10 MB at most. */

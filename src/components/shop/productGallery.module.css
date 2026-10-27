@@ -1,0 +1,51 @@
+/* A product's Front | Back on its photo, and the Back mark on its thumbnail (ProductGallery). */
+.sides {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  /* Above the photo's View Larger hit area. */
+  z-index: 3;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.sides button {
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sides button[aria-pressed='true'] {
+  background: #111;
+  color: #fff;
+}
+
+.sides button:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+.thumbTag {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  padding: 2px 0;
+  border-radius: 4px;
+  background: rgba(17, 17, 17, 0.78);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-align: center;
+  text-transform: uppercase;
+}

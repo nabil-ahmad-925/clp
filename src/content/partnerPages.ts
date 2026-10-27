@@ -74,6 +74,9 @@ export type PartnerPageData = PartnerCardData & {
   /** How much of the partner's colour the page uses ("off": CLP's black and gold), and their second colour. */
   colorMode?: 'little' | 'off';
   color2?: string;
+  /** The brand buttons' (Book a Session, the CLP Partner tag…) background and text: CLP's gold and white when empty. */
+  buttonColor?: string;
+  buttonText?: string;
   faq: { q: string; a: string }[];
   /** Press about them; one that is a CLP article carries its reading time (minutes). */
   press: { title: string; source: string; date: string; href: string; image: string; readingTime?: number }[];
@@ -81,8 +84,8 @@ export type PartnerPageData = PartnerCardData & {
   socials: { network: string; href: string }[];
   website: string;
   sections: { id: string; on: boolean }[];
-  /** Who follows the page (its e-mail list). */
-  followers: number;
+  /** How many subscribed to the page (clp-api subscriptions). */
+  subscribers: number;
   /** Opened with a preview link before the page is live. */
   preview: boolean;
   /** Its store on the shop: private (behind its password, until a date) or not, pick-up, and CLP's own (exclusive). */
@@ -100,9 +103,11 @@ export type PartnerProduct = {
   optionGroups: { kind: string; values: string[] }[];
   price: number;
   collection: string;
-  /** The first photo (the card), and all of them. */
+  /** The first photo (the front, on its card), and all of them. */
   image: string;
   images: string[];
+  /** A photo of its back, when the store added one (the product page offers Front | Back). */
+  backImage?: string;
   /** When the partner added it to their store (the "Newest" sort). */
   addedAt?: string;
 };
@@ -184,7 +189,6 @@ export type LeadInput = { name: string; organization: string; email: string; onC
 /** A "Work with us" idea, e-mailed to the partner and CLP. */
 export const sendPartnerLead = (slug: string, lead: LeadInput) => call<{ sent: true }>(`/partners/${encodeURIComponent(slug)}/leads`, { method: 'POST', body: JSON.stringify(lead) });
 /** Follows a page: its follower count after (the same e-mail counts once). */
-export const subscribeToPartner = (slug: string, email: string) => call<{ subscribed: true; followers: number }>(`/partners/${encodeURIComponent(slug)}/subscribe`, { method: 'POST', body: JSON.stringify({ email }) });
 
 export type ReviewEligibility = { canReview: boolean; reason?: 'not-partner' | 'reviewed' | 'not-checked-in'; review?: PartnerReviewData; partner?: { name: string; slug: string; mono: string; live: boolean } };
 /** Whether the guest of a booking (their link's token) may review it. */

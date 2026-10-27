@@ -1,5 +1,5 @@
-import { LuTag, LuVolleyball } from 'react-icons/lu';
-import { PRODUCT_TYPES, productTypeOf, sportLabel, type ShopProduct, type ShopStore } from '@/content/storefront';
+import { LuVolleyball } from 'react-icons/lu';
+import { sportLabel, type ShopProduct, type ShopStore } from '@/content/storefront';
 import type { ListChip } from './shopListing';
 
 /** A filter of a product list besides its category (a sport, a drop), its value in the address by `id`. */
@@ -28,19 +28,5 @@ export function sportFilter(products: ShopProduct[], stores: ShopStore[]): Produ
     plural: 'sports',
     options: sports.map((sp) => ({ value: sp, label: sportLabel(sp) })).sort((a, b) => a.label.localeCompare(b.label)),
     test: (p, v) => sportsOf(p).includes(v),
-  };
-}
-
-/** The Type filter: CLP Exclusive or Simple Product, the types the list has (hidden when it has only one). */
-export function typeFilter(products: ShopProduct[], stores: ShopStore[]): ProductFilter {
-  const types = new Set(products.map((p) => productTypeOf(p, stores)));
-  return {
-    id: 'type',
-    name: 'All Types',
-    heading: 'Type',
-    icon: <LuTag />,
-    plural: 'types',
-    options: types.size > 1 ? PRODUCT_TYPES.map((t) => ({ value: t.id, label: t.label })) : [],
-    test: (p, v) => productTypeOf(p, stores) === v,
   };
 }

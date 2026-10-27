@@ -1,5 +1,7 @@
 /* A CLP Partner's page (the Partner page handoff, Oct 15). The partner's colours come in as --accent (tabs, labels,
-   links, buttons), --accent-tint and --accent-ink (tags) and --accent-deep (dark cards); see paletteOf. */
+   links, accent buttons), --accent-tint and --accent-ink (tags), --accent-deep (dark cards), and --button and
+   --button-text (Book a Session, the CLP Partner tag and the other brand buttons: CLP's gold and white unless picked in
+   the admin); see paletteOf. */
 .page {
   --bar: var(--header-height);
   --accent: #7a1f2b;
@@ -7,6 +9,8 @@
   --accent-tint: #f6e9eb;
   --accent-ink: #5e1621;
   --accent-deep: #5e1621;
+  --button: #dcbd7d;
+  --button-text: #fff;
   background: #fff;
   color: #111;
   font-family: var(--font-body);
@@ -97,7 +101,7 @@
 /* ---- Buttons ---- */
 .btn,
 .btnAccent,
-.btnGold,
+.btnBrand,
 .btnOutline,
 .btnOutlineDark,
 .btnDark {
@@ -130,9 +134,10 @@
   color: #fff;
 }
 
-.btnGold {
-  background: #dcbd7d;
-  color: #000;
+.btnBrand,
+.page a.btnBrand {
+  background: var(--button);
+  color: var(--button-text);
 }
 
 .btnOutline {
@@ -184,7 +189,7 @@
 }
 
 .btnAccent:disabled,
-.btnGold:disabled,
+.btnBrand:disabled,
 .btnOutline:disabled,
 .btnOutlineDark:disabled {
   opacity: 0.5;
@@ -192,7 +197,7 @@
 }
 
 .btnAccent:focus-visible,
-.btnGold:focus-visible,
+.btnBrand:focus-visible,
 .btnOutline:focus-visible,
 .btnOutlineDark:focus-visible,
 .textLink:focus-visible,
@@ -314,9 +319,9 @@
   white-space: nowrap;
 }
 
-.badgeGold {
-  background: #dcbd7d;
-  color: #000;
+.badgeBrand {
+  background: var(--button);
+  color: var(--button-text);
 }
 
 .name {
@@ -414,9 +419,9 @@
   cursor: pointer;
 }
 
-.actionGold {
-  background: #dcbd7d;
-  color: #000;
+.actionBrand {
+  background: var(--button);
+  color: var(--button-text);
 }
 
 .actionLight {
@@ -885,7 +890,7 @@
 }
 
 .dateBlock span {
-  color: #dcbd7d;
+  color: #fff;
   font-size: 11px;
   font-weight: 700;
 }
@@ -930,43 +935,11 @@
   font-size: 14px;
 }
 
-.signupRow {
-  display: flex;
-  gap: 8px;
-}
-
-.signupRow input {
-  flex: 1;
-  min-width: 0;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #fff;
-  border-radius: 8px;
-  background: #fff;
-  color: #111;
-  font: inherit;
-  font-size: 14px;
-}
-
-.signupRow input::placeholder {
-  color: #888;
-}
-
-.signupRow input:focus {
-  border-color: #dcbd7d;
-  outline: 2px solid rgba(220, 189, 125, 0.5);
-  outline-offset: 1px;
-}
-
-.signupRow .btnGold {
+.signupJoin {
+  align-self: flex-start;
   height: 44px;
   padding: 0 22px;
   font-size: 15px;
-}
-
-.signupError {
-  color: #f3c3c0;
-  font-size: 13px;
 }
 
 /* ---- Content ---- */
@@ -1272,8 +1245,8 @@
 
 .jobCardNew {
   right: 16px;
-  background: #dcbd7d;
-  color: #111;
+  background: var(--button);
+  color: var(--button-text);
 }
 
 .jobCardBody {
@@ -1797,40 +1770,6 @@ article:hover .productCardMedia > img {
   background: #f3f2ee;
 }
 
-.kinds {
-  display: flex;
-  gap: 8px;
-}
-
-.kinds button {
-  flex: 1;
-  height: 40px;
-  border: 1px solid #d9d7d2;
-  border-radius: 8px;
-  background: #fff;
-  color: #111;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.kinds .kindOn {
-  border-color: #111;
-  background: #111;
-  color: #fff;
-}
-
-.formField {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.formField input,
-.formField select,
 .dialogBody textarea {
   box-sizing: border-box;
   width: 100%;
@@ -1881,41 +1820,6 @@ article:hover .productCardMedia > img {
   width: 34px;
   height: 34px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
-}
-
-/* A form's drop-down (FieldSelect's trigger) as the handoff's select: the fields' 44px box, its choice in bold. */
-.selectField {
-  box-sizing: border-box;
-  width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #d9d7d2;
-  border-radius: 8px;
-  background: #fff;
-  color: #111;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.selectField:focus-visible {
-  border-color: #111;
-  outline: none;
-}
-
-/* The message popup's send button (the handoff's 48px). */
-.btnSend {
-  height: 48px;
-}
-
-.rule2 {
-  padding: 10px 14px;
-  border: 1px solid #efede8;
-  border-radius: 10px;
-  background: #faf9f6;
-  color: #555;
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 .done {
@@ -2389,7 +2293,7 @@ button.person {
 
 .personText .readBio {
   margin-top: 6px;
-  color: #dcbd7d;
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
 }
