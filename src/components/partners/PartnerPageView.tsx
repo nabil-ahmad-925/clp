@@ -1301,6 +1301,7 @@ function ProductImage({ page, product, size }: { page: PartnerPageData; product:
 const subOf = (p: PartnerProduct) => [p.collection, p.optionGroups.find((g) => g.kind === 'Colors')?.values[0]].filter(Boolean).join(' · ');
 const isFresh = (p: PartnerProduct, now: number) => Boolean(p.addedAt) && now - Date.parse(p.addedAt!) < 30 * 86_400_000;
 
+
 /**
  * A product as the experiences pages' card: the photo (NEW), its category, name, collection and colour, price and View
  * Item; a row of the list in the list view (the price on the left of the foot, View Item on the right).

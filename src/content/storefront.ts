@@ -44,6 +44,13 @@ export const isExclusive = (p: ShopProduct, stores: ShopStore[]) => Boolean(stor
 const NEW_DAYS = 30;
 export const isNewProduct = (p: ShopProduct) => Boolean(p.addedAt) && Date.now() - Date.parse(p.addedAt!) < NEW_DAYS * 86_400_000;
 
+/** A product's type, from its store: CLP's own makes it a CLP Exclusive, a partner's a Simple Product. */
+export const PRODUCT_TYPES = [
+  { id: 'exclusive', label: 'CLP Exclusive' },
+  { id: 'simple', label: 'Simple Product' },
+] as const;
+export const productTypeOf = (p: ShopProduct, stores: ShopStore[]) => (isExclusive(p, stores) ? 'exclusive' : 'simple');
+
 /**
  * The shop's store groups (the design's chips and menu columns), each gathering partner types: athletes, clubs and
  * teams (with coaches and trainers), schools, organizations (with brands, agencies and nutritionists) and creators.

@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { GICON, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset, type WsItem } from '@/content/wholesale';
+import { GICON, METALS, SHAPES, WS_FONTS, isLightColor, type WsAsset } from '@/content/wsDrawing';
 
 /** What's on a print spot: the logo's move and size, text, a graphic, a player's name and number. */
 export type SpotDesign = {
@@ -34,7 +34,8 @@ export default function WsMock({
   className,
   label,
 }: {
-  item: WsItem;
+  /** The item drawn (its shape). */
+  item: { shape: string };
   loc?: string;
   asset?: WsAsset | null;
   color: string;

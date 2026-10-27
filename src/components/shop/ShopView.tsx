@@ -45,6 +45,7 @@ import {
 import ShopBulk from './ShopBulk';
 import ShopStudio from './ShopStudio';
 import { CardGrid, LIST_SIZES, ListToolbar, ProductCard, ShopSearch, ViewAll, hasWords, inPlace, nextQuery, storePlaces, type ListChip } from './shopListing';
+import { sportFilter, typeFilter, type ProductFilter } from './productFilters';
 import { Arrow, CategoryIcon, LockIcon } from './shopIcons';
 import s from './shop.module.css';
 
@@ -231,13 +232,12 @@ function ProductGrid({ products, stores, view = 'grid' }: { products: ShopProduc
   );
 }
 
-/** The exclusives' sports and drops (CLP's own products: their sport and collection). */
+/** The exclusives (CLP's own products) and their drops (collections). */
 function exclusivesOf(data: ShopData) {
   const slugs = new Set(exclusiveStores(data.stores).map((x) => x.slug));
   const products = data.products.filter((p) => slugs.has(p.slug));
-  const sports = [...new Set(products.map((p) => p.sport).filter(Boolean) as string[])];
   const drops = [...new Set(products.map((p) => p.collection).filter(Boolean))];
-  return { products, sports, drops };
+  return { products, drops };
 }
 
 /* ---------------------------------------------------------------- home */
@@ -331,7 +331,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
         <section className={`${s.section} ${s.spaced}`}>
           <div className={s.headCenter}>
             <h2 className={s.rowTitle}>All products</h2>
-            <span className={s.muted}>Every item from every store on CLP, in one place.</span>
+            <span className={s.muted}>Every item from every store on CLP, in one place</span>
           </div>
           <ProductGrid products={everything} stores={data.stores} />
           <ViewAll href={shopHref({ view: 'all' })} label="View All Products" />
@@ -342,7 +342,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
         <section className={`${s.section} ${s.spaced}`}>
           <div className={s.headCenter}>
             <h2 className={s.rowTitle}>CLP Exclusives</h2>
-            <span className={s.muted}>ONLY ON CLP</span>
+            <span className={s.muted}>Only on CLP</span>
           </div>
           <ProductGrid products={exclusive} stores={data.stores} />
           <ViewAll href={shopHref({ view: 'exclusives' })} label="View All Exclusives" />
@@ -353,6 +353,7 @@ function Home({ data, go }: { data: ShopData; go: (href: string) => void }) {
         <section className={`${s.section} ${s.spaced}`}>
           <div className={s.headCenter}>
             <h2 className={s.rowTitle}>New arrivals</h2>
+            <span className={s.muted}>The latest from CLP and our partners</span>
           </div>
           <ProductGrid products={newItems} stores={data.stores} />
           <ViewAll href={shopHref({ view: 'new' })} label="View All" />
@@ -490,12 +491,6 @@ function Directory({ data }: { data: ShopData }) {
 }
 
 /* ---------------------------------------------------------------- products: filters, sort, grid or list, pages */
-
-/** A filter of a product list besides its category (CLP Exclusives' sport and drop), its value in the address by `id`. */
-type ProductFilter = Omit<ListChip, 'options' | 'value' | 'onChange' | 'count'> & {
-  options: { value: string; label: string }[];
-  test: (p: ShopProduct, value: string) => boolean;
-};
 
 /**
  * Products with the experiences' bar (All Categories and any other filters, with `price` the experiences' Price slider,
@@ -643,7 +638,13 @@ function Collection({ data, view }: { data: ShopData; view: string }) {
         onSearch={(nq, nloc) => set({ q: nq, loc: nloc })}
         onGrey
       />
-      <Products products={products} stores={data.stores} price={view === 'all' || view === 'new'} />
+      {/* All Products and New Arrivals filter by sport and type too (a search stays as it was). */}
+      <Products
+        products={products}
+        stores={data.stores}
+        filters={view === 'search' ? [] : [sportFilter(products, data.stores), typeFilter(products, data.stores)]}
+        price={view === 'all' || view === 'new'}
+      />
       <div className={s.bottomSpace} />
     </>
   );
@@ -659,15 +660,7 @@ function Exclusives({ data }: { data: ShopData }) {
   const storeOf = (p: ShopProduct) => data.stores.find((x) => x.slug === p.slug);
   const products = ex.products.filter((p) => hasWords(productText(p, storeOf(p)), q));
   const filters: ProductFilter[] = [
-    {
-      id: 'sport',
-      name: 'Sports',
-      heading: 'Sport',
-      icon: <LuVolleyball />,
-      plural: 'sports',
-      options: ex.sports.map((sp) => ({ value: sp, label: sportLabel(sp) })).sort((a, b) => a.label.localeCompare(b.label)),
-      test: (p, v) => p.sport === v,
-    },
+    sportFilter(ex.products, data.stores),
     {
       id: 'drop',
       name: 'All Drops',
