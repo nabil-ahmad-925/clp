@@ -339,16 +339,19 @@
     {
       "slug": "michael",
       "name": "Compete Like Pros",
-      "bio": "News and field reports from the CLP team."
+      "bio": "News and field reports from the CLP team.",
+      "credential": "CLP Editors"
     },
     {
       "slug": "harpreetclp-com",
       "name": "H C",
-      "bio": "CLP staff writer covering athlete branding and sponsorship."
+      "bio": "CLP staff writer covering athlete branding and sponsorship.",
+      "credential": "CLP staff writer"
     },
     {
       "slug": "sponsor",
-      "name": "Sponsor"
+      "name": "Sponsor",
+      "credential": "Sponsored"
     }
   ],
   "locations": [
@@ -529,6 +532,51 @@
     {
       "slug": "trending",
       "name": "Trending"
+    }
+  ],
+  "topics": [
+    {
+      "slug": "training",
+      "name": "Training",
+      "categories": [
+        "resilience-performance-training"
+      ]
+    },
+    {
+      "slug": "nutrition-health",
+      "name": "Nutrition & Health",
+      "categories": [
+        "diet-recovery-injury-prevention"
+      ],
+      "health": true
+    },
+    {
+      "slug": "partner-news",
+      "name": "Partner News",
+      "writer": "partners"
+    },
+    {
+      "slug": "events-recaps",
+      "name": "Events & Recaps",
+      "categories": [
+        "activations-branded-experiences",
+        "briefings-field-reports",
+        "event-project-management"
+      ]
+    },
+    {
+      "slug": "recruiting-college",
+      "name": "Recruiting & College",
+      "categories": [
+        "transfers-scouting"
+      ]
+    },
+    {
+      "slug": "gear",
+      "name": "Gear",
+      "categories": [
+        "product-development-reviews"
+      ]
     }
   ]
 }

@@ -316,13 +316,16 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             <span className={s.logo}>
               <LogoImage page={page} alt={`${page.name} logo`} />
             </span>
-            {/* Verified by CLP: the seal on the logo's corner (as Instagram's), outside its rounded clip. */}
-            <span className={s.verifiedMark} role="img" aria-label="Verified by CLP" title="Verified by CLP">
-              <VerifiedSeal />
-            </span>
+            {/* CLP Verified: the seal on the logo's corner (as Instagram's), outside its rounded clip. Only once CLP approves. */}
+            {page.verified && (
+              <span className={s.verifiedMark} role="img" aria-label="CLP Verified" title="CLP Verified">
+                <VerifiedSeal />
+              </span>
+            )}
             <div className={s.identityText}>
               <div className={s.badges}>
                 <span className={`${s.badge} ${s.badgeBrand}`}>CLP PARTNER</span>
+                {page.verified && <span className={`${s.badge} ${s.badgeVerified}`}>✓ CLP VERIFIED</span>}
                 {featured && <span className={s.badge}>★ Featured on CLP</span>}
               </div>
               <h1 className={s.name}>{page.name}</h1>

@@ -42,6 +42,8 @@ export type PartnerCardData = {
   featured?: string[];
   /** CLP's Feature star: the shop's first row and the home page's featured spots. */
   homeFeatured?: boolean;
+  /** "CLP Verified": CLP approved every check for its role (set by the API only, never by the partner). */
+  verified?: boolean;
   /** How many experiences it hosts (its published listings): the cards' "N Experiences". */
   experiences?: number;
 };

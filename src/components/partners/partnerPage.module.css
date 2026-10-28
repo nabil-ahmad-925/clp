@@ -324,6 +324,11 @@
   color: var(--button-text);
 }
 
+.badgeVerified {
+  background: #e4f1e8;
+  color: #1e5b33;
+}
+
 .name {
   margin: 0;
   font-family: var(--font-heading);
@@ -1811,7 +1816,7 @@ article:hover .productCardMedia > img {
   line-height: 1.7;
 }
 
-/* Verified by CLP: the seal on the logo's lower right corner. */
+/* CLP Verified: the seal on the logo's lower right corner. */
 .verifiedMark {
   position: absolute;
   top: 46px;
