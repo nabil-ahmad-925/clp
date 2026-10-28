@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import StoresSupport from '@/components/partners/donate/StoresSupport';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
 import { useEffect, useState } from 'react';
 import { getCheckout, getOrder, money, type CheckoutInfo, type ShopOrder } from '@/content/cart';
@@ -142,6 +143,7 @@ export default function OrderDone() {
                 </div>
               ))}
             </div>
+            {state.done && <StoresSupport slugs={orders.map((o) => o.partner.slug)} />}
             <Link className={styles.keep} href={shopHref()}>
               Keep Shopping
             </Link>

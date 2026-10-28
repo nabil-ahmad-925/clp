@@ -18,6 +18,13 @@ export const PAGE_SECTIONS = config.sections;
 export const PARTNER_CATEGORIES = config.partnerCategories;
 export const partnerCategoryHref = (id?: string) => PARTNER_CATEGORIES.find((c) => c.id === id)?.href;
 
+/**
+ * A partner's Donate button as the public page gets it (clp-api shared/donations.mjs publicDonations): where it goes
+ * (the partner's own link on the provider they picked, never CLP's), the suggested amounts in dollars and the message.
+ * Null when it is off or the partner's type doesn't take donations.
+ */
+export type PartnerDonations = { provider: 'stripe' | 'paypal' | 'givebutter' | 'link'; link: string; amounts: number[]; custom: boolean; message: string };
+
 /** A partner as a card (directory, Partnerships page, spotlight). */
 export type PartnerCardData = {
   slug: string;
@@ -68,6 +75,8 @@ export type PartnerVideo = {
 };
 
 export type PartnerPageData = PartnerCardData & {
+  /** The Donate button (header and About tab), or null when the partner hasn't turned it on. */
+  donations?: PartnerDonations | null;
   highlights: string[];
   stats: { value: string; label: string }[];
   photos: { src: string; caption: string }[];

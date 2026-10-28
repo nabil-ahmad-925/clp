@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- the partners' product photos (their own uploads), shown as they are. */
 
 import Link from 'next/link';
+import StoresSupport from '@/components/partners/donate/StoresSupport';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setHeaderBrand } from '@/components/layout/headerBrand';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -415,6 +416,7 @@ export default function Checkout() {
                   </span>
                 </div>
               )}
+              <StoresSupport slugs={(cart.stores ?? []).map((st) => st.slug)} />
             </aside>
           </form>
         )}

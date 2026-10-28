@@ -1,5 +1,6 @@
 'use client';
 
+import PartnerSupport from '@/components/partners/donate/PartnerSupport';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
@@ -567,6 +568,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                       Manage Booking
                     </Link>
                   </div>
+                  {item.partner && <PartnerSupport slug={item.partner.slug} />}
                   <button type="button" className={styles.backLink} onClick={onClose}>
                     Back to Listings
                   </button>

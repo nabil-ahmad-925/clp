@@ -58,6 +58,7 @@ import { Overlay, PaletteContext } from './page/Overlay';
 import { luminance, paletteOf, rgbOf } from './page/palette';
 import { titleCase } from './page/titleCase';
 import { VIDEO_SOURCES, embedOf } from './page/videos';
+import SupportCard from './donate/SupportCard';
 import SubscribeButton from './subscribe/SubscribeButton';
 import SubscribeDialog from './subscribe/SubscribeDialog';
 
@@ -281,7 +282,8 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
     const w = waitOf(l);
     if (isBookable(item) && w.soldOut && w.place) window.location.assign(waitlistPageHref(w.place.id, w.place.token));
     else if (isBookable(item) && w.soldOut) setWaiting({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
-    else if (isBookable(item)) setBooking({ item, widgetId: Number(l.widgetId), facts: factsOf(l) });
+    // Booked on this partner's page: the booking confirmation knows whose it is (its Support prompt).
+    else if (isBookable(item)) setBooking({ item: { ...item, partner: item.partner ?? { name: page.name, slug: page.slug } }, widgetId: Number(l.widgetId), facts: factsOf(l) });
     else setDetails(item);
   };
   const socials = [...page.socials, ...(page.website ? [{ network: 'website', href: page.website }] : [])];
@@ -606,6 +608,7 @@ function About({
           </div>
         )}
         <SignupCard page={page} onSubscribe={onSubscribe} />
+        <SupportCard name={page.name} short={page.short} donations={page.donations} />
       </aside>
     </div>
   );
@@ -1847,6 +1850,7 @@ function CartDrawer({ page, cart, onClose, onShop }: { page: PartnerPageData; ca
             <strong>Subtotal</strong>
             <strong>{dollars(totals ? totals.subtotal - totals.discount - totals.covered : (cart?.subtotal ?? 0))}</strong>
           </div>
+          {lines.length > 0 && <SupportCard name={page.name} short={page.short} donations={page.donations} />}
           {lines.length > 0 ? (
             <a className={`${s.btnAccent} ${s.btnXl}`} href={checkoutHref(page.slug)}>
               Checkout
