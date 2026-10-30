@@ -266,6 +266,15 @@
     }
   ],
   "lowStock": 50,
+  "programRules": {
+    "_comment": "Defaults of Store programs & rules (Manufacturing). CLP's saved rules (clp-wholesale SETTINGS PROGRAMS) replace them; the partner shares are in programs below.",
+    "minPieces": 48,
+    "windowMin": 7,
+    "windowMax": 21,
+    "ifMissed": "ask",
+    "confirmDays": 7,
+    "approval": true
+  },
   "programs": [
     {
       "id": "pod",

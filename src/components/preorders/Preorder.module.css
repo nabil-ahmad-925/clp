@@ -1,0 +1,373 @@
+/* A CLP Partner's pre-order page and a buyer's order (same look as the shop's checkout). */
+
+.band {
+  height: calc(var(--header-height) + 24px);
+  background: #0a0a0a;
+}
+
+.page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 48px 120px;
+  color: #111;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.muted {
+  margin: 0;
+  color: #666;
+}
+
+.error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fcebeb;
+  color: #9b1c1c;
+  font-size: 14px;
+}
+
+.note {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  color: #777;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.eyebrow a {
+  color: #111;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.phase {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.meta {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.progress {
+  height: 10px;
+  max-width: 520px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: #ecebe7;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #111;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 48px;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid #e5e5e2;
+  border-radius: 14px;
+}
+
+.itemImage {
+  width: 148px;
+  height: 148px;
+  border-radius: 10px;
+  background: #f4f3f0;
+  object-fit: contain;
+}
+
+.itemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.itemName {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.itemPrice {
+  font-size: 16px;
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 84px;
+  padding: 8px;
+  border: 1px solid #e5e5e2;
+  border-radius: 10px;
+}
+
+.sizeOn {
+  border-color: #111;
+  background: #f7f6f2;
+}
+
+.sizeLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #cfcfca;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stepper button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.stepper span {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid #e5e5e2;
+  border-radius: 14px;
+}
+
+.formTitle {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #e5e5e2;
+  border-bottom: 1px solid #e5e5e2;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cfcfca;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary,
+.secondary,
+.danger {
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+}
+
+.primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.secondary {
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+}
+
+.danger {
+  border: 1px solid #9b1c1c;
+  background: #fff;
+  color: #9b1c1c;
+}
+
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #fcebeb;
+}
+
+.order {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 560px;
+  padding: 20px 24px;
+  border: 1px solid #e5e5e2;
+  border-radius: 14px;
+}
+
+.orderHead {
+  display: flex;
+  justify-content: space-between;
+}
+
+.orderNumber {
+  color: #777;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.money {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 24px 16px 96px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .item {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .itemImage {
+    width: 96px;
+    height: 96px;
+  }
+
+  .form {
+    padding: 18px;
+  }
+
+  .actions > button {
+    flex: 1 1 100%;
+  }
+}
