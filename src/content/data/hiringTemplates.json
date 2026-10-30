@@ -1,0 +1,173 @@
+[
+  {
+    "id": "head-coach-youth", "label": "Head coach (youth)", "guide": "coaching",
+    "title": "Head Coach", "category": "coaching", "type": "part-time", "workplace": "on-site", "payMin": 35, "payMax": 45, "payUnit": "hour",
+    "youth": true, "checks": ["background", "safesport", "licence", "firstaid"],
+    "questions": [{ "text": "Do you hold a coaching licence (e.g. USSF C) or higher?", "dealbreaker": "no" }, { "text": "Are you free for weekday evening practices and weekend games?", "dealbreaker": "no" }, { "text": "Are you 18 or older?", "dealbreaker": "no" }],
+    "description": "Lead a youth team through the season: plan and run practices, coach on game days and keep families in the loop.",
+    "duties": "Plan and run 2 practices a week\nCoach the team on game days\nKeep families up to date in CLP Messages\nWork with the director of coaching on player development",
+    "requirements": "Coaching licence or 2+ years coaching youth\nGreat with kids and parents\nBackground check and SafeSport training\nFirst aid / CPR"
+  },
+  {
+    "id": "assistant-coach", "label": "Assistant coach", "guide": "coaching",
+    "title": "Assistant Coach", "category": "coaching", "type": "part-time", "workplace": "on-site", "payMin": 20, "payMax": 25, "payUnit": "hour",
+    "youth": true, "checks": ["background", "safesport", "firstaid"],
+    "questions": [{ "text": "Have you coached or played at club level or above?", "dealbreaker": "" }, { "text": "Are you 18 or older?", "dealbreaker": "no" }],
+    "description": "Support the head coach at practices and games, run small groups and help every player improve.",
+    "duties": "Run drills and small groups at practice\nHelp with set-up, gear and check-in\nSupport the head coach on game days",
+    "requirements": "Coaching or playing experience\nGreat with kids\nBackground check and SafeSport training"
+  },
+  {
+    "id": "team-manager", "label": "Team manager", "guide": "office",
+    "title": "Team Manager", "category": "admin", "type": "volunteer", "workplace": "on-site", "payMin": null, "payMax": null, "payUnit": "",
+    "youth": true, "checks": ["background", "safesport"],
+    "questions": [{ "text": "Are you 18 or older?", "dealbreaker": "no" }],
+    "description": "Keep the team organised: schedules, rosters, travel and communication with families.",
+    "duties": "Share schedules and changes with families\nKeep the roster and documents up to date\nOrganise travel for away games",
+    "requirements": "Organised and reliable\nClear communicator\nBackground check and SafeSport training"
+  },
+  {
+    "id": "personal-trainer", "label": "Personal trainer", "guide": "health",
+    "title": "Personal Trainer", "category": "health", "type": "contract", "workplace": "on-site", "payMin": 40, "payMax": 70, "payUnit": "session",
+    "youth": false, "checks": ["cert", "insurance", "firstaid"],
+    "questions": [{ "text": "Do you hold a current personal training certification?", "dealbreaker": "no" }],
+    "description": "Train athletes one to one and in small groups, with plans built for their sport and level.",
+    "duties": "Assess athletes and build training plans\nRun one-to-one and small group sessions\nTrack progress and share it with the athlete",
+    "requirements": "Current certification (NASM, ACE or similar)\nLiability insurance\nFirst aid / CPR"
+  },
+  {
+    "id": "sc-coach", "label": "Strength & conditioning coach", "guide": "health",
+    "title": "Strength & Conditioning Coach", "category": "health", "type": "contract", "workplace": "on-site", "payMin": 30, "payMax": 50, "payUnit": "hour",
+    "youth": true, "checks": ["background", "safesport", "cert", "firstaid"],
+    "questions": [{ "text": "Do you hold a CSCS or similar certification?", "dealbreaker": "no" }, { "text": "Have you trained youth athletes before?", "dealbreaker": "" }],
+    "description": "Build strength, speed and injury-prevention programs for our teams, from youth to adult.",
+    "duties": "Design and run team S&C sessions\nTest athletes and track results\nWork with coaches on load in season",
+    "requirements": "CSCS or similar\nExperience with youth athletes\nBackground check and SafeSport training"
+  },
+  {
+    "id": "referee", "label": "Referee", "guide": "officiating",
+    "title": "Referee", "category": "events", "type": "contract", "workplace": "on-site", "payMin": 30, "payMax": 55, "payUnit": "session",
+    "youth": true, "checks": ["background", "safesport", "refgrade"],
+    "questions": [{ "text": "Do you hold a current referee grade?", "dealbreaker": "no" }, { "text": "Can you work weekends?", "dealbreaker": "no" }],
+    "description": "Referee league and tournament games. Pay is per game, by age group.",
+    "duties": "Referee assigned games\nArrive early and check the field\nSend the game report after each game",
+    "requirements": "Current referee grade\nGood fitness\nBackground check and SafeSport training"
+  },
+  {
+    "id": "field-marshal", "label": "Field marshal", "guide": "events",
+    "title": "Field Marshal", "category": "events", "type": "seasonal", "workplace": "on-site", "payMin": 17, "payMax": 20, "payUnit": "hour",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Can you work both tournament days?", "dealbreaker": "no" }],
+    "description": "Keep fields running on time at our tournaments: check teams in, help referees and keep spectators safe.",
+    "duties": "Check teams in at your fields\nKeep games on schedule\nReport injuries and incidents to the lead",
+    "requirements": "Calm and friendly\nOn your feet all day\nBackground check"
+  },
+  {
+    "id": "event-staff", "label": "Event staff", "guide": "events",
+    "title": "Event Staff", "category": "events", "type": "seasonal", "workplace": "on-site", "payMin": 17, "payMax": 20, "payUnit": "hour",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Can you work the event dates?", "dealbreaker": "no" }, { "text": "Are you 16 or older?", "dealbreaker": "no" }],
+    "description": "Help run our events: check-in, gates, set-up and helping families find their way.",
+    "duties": "Set up and break down the event\nRun check-in and gates\nHelp families and teams",
+    "requirements": "Friendly and reliable\nOn your feet all day\nBackground check for youth events"
+  },
+  {
+    "id": "event-volunteer", "label": "Event volunteer", "guide": "events",
+    "title": "Event Volunteer", "category": "events", "type": "volunteer", "workplace": "on-site", "payMin": null, "payMax": null, "payUnit": "",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Which event days can you help?", "dealbreaker": "" }],
+    "description": "Give a few hours at our events and help make game day great for every player.",
+    "duties": "Help at check-in, concessions or the info tent\nGuide families and teams",
+    "requirements": "Friendly and reliable\nBackground check for youth events"
+  },
+  {
+    "id": "athletic-trainer", "label": "Athletic trainer / medic", "guide": "health",
+    "title": "Athletic Trainer", "category": "health", "type": "contract", "workplace": "on-site", "payMin": 40, "payMax": 60, "payUnit": "hour",
+    "youth": true, "checks": ["background", "cert", "firstaid", "concussion"],
+    "questions": [{ "text": "Are you a licensed athletic trainer or EMT?", "dealbreaker": "no" }],
+    "description": "Provide first care at games and tournaments, from taping to concussion checks.",
+    "duties": "Cover games and tournament fields\nAssess and treat injuries\nRun concussion protocol and write incident reports",
+    "requirements": "ATC or EMT licence\nCPR / AED\nConcussion protocol training"
+  },
+  {
+    "id": "camp-counselor", "label": "Camp counselor", "guide": "events",
+    "title": "Summer Camp Counselor", "category": "coaching", "type": "seasonal", "workplace": "on-site", "payMin": 18, "payMax": 22, "payUnit": "hour",
+    "youth": true, "checks": ["background", "safesport", "firstaid"],
+    "questions": [{ "text": "Are you free for the whole camp season?", "dealbreaker": "" }, { "text": "Are you 16 or older?", "dealbreaker": "no" }],
+    "description": "Lead games and small groups at our summer camps and make every camper feel welcome.",
+    "duties": "Lead a group of campers each day\nRun games and drills\nCheck campers in and out to their guardians",
+    "requirements": "Great with kids\nBackground check and SafeSport training\nFirst aid / CPR"
+  },
+  {
+    "id": "front-desk", "label": "Front desk", "guide": "facilities",
+    "title": "Front Desk", "category": "facilities", "type": "part-time", "workplace": "on-site", "payMin": 16, "payMax": 19, "payUnit": "hour",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Can you work weekend shifts?", "dealbreaker": "" }],
+    "description": "Welcome players and families, run check-in and keep the facility running smoothly.",
+    "duties": "Greet guests and run check-in\nAnswer calls and messages\nOpen and close the building",
+    "requirements": "Friendly and organised\nComfortable with simple systems\nBackground check if minors are on site"
+  },
+  {
+    "id": "facility-maintenance", "label": "Facility maintenance", "guide": "facilities",
+    "title": "Facility Maintenance", "category": "facilities", "type": "part-time", "workplace": "on-site", "payMin": 18, "payMax": 24, "payUnit": "hour",
+    "youth": false, "checks": ["references"],
+    "questions": [{ "text": "Have you done facility or grounds maintenance before?", "dealbreaker": "" }],
+    "description": "Keep our fields, turf and building safe and ready for play.",
+    "duties": "Set up fields and goals\nClean and repair the facility\nReport hazards",
+    "requirements": "Handy with tools\nSafe work habits"
+  },
+  {
+    "id": "photographer", "label": "Sports photographer", "guide": "media",
+    "title": "Game-Day Photographer", "category": "media", "type": "contract", "workplace": "on-site", "payMin": 150, "payMax": 300, "payUnit": "session",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Do you have your own camera gear?", "dealbreaker": "no" }, { "text": "Can you share a sports portfolio link?", "dealbreaker": "" }],
+    "description": "Shoot games and events for CLP Fútbol Photos and our partners. Pay is per session.",
+    "duties": "Shoot assigned games and events\nEdit and upload within 48 hours\nFollow our rules on photos of minors",
+    "requirements": "Sports portfolio\nYour own gear\nBackground check"
+  },
+  {
+    "id": "video-social", "label": "Video & social media", "guide": "media",
+    "title": "Video & Social Media Creator", "category": "media", "type": "part-time", "workplace": "hybrid", "payMin": 20, "payMax": 30, "payUnit": "hour",
+    "youth": false, "checks": [],
+    "questions": [{ "text": "Can you share examples of sports content you made?", "dealbreaker": "" }],
+    "description": "Film and edit short videos and run our social channels on game days.",
+    "duties": "Film highlights and behind-the-scenes\nEdit short videos\nPost and reply on our social channels",
+    "requirements": "Examples of your work\nComfortable with editing apps"
+  },
+  {
+    "id": "marketing-intern", "label": "Marketing intern", "guide": "office",
+    "title": "Marketing Intern", "category": "marketing", "type": "internship", "workplace": "hybrid", "payMin": 18, "payMax": 20, "payUnit": "hour",
+    "youth": false, "checks": [],
+    "questions": [{ "text": "Are you a current student or recent graduate?", "dealbreaker": "" }],
+    "description": "Help plan campaigns, write posts and grow our community for a semester.",
+    "duties": "Write posts and newsletters\nHelp plan campaigns and events\nTrack results",
+    "requirements": "Strong writer\nCurious about sport and marketing"
+  },
+  {
+    "id": "sales-associate", "label": "Sales associate", "guide": "office",
+    "title": "Partnerships Sales Associate", "category": "marketing", "type": "full-time", "workplace": "hybrid", "payMin": 45000, "payMax": 60000, "payUnit": "year",
+    "youth": false, "checks": ["references"],
+    "questions": [{ "text": "Do you have sales or partnership experience?", "dealbreaker": "" }],
+    "description": "Find and grow partnerships with clubs, brands and facilities.",
+    "duties": "Find and reach out to new partners\nRun calls and demos\nKeep the pipeline up to date",
+    "requirements": "1+ years in sales or partnerships\nClear communicator"
+  },
+  {
+    "id": "brand-ambassador", "label": "Brand ambassador", "guide": "events",
+    "title": "Brand Ambassador", "category": "marketing", "type": "contract", "workplace": "on-site", "payMin": 20, "payMax": 25, "payUnit": "hour",
+    "youth": true, "checks": ["background"],
+    "questions": [{ "text": "Can you work the activation dates?", "dealbreaker": "no" }],
+    "description": "Represent the brand at events: run sampling, games and sign-ups with energy.",
+    "duties": "Run the activation booth\nTalk to families and players\nCollect sign-ups",
+    "requirements": "Outgoing and reliable\nBackground check for youth activations"
+  },
+  {
+    "id": "print-operator", "label": "Print / production operator", "guide": "production",
+    "title": "Print Operator", "category": "admin", "type": "full-time", "workplace": "on-site", "payMin": 19, "payMax": 24, "payUnit": "hour",
+    "youth": false, "checks": ["id"],
+    "questions": [{ "text": "Have you run print or production machines before?", "dealbreaker": "" }],
+    "description": "Print and finish uniforms and gear for teams and partners.",
+    "duties": "Run print and heat-press machines\nCheck quality before packing\nKeep the area safe and tidy",
+    "requirements": "Careful and accurate\nSafe work habits"
+  }
+]

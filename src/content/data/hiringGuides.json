@@ -1,0 +1,90 @@
+{
+  "coaching": {
+    "label": "Coaching",
+    "lookFor": ["Clear, safe set-up and warm-up", "Every player gets lots of touches", "Corrections are positive and specific", "Keeps the group moving, little standing around"],
+    "questions": [
+      { "q": "Walk us through how you planned today’s session.", "listen": "A clear goal, progression from simple to game-like" },
+      { "q": "A player is upset after being benched. What do you do?", "listen": "Empathy, talking to the player first, involving parents calmly" },
+      { "q": "How do you keep families in the loop during a season?", "listen": "Regular, simple updates through CLP Messages" },
+      { "q": "What would your first month with this team look like?", "listen": "Getting to know players, setting standards, realistic goals" }
+    ],
+    "criteria": ["Runs an organised session", "Connects with the players", "Teaches clearly at this age", "Fits our way of coaching"]
+  },
+  "officiating": {
+    "label": "Officiating",
+    "lookFor": ["Knows the laws of the game", "Calm, clear signals", "Good positioning and fitness", "Handles coaches and parents with respect"],
+    "questions": [
+      { "q": "Tell us about a tough call you made and how you handled the reaction.", "listen": "Composure, explaining briefly, not arguing" },
+      { "q": "How do you prepare on a game day?", "listen": "Arrives early, checks the field and gear, knows the rules of the event" },
+      { "q": "A coach keeps shouting at a young player’s mistakes. What do you do?", "listen": "Steps in calmly, protects the player, reports if it goes on" },
+      { "q": "Which days and how many games can you do in a weekend?", "listen": "Realistic availability, reliable" }
+    ],
+    "criteria": ["Knows the laws", "Game management", "Fitness and positioning", "Reliability"]
+  },
+  "events": {
+    "label": "Events & operations",
+    "lookFor": ["Friendly with families and guests", "Stays calm when it gets busy", "Follows a plan and checklists", "Speaks up when something is unsafe"],
+    "questions": [
+      { "q": "Tell us about a busy event you worked. What was your job?", "listen": "Clear role, took ownership, worked with the team" },
+      { "q": "A parent is angry about a schedule change. What do you do?", "listen": "Listens, stays calm, finds the right person" },
+      { "q": "You notice a safety problem near a field. What happens next?", "listen": "Acts at once, tells the lead, keeps people clear" },
+      { "q": "Which dates can you work, and can you be there early?", "listen": "Matches the event days, reliable" }
+    ],
+    "criteria": ["Customer care", "Calm under pressure", "Follows the plan", "Reliability"]
+  },
+  "health": {
+    "label": "Health & performance",
+    "lookFor": ["Holds the right licence or certification", "Explains things simply to athletes", "Puts safety first", "Plans by age and level"],
+    "questions": [
+      { "q": "How do you build a plan for a young athlete in season?", "listen": "Load management, age-appropriate, talks to the coach" },
+      { "q": "An athlete says they’re fine but you think they’re hurt. What do you do?", "listen": "Safety first, follows protocol, involves guardians" },
+      { "q": "How do you keep notes and share them with the team?", "listen": "Private, organised, shares only what is needed" },
+      { "q": "Which certifications do you hold, and when do they expire?", "listen": "Current and verifiable" }
+    ],
+    "criteria": ["Expertise", "Safety first", "Communication", "Plans by age and level"]
+  },
+  "facilities": {
+    "label": "Facilities & front desk",
+    "lookFor": ["Friendly first impression", "Organised and on time", "Comfortable with simple systems", "Takes care of the space"],
+    "questions": [
+      { "q": "Tell us about a time you helped a customer who was upset.", "listen": "Patience, owns the problem, follows up" },
+      { "q": "How do you open or close a building safely?", "listen": "Checklists, locks, lights, reports problems" },
+      { "q": "A child is waiting and no one has come to pick them up. What do you do?", "listen": "Stays with them, follows the pick-up policy, calls the contact" },
+      { "q": "Which shifts can you cover?", "listen": "Matches the schedule, reliable" }
+    ],
+    "criteria": ["Customer care", "Reliability", "Care of the space", "Follows policy"]
+  },
+  "media": {
+    "label": "Media & content",
+    "lookFor": ["Strong portfolio of sport", "Knows where to stand and when", "Fast, tidy delivery", "Respects rules on photos of minors"],
+    "questions": [
+      { "q": "Walk us through your portfolio. Which shot are you proudest of?", "listen": "Timing, storytelling, technical control" },
+      { "q": "How fast can you deliver edited photos after a game?", "listen": "Realistic turnaround, organised workflow" },
+      { "q": "A parent asks you not to photograph their child. What do you do?", "listen": "Respects it at once, tells the lead, removes any shots" },
+      { "q": "What gear do you bring, and what do you need from us?", "listen": "Prepared, clear about needs" }
+    ],
+    "criteria": ["Quality of work", "Speed and organisation", "Safeguarding", "Fit with our brand"]
+  },
+  "office": {
+    "label": "Marketing, sales & office",
+    "lookFor": ["Clear writer and speaker", "Organised with follow-ups", "Curious about sport and our community", "Comfortable with numbers and tools"],
+    "questions": [
+      { "q": "Tell us about a project you led from idea to result.", "listen": "Ownership, a measurable result, learning" },
+      { "q": "How would you grow sign-ups for a youth program?", "listen": "Knows the audience, simple practical ideas" },
+      { "q": "How do you keep track of many tasks and people?", "listen": "Tools, routines, follows up" },
+      { "q": "What do you want to learn in this role?", "listen": "Clear goals that fit the role" }
+    ],
+    "criteria": ["Communication", "Organisation", "Initiative", "Fit with our team"]
+  },
+  "production": {
+    "label": "Production",
+    "lookFor": ["Careful and accurate", "Works safely with machines", "Keeps a steady pace", "Checks quality before it ships"],
+    "questions": [
+      { "q": "Tell us about machines or tools you’ve run before.", "listen": "Relevant experience, safety habits" },
+      { "q": "You notice a batch has a mistake. What do you do?", "listen": "Stops, tells the lead, does not ship it" },
+      { "q": "How do you keep your area safe and tidy?", "listen": "Routines, reports hazards" },
+      { "q": "Which shifts can you work?", "listen": "Matches the schedule, reliable" }
+    ],
+    "criteria": ["Accuracy", "Safety", "Pace", "Reliability"]
+  }
+}
