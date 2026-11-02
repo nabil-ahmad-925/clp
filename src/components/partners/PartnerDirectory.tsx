@@ -181,17 +181,6 @@ function Directory({ category, label }: { category: string; label: string }) {
       <div className={t.bar}>
         <div className={t.barRow}>
           <div className={t.filters}>
-            <FilterChip
-              name="Sport"
-              icon={<LuVolleyball />}
-              plural="sports"
-              options={sportOptions}
-              value={filters.sports}
-              open={open === 'sport'}
-              onOpenChange={(o) => setOpen(o ? 'sport' : null)}
-              resultsFor={(draft) => count({ ...filters, sports: draft })}
-              onApply={(sports) => apply({ ...filters, sports })}
-            />
             {typeFilter && (
               <FilterChip
                 name="All Partners"
@@ -206,7 +195,18 @@ function Directory({ category, label }: { category: string; label: string }) {
                 onApply={(types) => apply({ ...filters, types })}
               />
             )}
-            {search.q && <AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => setSearch?.({ ...search, q: '' })} />}
+            <FilterChip
+              name="Sport"
+              icon={<LuVolleyball />}
+              plural="sports"
+              options={sportOptions}
+              value={filters.sports}
+              open={open === 'sport'}
+              onOpenChange={(o) => setOpen(o ? 'sport' : null)}
+              resultsFor={(draft) => count({ ...filters, sports: draft })}
+              onApply={(sports) => apply({ ...filters, sports })}
+            />
+            {search.q &&<AppliedPill icon={<LuSearch />} label={`“${search.q}”`} onClear={() => setSearch?.({ ...search, q: '' })} />}
             {search.loc && <AppliedPill icon={<LuMapPin />} label={search.loc} onClear={() => setSearch?.({ ...search, loc: '' })} />}
             {anyChosen && (
               <button type="button" className={t.clearAll} onClick={clearAll}>
@@ -217,8 +217,8 @@ function Directory({ category, label }: { category: string; label: string }) {
           <div className={t.mobileFilters}>
             <MobileFilters
               sections={[
-                { id: 'sport', heading: 'Sport', options: sportOptions, value: filters.sports },
                 ...(typeFilter ? [{ id: 'type', heading: 'Partner Type', options: typeOptions, value: filters.types }] : []),
+                { id: 'sport', heading: 'Sport', options: sportOptions, value: filters.sports },
               ]}
               applied={(filters.sports.length > 0 ? 1 : 0) + (filters.types.length > 0 ? 1 : 0)}
               sort={{ value: sort, options: SORTS }}
