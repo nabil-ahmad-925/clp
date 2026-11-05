@@ -22,7 +22,9 @@
       "appointments",
       "documents"
     ],
-    "photo": [],
+    "photo": [
+      "projects"
+    ],
     "brand": [
       "pickups",
       "sponsors",
@@ -110,6 +112,7 @@
       "quotes"
     ],
     "photo": [
+      "projects",
       "listedservices"
     ]
   },
