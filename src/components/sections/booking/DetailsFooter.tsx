@@ -19,14 +19,14 @@ type Props = {
 };
 
 /**
- * The foot of Book Now's details: Book Now, or first who's entering where a tournament or league is set up for the
- * listing. A team applies on its own page (Enter A Team), an individual books here as before.
+ * The foot of Book Now's details: Book Now, or (Camps & Tournaments, Leagues & Social Clubs) first who's entering. A team
+ * applies on its own page (Enter A Team) once the organizer has set up its divisions; an individual books here.
  */
 export default function DetailsFooter({ widgetId, listingId, bookLabel, hint, onePerson, onBook }: Props) {
   const router = useRouter();
   const [who, setWho] = useState<Who | null>(null);
-  const teamsOpen = useTeamsOpen(widgetId, listingId);
-  if (!teamsOpen) {
+  const teams = useTeamsOpen(widgetId, listingId);
+  if (teams === 'none') {
     return (
       <div className={modal.footer}>
         <button type="button" className={modal.primary} onClick={onBook}>
@@ -36,8 +36,10 @@ export default function DetailsFooter({ widgetId, listingId, bookLabel, hint, on
       </div>
     );
   }
+  // Team is always offered here; until the organizer adds its divisions, it says so and can't be chosen.
+  const teamClosed = teams === 'notSetUp';
   const options: [Who, string, string][] = [
-    ['team', 'Team', 'Enter a team. The organizer reviews it, nothing is charged until approved.'],
+    ['team', 'Team', teams === 'checking' ? 'Checking team entries…' : teamClosed ? 'Team entries aren’t open yet. The organizer adds the divisions first.' : 'Enter a team. The organizer reviews it, nothing is charged until approved.'],
     ['individual', 'Individual', onePerson ? 'One person, yourself or your child.' : 'Book a spot for yourself or your family.'],
   ];
   const go = () => (who === 'team' ? router.push(enterTeamHref(widgetId, listingId)) : onBook());
@@ -48,7 +50,7 @@ export default function DetailsFooter({ widgetId, listingId, bookLabel, hint, on
       </span>
       <div className={s.choices} role="radiogroup" aria-labelledby="entry-who">
         {options.map(([id, title, line]) => (
-          <button key={id} type="button" role="radio" aria-checked={who === id} className={s.choice} onClick={() => setWho(id)}>
+          <button key={id} type="button" role="radio" aria-checked={who === id} disabled={id === 'team' && teams !== 'open'} className={s.choice} onClick={() => setWho(id)}>
             <span className={s.dot} aria-hidden />
             <span>
               <strong>{title}</strong>
