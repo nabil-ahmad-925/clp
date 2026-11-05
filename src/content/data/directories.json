@@ -87389,12 +87389,12 @@
  },
  "/volunteering-open-play/": {
   "meta": {
-   "title": "Volunteering / Open Play - Compete Like Pros™",
+   "title": "Volunteering & Open Play - Compete Like Pros™",
    "description": ""
   },
   "hero": {
    "title": [
-    "Volunteering / Open Play"
+    "Volunteering & Open Play"
    ],
    "backgroundColor": "#0a0a0a",
    "height": 350
@@ -87408,324 +87408,297 @@
       "width": "12",
       "blocks": [
        {
-        "type": "mapDirectory",
-        "center": {
-         "lat": 37.079744,
-         "lng": -90.303852
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
         },
-        "zoom": 4,
-        "height": 400,
-        "styles": "[{\"featureType\":\"administrative\",\"elementType\":\"labels.text.fill\",\"stylers\":[{\"color\":\"#686868\"}]},{\"featureType\":\"landscape\",\"elementType\":\"all\",\"stylers\":[{\"color\":\"#f2f2f2\"}]},{\"featureType\":\"poi\",\"elementType\":\"all\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":\"road\",\"elementType\":\"all\",\"stylers\":[{\"saturation\":-100},{\"lightness\":45}]},{\"featureType\":\"road.highway\",\"elementType\":\"all\",\"stylers\":[{\"visibility\":\"simplified\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"geometry.fill\",\"stylers\":[{\"lightness\":\"-22\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"geometry.stroke\",\"stylers\":[{\"saturation\":\"11\"},{\"lightness\":\"-51\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"labels.text\",\"stylers\":[{\"saturation\":\"3\"},{\"lightness\":\"-56\"},{\"weight\":\"2.20\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"labels.text.fill\",\"stylers\":[{\"lightness\":\"-52\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"labels.text.stroke\",\"stylers\":[{\"weight\":\"6.13\"}]},{\"featureType\":\"road.highway\",\"elementType\":\"labels.icon\",\"stylers\":[{\"lightness\":\"-10\"},{\"gamma\":\"0.94\"},{\"weight\":\"1.24\"},{\"saturation\":\"-100\"},{\"visibility\":\"off\"}]},{\"featureType\":\"road.arterial\",\"elementType\":\"geometry\",\"stylers\":[{\"lightness\":\"-16\"}]},{\"featureType\":\"road.arterial\",\"elementType\":\"labels.text.fill\",\"stylers\":[{\"saturation\":\"-41\"},{\"lightness\":\"-41\"}]},{\"featureType\":\"road.arterial\",\"elementType\":\"labels.text.stroke\",\"stylers\":[{\"weight\":\"5.46\"}]},{\"featureType\":\"road.arterial\",\"elementType\":\"labels.icon\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":\"road.local\",\"elementType\":\"geometry.fill\",\"stylers\":[{\"weight\":\"0.72\"},{\"lightness\":\"-16\"}]},{\"featureType\":\"road.local\",\"elementType\":\"labels.text.fill\",\"stylers\":[{\"lightness\":\"-37\"}]},{\"featureType\":\"transit\",\"elementType\":\"all\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":\"water\",\"elementType\":\"all\",\"stylers\":[{\"color\":\"#b7e4f4\"},{\"visibility\":\"on\"}]}]",
-        "skin": "text",
-        "perPage": 4,
-        "categories": [
-         {
-          "id": "",
-          "name": "ALL SPORTS"
-         },
-         {
-          "id": "5",
-          "name": "Baseball"
-         },
-         {
-          "id": "6",
-          "name": "Basketball"
-         },
-         {
-          "id": "7",
-          "name": "Esports"
-         },
-         {
-          "id": "8",
-          "name": "Fútbol (Soccer)"
-         },
-         {
-          "id": "9",
-          "name": "Golfing"
-         },
-         {
-          "id": "10",
-          "name": "Pickleball"
-         }
-        ],
         "filters": [
          {
-          "key": "age-group",
-          "label": "AGE GROUP",
+          "key": "age",
+          "label": "ALL AGE",
           "options": [
            {
-            "value": "adults (18+)",
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "adults-18",
             "label": "Adults (18+)"
            },
            {
-            "value": "teenagers (13 - 17)",
-            "label": "Teenagers (13 - 17)"
+            "value": "adults-21",
+            "label": "Adults (21+)"
            },
            {
-            "value": "toddlers (4 - 7)",
-            "label": "Toddlers (4 - 7)"
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
            }
           ]
          },
          {
-          "key": "all-cost",
-          "label": "ALL COST ($)",
+          "key": "language",
+          "label": "City",
           "options": [
            {
-            "value": "100 - 249",
-            "label": "100 - 249"
+            "value": "",
+            "label": "All Cities"
            },
            {
-            "value": "1000 - 2499",
-            "label": "1000 - 2499"
+            "value": "new-york",
+            "label": "New York City"
            },
            {
-            "value": "500 - 999",
-            "label": "500 - 999"
-           }
-          ]
-         },
-         {
-          "key": "city",
-          "label": "ALL CITIES",
-          "options": [
-           {
-            "value": "denton",
-            "label": "Denton"
+            "value": "austin",
+            "label": "Austin"
            },
            {
-            "value": "el paso",
-            "label": "El Paso"
+            "value": "boston",
+            "label": "Boston"
            },
            {
-            "value": "new york",
-            "label": "New York"
+            "value": "charlotte",
+            "label": "Charlotte"
            },
            {
-            "value": "san diego",
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "san-diego",
             "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
            }
           ]
          },
          {
-          "key": "experience-type",
-          "label": "EXPERIENCE TYPE",
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
           "options": [
            {
-            "value": "amateur/club",
-            "label": "Amateur/Club"
+            "value": "",
+            "label": "All Experience"
            },
            {
-            "value": "charity play",
-            "label": "Charity Play"
+            "value": "community-service",
+            "label": "Community Service"
            },
            {
-            "value": "clinics",
-            "label": "Clinics"
+            "value": "mentoring",
+            "label": "Mentoring"
            },
            {
-            "value": "coaching certification",
-            "label": "Coaching Certification"
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
            },
            {
-            "value": "combine/recruiting",
-            "label": "Combine/Recruiting"
+            "value": "free-open-play",
+            "label": "Free Open Play"
            },
            {
-            "value": "full-day camps",
-            "label": "Full-Day Camps"
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
            },
            {
-            "value": "fundraiser",
-            "label": "Fundraiser"
+            "value": "500-to-999",
+            "label": "$500 to $999"
            },
            {
-            "value": "half-day camps",
-            "label": "Half-Day Camps"
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
            },
            {
-            "value": "invitational",
-            "label": "Invitational"
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
            },
            {
-            "value": "leadership development",
-            "label": "Leadership Development"
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
            },
            {
-            "value": "mental health and wellness",
-            "label": "Mental Health and Wellness"
+            "value": "10k",
+            "label": "$10k+"
            },
            {
-            "value": "multi-week camps",
-            "label": "Multi-Week Camps"
+            "value": "250-to-499",
+            "label": "$250 to $499"
            },
            {
-            "value": "officiating certification",
-            "label": "Officiating Certification"
+            "value": "100-to-249",
+            "label": "$100 to $249"
            },
            {
-            "value": "overnight",
-            "label": "Overnight"
+            "value": "50-to-99",
+            "label": "$50 to $99"
            },
            {
-            "value": "overnight camps",
-            "label": "Overnight Camps"
+            "value": "25-to-49",
+            "label": "$25 to $49"
            },
            {
-            "value": "performance and resilience",
-            "label": "Performance and Resilience"
+            "value": "free",
+            "label": "Free"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
            },
            {
-            "value": "showcase",
-            "label": "Showcase"
+            "value": "january",
+            "label": "January"
            },
            {
-            "value": "sports business and marketing",
-            "label": "Sports Business and Marketing"
+            "value": "february",
+            "label": "February"
            },
            {
-            "value": "weekend camps",
-            "label": "Weekend Camps"
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
            }
           ]
          }
         ],
-        "radius": {
-         "label": "SELECT RADIUS",
-         "options": [
-          5,
-          10,
-          15,
-          20,
-          25,
-          50,
-          100,
-          200,
-          500
-         ],
-         "unit": "miles"
-        },
-        "markerIcon": "upload:/2024/05/clp-map-pin-gold.png",
-        "places": [
-         {
-          "id": "1",
-          "title": "NYC Academy",
-          "address": "New York, NY, USA",
-          "content": "Testing testing testing",
-          "lat": 40.7127753,
-          "lng": -74.0059728,
-          "city": "New York",
-          "zoom": 5,
-          "categories": [
-           "Baseball"
-          ],
-          "categoryIds": [
-           "5"
-          ],
-          "image": "upload:/2024/04/Basketball-content-300x200.png",
-          "learnMore": "",
-          "extra": {
-           "age-group": "",
-           "all-cost": "",
-           "experience-type": ""
-          }
-         },
-         {
-          "id": "3",
-          "title": "location 1",
-          "address": "San Diego State University, San Diego, CA, United States",
-          "content": "This is sample description about the location.",
-          "lat": 32.7757217,
-          "lng": -117.0718893,
-          "city": "San Diego",
-          "zoom": 5,
-          "categories": [
-           "Esports",
-           "Fútbol (Soccer)"
-          ],
-          "categoryIds": [
-           "7",
-           "8"
-          ],
-          "image": "upload:/2024/06/unnamed-1-300x159.jpg",
-          "learnMore": "",
-          "extra": {
-           "age-group": "",
-           "all-cost": "",
-           "experience-type": "Clinics,Coaching Certification,Leadership Development,Mental Health and Wellness,Sports Business and Marketing,Officiating Certification,Performance and Resilience"
-          }
-         },
-         {
-          "id": "4",
-          "title": "Leagues / Social Clubs 232",
-          "address": "The University of Texas At El Paso, West University Avenue, El Paso, TX, United States",
-          "content": "This is sample description about the location.",
-          "lat": 31.7708544,
-          "lng": -106.5046216,
-          "city": "El Paso",
-          "zoom": 5,
-          "categories": [
-           "Golfing",
-           "Pickleball"
-          ],
-          "categoryIds": [
-           "9",
-           "10"
-          ],
-          "image": "upload:/2024/06/unnamed-1-300x159.jpg",
-          "learnMore": "",
-          "extra": {
-           "age-group": "Teenagers (13 - 17)",
-           "all-cost": "500 - 999",
-           "experience-type": "Overnight"
-          }
-         },
-         {
-          "id": "5",
-          "title": "CAMPS & TOURNAMENT EXPERIENCE",
-          "address": "University of Virginia, Charlottesville, VA, United States",
-          "content": "This is sample description about the location.",
-          "lat": 38.0335529,
-          "lng": -78.5079772,
-          "city": "El Paso",
-          "zoom": 5,
-          "categories": [
-           "Basketball"
-          ],
-          "categoryIds": [
-           "6"
-          ],
-          "image": "upload:/2024/06/unnamed-1-300x159.jpg",
-          "learnMore": "https://www.soxcessful.com/",
-          "extra": {
-           "age-group": "Toddlers (4 - 7)",
-           "all-cost": "100 - 249",
-           "experience-type": "Amateur/Club,Charity Play,Combine/Recruiting,Full-Day Camps,Fundraiser,Half-Day Camps,Invitational,Multi-Week Camps,Overnight Camps,Showcase,Weekend Camps"
-          }
-         },
-         {
-          "id": "7",
-          "title": "location 5",
-          "address": "Texas Woman University, Administration Drive, Denton, TX, United States",
-          "content": "This is sample description about the location.",
-          "lat": 33.2263112,
-          "lng": -97.1281615,
-          "city": "Denton",
-          "zoom": 5,
-          "categories": [
-           "Esports"
-          ],
-          "categoryIds": [
-           "7"
-          ],
-          "learnMore": "",
-          "extra": {
-           "age-group": "Adults (18+)",
-           "all-cost": "1000 - 2499",
-           "experience-type": ""
-          }
-         }
-        ]
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
        }
       ]
      }
@@ -133302,6 +133275,2146 @@
      "Outings & Charity Games"
     ],
     "href": "/portfolio/sampling/"
+   }
+  ]
+ },
+ "/volunteering-open-play-baseball-softball/": {
+  "meta": {
+   "title": "Volunteering & Open Play Baseball & Softball - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Baseball & Softball Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "tampa",
+            "label": "Tampa"
+           },
+           {
+            "value": "washington-d-c",
+            "label": "Washington D.C."
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           },
+           {
+            "value": "winter-sports",
+            "label": "Winter Sports"
+           }
+          ],
+          "preset": "baseball-softball",
+          "hidden": true
+         }
+        ],
+        "items": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "/volunteering-open-play-basketball/": {
+  "meta": {
+   "title": "Volunteering & Open Play Basketball - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Basketball Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           }
+          ],
+          "preset": "basketball",
+          "hidden": true
+         }
+        ],
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "/volunteering-open-play-esports/": {
+  "meta": {
+   "title": "Volunteering & Open Play Esports - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Esports Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           },
+           {
+            "value": "winter-sports",
+            "label": "Winter Sports"
+           }
+          ],
+          "preset": "esports",
+          "hidden": true
+         }
+        ],
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "/volunteering-open-play-futbol-soccer/": {
+  "meta": {
+   "title": "Volunteering & Open Play Fútbol - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Fútbol Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "anchorage",
+            "label": "Anchorage"
+           },
+           {
+            "value": "arizona",
+            "label": "Arizona"
+           },
+           {
+            "value": "atlanta",
+            "label": "Atlanta"
+           },
+           {
+            "value": "detriot",
+            "label": "Detriot"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           },
+           {
+            "value": "memphis",
+            "label": "Memphis"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "dallas",
+            "label": "Dallas"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "honolulu",
+            "label": "Honolulu"
+           },
+           {
+            "value": "houston",
+            "label": "Houston"
+           },
+           {
+            "value": "jacksonville",
+            "label": "Jacksonville"
+           },
+           {
+            "value": "indianapolis",
+            "label": "Indianapolis"
+           },
+           {
+            "value": "kansas-city",
+            "label": "Kansas City"
+           },
+           {
+            "value": "lancaster",
+            "label": "Lancaster"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "minneapolis",
+            "label": "Minneapolis"
+           },
+           {
+            "value": "nashville",
+            "label": "Nashville"
+           },
+           {
+            "value": "new-orleans",
+            "label": "New Orleans"
+           },
+           {
+            "value": "newark",
+            "label": "Newark"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "oklahoma-city",
+            "label": "Oklahoma City"
+           },
+           {
+            "value": "orlando",
+            "label": "Orlando"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "phoenix",
+            "label": "Phoenix"
+           },
+           {
+            "value": "raleigh",
+            "label": "Raleigh"
+           },
+           {
+            "value": "portland",
+            "label": "Portland"
+           },
+           {
+            "value": "salt-lake-city",
+            "label": "Salt Lake City"
+           },
+           {
+            "value": "san-antonio",
+            "label": "San Antonio"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "san-jose",
+            "label": "San Jose"
+           },
+           {
+            "value": "san-juan",
+            "label": "San Juan"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "tampa",
+            "label": "Tampa"
+           },
+           {
+            "value": "washington-d-c",
+            "label": "Washington D.C."
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           },
+           {
+            "value": "winter-sports",
+            "label": "Winter Sports"
+           }
+          ],
+          "preset": "futbol-soccer",
+          "hidden": true
+         }
+        ],
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "/volunteering-open-play-golf/": {
+  "meta": {
+   "title": "Volunteering & Open Play Golf - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Golf Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "charlotte",
+            "label": "Charlotte"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "denver",
+            "label": "Denver"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           },
+           {
+            "value": "miami",
+            "label": "Miami"
+           },
+           {
+            "value": "philadelphia",
+            "label": "Philadelphia"
+           },
+           {
+            "value": "san-diego",
+            "label": "San Diego"
+           },
+           {
+            "value": "san-francisco",
+            "label": "San Francisco"
+           },
+           {
+            "value": "seattle",
+            "label": "Seattle"
+           },
+           {
+            "value": "las-vegas",
+            "label": "Las Vegas"
+           },
+           {
+            "value": "florida",
+            "label": "Florida"
+           },
+           {
+            "value": "fort-myers",
+            "label": "Fort Myers"
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           },
+           {
+            "value": "1-to-24",
+            "label": "$1 to $24"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           },
+           {
+            "value": "winter-sports",
+            "label": "Winter Sports"
+           }
+          ],
+          "preset": "golfing",
+          "hidden": true
+         }
+        ],
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "/volunteering-open-play-pickleball/": {
+  "meta": {
+   "title": "Volunteering & Open Play Pickleball - Compete Like Pros™",
+   "description": ""
+  },
+  "hero": {
+   "title": [
+    "Pickleball Volunteering",
+    "& Open Play Nearby"
+   ],
+   "backgroundColor": "#0a0a0a",
+   "height": 350
+  },
+  "rows": [
+   {
+    "paddingTop": "0px",
+    "paddingBottom": "0px",
+    "columns": [
+     {
+      "width": "12",
+      "blocks": [
+       {
+        "type": "divider",
+        "height": 25
+       },
+       {
+        "type": "team",
+        "widgetId": 48,
+        "layout": {
+         "width": "1200px",
+         "colGap": 10,
+         "rowGap": 15,
+         "filterColumns": 3
+        },
+        "filters": [
+         {
+          "key": "age",
+          "label": "ALL AGE",
+          "options": [
+           {
+            "value": "",
+            "label": "All Ages"
+           },
+           {
+            "value": "toddlers-2-4",
+            "label": "Toddlers (2-4)"
+           },
+           {
+            "value": "youth-5-12",
+            "label": "Youth (5-12)"
+           },
+           {
+            "value": "teens-13-17",
+            "label": "Teens (13-17)"
+           },
+           {
+            "value": "adults-18",
+            "label": "Adults (18+)"
+           },
+           {
+            "value": "adults-21",
+            "label": "Adults (21+)"
+           }
+          ]
+         },
+         {
+          "key": "language",
+          "label": "City",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cities"
+           },
+           {
+            "value": "new-york",
+            "label": "New York City"
+           },
+           {
+            "value": "austin",
+            "label": "Austin"
+           },
+           {
+            "value": "boston",
+            "label": "Boston"
+           },
+           {
+            "value": "chicago",
+            "label": "Chicago"
+           },
+           {
+            "value": "los-angeles",
+            "label": "Los Angeles"
+           }
+          ]
+         },
+         {
+          "key": "experiencesvolunteer",
+          "label": "All Experience",
+          "options": [
+           {
+            "value": "",
+            "label": "All Experience"
+           },
+           {
+            "value": "community-service",
+            "label": "Community Service"
+           },
+           {
+            "value": "mentoring",
+            "label": "Mentoring"
+           },
+           {
+            "value": "travel-volunteer",
+            "label": "Travel & Volunteer"
+           },
+           {
+            "value": "free-open-play",
+            "label": "Free Open Play"
+           },
+           {
+            "value": "paid-drop-in",
+            "label": "Paid Drop-Ins"
+           }
+          ]
+         },
+         {
+          "key": "extra-five",
+          "label": "cost",
+          "options": [
+           {
+            "value": "",
+            "label": "All Cost"
+           },
+           {
+            "value": "500-to-999",
+            "label": "$500 to $999"
+           },
+           {
+            "value": "1000-to-2499",
+            "label": "$1,000 to $2,499"
+           },
+           {
+            "value": "2500-to-4999",
+            "label": "$2,500 to $4,999"
+           },
+           {
+            "value": "5000-to-9999",
+            "label": "$5,000 to $9,999"
+           },
+           {
+            "value": "10k",
+            "label": "$10k+"
+           },
+           {
+            "value": "250-to-499",
+            "label": "$250 to $499"
+           },
+           {
+            "value": "100-to-249",
+            "label": "$100 to $249"
+           },
+           {
+            "value": "50-to-99",
+            "label": "$50 to $99"
+           },
+           {
+            "value": "25-to-49",
+            "label": "$25 to $49"
+           },
+           {
+            "value": "free",
+            "label": "Free"
+           }
+          ]
+         },
+         {
+          "key": "alldates",
+          "label": "Date",
+          "options": [
+           {
+            "value": "",
+            "label": "All Dates"
+           },
+           {
+            "value": "january",
+            "label": "January"
+           },
+           {
+            "value": "february",
+            "label": "February"
+           },
+           {
+            "value": "march",
+            "label": "March"
+           },
+           {
+            "value": "april",
+            "label": "April"
+           },
+           {
+            "value": "may",
+            "label": "May"
+           },
+           {
+            "value": "june",
+            "label": "June"
+           },
+           {
+            "value": "july",
+            "label": "July"
+           },
+           {
+            "value": "august",
+            "label": "August"
+           },
+           {
+            "value": "september",
+            "label": "September"
+           },
+           {
+            "value": "october",
+            "label": "October"
+           },
+           {
+            "value": "november",
+            "label": "November"
+           },
+           {
+            "value": "december",
+            "label": "December"
+           }
+          ]
+         },
+         {
+          "key": "extra-one",
+          "label": "Sport",
+          "options": [
+           {
+            "value": "",
+            "label": "All Sports"
+           },
+           {
+            "value": "baseball-softball",
+            "label": "Baseball & Softball"
+           },
+           {
+            "value": "basketball",
+            "label": "Basketball"
+           },
+           {
+            "value": "esports",
+            "label": "Esports"
+           },
+           {
+            "value": "futbol-soccer",
+            "label": "Fútbol (Soccer)"
+           },
+           {
+            "value": "golfing",
+            "label": "Golfing"
+           },
+           {
+            "value": "pickleball",
+            "label": "Pickleball"
+           },
+           {
+            "value": "winter-sports",
+            "label": "Winter Sports"
+           }
+          ],
+          "preset": "pickleball",
+          "hidden": true
+         }
+        ],
+        "items": []
+       },
+       {
+        "type": "divider",
+        "height": 25
+       }
+      ]
+     }
+    ]
    }
   ]
  }

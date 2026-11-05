@@ -1,0 +1,247 @@
+/* Enter A Team (design board 5, "Enter your team"): a sand heading band, the five steps, the step beside its summary. */
+
+.page {
+  background: var(--white);
+  color: #1a1a1a;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* Black behind the site's fixed header, as the design's top bar. */
+.headerSpace {
+  height: var(--header-height);
+  background: #111;
+}
+
+.band {
+  padding: 24px;
+  border-bottom: 1px solid #e3ddd2;
+  background: #f6f3ee;
+}
+
+.bandInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.eyebrow {
+  color: #6e5119;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.line {
+  margin-top: 4px;
+  color: #4f493f;
+  font-size: 15px;
+}
+
+.notice {
+  max-width: 360px;
+  padding: 12px 16px;
+  border: 1px solid #e3ddd2;
+  border-radius: 12px;
+  background: var(--white);
+  color: #4f493f;
+  font-size: 14px;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* 1200px of content, lined up with the band's. */
+  max-width: 1248px;
+  margin: 0 auto;
+  padding: 24px 24px 96px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stepButton {
+  width: 100%;
+  min-height: 56px;
+  padding: 10px 12px;
+  border: 1px solid #e3ddd2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #5f584d;
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.stepButton[data-state='done'] {
+  border-color: #e5d3ad;
+  background: #faf3e3;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.stepButton[data-state='now'] {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: var(--white);
+}
+
+.stepNum {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stepLabel {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.main {
+  display: flex;
+  flex: 999 1 560px;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid #eee8de;
+}
+
+.footHint {
+  flex: 1 1 200px;
+  color: #5f584d;
+  font-size: 14px;
+  text-align: right;
+}
+
+.back,
+.next {
+  height: 48px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.back {
+  padding: 0 22px;
+  border: 1px solid #e3ddd2;
+  background: var(--white);
+  font-weight: 600;
+}
+
+.next {
+  padding: 0 26px;
+  border: 0;
+  background: #1a1a1a;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.next:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #f3c7c2;
+  border-radius: 12px;
+  background: #fde9e7;
+  color: #9b1c14;
+  font-size: 14px;
+}
+
+.status {
+  padding: 64px 24px;
+  color: #4f493f;
+  text-align: center;
+}
+
+.status h1 {
+  margin: 0 0 8px;
+  color: #1a1a1a;
+  font-family: var(--font-heading);
+  font-size: 24px;
+}
+
+.status a {
+  color: #7a5a1f;
+}
+
+@media (max-width: 760px) {
+  .band {
+    padding: 20px 16px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .notice {
+    max-width: none;
+  }
+
+  .wrap {
+    padding: 20px 16px 72px;
+  }
+
+  /* Five steps don't fit across a phone: they scroll sideways in their own row. */
+  .steps {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .steps li {
+    flex: 0 0 150px;
+    scroll-snap-align: start;
+  }
+
+  .footHint {
+    order: -1;
+    flex-basis: 100%;
+    text-align: left;
+  }
+}

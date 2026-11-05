@@ -45,6 +45,8 @@ export type FacilityCard = {
 export type DirectoryItem = FacilityCard & {
   id: string;
   tags: string[];
+  /** How it runs, when it isn't its category's usual kind (listingKinds.json). */
+  kind?: string;
   /** What its price is for ("athlete": "$20 / athlete"; listingDisplay.json). */
   priceUnit?: string;
   /** The tag on its photo ("special-event"; listingDisplay.json). */

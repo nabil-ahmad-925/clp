@@ -1,0 +1,20 @@
+{
+  "contexts": ["team", "session", "tournament", "league", "trip", "overseas", "training", "contact", "nutrition", "shoot", "rental", "activation", "volunteer", "youth-volunteer"],
+  "rules": [
+    { "id": "clp-waiver", "when": "Everyone, any event", "ask": "CLP Waiver & Release, Terms", "who": "Adult, or guardian for under 18", "keeps": "always" },
+    { "id": "media-release", "when": "Anyone attending in person", "ask": "Photo & media release, emergency contact", "who": "Adult or guardian", "keeps": "year" },
+    { "id": "guardian-consent", "when": "Under 18", "ask": "Guardian consent, approved pickups", "who": "Guardian", "keeps": "year", "minorOnly": true },
+    { "id": "par-q", "when": "Training, S&C, high intensity", "ask": "Health questions (PAR-Q)", "who": "Adult or guardian", "keeps": "year", "contexts": ["training"] },
+    { "id": "concussion", "when": "Youth contact sports", "ask": "Concussion information acknowledgement", "who": "Guardian and player", "keeps": "season", "contexts": ["contact"], "minorOnly": true },
+    { "id": "proof-of-age", "when": "Tournament with age divisions", "ask": "Proof of age", "who": "Guardian uploads", "keeps": "always", "contexts": ["tournament"] },
+    { "id": "event-waiver", "when": "Tournament or league", "ask": "Event waiver, player pass if the governing body needs one", "who": "Guardian", "keeps": "event", "contexts": ["tournament", "league"] },
+    { "id": "medical-consent", "when": "Overnight or travel", "ask": "Medical consent to treat, medications, allergies", "who": "Guardian", "keeps": "event", "contexts": ["trip", "overseas"] },
+    { "id": "travel-consent", "when": "International trip", "ask": "Passport details, travel consent letter", "who": "Guardian", "keeps": "event", "contexts": ["overseas"] },
+    { "id": "nutrition-intake", "when": "Nutrition or dietitian", "ask": "Health intake and consent", "who": "Adult or guardian", "keeps": "always", "contexts": ["nutrition"] },
+    { "id": "shoot-agreement", "when": "Photo or video shoot", "ask": "Shoot agreement", "who": "Booker", "keeps": "event", "contexts": ["shoot"] },
+    { "id": "rental-agreement", "when": "Facility rental", "ask": "Rental agreement and insurance certificate", "who": "Renting organization", "keeps": "always", "contexts": ["rental"] },
+    { "id": "activation-waiver", "when": "Brand activation or sampling", "ask": "Activation waiver, media release", "who": "Adult, or guardian for under 18", "keeps": "event", "contexts": ["activation"] },
+    { "id": "volunteer-agreement", "when": "Volunteering", "ask": "Volunteer agreement, emergency contact", "who": "Volunteer (guardian if under 18)", "keeps": "year", "contexts": ["volunteer", "youth-volunteer"] },
+    { "id": "background-check", "when": "Volunteer in a youth-facing role", "ask": "Background check, SafeSport or equivalent", "who": "Volunteer", "keeps": "year", "contexts": ["youth-volunteer"] }
+  ]
+}

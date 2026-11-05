@@ -9,6 +9,10 @@ import { downloadCalendarFile } from '@/content/calendar';
 import { agePolicy, bookingPageHref, CANCEL_TIME, directionsHref, fetchAvailability, requestBooking, type NewBooking } from '@/content/listings';
 import { WAIVER_URL } from '@/content/documents';
 import type { DirectoryItem, Provider } from '@/content/types';
+import { onePersonOnly } from '@/content/teamEntry';
+import DetailsFooter from './booking/DetailsFooter';
+import OnePersonPicker from './booking/OnePersonPicker';
+import VolunteerSignup from './booking/VolunteerSignup';
 import type { RowFacts } from './DirectoryRow';
 import styles from './BookingModal.module.css';
 
@@ -62,7 +66,7 @@ const people = (adults: number, kids: number) =>
   [adults ? `${adults} adult${adults === 1 ? '' : 's'}` : '', kids ? `${kids} kid${kids === 1 ? '' : 's'}` : ''].filter(Boolean).join(' + ') || '0 people';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-type Step = 'details' | 'book' | 'done';
+type Step = 'details' | 'book' | 'volunteer' | 'done';
 
 /**
  * "Book Now" (CLP Partner and Compete Like Pros listings; the new design's booking popup): the listing's details,
@@ -82,6 +86,8 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
   const ended = Boolean(item.startDate) && !days;
   const policy = agePolicy(item.tags);
   const [date, setDate] = useState(days?.[0] ?? '');
+  // A tournament or league: an individual is one person, a group enters as a team.
+  const onePerson = onePersonOnly(widgetId, item.kind);
   const [adults, setAdults] = useState(policy.kind === 'youth' ? 0 : 1);
   const [kids, setKids] = useState(policy.kind === 'youth' ? 1 : 0);
   const [ageOk, setAgeOk] = useState(false);
@@ -91,6 +97,8 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState<NewBooking | null>(null);
+  // A tournament or league: the host approves it first.
+  const waiting = done?.booking.status === 'requested';
   // Spots left each day (a listing with a capacity); fetched on the booking step, again after a "full" answer.
   const [avail, setAvail] = useState<{ capacity: number | null; left: Record<string, number> }>({ capacity: item.capacity ?? null, left: {} });
   const [availTick, setAvailTick] = useState(0);
@@ -311,16 +319,28 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                   {ended && <p className={styles.error}>This experience has ended. Check back for new dates.</p>}
                 </div>
               </div>
-              {!ended && (
+              {!ended && item.kind === 'volunteering' && (
                 <div className={styles.footer}>
-                  <button type="button" className={styles.primary} onClick={() => setStep('book')}>
-                    Book Now{per != null && per > 0 ? ` · ${dollars(per)} per person` : ''}
+                  <button type="button" className={styles.primary} onClick={() => setStep('volunteer')}>
+                    Register
                   </button>
-                  <span className={styles.hint}>Free cancellation up to {CANCEL_DAYS} days before.</span>
+                  <span className={styles.hint}>{host} reviews every request.</span>
                 </div>
+              )}
+              {!ended && item.kind !== 'volunteering' && (
+                <DetailsFooter
+                  widgetId={widgetId}
+                  listingId={item.id}
+                  bookLabel={`Book Now${per != null && per > 0 ? ` · ${dollars(per)} per person` : ''}`}
+                  hint={`Free cancellation up to ${CANCEL_DAYS} days before.`}
+                  onePerson={onePerson}
+                  onBook={() => setStep('book')}
+                />
               )}
             </div>
           )}
+
+          {step === 'volunteer' && <VolunteerSignup widgetId={widgetId} listingId={item.id} host={host} onBack={() => setStep('details')} onClose={onClose} />}
 
           {step === 'book' && (
             <form className={styles.step} onSubmit={submit} noValidate>
@@ -375,8 +395,19 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                         {policy.kind === 'adult' ? `${policy.minAge}+ ONLY` : policy.kind === 'youth' ? 'KIDS ONLY' : 'ALL AGES WELCOME'}
                       </span>
                     </span>
-                    <span className={styles.hint}>{per != null && per > 0 ? `${dollars(per)} per person · ` : ''}each person needs a spot</span>
-                    <div className={styles.counters}>
+                    {onePerson ? (
+                      <OnePersonPicker
+                        policy={policy}
+                        adult={adults === 1}
+                        onChange={(adult) => {
+                          setAdults(adult ? 1 : 0);
+                          setKids(adult ? 0 : 1);
+                        }}
+                      />
+                    ) : (
+                      <span className={styles.hint}>{per != null && per > 0 ? `${dollars(per)} per person · ` : ''}each person needs a spot</span>
+                    )}
+                    {!onePerson && <div className={styles.counters}>
                       {counter(
                         policy.kind === 'adult' ? `Adults (${policy.minAge}+)` : 'Adults (18+)',
                         policy.kind === 'youth' ? 'This one is just for kids' : 'Including you, if you’re playing',
@@ -393,7 +424,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                         0,
                         policy.kind === 'adult',
                       )}
-                    </div>
+                    </div>}
                   </div>
 
                   {policy.kind === 'adult' && (
@@ -480,7 +511,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                 ) : (
                   <>
                     <button type="submit" className={styles.primary} disabled={Boolean(missing) || sending}>
-                      {sending ? 'Booking…' : 'Confirm Booking'}
+                      {sending ? 'Sending…' : onePerson ? 'Send Request' : 'Confirm Booking'}
                     </button>
                     <span className={styles.hint}>{missing || `No payment online: you pay ${host} directly.`}</span>
                   </>
@@ -497,12 +528,12 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M20 6 9 17l-5-5" />
                     </svg>
-                    YOU&rsquo;RE BOOKED
+                    {waiting ? 'REQUEST SENT' : <>YOU&rsquo;RE BOOKED</>}
                   </span>
-                  <span className={styles.doneTitle}>See you on {dayParts(done.booking.date).short}</span>
+                  <span className={styles.doneTitle}>{waiting ? 'Waiting For Approval' : `See you on ${dayParts(done.booking.date).short}`}</span>
                   <span className={styles.doneText}>
                     {people(done.booking.adults, done.booking.kids)}
-                    {time ? ` · ${time}` : ''}. A confirmation is on its way to your email.
+                    {time ? ` · ${time}` : ''}. {waiting ? `${host} reviews your request and emails you. Your spot is held until then.` : 'A confirmation is on its way to your email.'}
                   </span>
                   <div className={styles.location}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -537,33 +568,35 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                     )}
                   </span>
                   <div className={styles.doneActions}>
-                    <button
-                      type="button"
-                      className={styles.outline}
-                      onClick={() =>
-                        downloadCalendarFile(
-                          {
-                            uid: done.booking.id,
-                            title: item.title,
-                            date: done.booking.date,
-                            startTime: done.booking.startTime,
-                            endTime: done.booking.endTime,
-                            location: done.booking.address || facts.city,
-                            description: [
-                              `${people(done.booking.adults, done.booking.kids)} · hosted by ${host}`,
-                              done.booking.checkInInstructions ? `Check-in: ${done.booking.checkInInstructions}` : '',
-                              `Your booking: ${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
-                            ]
-                              .filter(Boolean)
-                              .join('\n'),
-                            url: `${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
-                          },
-                          item.title,
-                        )
-                      }
-                    >
-                      Add to Calendar
-                    </button>
+                    {!waiting && (
+                      <button
+                        type="button"
+                        className={styles.outline}
+                        onClick={() =>
+                          downloadCalendarFile(
+                            {
+                              uid: done.booking.id,
+                              title: item.title,
+                              date: done.booking.date,
+                              startTime: done.booking.startTime,
+                              endTime: done.booking.endTime,
+                              location: done.booking.address || facts.city,
+                              description: [
+                                `${people(done.booking.adults, done.booking.kids)} · hosted by ${host}`,
+                                done.booking.checkInInstructions ? `Check-in: ${done.booking.checkInInstructions}` : '',
+                                `Your booking: ${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
+                              ]
+                                .filter(Boolean)
+                                .join('\n'),
+                              url: `${window.location.origin}${bookingPageHref(done.booking.id, done.token)}`,
+                            },
+                            item.title,
+                          )
+                        }
+                      >
+                        Add to Calendar
+                      </button>
+                    )}
                     <Link href={bookingPageHref(done.booking.id, done.token)} className={styles.dark}>
                       Manage Booking
                     </Link>

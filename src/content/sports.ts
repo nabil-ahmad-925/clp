@@ -105,8 +105,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/wLeN",
-          newTab: true
+          href: "/volunteering-open-play-baseball-softball/"
         }
       }
     ],
@@ -404,8 +403,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/9t4N",
-          newTab: true
+          href: "/volunteering-open-play-basketball/"
         }
       }
     ],
@@ -695,8 +693,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/R5kh",
-          newTab: true
+          href: "/volunteering-open-play-esports/"
         }
       }
     ],
@@ -990,8 +987,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/TH7A",
-          newTab: true
+          href: "/volunteering-open-play-futbol-soccer/"
         }
       }
     ],
@@ -1277,8 +1273,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/RF2U",
-          newTab: true
+          href: "/volunteering-open-play-golf/"
         }
       }
     ],
@@ -1564,8 +1559,7 @@ export const sportPages: SportPage[] = [
         image: upload('/2024/03/CLP-Photos-for-Volunteering.png'),
         cta: {
           label: "Learn More",
-          href: "https://link.heylo.co/kosM",
-          newTab: true
+          href: "/volunteering-open-play-pickleball/"
         }
       }
     ],

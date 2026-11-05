@@ -8,6 +8,8 @@ import PartnerApplicationForm from './PartnerApplicationForm';
 type Props = {
   /** The partner type chosen at the start (the person can change it). */
   type?: string;
+  /** Applying to write for CLP (Updates & News). */
+  contributor?: boolean;
   onClose: () => void;
 };
 
@@ -16,7 +18,7 @@ type Props = {
  * Partner (PartnerApplicationForm), without leaving the site. Esc, the close button or a click outside closes it (not
  * while it is sending).
  */
-export default function PartnerSignupModal({ type = '', onClose }: Props) {
+export default function PartnerSignupModal({ type = '', contributor, onClose }: Props) {
   const [sending, setSending] = useState(false);
   const dialog = useRef<HTMLDivElement>(null);
 
@@ -46,7 +48,7 @@ export default function PartnerSignupModal({ type = '', onClose }: Props) {
             <path d="M6 6l12 12M18 6 6 18" />
           </svg>
         </button>
-        <PartnerApplicationForm type={type} onSending={setSending} doneLabel="Done" onDone={onClose} />
+        <PartnerApplicationForm type={type} contributor={contributor} onSending={setSending} doneLabel="Done" onDone={onClose} />
       </div>
     </div>,
     document.body,

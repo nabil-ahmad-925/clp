@@ -1,0 +1,129 @@
+/* Enter A Team's "Your application" card beside the steps, and the sent screen. */
+
+.aside {
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  max-width: 360px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f6f3ee;
+}
+
+.kicker {
+  color: #6b6459;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.lines + .lines {
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid #e3ddd2;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.line strong {
+  text-align: right;
+}
+
+.muted {
+  color: #4f493f;
+}
+
+.today {
+  margin-top: 4px;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.note {
+  color: #5f584d;
+  font-size: 13px;
+}
+
+.done {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid #e3ddd2;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.doneKicker {
+  color: #1f5b2c;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.doneTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.doneText {
+  margin: 0;
+  color: #4f493f;
+}
+
+.doneActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.doneLink {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid #1a1a1a;
+  border-radius: 12px;
+  background: #1a1a1a;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.doneLink + .doneLink {
+  border-color: #e3ddd2;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+@media (max-width: 760px) {
+  .aside {
+    max-width: none;
+  }
+
+  .done {
+    padding: 22px 18px;
+  }
+}

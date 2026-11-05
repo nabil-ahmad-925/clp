@@ -1,4 +1,4 @@
-import { PARTNER_SPORTS, PARTNER_TYPES, call, read, type PartnerCardData, type PartnerProduct } from './partnerPages';
+import { PARTNER_SPORTS, call, partnerType, partnerTypeId, read, type PartnerCardData, type PartnerProduct } from './partnerPages';
 
 /**
  * The shop (/shop/): every live partner's store and products (clp-api partners-read GET /partners?products=1),
@@ -48,15 +48,15 @@ export const isNewProduct = (p: ShopProduct) => Boolean(p.addedAt) && Date.now()
  * The shop's store groups (the design's chips and menu columns), each gathering partner types: athletes, clubs and
  * teams (with coaches and trainers), schools, organizations (with brands, agencies and nutritionists) and creators.
  */
+// The store tabs, by the partner account types (partnerConfig.json).
 export const SHOP_GROUPS = [
-  { id: 'athletes', label: 'Athletes', types: ['athlete'] },
-  { id: 'clubs', label: 'Clubs & Teams', types: ['club', 'coach', 'sc'] },
-  { id: 'schools', label: 'Schools', types: ['school'] },
-  { id: 'orgs', label: 'Organizations', types: ['org', 'brand', 'agency', 'agent', 'nutrition'] },
-  { id: 'creators', label: 'Creators', types: ['creator', 'writer', 'analyst'] },
+  { id: 'clubs', label: 'Clubs & Teams', types: ['club', 'organizer', 'governing', 'facility'] },
+  { id: 'coaches', label: 'Coaches & Trainers', types: ['coach', 'sc'] },
+  { id: 'brands', label: 'Brands', types: ['brand'] },
+  { id: 'creators', label: 'Photo & Video', types: ['photo'] },
 ] as const;
 export type ShopGroup = (typeof SHOP_GROUPS)[number];
-export const groupOf = (type: string) => SHOP_GROUPS.find((g) => (g.types as readonly string[]).includes(type)) ?? SHOP_GROUPS[3];
+export const groupOf = (type: string) => SHOP_GROUPS.find((g) => (g.types as readonly string[]).includes(partnerTypeId(type))) ?? SHOP_GROUPS[0];
 export const groupById = (id: string) => SHOP_GROUPS.find((g) => g.id === id);
 /** "Clubs" for a tile's line (the design drops " & Teams"). */
 export const groupShort = (g: ShopGroup) => g.label.replace(' & Teams', '');
@@ -67,7 +67,7 @@ export const storesIn = (stores: ShopStore[], group: string) =>
     .filter((s) => !group || groupOf(s.type).id === group)
     .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 /** The partner type's own label, kept for search. */
-export const typeLabel = (type: string) => PARTNER_TYPES.find((t) => t.id === type)?.label ?? '';
+export const typeLabel = (type: string) => (partnerTypeId(type) ? partnerType(type).label : '');
 export const sportLabel = (id: string) => PARTNER_SPORTS.find((s) => s.id === id)?.label ?? id;
 /** A sport's short mark on the exclusives' sport tiles. */
 const SPORT_MARKS: Record<string, string> = { 'baseball-softball': 'BSB', basketball: 'BKB', esports: 'ESP', 'futbol-soccer': 'SOC', golfing: 'GLF', pickleball: 'PKL' };
