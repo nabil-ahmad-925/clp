@@ -18,15 +18,18 @@
     { "id": "ticket", "label": "ticket" },
     { "id": "visit", "label": "visit" },
     { "id": "consultation", "label": "consultation" },
-    { "id": "project", "label": "project" }
+    { "id": "project", "label": "project" },
+    { "id": "shoot", "label": "shoot" },
+    { "id": "package", "label": "package" }
   ],
   "unitsByWidget": {
     "45": ["athlete", "session", "participant"],
-    "46": ["person", "ticket", "team"],
+    "46": ["person", "ticket"],
     "47": ["athlete", "team", "day", "week"],
     "6": ["session", "hour", "athlete", "class"],
     "37": ["player", "team", "season", "session"],
     "41": ["person", "athlete", "trip", "night"],
+    "48": ["person", "visit", "session"],
     "40": ["consultation", "session", "month"],
     "16": ["session", "visit", "month"],
     "39": ["session", "month"],
@@ -46,6 +49,15 @@
     "107": ["person", "trip", "night"]
   },
   "otherUnits": ["person", "session", "hour"],
+  "_aboutFitByAccountType": "What an account type sells in a category it shares with others: its price units instead of the category's, and the category's services it doesn't offer (a saved one stays).",
+  "fitByAccountType": {
+    "photo": {
+      "102": {
+        "units": ["shoot", "package", "hour", "day", "project"],
+        "notOffered": ["copywriting-services", "graphic-design-services"]
+      }
+    }
+  },
   "cornerTags": [
     { "id": "special-event", "label": "Special event" },
     { "id": "new", "label": "New" },

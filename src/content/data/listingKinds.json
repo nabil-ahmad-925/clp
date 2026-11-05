@@ -1,0 +1,168 @@
+{
+  "kinds": [
+    { "id": "session", "label": "Session", "signUp": "Book now, for clinics, workshops, camps and open play" },
+    { "id": "tournament", "label": "Tournament", "signUp": "Teams apply, the organizer reviews and accepts" },
+    { "id": "league", "label": "League", "signUp": "Teams apply, single players join as free agents" },
+    { "id": "trip", "label": "Trip", "signUp": "Reserve a spot with a deposit" },
+    { "id": "service", "label": "Service", "signUp": "Book a time or buy a pack" },
+    { "id": "activation", "label": "Activation", "signUp": "Sign up, get a ticket or walk up" },
+    { "id": "volunteering", "label": "Volunteering", "signUp": "Pick a shift" },
+    { "id": "rental", "label": "Rental", "signUp": "Request a time or permit" }
+  ],
+  "teamEntryWidgets": ["47", "37"],
+  "kindByWidget": {
+    "45": "session",
+    "46": "activation",
+    "47": "session",
+    "6": "service",
+    "37": "league",
+    "41": "trip", "48": "volunteering",
+    "40": "service",
+    "16": "service",
+    "39": "service",
+    "33": "service",
+    "10": "rental",
+    "9": "rental",
+    "42": "rental",
+    "8": "rental",
+    "43": "rental",
+    "44": "rental"
+  },
+  "usualPriceByWidget": {
+    "48": {
+      "usual": "Free, open play free or per visit",
+      "options": [
+        "free",
+        "paid"
+      ]
+    },
+    "45": {
+      "usual": "Paid or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "46": {
+      "usual": "Usually free, ticketed or VIP paid",
+      "options": [
+        "free",
+        "tickets"
+      ]
+    },
+    "47": {
+      "usual": "Paid, deposits common",
+      "options": [
+        "paid",
+        "deposit"
+      ]
+    },
+    "6": {
+      "usual": "Paid, free intro sessions possible",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "37": {
+      "usual": "Season fee, membership or free",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "41": {
+      "usual": "Deposit + payment plan",
+      "options": [
+        "deposit",
+        "payment-plan"
+      ]
+    },
+    "40": {
+      "usual": "Paid, free intro sessions possible",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "16": {
+      "usual": "Paid, free intro sessions possible",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "39": {
+      "usual": "Paid, free intro sessions possible",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "33": {
+      "usual": "Paid, free intro sessions possible",
+      "options": [
+        "paid",
+        "packs",
+        "free"
+      ]
+    },
+    "10": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "9": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "42": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "8": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "43": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    },
+    "44": {
+      "usual": "Hourly, permit fee or free",
+      "options": [
+        "paid",
+        "free"
+      ]
+    }
+  },
+  "priceOptions": [
+    { "id": "paid", "label": "Paid", "hint": "One price, or tiers", "charged": true },
+    { "id": "free", "label": "Free", "hint": "No checkout, people still sign up and sign" },
+    { "id": "pay-what-you-can", "label": "Pay What You Can", "hint": "A suggested amount, minimum $0" },
+    { "id": "sponsor-covered", "label": "Sponsor-Covered", "hint": "A brand or partner pays for some or all spots" },
+    { "id": "deposit", "label": "Deposit + Balance", "hint": "A deposit holds the spot, the balance is due by a date", "charged": true },
+    { "id": "payment-plan", "label": "Payment Plan", "hint": "Installments for camps, leagues and trips", "charged": true },
+    { "id": "packs", "label": "Packs & Memberships", "hint": "Credits for services, season or club membership", "charged": true },
+    { "id": "tickets", "label": "Tickets", "hint": "General and VIP tiers", "charged": true }
+  ]
+}

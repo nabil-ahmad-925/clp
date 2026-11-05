@@ -1,0 +1,239 @@
+{
+  "areasByType": {
+    "club": [
+      "pickups",
+      "teams",
+      "tournaments",
+      "appointments",
+      "documents",
+      "adults",
+      "sponsors",
+      "shipments"
+    ],
+    "coach": [
+      "pickups",
+      "teams",
+      "appointments",
+      "documents",
+      "adults",
+      "shipments"
+    ],
+    "sc": [
+      "appointments",
+      "documents"
+    ],
+    "photo": [
+      "projects"
+    ],
+    "brand": [
+      "pickups",
+      "sponsors",
+      "documents",
+      "shipments"
+    ],
+    "organizer": [
+      "pickups",
+      "tournaments",
+      "documents",
+      "adults",
+      "sponsors",
+      "shipments"
+    ],
+    "facility": [
+      "rentals",
+      "pickups",
+      "tournaments",
+      "appointments",
+      "documents",
+      "adults",
+      "sponsors",
+      "shipments"
+    ],
+    "governing": [
+      "tournaments",
+      "documents",
+      "adults"
+    ]
+  },
+  "menuByType": {
+    "club": [
+      "teams",
+      "schedule",
+      "programs",
+      "tournaments",
+      "registrations",
+      "volunteers",
+      "pickups",
+      "adults"
+    ],
+    "organizer": [
+      "tournaments",
+      "registrations",
+      "enteredteams",
+      "brackets",
+      "referees",
+      "volunteers",
+      "pickups"
+    ],
+    "governing": [
+      "tournaments",
+      "registrations",
+      "enteredteams",
+      "brackets",
+      "referees",
+      "volunteers"
+    ],
+    "facility": [
+      "calendar",
+      "rentals",
+      "renters",
+      "hosted",
+      "tournaments",
+      "registrations",
+      "volunteers",
+      "rentalcheckin"
+    ],
+    "coach": [
+      "appointments",
+      "services",
+      "availability",
+      "clients",
+      "classes",
+      "quotes",
+      "teams",
+      "schedule"
+    ],
+    "sc": [
+      "appointments",
+      "services",
+      "availability",
+      "clients",
+      "classes",
+      "quotes"
+    ],
+    "photo": [
+      "projects",
+      "listedservices"
+    ]
+  },
+  "adminMenu": [
+    "teams",
+    "schedule",
+    "tournaments",
+    "registrations",
+    "volunteers",
+    "enteredteams",
+    "appointments",
+    "activations",
+    "rentalrequests",
+    "renters",
+    "orders",
+    "documents",
+    "adults",
+    "sponsors",
+    "shipments"
+  ],
+  "rentalTypes": [
+    "facility"
+  ],
+  "registrationTypes": [
+    "organizer",
+    "governing"
+  ],
+  "activationTypes": [
+    "brand"
+  ],
+  "projectTypes": [
+    "photo"
+  ],
+  "checkinTypes": [
+    "club",
+    "organizer",
+    "governing",
+    "coach",
+    "sc"
+  ],
+  "listingWidgetsByType": {
+    "club": [
+      "45",
+      "46",
+      "47",
+      "6",
+      "37",
+      "41",
+      "101",
+      "102",
+      "103",
+      "104",
+      "105",
+      "106",
+      "107",
+      "48"
+    ],
+    "coach": [
+      "45",
+      "47",
+      "6",
+      "101",
+      "102",
+      "103",
+      "104",
+      "105",
+      "106",
+      "107"
+    ],
+    "sc": [
+      "6",
+      "41",
+      "33",
+      "40",
+      "16",
+      "39",
+      "101",
+      "102",
+      "103",
+      "104",
+      "105",
+      "106",
+      "107"
+    ],
+    "photo": [
+      "102"
+    ],
+    "organizer": [
+      "45",
+      "47",
+      "37",
+      "48"
+    ],
+    "facility": [
+      "45",
+      "46",
+      "47",
+      "6",
+      "37",
+      "10",
+      "9",
+      "42",
+      "8",
+      "43",
+      "44",
+      "48"
+    ],
+    "brand": [
+      "46"
+    ],
+    "governing": [
+      "47",
+      "37",
+      "48"
+    ]
+  },
+  "serviceTypes": [
+    "club",
+    "coach",
+    "sc",
+    "photo",
+    "facility"
+  ]
+}

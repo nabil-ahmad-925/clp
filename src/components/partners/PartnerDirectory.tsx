@@ -12,7 +12,7 @@ import MobileFilters from '@/components/ui/MobileFilters';
 import PillSelect from '@/components/ui/PillSelect';
 import Pager from '@/components/ui/Pager';
 import ViewToggle, { type ResultsView } from '@/components/ui/ViewToggle';
-import { PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, type PartnerCardData } from '@/content/partnerPages';
+import { PARTNER_SPORTS, PARTNER_TYPES, loadLivePartners, partnerHref, partnerType, partnerTypeId, type PartnerCardData } from '@/content/partnerPages';
 import t from '@/components/sections/TeamDirectory.module.css';
 import BecomePartner from './BecomePartner';
 import c from './partnerDirectory.module.css';
@@ -96,7 +96,8 @@ function Directory({ category, label }: { category: string; label: string }) {
   const [items, setItems] = useState<PartnerCardData[] | null>(null);
   const [filters, setFilters] = useState<Filters>(() => ({
     sports: params.getAll('sport').filter((s) => PARTNER_SPORTS.some((x) => x.id === s)),
-    types: params.getAll('type').filter((ty) => PARTNER_TYPES.some((x) => x.id === ty)),
+    // Old links (?type=school) open the type it merged into.
+    types: [...new Set(params.getAll('type').map(partnerTypeId).filter(Boolean))],
   }));
   const [open, setOpen] = useState<string | null>(null);
   const [size, setSize] = useState(PAGE_SIZES[0]);

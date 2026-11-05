@@ -4,13 +4,15 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import claim from '@/components/sections/ClaimModal.module.css';
 import FieldSelect from '@/components/ui/FieldSelect';
-import { PARTNER_SPORTS, PARTNER_TYPES, PartnerApiError, applyAsPartner } from '@/content/partnerPages';
+import { PARTNER_SPORTS, PARTNER_TYPES, PartnerApiError, applyAsPartner, partnerTypeId } from '@/content/partnerPages';
 import auth from '@/components/account/authLook.module.css';
 import own from './partnerSignupModal.module.css';
 
 type Props = {
   /** The partner type chosen at the start (the person can change it). */
   type?: string;
+  /** Applying to write for CLP (Updates & News › Apply to Contribute): CLP's Contributor Applications list it. */
+  contributor?: boolean;
   /** While it sends (a popup stays open meanwhile). */
   onSending?: (sending: boolean) => void;
   /** The confirmation's button. */
@@ -34,11 +36,12 @@ const EMPTY = { name: '', email: '', phone: '', organization: '', area: '', webs
  * popup's look (ClaimModal.module.css). No password here: CLP reviews the application, and once it's approved the
  * partner gets an e-mail with a temporary password and the sign-in link, where they choose their own password.
  */
-export default function PartnerApplicationForm({ type = '', onSending, doneLabel, onDone, onSignIn, initial, look = 'popup' }: Props) {
+export default function PartnerApplicationForm({ type = '', contributor, onSending, doneLabel, onDone, onSignIn, initial, look = 'popup' }: Props) {
   const s = look === 'page' ? auth : claim;
   const o = look === 'page' ? auth : own;
   const [form, setForm] = useState({ ...EMPTY, ...(initial ? { name: initial.name, email: initial.email } : {}) });
-  const [partnerType, setPartnerType] = useState(PARTNER_TYPES.some((t) => t.id === type) ? type : '');
+  // An old link's type (?type=school) preselects the type it merged into.
+  const [partnerType, setPartnerType] = useState(partnerTypeId(type));
   const [sports, setSports] = useState<string[]>([]);
   const [tried, setTried] = useState(false);
   const [sending, setSending] = useState(false);
@@ -98,6 +101,7 @@ export default function PartnerApplicationForm({ type = '', onSending, doneLabel
         sports,
         website: form.website.trim() || undefined,
         message: form.message.trim() || undefined,
+        contributor: contributor || undefined,
       });
       setSent({ email, repeat: Boolean(result.repeat) });
     } catch (err) {

@@ -1,0 +1,389 @@
+/* Enter A Team's step contents and summary (design board 5). */
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.headRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.intro {
+  margin: 0;
+  color: #4f493f;
+  font-size: 15px;
+}
+
+.hint {
+  color: #5f584d;
+  font-size: 14px;
+}
+
+.hint a,
+.intro a,
+.warn a {
+  color: #7a5a1f;
+  font-weight: 600;
+}
+
+/* Division cards, two to a row. */
+.divisions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.division {
+  padding: 16px;
+  border: 2px solid #ece6db;
+  border-radius: 12px;
+  background: var(--white);
+  color: #1a1a1a;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.division[aria-checked='true'] {
+  border-color: #c9a467;
+  background: #faf3e3;
+}
+
+.divisionTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.divisionLine {
+  display: block;
+  margin-top: 6px;
+  color: #4f493f;
+  font-size: 14px;
+}
+
+.divisionFee {
+  display: block;
+  margin-top: 2px;
+  color: #4f493f;
+  font-size: 14px;
+}
+
+/* A bordered list of rows (players, documents, add-ons). */
+.list {
+  overflow: hidden;
+  border: 1px solid #e3ddd2;
+  border-radius: 14px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3eee6;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+label.row {
+  cursor: pointer;
+}
+
+.rowOut {
+  background: #fff8f7;
+}
+
+.check {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  accent-color: #1a1a1a;
+}
+
+.rowText {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.rowTitle {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rowSub {
+  display: block;
+  color: #5f584d;
+  font-size: 13px;
+}
+
+.rowFoot {
+  padding: 12px 16px;
+  background: #fcfbf8;
+  color: #5f584d;
+  font-size: 14px;
+}
+
+.tag {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.green {
+  background: #e5f2e7;
+  color: #1f5b2c;
+}
+
+.red {
+  background: #fde9e7;
+  color: #9b1c14;
+}
+
+.amber {
+  background: #f3e9d4;
+  color: #6e5119;
+}
+
+.gray {
+  background: #f1ece2;
+  color: #4f493f;
+}
+
+.warn {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f0dcb4;
+  border-radius: 12px;
+  background: #fff7e8;
+  font-size: 14px;
+}
+
+.warn svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 8px 12px;
+  border: 1px solid #e3ddd2;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.alert {
+  margin: 0;
+  color: #9b1c14;
+  font-size: 14px;
+}
+
+.verified {
+  color: #1f5b2c;
+  font-weight: 600;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #e3ddd2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #1a1a1a;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+textarea.input {
+  min-height: 72px;
+  padding: 10px 12px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+/* A player: name, birth year and number on one row, the guardian and their e-mail on the next. */
+.playerFields {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 12px;
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e3ddd2;
+  border-radius: 14px;
+  background: #fcfbf8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.small {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #e3ddd2;
+  border-radius: 10px;
+  background: var(--white);
+  color: #1a1a1a;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.smallDark {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: var(--white);
+}
+
+.small:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #e3ddd2;
+  border-radius: 14px;
+}
+
+.legend {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.agree input {
+  margin-top: 2px;
+}
+
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
+.dot {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .divisions,
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .playerFields {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .playerFields > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .span2 {
+    grid-column: 1 / -1;
+  }
+}

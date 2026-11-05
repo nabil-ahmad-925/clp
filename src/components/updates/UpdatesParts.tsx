@@ -28,7 +28,9 @@ export function UpdatesJoin() {
         <span className={styles.eyebrowGold}>WRITE FOR CLP</span>
         <h2 className={styles.writeTitle}>Coaches, Dietitians, Trainers and Specialists: Share What You Know</h2>
         <p className={styles.writeText}>Get a verified contributor profile, a byline on every article and a link to your practice or programs on CLP.</p>
-        <BecomePartner className={styles.writeCta}>Apply to Contribute</BecomePartner>
+        <BecomePartner className={styles.writeCta} contributor>
+          Apply to Contribute
+        </BecomePartner>
       </div>
       <div className={styles.newsletter}>
         <span className={styles.eyebrowDark}>NEWSLETTER</span>

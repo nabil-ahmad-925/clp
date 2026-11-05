@@ -8,8 +8,15 @@ import type { Listing } from './listings';
  */
 const API_URL = process.env.NEXT_PUBLIC_LISTINGS_API_URL?.replace(/\/$/, '');
 
+/**
+ * The partner account types, as the Events & Bookings design has them (8). An account made before 2026-11-05 may hold
+ * an old id (school, athlete…): `legacyTypes` names the type it merged into, and it's read as that everywhere.
+ */
 export const PARTNER_TYPES = config.types;
-export const partnerType = (id?: string) => PARTNER_TYPES.find((t) => t.id === id) ?? PARTNER_TYPES[0];
+const LEGACY_TYPES: Record<string, string> = config.legacyTypes;
+/** Today's id for a stored or linked type ("school" is "club"); '' when it's no type. */
+export const partnerTypeId = (id?: string | null) => (!id ? '' : PARTNER_TYPES.some((t) => t.id === id) ? id : Object.hasOwn(LEGACY_TYPES, id) ? LEGACY_TYPES[id] : '');
+export const partnerType = (id?: string | null) => PARTNER_TYPES.find((t) => t.id === partnerTypeId(id)) ?? PARTNER_TYPES[0];
 export const PARTNER_SPORTS = config.sports;
 export const COLLAB_TYPES = config.collabTypes;
 export const collabLabel = (id: string) => COLLAB_TYPES.find((t) => t.id === id)?.label ?? 'Other';
@@ -189,7 +196,8 @@ export const fetchPartnerPage = (slug: string, preview?: string | null) =>
 /** Live partners as cards (the directory), A to Z. */
 export const fetchPartners = (params: { type?: string; sport?: string; q?: string } = {}) => {
   const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v) as [string, string][]).toString();
-  return read<{ items: PartnerCardData[] }>(`/partners${qs ? `?${qs}` : ''}`).then((r) => r.items);
+  // Each card's type as today's list has it, so every filter compares new ids.
+  return read<{ items: PartnerCardData[] }>(`/partners${qs ? `?${qs}` : ''}`).then((r) => r.items.map((p) => ({ ...p, type: partnerTypeId(p.type) || p.type })));
 };
 
 /** The live partners, fetched once per visit and shared by every place that lists them. */
@@ -217,6 +225,8 @@ export type PartnerApplicationInput = {
   sports: string[];
   website?: string;
   message?: string;
+  /** Applying to write for CLP (Updates & News › Apply to Contribute). */
+  contributor?: boolean;
 };
 /**
  * Applies to become a CLP Partner (clp-api partner-applications: the admin's sign-up page sends the same). No account is

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import ListingHero from '@/components/sections/ListingHero';
 import { CANCEL_TIME, cancelGuestBooking, directionsHref, fetchGuestBooking, type BookingConfirmation } from '@/content/listings';
 import { messageHost, saveConversation, sitePath } from '@/content/messages';
+import { ticketHref } from '@/content/ticket';
 import GuestWaitlist from './GuestWaitlist';
 import styles from './GuestBooking.module.css';
 
@@ -174,6 +175,12 @@ function GuestBookingView({ id, token }: { id: string; token: string }) {
                 <p className={styles.muted}>
                   Free cancellation ended on {longDay(current.booking.cancelBy)}. To change your booking, message the host.
                 </p>
+              )}
+              {/* On the day: the ticket on their phone (check in with the field code, show the QR, updates). */}
+              {current.booking.status === 'confirmed' && (
+                <Link href={ticketHref(id, token)} className={styles.secondary}>
+                  Open Your Ticket
+                </Link>
               )}
               <MessageHost id={id} token={token} title={current.booking.listingTitle ?? 'Your booking'} />
               {/* Checked in at a CLP Partner's session: a verified review for their page. */}

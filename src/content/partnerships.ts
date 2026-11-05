@@ -23,7 +23,7 @@ export const partnerWays: PartnerWay[] = [
     id: 'athlete',
     label: 'Athletes & Creators',
     cta: 'Apply as an athlete',
-    partnerType: 'athlete',
+    partnerType: 'brand',
     perks: ['Your own page with bio, photos and videos', 'Paid appearances, clinics and brand deals', 'A merch store, no inventory needed', 'Content with CLP events and partners'],
     questions: [
       {
@@ -71,7 +71,7 @@ export const partnerWays: PartnerWay[] = [
     id: 'org',
     label: 'Schools & Organizations',
     cta: 'Apply as an organization',
-    partnerType: 'org',
+    partnerType: 'club',
     perks: ['Host events and programs with CLP', 'Volunteer and service hours', 'Fundraising through your store', 'A page for your community'],
     questions: [
       { q: 'Which organizations can partner?', a: 'Schools, clubs, community centers and nonprofits that want to promote the sport, host events and build programs.' },

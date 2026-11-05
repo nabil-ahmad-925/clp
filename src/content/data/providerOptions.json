@@ -1,0 +1,55 @@
+{
+  "_about": "Service providers' Appointments, Services & packages, Availability, Clients, Group classes, Requests & quotes (design board 6, requirements section 42). Read by clp-api shared/events-services.mjs and events-clients.mjs, synced to the admin by sync-widgets. The PAR-Q questions follow the standard PAR-Q; have the wording confirmed before launch.",
+  "kinds": [
+    ["session", "1:1 session"],
+    ["group", "Small group"],
+    ["pack", "Pack of sessions"],
+    ["team", "Team block (by quote)"]
+  ],
+  "contexts": [
+    ["training", "Training, S&C or high intensity: health questions (PAR-Q)"],
+    ["nutrition", "Nutrition or dietitian: health intake and consent"],
+    ["shoot", "Photo or video shoot: shoot agreement"],
+    ["none", "No extra forms"]
+  ],
+  "contextByType": {
+    "coach": "training",
+    "sc": "training",
+    "club": "training",
+    "facility": "training",
+    "photo": "shoot"
+  },
+  "intake": {
+    "training": {
+      "ruleId": "par-q",
+      "title": "Health Questions (PAR-Q)",
+      "questions": [
+        { "id": "heart", "ask": "Has a doctor ever said they have a heart condition and should only do physical activity a doctor recommends?", "type": "yesno" },
+        { "id": "chestActive", "ask": "Do they feel pain in their chest during physical activity?", "type": "yesno" },
+        { "id": "chestRest", "ask": "In the past month, have they had chest pain when not doing physical activity?", "type": "yesno" },
+        { "id": "dizzy", "ask": "Do they lose their balance because of dizziness, or ever lose consciousness?", "type": "yesno" },
+        { "id": "joint", "ask": "Do they have a bone or joint problem that a change in physical activity could make worse?", "type": "yesno" },
+        { "id": "medication", "ask": "Is a doctor prescribing medication for their blood pressure or a heart condition?", "type": "yesno" },
+        { "id": "other", "ask": "Is there any other reason they shouldn’t do physical activity?", "type": "yesno" }
+      ]
+    },
+    "nutrition": {
+      "ruleId": "nutrition-intake",
+      "title": "Health Intake",
+      "questions": [
+        { "id": "conditions", "ask": "Medical conditions", "type": "text" },
+        { "id": "medications", "ask": "Medications or supplements", "type": "text" },
+        { "id": "allergies", "ask": "Allergies or intolerances", "type": "text" },
+        { "id": "goals", "ask": "Goals", "type": "text" }
+      ]
+    }
+  },
+  "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  "limits": {
+    "rangesPerDay": 4,
+    "resources": 30,
+    "sessionsPerQuote": 100,
+    "sessionsPerClass": 120,
+    "plans": 50
+  }
+}

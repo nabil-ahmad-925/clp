@@ -537,3 +537,18 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+/* A Volunteering & Open Play card's tag (the design's kind tag). */
+.opportunity {
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #1b4f8c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.opportunityOpen {
+  background: #1e5b33;
+}

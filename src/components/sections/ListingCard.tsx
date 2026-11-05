@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { agePolicy, cornerTagLabel, isBookable, waitlistPageHref, type SavedPlace } from '@/content/listings';
 import { DEFAULT_CARD_BUTTON } from '@/content/requests';
+import { opportunityTag } from '@/content/volunteer';
 import type { DirectoryItem, Provider } from '@/content/types';
 import type { RowFacts } from './DirectoryRow';
 import styles from './ListingCard.module.css';
@@ -122,10 +123,14 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
         {chips.slice(facts.ages ? 1 : 0).map(render)}
       </>
     );
-  const price = facts.price ? (
+  // A volunteering role isn't priced: it's a way to give back.
+  const volunteering = card.kind === 'volunteering';
+  const tag = opportunityTag(card.tags);
+  const shownPrice = volunteering && (!facts.price || facts.price === 'Free') ? 'Give back' : facts.price;
+  const price = shownPrice ? (
     <>
-      {facts.price}
-      {facts.unit && <span className={styles.unit}> / {facts.unit}</span>}
+      {shownPrice}
+      {facts.unit && shownPrice === facts.price && <span className={styles.unit}> / {facts.unit}</span>}
     </>
   ) : undefined;
   const noPrice = variant === 'listing' && <span className={styles.noPrice}>Contact for pricing</span>;
@@ -138,7 +143,7 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
   const project = serviceButton?.action === 'project' && Boolean(onProject);
   // Sold out with a waitlist: join it (or, once joined, see the place in line).
   const waitlist = book && Boolean(soldOut) && Boolean(onWaitlist);
-  const ctaLabel = permit ? 'Permit Now' : book ? 'Book Now' : serviceButton && (project || serviceButton.action === 'details') ? serviceButton.label : 'Learn More';
+  const ctaLabel = permit ? 'Permit Now' : book ? (volunteering ? 'Register' : 'Book Now') : serviceButton && (project || serviceButton.action === 'details') ? serviceButton.label : 'Learn More';
   const named = [card.subtitle, card.title].filter(Boolean).join(' – ');
   const learnMore = waitlist ? (
     place ? (
@@ -204,6 +209,7 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
       </div>
       <div className={styles.body}>
         {(card.partner?.name || card.subtitle) && <span className={styles.provider}>{card.partner?.name || card.subtitle}</span>}
+        {tag && <span className={`${styles.opportunity} ${tag.open ? styles.opportunityOpen : ''}`}>{tag.label}</span>}
         <h3 className={styles.title}>{card.title}</h3>
         {waitlist && (
           <span className={styles.spots}>

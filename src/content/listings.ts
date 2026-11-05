@@ -1,5 +1,6 @@
 import type { CardButton, Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
 import display from './data/listingDisplay.json';
+import kinds from './data/listingKinds.json';
 
 /**
  * Directory cards added from the admin (clp-admin), stored in DynamoDB and served by the listings read API
@@ -21,6 +22,7 @@ const WIDGET_TYPES: Record<number, ListingType> = {
   6: 'experiences', // Groups & Private Lessons
   37: 'experiences', // Leagues & Social Clubs
   41: 'experiences', // Trips & Retreats
+  48: 'experiences', // Volunteering & Open Play
   40: 'resources', // Dieting & Nutrition
   16: 'resources', // Injury Prevention & Recovery
   39: 'resources', // Mental Health & Resilience
@@ -49,6 +51,7 @@ const WIDGET_NAMES: Record<number, string> = {
   6: 'Groups & Private Lessons',
   37: 'Leagues & Social Clubs',
   41: 'Trips & Retreats',
+  48: 'Volunteering & Open Play',
   40: 'Dieting & Nutrition',
   16: 'Injury Prevention & Recovery',
   39: 'Mental Health & Resilience',
@@ -82,6 +85,7 @@ const WIDGET_PARTNER_CATEGORIES: Record<number, string> = {
   6: 'performance-training-coaching',
   37: 'clubs-teams',
   41: 'travel-logistics',
+  48: 'community-engagement-volunteering',
   40: 'dieting-nutrition',
   16: 'injury-prevention-recovery',
   39: 'injury-prevention-recovery',
@@ -103,6 +107,7 @@ const WIDGET_BLURBS: Record<number, string> = {
   6: 'Small-group sessions and one-on-one training with local coaches.',
   37: 'Pickup runs, rec leagues and social clubs for every level.',
   41: 'Travel programs, showcases and team retreats.',
+  48: 'Give back, mentor or volunteer abroad. Or just show up and play: free games and drop-ins from CLP, partners and local facilities.',
   40: 'Sports dietitians, meal planning and fueling guides for players and parents.',
   16: 'Physical therapists, athletic trainers, recovery studios and prevention programs.',
   39: 'Sport psychologists, counselors and mindset programs for athletes and families.',
@@ -194,6 +199,7 @@ export type Listing = {
   provider?: Provider;
   /** What the price is for ("athlete": "$20 / athlete"), and the tag on its photo ("special-event"). */
   priceUnit?: string;
+  kind?: string;
   cornerTag?: string;
   /** A CLP Partner's listing: the partner (their live page). */
   partner?: { name: string; slug: string };
@@ -311,6 +317,8 @@ export type AddedItem = DirectoryItem & { sourceId?: string; fallbackImage?: str
 /** A card from an API listing (the directories, a partner page's experiences). */
 export const toItem = (l: Listing): AddedItem => ({
   id: l.id,
+  // How it runs: its own kind, else its category's usual one.
+  kind: l.kind ?? (l.widgetId ? (kinds.kindByWidget as Record<string, string | undefined>)[l.widgetId] : undefined),
   provider: l.provider,
   // Without a unit of its own, the price is for its category's usual one.
   priceUnit: l.priceUnit ?? (l.widgetId ? unitsFor(l.widgetId)[0] : undefined),
