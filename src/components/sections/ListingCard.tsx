@@ -143,7 +143,7 @@ export default function ListingCard({ card, facts, view, variant = 'listing', on
   const project = serviceButton?.action === 'project' && Boolean(onProject);
   // Sold out with a waitlist: join it (or, once joined, see the place in line).
   const waitlist = book && Boolean(soldOut) && Boolean(onWaitlist);
-  const ctaLabel = permit ? 'Permit Now' : book ? (volunteering ? 'Register' : 'Book Now') : serviceButton && (project || serviceButton.action === 'details') ? serviceButton.label : 'Learn More';
+  const ctaLabel = permit ? 'Permit Now' : book ? (volunteering ? 'Register' : card.kind === 'trip' ? 'Reserve' : 'Book Now') : serviceButton && (project || serviceButton.action === 'details') ? serviceButton.label : 'Learn More';
   const named = [card.subtitle, card.title].filter(Boolean).join(' – ');
   const learnMore = waitlist ? (
     place ? (

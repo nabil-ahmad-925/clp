@@ -12,6 +12,13 @@ import type { DirectoryItem, Provider } from '@/content/types';
 import { onePersonOnly } from '@/content/teamEntry';
 import DetailsFooter from './booking/DetailsFooter';
 import OnePersonPicker from './booking/OnePersonPicker';
+import TripFooter from './booking/TripFooter';
+import TripReserve from './booking/TripReserve';
+import TripSummary from './booking/TripSummary';
+import { useTripPlan } from './booking/useTripPlan';
+import ServiceBooking from './booking/ServiceBooking';
+import ServiceFooter from './booking/ServiceFooter';
+import { useServicePlan } from './booking/useServicePlan';
 import VolunteerSignup from './booking/VolunteerSignup';
 import type { RowFacts } from './DirectoryRow';
 import styles from './BookingModal.module.css';
@@ -66,7 +73,7 @@ const people = (adults: number, kids: number) =>
   [adults ? `${adults} adult${adults === 1 ? '' : 's'}` : '', kids ? `${kids} kid${kids === 1 ? '' : 's'}` : ''].filter(Boolean).join(' + ') || '0 people';
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-type Step = 'details' | 'book' | 'volunteer' | 'done';
+type Step = 'details' | 'book' | 'volunteer' | 'trip' | 'service' | 'done';
 
 /**
  * "Book Now" (CLP Partner and Compete Like Pros listings; the new design's booking popup): the listing's details,
@@ -77,6 +84,9 @@ type Step = 'details' | 'book' | 'volunteer' | 'done';
  */
 export default function BookingModal({ item, widgetId, facts, onClose, onJoinWaitlist }: Props) {
   const [step, setStep] = useState<Step>('details');
+  const plan = useTripPlan(widgetId, item.id, item.kind);
+  // A coach's service (Services & packages): booked at their open times, on their Appointments.
+  const service = useServicePlan(widgetId, item.id, item.kind);
   const now = today();
   // The days offered: a dated listing's (from today on), else any day from today (picked in a date field).
   const days =
@@ -311,6 +321,7 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                       </ul>
                     </div>
                   )}
+                  {plan && <TripSummary plan={plan} />}
                   <div className={styles.hosted}>
                     <span className={styles.kicker}>HOSTED BY</span>
                     <span className={styles.hostName}>{host}</span>
@@ -327,7 +338,9 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
                   <span className={styles.hint}>{host} reviews every request.</span>
                 </div>
               )}
-              {!ended && item.kind !== 'volunteering' && (
+              {!ended && plan && <TripFooter plan={plan} onReserve={() => setStep('trip')} />}
+              {!ended && service && <ServiceFooter plan={service} onBook={() => setStep('service')} />}
+              {!ended && item.kind !== 'volunteering' && plan === null && service === null && (
                 <DetailsFooter
                   widgetId={widgetId}
                   listingId={item.id}
@@ -339,6 +352,10 @@ export default function BookingModal({ item, widgetId, facts, onClose, onJoinWai
               )}
             </div>
           )}
+
+          {step === 'trip' && plan && <TripReserve widgetId={widgetId} listingId={item.id} plan={plan} onBack={() => setStep('details')} onClose={onClose} />}
+
+          {step === 'service' && service && <ServiceBooking widgetId={widgetId} listingId={item.id} plan={service} onBack={() => setStep('details')} onClose={onClose} />}
 
           {step === 'volunteer' && <VolunteerSignup widgetId={widgetId} listingId={item.id} host={host} onBack={() => setStep('details')} onClose={onClose} />}
 

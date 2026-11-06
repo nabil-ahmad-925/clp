@@ -2,17 +2,18 @@ import { useState } from 'react';
 import type { ClubTeam } from '@/content/teamEntry';
 import { AddPlayerForm, CreateTeamForm } from './ClubTeamForms';
 import { eligibility } from './entryRules';
-import { RowText, Tag, Warn } from './parts';
+import { RowText, Tag } from './parts';
 import { useClubTeamEdits } from './useClubTeamEdits';
 import type { EntryDraftState } from './useEntryDraft';
+import ExceptionAsk from './ExceptionAsk';
 import s from './steps.module.css';
 
 const NEW = '__new';
 
-type Props = { entry: EntryDraftState; teams: ClubTeam[]; verified: boolean; keepTeam: (team: ClubTeam) => void };
+type Props = { entry: EntryDraftState; teams: ClubTeam[]; verified: boolean; keepTeam: (team: ClubTeam) => void; most: number };
 
 /** A signed-in partner's own teams: pick one and untick anyone not going, add a player to it, or create a new team. */
-export default function ClubTeamPicker({ entry, teams, verified, keepTeam }: Props) {
+export default function ClubTeamPicker({ entry, teams, verified, keepTeam, most }: Props) {
   const { draft, update, division, team, roster } = entry;
   const edits = useClubTeamEdits(keepTeam);
   const [creating, setCreating] = useState(teams.length === 0);
@@ -58,12 +59,7 @@ export default function ClubTeamPicker({ entry, teams, verified, keepTeam }: Pro
             })}
           </div>
           {roster.outside.map((p) => (
-            <Warn key={p.id}>
-              <strong>
-                {p.name} was born in {p.born}
-              </strong>
-              , so they&rsquo;re outside {division?.name}. Untick them, or ask the organizer for a guest-player exception (they decide).
-            </Warn>
+            <ExceptionAsk key={p.id} name={p.name} born={p.born} divisionName={division?.name} most={most} value={draft.exceptions[p.id] ?? ''} onChange={(reason) => entry.update({ exceptions: { ...draft.exceptions, [p.id]: reason } })} />
           ))}
           {adding ? (
             <AddPlayerForm team={team} edits={edits} onDone={() => setAdding(false)} />

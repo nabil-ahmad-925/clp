@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { enterTeamHref } from '@/content/teamEntry';
 import EntryHero from './EntryHero';
 import EntryWizard from './EntryWizard';
+import IndividualEntry from './IndividualEntry';
 import { useEntryData } from './useEntryData';
 import s from './enterTeam.module.css';
 
@@ -16,7 +17,9 @@ export default function EnterTeamPage() {
   const params = useSearchParams();
   const widgetId = params.get('widget') ?? '';
   const listingId = params.get('listing') ?? '';
-  const { state, user, club, keepTeam, reload } = useEntryData(widgetId, listingId);
+  const invite = params.get('invite') ?? undefined;
+  const individual = params.get('as') === 'individual';
+  const { state, user, club, keepTeam, reload } = useEntryData(widgetId, listingId, invite);
   const signInHref = `/sign-in/?next=${encodeURIComponent(enterTeamHref(widgetId, listingId))}`;
 
   if (state.status !== 'ready') {
@@ -50,13 +53,15 @@ export default function EnterTeamPage() {
   return (
     <div className={s.page}>
       <EntryHero terms={terms} host={listing?.subtitle} />
-      {terms.closedReason ? (
+      {individual ? (
+        <IndividualEntry widgetId={widgetId} listingId={listingId} terms={terms} invite={invite} />
+      ) : terms.closedReason ? (
         <div className={s.status}>
           <h1>Applications Are Closed</h1>
           <p>{terms.closedReason}</p>
         </div>
       ) : (
-        <EntryWizard widgetId={widgetId} listingId={listingId} terms={terms} club={club} user={user} keepTeam={keepTeam} signInHref={signInHref} />
+        <EntryWizard widgetId={widgetId} listingId={listingId} terms={terms} club={club} user={user} keepTeam={keepTeam} signInHref={signInHref} invite={invite} />
       )}
     </div>
   );

@@ -16,12 +16,12 @@ import type { ClubData } from './useEntryData';
 import { useEntryDraft } from './useEntryDraft';
 import s from './enterTeam.module.css';
 
-type Props = { widgetId: string; listingId: string; terms: EntryTerms; club: ClubData | null | undefined; user: PartnerUser | null; keepTeam: (team: ClubTeam) => void; signInHref: string };
+type Props = { widgetId: string; listingId: string; terms: EntryTerms; club: ClubData | null | undefined; user: PartnerUser | null; invite?: string; keepTeam: (team: ClubTeam) => void; signInHref: string };
 
 /** The five steps beside "Your application", then the sent screen. */
-export default function EntryWizard({ widgetId, listingId, terms, club, user, keepTeam, signInHref }: Props) {
+export default function EntryWizard({ widgetId, listingId, terms, club, user, keepTeam, signInHref, invite }: Props) {
   // A partner's teams still loading count as theirs (none yet), so the form doesn't flip to a typed team and back.
-  const entry = useEntryDraft({ widgetId, listingId, terms, teams: club === undefined ? [] : (club?.teams ?? null), user });
+  const entry = useEntryDraft({ widgetId, listingId, terms, teams: club === undefined ? [] : (club?.teams ?? null), user, invite });
   const top = useRef<HTMLDivElement>(null);
   const last = entry.step === STEPS.length - 1;
   // Each step starts at the top of the steps.
@@ -42,7 +42,7 @@ export default function EntryWizard({ widgetId, listingId, terms, club, user, ke
       <div className={s.layout}>
         <section className={s.main} aria-label="Step content">
           {entry.step === 0 && <DivisionStep terms={terms} entry={entry} />}
-          {entry.step === 1 && <RosterStep entry={entry} club={club} keepTeam={keepTeam} signInHref={signInHref} />}
+          {entry.step === 1 && <RosterStep entry={entry} club={club} keepTeam={keepTeam} signInHref={signInHref} most={terms.maxExceptions ?? 2} />}
           {entry.step === 2 && <DocumentsStep entry={entry} club={club} />}
           {entry.step === 3 && <PaymentStep terms={terms} entry={entry} />}
           {entry.step === 4 && <ReviewStep terms={terms} entry={entry} />}

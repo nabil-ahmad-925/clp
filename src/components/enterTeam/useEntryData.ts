@@ -26,7 +26,7 @@ async function clubData(): Promise<ClubData | null> {
 }
 
 /** What the Enter A Team page shows: the listing, what Team applies to, and the signed-in partner's teams. */
-export function useEntryData(widgetId: string, listingId: string) {
+export function useEntryData(widgetId: string, listingId: string, invite?: string) {
   const user = useSiteUser();
   const partner = isPartnerUser(user);
   const [state, setState] = useState<State>({ status: 'loading' });
@@ -42,13 +42,13 @@ export function useEntryData(widgetId: string, listingId: string) {
       return;
     }
     setState({ status: 'loading' });
-    Promise.all([fetchEntryTerms(widgetId, listingId), fetchEntryListing(widgetId, listingId).catch(() => null)])
+    Promise.all([fetchEntryTerms(widgetId, listingId, invite), fetchEntryListing(widgetId, listingId).catch(() => null)])
       .then(([terms, listing]) => active && setState(terms ? { status: 'ready', terms, listing } : { status: 'none' }))
       .catch((err: Error) => active && setState({ status: 'error', message: err.message }));
     return () => {
       active = false;
     };
-  }, [widgetId, listingId, tick]);
+  }, [widgetId, listingId, invite, tick]);
 
   useEffect(() => {
     let active = true;

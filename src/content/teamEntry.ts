@@ -18,7 +18,7 @@ export const onePersonOnly = (widgetId: number | string, kind?: string) => ['tou
 export const enterTeamHref = (widgetId: number | string, listingId: string) => `/enter-team/?widget=${encodeURIComponent(String(widgetId))}&listing=${encodeURIComponent(listingId)}`;
 
 /** A division as the site sees it: `left` is its spots left, null when it has no set limit. */
-export type EntryDivision = { id: string; name: string; bornFrom?: number; bornTo?: number; minPlayers: number; maxPlayers: number; left: number | null; /** Its own price, when it has one. */ fee?: number; deposit?: number; feePer?: 'team' | 'player' };
+export type EntryDivision = { waitlist?: boolean; id: string; name: string; bornFrom?: number; bornTo?: number; minPlayers: number; maxPlayers: number; left: number | null; /** Its own price, when it has one. */ fee?: number; deposit?: number; feePer?: 'team' | 'player' };
 export type EntryTerms = {
   tournamentId: string;
   organizerName: string;
@@ -38,6 +38,15 @@ export type EntryTerms = {
   unit: string;
   balanceDue?: string;
   rosterLocksOn?: string;
+  /** Came through its private link, or it only takes invited teams. */
+  invited?: boolean;
+  inviteOnly?: boolean;
+  /** Age exceptions per team: 0 for none. */
+  maxExceptions?: number;
+  /** Individuals can join a free-agent pool, or enter individual events. */
+  freeAgents?: boolean;
+  playerFee?: number;
+  individualEvents?: { id: string; name: string; price: number; bornFrom?: number; bornTo?: number; left: number }[];
   /** No tournament set up for it yet: the listing itself, as one Open Division. */
   fromListing?: boolean;
   /** Why a team can't apply now. */
@@ -61,6 +70,9 @@ export type NewTeamApplication = {
   paysBy: PayBy;
   insurance?: string;
   notes?: string;
+  invite?: string;
+  /** The coach's reasons for older players, by their place on the form. */
+  exceptions?: Record<string, string>;
   agreed: boolean;
   website: string;
 };
@@ -100,8 +112,8 @@ export const fetchEntryListing = (widgetId: string, id: string) =>
     });
 
 /** What Team applies to on this listing, or null when it takes no teams. */
-export const fetchEntryTerms = (widgetId: string, id: string) =>
-  send<{ entry: EntryTerms | null }>(`/events/team-entry?widget=${encodeURIComponent(widgetId)}&listing=${encodeURIComponent(id)}`).then((r) => r.entry);
+export const fetchEntryTerms = (widgetId: string, id: string, invite?: string) =>
+  send<{ entry: EntryTerms | null }>(`/events/team-entry?widget=${encodeURIComponent(widgetId)}&listing=${encodeURIComponent(id)}${invite ? `&invite=${encodeURIComponent(invite)}` : ''}`).then((r) => r.entry);
 
 export const applyNewTeam = (application: NewTeamApplication) =>
   send<{ application: SentApplication }>('/events/team-entry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(application) }).then((r) => r.application);
@@ -116,6 +128,6 @@ export const createClubTeam = (name: string, coaches: string[]) => partnerCall<{
 export const addClubPlayer = (teamId: string, player: TypedPlayer) =>
   partnerCall<{ item: ClubTeam }>(`/my/events/teams/${encodeURIComponent(teamId)}/addPlayer`, json(player)).then((r) => r.item);
 
-export type ClubApplication = { listing: { widgetId: string; id: string }; tournamentId: string; divisionId: string; teamId: string; leaveOut: string[]; paysBy: PayBy; insurance?: string };
+export type ClubApplication = { invite?: string; exceptions?: Record<string, string>; listing: { widgetId: string; id: string }; tournamentId: string; divisionId: string; teamId: string; leaveOut: string[]; paysBy: PayBy; insurance?: string };
 export const applyClubTeam = (application: ClubApplication) =>
   partnerCall<{ item: SentApplication & { teamName: string } }>('/my/events/registrations', json(application)).then((r) => r.item);

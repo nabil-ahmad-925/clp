@@ -5,7 +5,7 @@ import type { PartnerUser } from '@/content/partnerSession';
 import { applyClubTeam, applyNewTeam, type ClubTeam, type EntryTerms, type SentApplication } from '@/content/teamEntry';
 import { STEPS, blankPlayer, clubRoster, coachList, stepProblem, typedPlayer, typedRows, type Draft } from './entryRules';
 
-type Args = { widgetId: string; listingId: string; terms: EntryTerms; teams: ClubTeam[] | null; user: PartnerUser | null };
+type Args = { widgetId: string; listingId: string; terms: EntryTerms; teams: ClubTeam[] | null; user: PartnerUser | null; invite?: string };
 
 const firstDraft = (terms: EntryTerms, user: PartnerUser | null): Draft => ({
   // One division: nothing to pick.
@@ -19,12 +19,13 @@ const firstDraft = (terms: EntryTerms, user: PartnerUser | null): Draft => ({
   paysBy: 'club',
   contact: { name: user?.name ?? '', email: user?.email ?? '', phone: '' },
   notes: '',
+  exceptions: {},
   agreed: false,
   website: '',
 });
 
 /** The five steps' answers, how far they've got, and sending the application (the partner's own team, or a new one). */
-export function useEntryDraft({ widgetId, listingId, terms, teams, user }: Args) {
+export function useEntryDraft({ widgetId, listingId, terms, teams, user, invite }: Args) {
   const [step, setStep] = useState(0);
   const [reached, setReached] = useState(0);
   const [draft, setDraft] = useState<Draft>(() => firstDraft(terms, user));
@@ -59,10 +60,12 @@ export function useEntryDraft({ widgetId, listingId, terms, teams, user }: Args)
     setSending(true);
     setError('');
     try {
-      const shared = { tournamentId: terms.tournamentId, divisionId: division.id, paysBy: draft.paysBy, insurance: draft.insurance.trim() || undefined };
+      const shared = { tournamentId: terms.tournamentId, divisionId: division.id, paysBy: draft.paysBy, insurance: draft.insurance.trim() || undefined, invite };
+      // A typed team's reasons go by place on the form: its players have no ids yet.
+      const typedReasons = Object.fromEntries(typedRows(draft).flatMap((p, i) => (draft.exceptions[p.key]?.trim() ? [[String(i), draft.exceptions[p.key].trim()]] : [])));
       setSent(
         club
-          ? await applyClubTeam({ ...shared, listing: { widgetId, id: listingId }, teamId: draft.teamId, leaveOut: draft.leftOut })
+          ? await applyClubTeam({ ...shared, listing: { widgetId, id: listingId }, teamId: draft.teamId, leaveOut: draft.leftOut, exceptions: draft.exceptions })
           : await applyNewTeam({
               ...shared,
               widgetId,
@@ -72,6 +75,7 @@ export function useEntryDraft({ widgetId, listingId, terms, teams, user }: Args)
               players: typedRows(draft).map(typedPlayer),
               contact: { name: draft.contact.name.trim(), email: draft.contact.email.trim(), phone: draft.contact.phone.trim() || undefined },
               notes: draft.notes.trim() || undefined,
+              exceptions: typedReasons,
               agreed: draft.agreed,
               website: draft.website,
             }),

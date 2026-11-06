@@ -8,7 +8,8 @@
       "documents",
       "adults",
       "sponsors",
-      "shipments"
+      "shipments",
+      "trips"
     ],
     "coach": [
       "pickups",
@@ -20,7 +21,8 @@
     ],
     "sc": [
       "appointments",
-      "documents"
+      "documents",
+      "trips"
     ],
     "photo": [
       "projects"
@@ -62,6 +64,7 @@
       "programs",
       "tournaments",
       "registrations",
+      "trips",
       "volunteers",
       "pickups",
       "adults"
@@ -94,6 +97,7 @@
       "rentalcheckin"
     ],
     "coach": [
+      "sessions",
       "appointments",
       "services",
       "availability",
@@ -109,7 +113,8 @@
       "availability",
       "clients",
       "classes",
-      "quotes"
+      "quotes",
+      "trips"
     ],
     "photo": [
       "projects",
@@ -121,6 +126,7 @@
     "schedule",
     "tournaments",
     "registrations",
+    "trips",
     "volunteers",
     "enteredteams",
     "appointments",
@@ -146,10 +152,12 @@
   "projectTypes": [
     "photo"
   ],
+  "noBookingsTypes": [
+    "governing"
+  ],
   "checkinTypes": [
     "club",
     "organizer",
-    "governing",
     "coach",
     "sc"
   ],
@@ -161,26 +169,16 @@
       "6",
       "37",
       "41",
-      "101",
-      "102",
+      "48",
       "103",
       "104",
-      "105",
-      "106",
-      "107",
-      "48"
+      "107"
     ],
     "coach": [
       "45",
       "47",
       "6",
-      "101",
-      "102",
-      "103",
-      "104",
-      "105",
-      "106",
-      "107"
+      "105"
     ],
     "sc": [
       "6",
@@ -189,13 +187,7 @@
       "40",
       "16",
       "39",
-      "101",
-      "102",
-      "103",
-      "104",
-      "105",
-      "106",
-      "107"
+      "105"
     ],
     "photo": [
       "102"
@@ -235,5 +227,23 @@
     "sc",
     "photo",
     "facility"
-  ]
+  ],
+  "retreatOnlyTypes": [
+    "sc"
+  ],
+  "practiceTimeTypes": [
+    "coach"
+  ],
+  "serviceListingWidgetsByType": {
+    "coach": [
+      "6",
+      "105"
+    ]
+  },
+  "listingKindsByType": {
+    "coach": [
+      "session",
+      "service"
+    ]
+  }
 }

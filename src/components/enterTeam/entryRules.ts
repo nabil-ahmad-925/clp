@@ -26,6 +26,8 @@ export type Draft = {
   paysBy: PayBy;
   contact: { name: string; email: string; phone: string };
   notes: string;
+  /** The coach's reason for each older player, by player. */
+  exceptions: Record<string, string>;
   agreed: boolean;
   website: string;
 };
@@ -33,7 +35,7 @@ export type Draft = {
 /** A division's tag: spots left, or the waitlist when full. */
 export function divisionTag(d: EntryDivision): Tag {
   if (d.left === null) return { label: 'Open', tone: 'green' };
-  if (d.left <= 0) return { label: 'Waitlist', tone: 'red' };
+  if (d.left <= 0) return d.waitlist === false ? { label: 'Full', tone: 'red' } : { label: 'Waitlist', tone: 'red' };
   return { label: `${d.left} Spot${d.left === 1 ? '' : 's'}`, tone: d.left <= 2 ? 'amber' : 'green' };
 }
 
@@ -44,8 +46,8 @@ export const divisionLine = (d: EntryDivision) => `${bornRange(d)} · ${d.minPla
 
 /** Whether a player fits the division by birth year. */
 export function eligibility(born: number, d?: Pick<EntryDivision, 'bornFrom' | 'bornTo'>): Tag {
-  if (d?.bornFrom && born < d.bornFrom) return { label: 'Too Old', tone: 'red' };
-  if (d?.bornTo && born > d.bornTo) return { label: 'Too Young', tone: 'red' };
+  if (d?.bornFrom && born < d.bornFrom) return { label: 'Needs Exception', tone: 'red' };
+  if (d?.bornTo && born > d.bornTo) return { label: 'Playing Up', tone: 'green' };
   return { label: 'Eligible', tone: 'green' };
 }
 

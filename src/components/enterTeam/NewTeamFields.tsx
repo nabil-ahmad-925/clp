@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { blankPlayer } from './entryRules';
+import { blankPlayer, eligibility } from './entryRules';
+import ExceptionAsk from './ExceptionAsk';
 import PlayerFields from './PlayerFields';
 import type { EntryDraftState } from './useEntryDraft';
 import s from './steps.module.css';
 
 /** Anyone not signed in as a CLP Partner: a new team typed in, its coaches and every player. */
-export default function NewTeamFields({ entry, signInHref }: { entry: EntryDraftState; signInHref: string }) {
+export default function NewTeamFields({ entry, signInHref, most }: { entry: EntryDraftState; signInHref: string; most: number }) {
   const { draft, update, division } = entry;
   // No more rows than the division takes.
   const full = draft.players.length >= (division?.maxPlayers ?? 60);
@@ -29,6 +30,9 @@ export default function NewTeamFields({ entry, signInHref }: { entry: EntryDraft
       <span className={s.hint}>Separate coaches with commas. Players under 18 need a parent or guardian.</span>
       {draft.players.map((p, i) => (
         <PlayerFields key={p.key} label={`Player ${i + 1}`} value={p} onChange={(next) => setPlayer(p.key, next)} onRemove={draft.players.length > 1 ? () => update({ players: draft.players.filter((x) => x.key !== p.key) }) : undefined} />
+      ))}
+      {draft.players.filter((p) => /^\d{4}$/.test(p.born) && eligibility(Number(p.born), division).tone === 'red').map((p) => (
+        <ExceptionAsk key={p.key} name={p.name || 'This player'} born={Number(p.born)} divisionName={division?.name} most={most} value={draft.exceptions[p.key] ?? ''} onChange={(reason) => update({ exceptions: { ...draft.exceptions, [p.key]: reason } })} />
       ))}
       <div className={s.actions}>
         <button type="button" className={s.small} disabled={full} onClick={addRow}>

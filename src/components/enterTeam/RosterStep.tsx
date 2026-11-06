@@ -7,10 +7,10 @@ import type { ClubData } from './useEntryData';
 import type { EntryDraftState } from './useEntryDraft';
 import s from './steps.module.css';
 
-type Props = { entry: EntryDraftState; club: ClubData | null | undefined; keepTeam: (team: ClubTeam) => void; signInHref: string };
+type Props = { entry: EntryDraftState; club: ClubData | null | undefined; keepTeam: (team: ClubTeam) => void; signInHref: string; most: number };
 
 /** Step 2: the team. A signed-in partner's own (or a new one saved to their Teams), else a new team typed in here. */
-export default function RosterStep({ entry, club, keepTeam, signInHref }: Props) {
+export default function RosterStep({ entry, club, keepTeam, signInHref, most }: Props) {
   const { division, playerCount } = entry;
   const size = rosterSizeProblem(division, playerCount);
   return (
@@ -37,9 +37,9 @@ export default function RosterStep({ entry, club, keepTeam, signInHref }: Props)
           Loading your teams…
         </p>
       ) : club ? (
-        <ClubTeamPicker entry={entry} teams={club.teams} verified={club.verified} keepTeam={keepTeam} />
+        <ClubTeamPicker entry={entry} teams={club.teams} verified={club.verified} keepTeam={keepTeam} most={most} />
       ) : (
-        <NewTeamFields entry={entry} signInHref={signInHref} />
+        <NewTeamFields entry={entry} signInHref={signInHref} most={most} />
       )}
     </>
   );
