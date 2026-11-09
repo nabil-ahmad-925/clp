@@ -41,7 +41,7 @@ export default function TripReserve({ widgetId, listingId, plan, onBack, onClose
     setSending(true);
     setError('');
     try {
-      setDone(await reserveTrip({ widgetId: String(widgetId), listingId, ...form, born: Number(form.born), agreed }));
+      setDone(await reserveTrip({ widgetId: String(widgetId), listingId, ...form, born: Number(form.born), under18, agreed }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not reserve your spot.');
     } finally {
