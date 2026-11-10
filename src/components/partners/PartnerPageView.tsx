@@ -61,6 +61,7 @@ import { VIDEO_SOURCES, embedOf } from './page/videos';
 import SupportCard from './donate/SupportCard';
 import SubscribeButton from './subscribe/SubscribeButton';
 import SubscribeDialog from './subscribe/SubscribeDialog';
+import { EMBED_REFERRER } from '@/components/ui/embedReferrer';
 
 type Experience = PartnerPageResponse['experiences'][number];
 type TabId = 'about' | 'content' | 'experiences' | 'jobs' | 'partnerships' | 'reviews' | 'shop' | 'news';
@@ -1712,7 +1713,7 @@ function VideoDialog({ video, onClose }: { video: PartnerVideo; onClose: () => v
         </div>
         <div className={`${s.videoFrame} ${video.source === 'tiktok' || video.source === 'instagram' ? s.videoTall : ''}`}>
           {embed ? (
-            <iframe src={embed} title={video.title || 'Video'} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+            <iframe src={embed} title={video.title || 'Video'} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen referrerPolicy={EMBED_REFERRER} />
           ) : (
             <a className={s.btnBrand} href={video.url} target="_blank" rel="noopener noreferrer">
               Watch on {name} ↗

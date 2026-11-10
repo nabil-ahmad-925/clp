@@ -36,3 +36,13 @@
 .richText a:hover {
   color: inherit;
 }
+
+/* Video players in an article (the API keeps only YouTube and Vimeo frames): the column's width, 16:9. */
+.richText iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 27px;
+  border: 0;
+}
