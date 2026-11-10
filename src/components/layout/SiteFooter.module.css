@@ -1,145 +1,195 @@
+/* The footer of the new designs (identical on every board): black with the social icons and two centred rows of links,
+   then the gold copyright band. Open Sans throughout. */
 .footer {
   position: relative;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .main {
-  background: var(--black);
-  padding: 50px 0;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+  padding: 88px 48px 120px;
+  background: #000;
 }
 
-/* Six 60px icon boxes in a 400px row (matches the original's left-packed alignment). */
 .social {
   display: flex;
-  max-width: 400px;
-  margin: 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
 .social a {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 60px;
   height: 60px;
-  color: var(--white);
+  color: #fff;
 }
 
-.icon {
-  width: 30px;
-  height: 30px;
-  position: relative;
-  top: -2px;
-}
-
-.iconSmall {
-  width: 26px;
-  height: 26px;
+.social a:hover {
+  color: #dcbd7d;
 }
 
 .links {
-  margin: 30px 0;
-  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
 }
 
 .links ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 60px;
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
-.links li {
+/* A box of its line's height (the design's links are flex items). */
+.links a {
   display: inline-block;
-  margin: 10px 20px;
-  line-height: 27px;
+  color: #fff;
+  font-size: 22px;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
-.links a {
-  color: var(--white);
-  font-size: 16px;
+.links a:hover {
+  color: #dcbd7d;
+}
+
+.social a:focus-visible,
+.links a:focus-visible {
+  outline: 2px solid #dcbd7d;
+  outline-offset: 4px;
 }
 
 .copyright {
-  background: var(--gold);
-  padding: 15px 0;
-  color: var(--white);
-}
-
-.copyrightInner {
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: 0 var(--container-pad);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 30px 48px 34px;
+  background: #dcbd7d;
+  color: #fff;
+  text-align: center;
 }
 
 .copyright p {
   margin: 0;
-  font-size: 14px;
-  line-height: 27px;
-  text-align: center;
+  font-size: 21px;
 }
 
 .copyLine {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .trademark {
   font-weight: 400;
 }
 
+/* "Soxcessful®" reads as part of the line, as in the design. */
 .copyright a {
-  color: var(--white);
+  color: inherit;
+  text-decoration: none;
 }
 
+.copyright a:hover {
+  text-decoration: underline;
+}
+
+.copyright a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Tablets: the same layout, a size down. */
 @media (max-width: 999px) {
-  .copyrightInner {
-    max-width: 88%;
-    padding: 0;
+  .main {
+    --icon-scale: 0.85;
+    gap: 48px;
+    padding: 72px 32px 88px;
   }
-}
 
-/* The original stacks the footer's columns below 1000px: the icons' column keeps its 25px bottom margin (phones
-   size it below). */
-@media (min-width: 691px) and (max-width: 999px) {
-  /* Padding, not margin: a margin would merge with the links' 30px top margin. */
   .social {
-    padding-bottom: 25px;
-  }
-}
-
-@media (max-width: 767px) {
-  .trademark {
-    margin-top: 2px;
-    padding: 20px;
-    font-size: 12px !important;
-    line-height: 18px !important;
-  }
-}
-
-@media (max-width: 690px) {
-  .social {
-    max-width: none;
-    justify-content: center;
+    gap: 18px;
   }
 
-  .social a {
-    width: 40px;
+  .links {
+    gap: 24px;
   }
 
-  .icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  .iconSmall {
-    width: 18px;
-    height: 18px;
-  }
-
-  .links li {
-    display: block;
-    margin: 5px 0;
-    line-height: 27px;
+  .links ul {
+    gap: 14px 36px;
   }
 
   .links a {
-    font-size: 13px;
+    font-size: 18px;
+  }
+
+  .copyright {
+    padding: 26px 32px 30px;
+  }
+
+  .copyright p {
+    font-size: 17px;
+  }
+}
+
+/* Phones: one icon row and the links stacked, one per line. */
+@media (max-width: 639px) {
+  .main {
+    --icon-scale: 0.6;
+    gap: 36px;
+    padding: 56px 16px 64px;
+  }
+
+  .social {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .social a {
+    width: 44px;
+    height: 44px;
+  }
+
+  .links {
+    gap: 12px;
+  }
+
+  .links ul {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .links a {
+    font-size: 15px;
+  }
+
+  .copyright {
+    gap: 10px;
+    padding: 22px 16px 26px;
+  }
+
+  .copyright p {
+    font-size: 14px;
+  }
+
+  .copyright .trademark {
+    font-size: 12px;
   }
 }

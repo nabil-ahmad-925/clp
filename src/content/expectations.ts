@@ -1,87 +1,75 @@
-// Content for /our-expectations/, from the original site.
-import type { FaqData, PageHeroData } from './types';
+// Content for /our-expectations/ (the Expectations & Commitment handoff, Oct 15, 2026). The per-role copy is in
+// expectationsRoles.ts. The policy wording still needs CLP's final legal review.
+
+/** Bump with clp-api shared/expectations.mjs EXPECTATIONS_VERSION: everyone is asked to agree again. */
+export const EXPECTATIONS_VERSION = '2.0';
+export const EXPECTATIONS_UPDATED = 'Oct 15, 2026';
 
 export const expectationsMeta = {
-  title: 'EXPECTATIONS & COMMITMENT - Compete Like Pros™',
+  title: 'Expectations & Commitment - Compete Like Pros™',
   description:
-    'Inclusivity: Create an environment that welcomes participants of all backgrounds and abilities. Embrace diversity to enrich the sports community. Passion for',
+    'What you can count on from CLP, and what we ask of everyone who plays, hosts or cheers at a CLP experience, in person or online.',
 };
 
-export const expectationsHero: PageHeroData = {
-  title: ['EXPECTATIONS & COMMITMENT'],
-  backgroundColor: '#000000',
-  height: 500,
+export const expectationsHero = {
+  eyebrow: 'EXPECTATIONS & COMMITMENT',
+  title: 'Safe, fair and fun for everyone.',
+  blurb: 'What you can count on from CLP, and what we ask of everyone who plays, hosts or cheers at a CLP experience, in person or online.',
+  meta: `3 minute read · Updated ${EXPECTATIONS_UPDATED} · Version ${EXPECTATIONS_VERSION}`,
 };
 
-export const expectationsQuote = {
-  quote:
-    '“Banners, signs, wearables, or similar items that are obscene or indecent, unrelated to the event, potentially offensive to other patrons, that may block the views of other fans, or that are otherwise considered dangerous or inappropriate are prohibited from all CLP experiences in person or virtually.”',
-  commitment:
-    'As a result of these principles, our partner operators must commit to providing all participants with an enjoyable, safe, and sustainable experience.',
-};
+/** A line with its bold lead ("Show up on time," + "checked in, with a signed waiver."). */
+export type Point = { b: string; t: string };
+/** An expandable row. */
+export type Row = { q: string; a: string };
+export type LadderStep = { t: string; d: string; color: string };
 
-export type Principle = { title: string; paragraphs: string[]; gradient: [string, string] };
-
-export const principles: Principle[] = [
-  {
-    title: 'Inclusivity and Excellence.',
-    paragraphs: [
-      'Inclusivity: Create an environment that welcomes participants of all backgrounds and abilities. Embrace diversity to enrich the sports community. Passion for',
-      'Excellence: Strive for excellence in every aspect of sports management, from event organization to facility maintenance. A commitment to continuous\nimprovement ensures a top-tier experience for participants.',
-    ],
-    gradient: ['#0a0a0a', '#000000'],
-  },
-  {
-    title: 'Player-Centric Approach and Community Engagement',
-    paragraphs: [
-      'Player-Centric Approach: Prioritize the needs and experiences of the players. Tailor programs, facilities,and services to enhance player enjoyment and skill development.',
-      'Community Engagement: Actively engage with the local community. Build partnerships that contribute to a vibrant and supportive sports culture, fostering a sense of belonging.',
-    ],
-    gradient: ['#000000', '#000000'],
-  },
-  {
-    title: 'Safety, Innovation, and Education',
-    paragraphs: [
-      'Safety and Well-being: Prioritize the safety and well-being of participants. Implement robust safety measures and create an environment that promotes physical and mental health.',
-      'Innovation and Adaptability: Embrace innovation in sports programming, technology, and facility management. Stay adaptable to evolving trends to keep the sports experience fresh and relevant.',
-      'Education and Development: Foster a culture of continuous learning and skill development, benefiting athletes, coaches, organizers, and staff alike.',
-    ],
-    gradient: ['#000000', '#000000'],
-  },
-  {
-    title: 'Sustainability, Transparency, and Enjoyment',
-    paragraphs: [
-      'Sustainability: Integrate environmentally friendly practices into sports operations. Prioritize sustainability in facility design, event planning, and resource management.',
-      'Transparency and Integrity: Uphold high standards of transparency and integrity in all aspects of sports management. Clear communication and ethical practices build trust.',
-      'Fun and Enjoyment: Cultivate an atmosphere where participants and spectators can derive joy and satisfaction from their engagement with sports.',
-    ],
-    gradient: ['#000000', '#000000'],
-  },
+export type SectionId = 'short' | 'promise' | 'side' | 'event' | 'safety' | 'rules' | 'faq';
+/** The sections in reading order. `sub` names the reader where it says {who}. */
+export const SECTIONS: { id: SectionId; title: string; sub: string }[] = [
+  { id: 'short', title: 'The Short Version', sub: 'The six things that matter most for {who}.' },
+  { id: 'promise', title: 'Our Promise', sub: 'What you can count on from CLP, every time.' },
+  { id: 'side', title: 'Your Side', sub: 'What we ask of {who}.' },
+  { id: 'event', title: 'At Every Event', sub: 'The basics for every game, clinic, event and livestream.' },
+  { id: 'safety', title: 'Safety & Reporting', sub: 'See something? Say something. Anyone can report, and you can stay anonymous.' },
+  { id: 'rules', title: 'If Rules Are Broken', sub: 'Most things are fixed with a conversation. Safety issues can skip straight to removal.' },
+  { id: 'faq', title: 'FAQ', sub: 'Quick answers for {who} and everyone.' },
 ];
 
-export const expectationsFaq: FaqData = {
-  title: "EXPECTATIONS & COMMITMENT FAQ's",
-  items: [
-    {
-      question: 'What opportunities does CLP offer for athletes to engage with their communities and make a positive impact?',
-      answer:
-        'CLP facilitates community engagement initiatives and partnerships for athletes to give back, support charitable causes, and inspire the next generation of athletes through mentorship and outreach programs.',
-    },
-    {
-      question: 'How does CLP ensure the well-being and success of young athletes?',
-      answer:
-        'CLP prioritizes the holistic development and welfare of young athletes, providing guidance on balancing academics, training, and competitions. We also promote ethical practices, compliance with regulations, and support systems for mental and physical well-being.',
-    },
-    {
-      question: "How does CLP ensure transparency and open communication with parents regarding their child's athletic journey?",
-      answer:
-        'CLP maintains open channels of communication with parents, providing regular updates, progress reports, and opportunities for parent-athlete consultations to ensure alignment with goals and expectations.',
-    },
-    {
-      question: 'What can operators expect when partnering with CLP?',
-      answer:
-        'Operators can expect a collaborative partnership with CLP focused on enhancing the overall experience for athletes, coaches, and stakeholders. This includes access to professional services, strategic planning, marketing support, and opportunities for growth and sustainability.',
-    },
-  ],
-  viewAll: { label: 'VIEW ALL', href: '/faq/expectations-commitments/' },
-};
+export const promises: Row[] = [
+  { q: 'Cleared coaches and hosts', a: 'Anyone who works with kids passes a background check and SafeSport training, and is re-checked on a schedule.' },
+  { q: 'Safe messaging', a: 'Youth messages always include a parent or guardian. Phone numbers and emails stay private on both sides.' },
+  { q: 'Your photos, your choice', a: 'Youth photos stay private unless a parent signs a release. Ask us to remove any photo of you.' },
+  { q: 'Honest reviews', a: 'Only people who attended, or parents with a member account, can leave a review.' },
+  { q: 'Secure payments, clear refunds', a: 'Checkout is handled by CLP. Cancellation and refund rules are shown before you pay.' },
+  { q: 'Real people, fast answers', a: 'Questions answered within 1 business day. Safety reports within 24 hours.' },
+];
+
+export const eventRules: Row[] = [
+  { q: 'Banners & signs', a: 'Welcome if they support the event. Nothing obscene, offensive, unrelated to the event, view-blocking or dangerous, in person or online.' },
+  { q: 'Alcohol and drugs', a: 'Not allowed at CLP experiences, and never at youth sessions. Some 21+ events may allow alcohol where the venue is licensed.' },
+  { q: 'Weapons', a: 'Not allowed, of any kind, at any CLP experience.' },
+  { q: 'The right gear', a: 'Cleats or turf shoes for the surface. Shin guards for youth sessions.' },
+  { q: 'Being on time', a: 'Arrive 10 minutes early to check in. Late arrivals join at the host’s call.' },
+  { q: 'Weather', a: 'Hosts make the call for safety. Lightning means everyone off the field for 30 minutes.' },
+  { q: 'Pets', a: 'Leashed pets on the sidelines only where the venue allows. Never on the field.' },
+  { q: 'Leave it better', a: 'Take your trash and follow the venue’s rules.' },
+];
+
+export const safetySteps: Point[] = [
+  { b: 'Tell us what happened.', t: 'Use “Report a concern”, a message thread or your booking. Add photos if you have them.' },
+  { b: 'We respond within 24 hours.', t: 'Our Trust & Safety team reviews every report. Urgent ones go first.' },
+  { b: 'We follow up.', t: 'We’ll tell you what we did, unless sharing would put someone at risk.' },
+];
+
+export const ladder: LadderStep[] = [
+  { t: 'Reminder', d: 'A friendly note from the host or CLP about what went wrong.', color: '#8A6F33' },
+  { t: 'Warning', d: 'A written warning on your account.', color: '#C77D1F' },
+  { t: 'Removal', d: 'Removed from a session or event, without a refund.', color: '#B03A2E' },
+  { t: 'Suspension or ban', d: 'Suspended or banned from CLP. Partners may lose their listing and page.', color: '#5E1621' },
+];
+
+export const APPEAL_LINE = 'Think we got it wrong? Reply to the decision email within 14 days and someone new on the CLP team will review it.';
+
+/** Where "Report a concern" and "ask us" go (CLP support; the e-mail app opens with the subject written). */
+export const SAFETY_EMAIL = 'support@competelikepros.com';

@@ -11,15 +11,10 @@ export const aboutMeta = {
 };
 
 export const aboutHero = {
-  kicker: 'ABOUT COMPETE LIKE PROS™',
   title: 'We Are Game Changers',
   tagline: 'REDEFINE YOUR PURPOSE™',
   hashtag: '#LeaveYourFootprints',
   image: upload('/2024/03/tt.jpg'),
-  actions: [
-    { label: 'Start a Project', href: '#start' },
-    { label: 'Explore Experiences', href: '/experiences/' },
-  ],
 };
 
 /** The gold strip under the heading: what CLP has done and is (counts from the site where it has them). */

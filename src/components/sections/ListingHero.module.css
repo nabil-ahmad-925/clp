@@ -131,3 +131,51 @@
     font-size: 36px;
   }
 }
+
+/* A page heading with a gold label above the title and a grey line under the blurb (Expectations & Commitment). */
+.withMeta {
+  /* The design's label starts 152px from the top: its 104px header (28px + the 76px logo) and 48px. */
+  padding-top: calc(var(--header-height) + 36px);
+  padding-bottom: 108px;
+}
+
+.withMeta .inner {
+  gap: 14px;
+}
+
+.withMeta .blurb {
+  max-width: 640px;
+}
+
+.eyebrow {
+  color: #dcbd7d;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 2.4px;
+}
+
+.meta {
+  color: #888;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 999px) {
+  .withMeta {
+    padding-top: calc(var(--header-height) + 40px);
+    padding-bottom: 96px;
+  }
+}
+
+@media (max-width: 639px) {
+  .withMeta {
+    padding-bottom: 72px;
+  }
+
+  .meta {
+    font-size: 13px;
+  }
+}

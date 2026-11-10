@@ -2,7 +2,7 @@ import { Archivo, Host_Grotesk, Instrument_Sans, Lato, Montserrat, Open_Sans, Os
 
 export const openSans = Open_Sans({
   subsets: ['latin', 'latin-ext'],
-  weight: ['300', '400', '600', '700'],
+  weight: ['300', '400', '600', '700', '800'],
   style: ['normal', 'italic'],
   variable: '--font-open-sans',
   display: 'swap',

@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { footerLinks, site, socialLinks } from '@/content/site';
-import SocialIcon from '@/components/ui/SocialIcon';
+import FooterSocialIcon from './FooterSocialIcon';
 import styles from './SiteFooter.module.css';
 
+/**
+ * The site's footer, as on every new design board: the social icons, the two rows of links on black, then the gold
+ * copyright band.
+ */
 export default function SiteFooter() {
   return (
     <footer className={styles.footer} data-header-tone="light">
@@ -10,8 +14,8 @@ export default function SiteFooter() {
         <ul className={styles.social}>
           {socialLinks.map((s) => (
             <li key={s.network}>
-              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label}>
-                <SocialIcon network={s.network} className={s.network === 'x' || s.network === 'tiktok' ? styles.iconSmall : styles.icon} />
+              <a href={s.href} target="_blank" rel="noopener" aria-label={`CLP on ${s.label}`}>
+                <FooterSocialIcon network={s.network} />
               </a>
             </li>
           ))}
@@ -37,15 +41,13 @@ export default function SiteFooter() {
       </div>
 
       <div className={styles.copyright}>
-        <div className={styles.copyrightInner}>
-          <p className={styles.copyLine}>
-            {site.copyright.line}{' '}
-            <a href={site.copyright.poweredBy.href} target="_blank" rel="noopener">
-              {site.copyright.poweredBy.label}
-            </a>
-          </p>
-          <p className={styles.trademark}>{site.copyright.trademark}</p>
-        </div>
+        <p className={styles.copyLine}>
+          {site.copyright.line}{' '}
+          <a href={site.copyright.poweredBy.href} target="_blank" rel="noopener">
+            {site.copyright.poweredBy.label}
+          </a>
+        </p>
+        <p className={styles.trademark}>{site.copyright.trademark}</p>
       </div>
     </footer>
   );

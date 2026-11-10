@@ -1,0 +1,225 @@
+/* Expectations & Commitment (the Oct 15, 2026 handoff): the FAQ page's layout (FaqCenter.module.css) with the "I'm a"
+   card on the heading's edge, a ✓ on the tabs already read, the "N OF 7" label and Back / Next. */
+
+/* The card half over the black heading, where the FAQ's search sits (ListingHero keeps room for it). */
+.switchSlot {
+  position: relative;
+  z-index: 3;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.switchCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  /* 860px inside its padding, as the design's card. */
+  max-width: 900px;
+  margin: -40px auto 0;
+  padding: 12px 12px 12px 28px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.switchLabel {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.switchGroup {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #f2f1ee;
+}
+
+.switchOption {
+  flex: 1;
+  height: 46px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #666;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.switchOption:hover {
+  color: #111;
+}
+
+.switchOn,
+.switchOn:hover {
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  color: #111;
+}
+
+.switchOption:focus-visible,
+.back:focus-visible,
+.next:focus-visible {
+  outline: 2px solid #dcbd7d;
+  outline-offset: 2px;
+}
+
+/* The FAQ's tabs, 32px apart (nav: outranks the FAQ's 36px), clear of the fixed header when Back / Next scroll to them. */
+nav.tabs {
+  gap: 8px 32px;
+  scroll-margin-top: calc(var(--header-height) + 16px);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tick {
+  color: #1e5b33;
+  font-size: 13px;
+}
+
+/* The section's title at the design's line height (the FAQ's is tighter). */
+h2.title {
+  line-height: 1.5;
+}
+
+.step {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.sub {
+  max-width: 620px;
+  color: #666;
+}
+
+.readNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.back,
+.next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 50px;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.back {
+  padding: 0 22px;
+  border: 1.5px solid #111;
+  background: #fff;
+  color: #000;
+}
+
+.next {
+  padding: 0 24px;
+  border: 0;
+  background: #111;
+  color: #fff;
+}
+
+.progress {
+  color: #888;
+  font-size: 14px;
+}
+
+.toast {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 30;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #111;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-weight: 600;
+}
+
+@media (max-width: 999px) {
+  .switchSlot {
+    padding: 0 32px;
+  }
+}
+
+@media (max-width: 639px) {
+  .switchSlot {
+    padding: 0 16px;
+  }
+
+  /* "I'm a" above the three options, which share the card's width. */
+  .switchCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: -32px;
+    padding: 12px;
+  }
+
+  .switchLabel {
+    text-align: center;
+  }
+
+  .switchOption {
+    height: 48px;
+    padding: 0 6px;
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  nav.tabs {
+    gap: 24px;
+  }
+
+  /* The counter on its own line above Back and Next. */
+  .readNav {
+    flex-wrap: wrap;
+  }
+
+  .progress {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .back,
+  .next {
+    flex: 1;
+    justify-content: center;
+    height: auto;
+    min-height: 50px;
+    padding: 10px 14px;
+    text-align: center;
+  }
+
+  .toast {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    text-align: center;
+  }
+}

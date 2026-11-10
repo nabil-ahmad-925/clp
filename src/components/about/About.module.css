@@ -100,48 +100,6 @@
   font-weight: 700;
 }
 
-.heroActions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  padding-top: 20px;
-}
-
-.buttonWhite,
-.buttonOutline {
-  display: inline-flex;
-  align-items: center;
-  height: 56px;
-  padding: 0 30px;
-  border-radius: 6px;
-  font-weight: 700;
-  text-decoration: none;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-}
-
-/* "Start a Project": white on the photo. */
-.buttonWhite {
-  background: var(--white);
-  color: #111;
-}
-
-.buttonWhite:hover {
-  background: #ececec;
-}
-
-.buttonOutline {
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  color: var(--white);
-}
-
-.buttonOutline:hover {
-  border-color: var(--white);
-  background: rgba(255, 255, 255, 0.08);
-}
-
 /* ---- Gold proof strip ---- */
 .proof {
   background: #dcbd7d;
@@ -220,7 +178,8 @@
   padding-top: 20px;
 }
 
-/* The Creator (light) and The Outlaw (black): on hover both are black (the light one turns black, the black one stays). */
+/* The Creator (light) and The Outlaw (black): the card under the mouse is black and the other light, so the black one
+   moves with the mouse. With no mouse over either, The Outlaw is black. */
 .trait {
   display: flex;
   flex-direction: column;
@@ -228,20 +187,22 @@
   padding: 32px;
   border-radius: 14px;
   background: #f7f6f3;
+  color: #111;
   transition:
     background-color 0.25s ease,
     color 0.25s ease,
     box-shadow 0.25s ease;
 }
 
-.trait:hover {
+.trait:hover,
+.traitDark {
   background: #0a0a0a;
   color: var(--white);
 }
 
-.traitDark {
-  background: #0a0a0a;
-  color: var(--white);
+.traits:has(.trait:hover) .trait:not(:hover) {
+  background: #f7f6f3;
+  color: #111;
 }
 
 .traitName {
@@ -258,6 +219,10 @@
 .trait:hover .traitText,
 .traitDark .traitText {
   color: #bbb;
+}
+
+.traits:has(.trait:hover) .trait:not(:hover) .traitText {
+  color: #555;
 }
 
 .closing {
@@ -281,6 +246,7 @@
   padding: 128px 48px;
 }
 
+/* Mission (white) and Vision (black): as the traits above, the card under the mouse is black and the other white. */
 .mv {
   display: flex;
   flex-direction: column;
@@ -291,11 +257,20 @@
   background: var(--white);
   color: #111;
   text-align: center;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
+.mv:hover,
 .mvDark {
   background: #0a0a0a;
   color: var(--white);
+}
+
+.mvGrid:has(.mv:hover) .mv:not(:hover) {
+  background: var(--white);
+  color: #111;
 }
 
 .mvKicker {
@@ -303,8 +278,10 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 4px;
+  transition: color 0.25s ease;
 }
 
+.mv:hover .mvKicker,
 .mvDark .mvKicker {
   color: #dcbd7d;
 }
@@ -320,8 +297,10 @@
   width: 48px;
   height: 2px;
   background: #8a6f33;
+  transition: background-color 0.25s ease;
 }
 
+.mv:hover .mvRule,
 .mvDark .mvRule {
   background: #dcbd7d;
 }
@@ -330,10 +309,24 @@
   color: #555;
   font-size: 16px;
   line-height: 1.7;
+  transition: color 0.25s ease;
 }
 
+.mv:hover .mvText,
 .mvDark .mvText {
   color: #bbb;
+}
+
+.mvGrid:has(.mv:hover) .mv:not(:hover) .mvKicker {
+  color: #8a6f33;
+}
+
+.mvGrid:has(.mv:hover) .mv:not(:hover) .mvRule {
+  background: #8a6f33;
+}
+
+.mvGrid:has(.mv:hover) .mv:not(:hover) .mvText {
+  color: #555;
 }
 
 /* ---- What we do ---- */

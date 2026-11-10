@@ -1,0 +1,225 @@
+/* Expectations & Commitment's lines (the handoff): rows between thin rules like the FAQ's, with a circled number, ✓ or
+   ✕; the rules ladder's STEP pills; Report a Concern; the FAQ section's search. */
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #e5e5e2;
+  list-style: none;
+}
+
+.point {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e5e5e2;
+}
+
+/* 32px inside the 1.5px ring, as the design's circles (not border-box). */
+.mark {
+  box-sizing: content-box;
+  display: flex;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.markGold {
+  border-color: #dcbd7d;
+  color: #8a6f33;
+}
+
+.markGreen {
+  border-color: #9bc7a8;
+  color: #1e5b33;
+}
+
+.markRed {
+  border-color: #e8a9a1;
+  color: #b03a2e;
+}
+
+/* The open rows' + / − ring at the design's size (see .mark). */
+span.sign {
+  box-sizing: content-box;
+}
+
+.text {
+  padding-top: 3px;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupNever {
+  margin-top: 18px;
+}
+
+.groupLabel {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.groupAlways {
+  color: #1e5b33;
+}
+
+.groupNeverLabel {
+  color: #b03a2e;
+}
+
+.step {
+  align-items: center;
+  gap: 20px;
+}
+
+.stepPill {
+  display: flex;
+  flex: 0 0 92px;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.stepText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stepText strong {
+  font-size: 18px;
+}
+
+.stepText span {
+  color: #555;
+  font-size: 16px;
+}
+
+.appeal {
+  margin: 0;
+  color: #555;
+  font-size: 15px;
+  text-align: center;
+}
+
+.safety {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.report,
+.danger {
+  display: inline-flex;
+  align-items: center;
+  height: 50px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.report {
+  padding: 0 26px;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+}
+
+.report:focus-visible {
+  outline: 2px solid #dcbd7d;
+  outline-offset: 2px;
+}
+
+.danger {
+  padding: 0 20px;
+  background: #fbe9e7;
+  color: #b03a2e;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 0 16px;
+  border: 1px solid #e5e5e2;
+  border-radius: 10px;
+}
+
+.search:focus-within {
+  border-color: #dcbd7d;
+}
+
+.search svg {
+  flex: 0 0 auto;
+  color: #8a6f33;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #111;
+  font: inherit;
+  font-size: 16px;
+}
+
+@media (max-width: 639px) {
+  .point {
+    gap: 14px;
+  }
+
+  .text {
+    font-size: 16px;
+  }
+
+  .step {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .stepPill {
+    flex-basis: 80px;
+  }
+
+  .stepText strong {
+    font-size: 17px;
+  }
+
+  .stepText span {
+    font-size: 15px;
+  }
+
+  .report,
+  .danger {
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    min-height: 50px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+}

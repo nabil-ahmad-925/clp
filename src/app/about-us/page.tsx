@@ -33,17 +33,9 @@ export default function AboutPage() {
         <img className={styles.heroImage} src={aboutHero.image} alt="" />
         <span className={styles.heroShade} aria-hidden />
         <div className={styles.heroInner}>
-          <span className={styles.kickerGold}>{aboutHero.kicker}</span>
           <h1 className={styles.heroTitle}>{aboutHero.title}</h1>
           <span className={styles.tagline}>{aboutHero.tagline}</span>
           <span className={styles.hashtag}>{aboutHero.hashtag}</span>
-          <div className={styles.heroActions}>
-            {aboutHero.actions.map((a, i) => (
-              <Link key={a.href} href={a.href} className={i === 0 ? styles.buttonWhite : styles.buttonOutline}>
-                {a.label}
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 

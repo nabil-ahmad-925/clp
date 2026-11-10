@@ -1,12 +1,13 @@
 import { cartChanged, getCart, joinAccountCart, switchCartId } from '@/content/cart';
+import { forgetAgreement, joinAgreement } from '@/content/expectationsAgreement';
 import { forgetSubscriptions } from '@/components/partners/subscribe/subscriptionStore';
 import { forgetFavorites, joinFavorites, loadFavorites } from '@/components/shop/favoritesSync';
 
 /**
- * What a guest keeps in this browser (their cart, their favorites, the partner pages they subscribed to) and the
- * account they sign in to. Signing in joins the guest's to the account's, and from then on the account's are used (on
- * every device). Signing out leaves them with the account and starts this browser afresh, so the next person here
- * doesn't see them.
+ * What a guest keeps in this browser (their cart, their favorites, the partner pages they subscribed to, their "I agree"
+ * on the Expectations & Commitment) and the account they sign in to. Signing in joins the guest's to the account's, and
+ * from then on the account's are used (on every device). Signing out leaves them with the account and starts this
+ * browser afresh, so the next person here doesn't see them.
  *
  * "clp-account-owner" remembers whose this browser's cart and favorites are (a user id, '' for a guest): a page load
  * after signing in or out (here, in another tab, or a sign-in that ran out) finishes the switch.
@@ -36,12 +37,13 @@ function signedOut() {
   switchCartId();
   forgetFavorites();
   forgetSubscriptions();
+  forgetAgreement();
   writeOwner('');
   void showCart();
 }
 
 async function signedIn(userId: string) {
-  await Promise.all([joinAccountCart(), joinFavorites()]);
+  await Promise.all([joinAccountCart(), joinFavorites(), joinAgreement()]);
   writeOwner(userId);
   void showCart();
 }

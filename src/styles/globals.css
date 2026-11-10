@@ -178,6 +178,23 @@ button {
   border: 0;
 }
 
+/* A page's printable version (Expectations & Commitment's Download PDF): a direct child of <main>, shown only on paper,
+   where it is all that prints. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  body:has(.print-only) > :not(main),
+  main:has(> .print-only) > :not(.print-only) {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+}
+
 .skip-link {
   position: absolute;
   left: -9999px;

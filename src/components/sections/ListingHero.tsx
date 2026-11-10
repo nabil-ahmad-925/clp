@@ -7,16 +7,21 @@ type Props = {
   blurb?: string;
   /** The page it belongs to, on the heading's bottom line ("← Updates & News"): an article list's breadcrumb. */
   back?: { label: string; href: string };
+  /** A gold label above the title ("EXPECTATIONS & COMMITMENT"). */
+  eyebrow?: string;
+  /** A grey line under the blurb ("3 minute read · Updated Oct 15, 2026 · Version 2.0"). */
+  meta?: string;
 };
 
 /**
  * A listing page's heading (the new design): the title and the category's line, centred on black. The search bar
  * (DirectorySearchSlot) sits on its bottom edge, so it keeps room for the bar's top half.
  */
-export default function ListingHero({ title, blurb, back }: Props) {
+export default function ListingHero({ title, blurb, back, eyebrow, meta }: Props) {
   return (
-    <section className={`${styles.hero} ${back ? styles.withBack : ''}`} data-header-tone="light" data-page-hero>
+    <section className={`${styles.hero} ${back ? styles.withBack : ''} ${eyebrow || meta ? styles.withMeta : ''}`} data-header-tone="light" data-page-hero>
       <div className={styles.inner}>
+        {eyebrow && <span className={styles.eyebrow}>{eyebrow}</span>}
         <h1 className={styles.title}>
           {title.map((line, i) => (
             <span key={i} className={styles.line}>
@@ -26,6 +31,7 @@ export default function ListingHero({ title, blurb, back }: Props) {
           ))}
         </h1>
         {blurb && <p className={styles.blurb}>{blurb}</p>}
+        {meta && <span className={styles.meta}>{meta}</span>}
         {back && (
           <Link href={back.href} className={styles.back}>
             <span className="glyph" aria-hidden>←</span> {back.label}
