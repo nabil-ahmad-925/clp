@@ -1,0 +1,273 @@
+/* The Wholesale payment page (PayPage): the form and history on the left, the order's money on the right. */
+.page {
+  display: grid;
+  gap: 18px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 64px;
+}
+
+.back {
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-montserrat), Montserrat, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1px solid #e3e1db;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.kicker {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.item {
+  font-size: 18px;
+}
+
+.mut {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.rows dt {
+  color: #555;
+}
+
+.rows dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.option {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid #ddddda;
+  border-radius: 10px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option span {
+  color: #666;
+  font-size: 13px;
+}
+
+.option[aria-checked='true'] {
+  border-color: #111;
+  box-shadow: inset 0 0 0 1px #111;
+  background: #fbf6ec;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #ddddda;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.details {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f7f6f3;
+}
+
+.details pre {
+  margin: 0;
+  color: #111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.fields label,
+.full {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fields input,
+.full textarea {
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #ddddda;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.fields input[aria-invalid='true'] {
+  border-color: #b03a2e;
+}
+
+.error {
+  color: #b03a2e;
+  font-size: 14px;
+}
+
+.pay {
+  height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pay:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.note {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f7f6f3;
+  color: #444;
+}
+
+.history {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #eee;
+}
+
+.history li > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.warn {
+  color: #b03a2e;
+  font-size: 13px;
+}
+
+.chip {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.option:focus-visible,
+.tab:focus-visible,
+.pay:focus-visible {
+  outline: 2px solid #dcbd7d;
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .page {
+    padding: 20px 16px 48px;
+  }
+
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -75,6 +75,9 @@ export function cartId() {
   }
 }
 
+/** Tells the page the cart id changed (signed in or out): what's kept under it (quote requests) is loaded again. */
+const ID_EVENT = 'clp-cart-id';
+
 /** The cart this browser uses from now on: the account's once signed in (clp-api POST /my/cart), a new one once signed out. */
 export function switchCartId(id: string = randomId()) {
   try {
@@ -82,6 +85,18 @@ export function switchCartId(id: string = randomId()) {
   } catch {
     sessionId = id;
   }
+  window.dispatchEvent(new Event(ID_EVENT));
+}
+
+/** Calls `fn` whenever the cart id changes, in this tab or another (a sign-in or sign-out there). Returns the unsubscribe. */
+export function onCartIdChange(fn: () => void) {
+  const other = (e: StorageEvent) => e.key === ID_KEY && fn();
+  window.addEventListener(ID_EVENT, fn);
+  window.addEventListener('storage', other);
+  return () => {
+    window.removeEventListener(ID_EVENT, fn);
+    window.removeEventListener('storage', other);
+  };
 }
 
 /** Signing in: this browser's cart joins the account's, and this browser uses the account's from then on. */

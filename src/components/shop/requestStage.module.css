@@ -1,0 +1,154 @@
+/* A request's deposit and proof step on the shop (RequestStage), in the request cards' note look. */
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7f6f3;
+  font-size: 14px;
+}
+
+.box[data-on='true'] {
+  border: 1px solid #d9b77e;
+  background: #fbf6ec;
+}
+
+.box strong {
+  color: #8a6f33;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+}
+
+.box > span {
+  color: #333;
+  line-height: 1.55;
+}
+
+.box a {
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field textarea {
+  padding: 10px 12px;
+  border: 1px solid #ddddda;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+  resize: vertical;
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark,
+.light {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dark {
+  border: 0;
+  background: #111;
+  color: #fff;
+}
+
+.light {
+  border: 1px solid #ddddda;
+  background: #fff;
+  color: #111;
+}
+
+.dark:disabled,
+.light:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.text {
+  border: 0;
+  background: none;
+  color: #555;
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* A link styled as the dark button (Pay Deposit): not the box's underlined text link. */
+.box a.dark {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Photos from the workshop: each picture as a thumbnail that opens full size, a PDF or a link by name. */
+.shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shots img {
+  display: block;
+  width: 84px;
+  height: 84px;
+  border: 1px solid #ebe8e1;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f2f1ed;
+}
+
+.shotFile {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid #ebe8e1;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.sample {
+  display: grid;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid #ebe8e1;
+}
+
+.sampleHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.sampleHead b {
+  flex: 1;
+  min-width: 140px;
+}
+
+.chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}

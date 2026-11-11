@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { LuBox, LuFactory, LuPalette, LuShapes, LuTag } from 'react-icons/lu';
 import { createPortal } from 'react-dom';
 import BecomePartner from '@/components/partners/BecomePartner';
@@ -18,9 +18,7 @@ import {
   deleteDesign,
   designAction,
   guestRequestAction,
-  guestRequests,
   isApparel,
-  myDesigns,
   sendGuestQuote,
   uploadGuestImage,
   type BulkItem,
@@ -29,11 +27,18 @@ import {
   type RequestAction,
   type RequestActionInput,
 } from '@/content/bulk';
+import { canPay, proofWaiting } from '@/content/bulkStages';
 import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import { SRC, WS_DECOS, WS_SOURCES, type WsItem, type WsSource } from '@/content/wholesale';
 import Mockup, { mockupPng, saveFile } from './Mockup';
 import PartnerSignIn from './PartnerSignIn';
+import PayPage from './pay/PayPage';
+import RequestFiles from './RequestFiles';
+import RequestPay from './RequestPay';
+import RequestSamples from './RequestSamples';
+import RequestStage from './RequestStage';
+import { useBulkRequests } from './useBulkRequests';
 import { BrandAssetsBar } from './BrandAssets';
 import WholesaleCard, { CustomCard } from './WholesaleCard';
 import WholesaleItem from './WholesaleItem';
@@ -69,6 +74,8 @@ const STATUS: Record<string, [string, string, string]> = {
   changes: ['Changes requested', '#FBEAE8', '#B03A2E'],
   quoted: ['Quote ready', '#111111', '#FFFFFF'],
   expired: ['Quote expired', '#F0EEE9', '#666666'],
+  deposit: ['Deposit due', '#FBF3E2', '#8A6F33'],
+  proof: ['Your proof', '#111111', '#FFFFFF'],
   'in-production': ['In production', '#E7F3EC', '#1E7A45'],
   shipped: ['Shipped', '#E6EEF8', '#1B4F8C'],
   declined: ['Declined', '#F0EEE9', '#666666'],
@@ -86,19 +93,8 @@ const statusKey = (r: BulkRequest) => {
 };
 const statusOf = (r: BulkRequest) => STATUS[statusKey(r)] ?? STATUS.quote;
 /** What needs the requester: a quote to approve, or new artwork to send. */
-const needsYou = (r: BulkRequest) => r.status === 'changes' || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
+const needsYou = (r: BulkRequest) => r.status === 'changes' || proofWaiting(r) || (canPay(r) && ['deposit', 'in-production'].includes(r.status)) || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
 
-/** The partner's or guest's requests (saved designs, quotes, orders), loaded again when they sign in or out. */
-function useRequests(partner: boolean, ready: boolean) {
-  const [items, setItems] = useState<BulkRequest[]>([]);
-  const reload = useCallback(() => {
-    (partner ? myDesigns() : guestRequests()).then(setItems, () => setItems([]));
-  }, [partner]);
-  useEffect(() => {
-    if (ready) reload();
-  }, [ready, reload]);
-  return { items, setItems, reload };
-}
 
 /**
  * Bulk & Operations (/shop/?view=bulk, the Shop design): team kits, staff gear, event supplies, inflatables, awards and
@@ -123,7 +119,7 @@ export default function ShopBulk() {
   };
   const [reqsOpen, setReqsOpen] = useState(false);
   const [signIn, setSignIn] = useState(false);
-  const reqs = useRequests(partner, !studio.loading);
+  const reqs = useBulkRequests(partner, !studio.loading);
   const ws = useWholesale();
   // The live catalog (CLP's Manufacturing › Catalog & suppliers): its items, and the categories and brands they use.
   const catalog = useWholesaleCatalog();
@@ -202,6 +198,17 @@ export default function ShopBulk() {
   );
 
   // Favorites (the board's): the folders on the side, the saved items in the one picked.
+  // Paying for a request (?pay=<id>): from its card in Quote Requests and the e-mails.
+  const payId = get('pay');
+  if (payId) {
+    return (
+      <div className={b.bulk}>
+        <section className={s.thinBand} data-header-tone="light" />
+        <PayPage id={payId} items={reqs.items} partner={partner} loaded={reqs.loaded} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} />
+        {drawers}
+      </div>
+    );
+  }
   // Quote Requests (the board's page): from the button, the item pages and the e-mails' links (?requests=1).
   if (get('reqs') === '1' || get('requests') === '1') {
     return (
@@ -423,7 +430,7 @@ export default function ShopBulk() {
           </Link>
           <Link href={shopHref({ view: 'bulk', reqs: '1' })} className={w.favBtn}>
             Quote Requests
-            <span data-alert={reqs.items.some(wsNeedsYou)}>{reqs.items.filter((r) => r.kind !== 'saved').length}</span>
+            {reqs.loaded && <span data-alert={reqs.items.some(wsNeedsYou)}>{reqs.items.filter((r) => r.kind !== 'saved').length}</span>}
           </Link>
           </span>
         </div>
@@ -803,7 +810,7 @@ function BulkItemPage({
             <span className={b.doneText}>
               {done === 'order'
                 ? `${item.name} is in production review. We’ll send a final proof to approve, then it’s made and shipped in bulk.`
-                : `${item.name} is with our sourcing team. Expect your custom quote within 2 business days.`}
+                : `${item.name} is with our sourcing team. Expect your custom quote within 2 business days. Send your production files from My Quote Requests to start sooner.`}
             </span>
             <div className={b.doneBtns}>
               <button type="button" className={b.btnDark} onClick={onBack}>
@@ -1005,7 +1012,7 @@ const money = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDi
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 /** Where a request is on its way: requested, quoted, in production, shipped. */
 const STEPS = ['Requested', 'Quote', 'Production', 'Shipped'];
-const stepOf = (r: BulkRequest) => (r.status === 'shipped' ? 3 : r.status === 'in-production' ? 2 : r.status === 'quoted' ? 1 : 0);
+const stepOf = (r: BulkRequest) => (r.status === 'shipped' ? 3 : r.status === 'in-production' ? 2 : ['quoted', 'deposit', 'proof'].includes(r.status) ? 1 : 0);
 
 function Requests({
   title,
@@ -1284,6 +1291,10 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
         </div>
       )}
 
+      <RequestPay r={r} />
+      <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />
+      <RequestStage r={r} busy={busy} act={(action, input) => void act(action, input)} />
+      <RequestSamples r={r} busy={busy} act={(action, input) => void act(action, input)} />
       {(r.status === 'in-production' || r.status === 'shipped') && (
         <div className={b.reqNoteGreen}>
           {r.approvedAt ? `Approved ${day(r.approvedAt)}` : 'Approved'}

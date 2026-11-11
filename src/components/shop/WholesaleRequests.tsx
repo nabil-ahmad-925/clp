@@ -4,15 +4,20 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { designAction, guestRequestAction, uploadGuestImage, type BulkRequest, type RequestAction, type RequestActionInput } from '@/content/bulk';
+import { canPay, proofWaiting, stageChip } from '@/content/bulkStages';
 import { uploadImage } from '@/content/partnerSession';
 import { money, type WsItem } from '@/content/wholesale';
 import { imageDataUrl } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
+import RequestFiles from './RequestFiles';
+import RequestPay from './RequestPay';
+import RequestSamples, { sampleWaiting } from './RequestSamples';
+import RequestStage from './RequestStage';
 import WsMock from './WsMock';
 import w from './wholesale.module.css';
 
 const CLP_EMAIL = 'hello@competelikepros.com';
-const TRACK = ['Submitted', 'Artwork check', 'Quote / proof', 'In production', 'Shipped'];
+const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'];
 const TRACK_URLS: Record<string, string> = {
   UPS: 'https://www.ups.com/track?tracknum=',
   FedEx: 'https://www.fedex.com/fedextrack/?trknbr=',
@@ -21,18 +26,21 @@ const TRACK_URLS: Record<string, string> = {
 };
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 const expired = (r: BulkRequest) => r.status === 'quoted' && Boolean(r.quote) && new Date(r.quote!.validUntil).getTime() < Date.now();
-/** What needs the requester: a quote to approve, or new artwork to send. */
-export const needsYou = (r: BulkRequest) => r.status === 'changes' || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
+/** What needs the requester: a quote or proof to approve, or new artwork to send. */
+export const needsYou = (r: BulkRequest) => r.status === 'changes' || proofWaiting(r) || sampleWaiting(r) || (canPay(r) && ['deposit', 'in-production'].includes(r.status)) || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
 
 /** Where a request is (the board's chips and its 5-step tracker). */
 function statusOf(r: BulkRequest): [string, string, string, number] {
-  if (r.status === 'changes') return ['Changes requested', '#FBEAE8', '#B03A2E', 1];
-  if (r.status === 'art') return ['Artwork in review', '#FBF3E2', '#8A6F33', 1];
-  if (r.status === 'quoted') return expired(r) ? ['Quote expired', '#F2F1ED', '#666666', 2] : ['Quote ready', '#111111', '#FFFFFF', 2];
+  const stage = stageChip(r);
+  if (stage) return [...stage, r.status === 'in-production' ? 3 : r.status === 'proof' ? 2 : 1];
+  if (r.status === 'changes') return ['Changes requested', '#FBEAE8', '#B03A2E', 0];
+  if (r.status === 'art') return ['Preparing your quote', '#F2F1ED', '#444444', 0];
+  if (r.status === 'quoted') return expired(r) ? ['Quote expired', '#F2F1ED', '#666666', 1] : ['Quote ready', '#111111', '#FFFFFF', 1];
   if (r.status === 'in-production') return ['In production', '#E7F3EC', '#1E7A45', 3];
   if (r.status === 'shipped') return ['Shipped', '#E7F3EC', '#1E7A45', 4];
   if (r.status === 'closed') return [r.reply?.kind === 'declined' ? 'Declined' : 'Closed', '#F2F1ED', '#666666', 0];
-  return [r.reply?.kind === 'changes' ? 'Updating your quote' : 'Preparing your quote', '#F2F1ED', '#444444', 2];
+  if (r.reply?.kind === 'changes') return ['Updating your quote', '#F2F1ED', '#444444', 1];
+  return ['Preparing your quote', '#F2F1ED', '#444444', 0];
 }
 
 /** The note on a request: who it's from and what it says. */
@@ -41,7 +49,7 @@ function noteOf(r: BulkRequest): [string, string, string] | null {
   if (r.status === 'quoted' && q)
     return [
       'QUOTE FROM THE CLP TEAM',
-      `${money(q.unitPrice)} each · ${q.qty} pieces · ${money(q.total)} total${q.lead ? ` · ready in ${q.lead}` : ''}. ${expired(r) ? `Expired ${day(q.validUntil)}. Ask for changes and we’ll send an updated one.` : `Valid until ${day(q.validUntil)}. Approving starts production.`}`,
+      `${money(q.unitPrice)} each · ${q.qty} pieces · ${money(q.total)} total${q.lead ? ` · ready in ${q.lead}` : ''}. ${expired(r) ? `Expired ${day(q.validUntil)}. Ask for changes and we’ll send an updated one.` : `Valid until ${day(q.validUntil)}. Approve it and a 50% deposit starts your proof and production.`}`,
       '#F7F6F3',
     ];
   if (r.status === 'quoted') return ['QUOTE FROM THE CLP TEAM', 'We e-mailed you your quote. Reply to that e-mail to approve it or ask for changes.', '#F7F6F3'];
@@ -50,7 +58,9 @@ function noteOf(r: BulkRequest): [string, string, string] | null {
   if (r.art?.state === 'resubmitted' && ['art', 'quote', 'maker', 'maker-in'].includes(r.status)) return ['YOUR UPDATE', `New file sent ${day(r.art.at)}. Our team is checking it with your quote.`, '#F7F6F3'];
   if (r.status === 'in-production') return ['UPDATE', `Approved${r.approvedAt ? ` ${day(r.approvedAt)}` : ''}${q ? ` · ${money(q.total)}` : ''}. It’s being made${q?.lead ? `, ready in ${q.lead}` : ''}. We’ll e-mail you the tracking when it ships.`, '#F7F6F3'];
   if (r.status === 'closed' && r.reply?.kind === 'declined') return ['YOUR REQUEST', `You declined this quote ${day(r.reply.at)}.`, '#F7F6F3'];
-  if (['quote', 'maker', 'maker-in', 'new', 'art'].includes(r.status)) return ['UPDATE', 'We’re preparing your quote. Expect it within 2 business days.', '#F7F6F3'];
+  if (['quote', 'maker', 'maker-in', 'new', 'art'].includes(r.status)) {
+    return ['UPDATE', 'We’re preparing your quote. Expect it within 2 business days. Send your production files below so we can start right away.', '#F7F6F3'];
+  }
   return null;
 }
 
@@ -87,7 +97,7 @@ export default function WholesaleRequests({
       <div className={w.reqPageHead}>
         <span>
           <h2>Quote Requests</h2>
-          <span>Artwork approvals, quotes and orders in one place.</span>
+          <span>Production files, quotes and orders in one place.</span>
         </span>
         <span className={w.reqPageRight}>
           <span>{waiting ? `${waiting} ${waiting === 1 ? 'needs' : 'need'} your attention` : 'Nothing needs you right now'}</span>
@@ -184,6 +194,10 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
             <span>{n[1]}</span>
           </div>
         )}
+        <RequestPay r={r} />
+        <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />
+        <RequestStage r={r} busy={busy} act={(action, input) => void act(action, input)} />
+        <RequestSamples r={r} busy={busy} act={(action, input) => void act(action, input)} />
         {r.status === 'shipped' && r.shipping && (
           <div className={w.reqTrackBox}>
             <strong>TRACKING</strong>

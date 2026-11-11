@@ -39,7 +39,7 @@ import { DEFAULT_PLAYERS, designSummary, emptyDesign, locsOf, rosterOf, spotOf, 
 import w from './wholesale.module.css';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TRACK = ['Submitted', 'Artwork check', 'Quote / proof', 'In production', 'Shipped'];
+const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'];
 
 /**
  * An item's page (the Wholesale board's): its mockup with the print spots under it, the item's price breaks, then item
@@ -611,11 +611,11 @@ export default function WholesaleItem({
                   </span>
                 </span>
                 <span className={w.doneText}>
-                  {done.kind === 'order' ? 'We’ll send a final proof before production.' : `You’ll get a quote from ${handlerOf(item)} within 2 business days. Track it in Quote Requests.`}
+                  {done.kind === 'order' ? 'Next, send your production files (vector logo and the rest) from Quote Requests. We send a final proof before production.' : `You’ll get a quote from ${handlerOf(item)} within 2 business days. Send your production files from Quote Requests to start sooner.`}
                 </span>
                 <span className={w.doneSteps}>
                   {TRACK.map((label, i) => (
-                    <span key={label} data-on={i <= (done.kind === 'order' ? 3 : 2)}>
+                    <span key={label} data-on={i === 0} data-now={i === 1}>
                       <i />
                       {label}
                     </span>

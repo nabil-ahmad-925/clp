@@ -122,11 +122,61 @@ export type BulkRequest = {
   /** What they said about the quote: asked for changes, or declined it. */
   reply?: { kind: 'changes' | 'declined'; note: string; at: string };
   approvedAt?: string;
+  /** After the quote: the 50% deposit due and what CLP received, a verified buyer's PO, and the proof to approve. */
+  /** The money (clp-api shared/bulk-payments.mjs): total, 50% deposit, paid, waiting for CLP, left; what can be paid now. */
+  money?: PayMoney;
+  payOptions?: PayOption[];
+  payments?: Payment[];
+  /** The production files it needs (a vector logo, a stitch file for embroidery, a print-ready file for sublimation). */
+  files?: Partial<Record<FileKey, ProductionFile>>;
+  /** CLP still has to choose how it's made (the item lists methods that need different files). */
+  needsMethod?: boolean;
+  methods?: string[];
+  /** CLP's payment details, only while something can be paid. */
+  payTo?: PayTo;
+  po?: { number: string };
+  proof?: { url: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; reply?: { note: string; at: string }; approvedAt?: string };
   shipping?: { boxes: { carrier: string; number: string }[]; shippedAt: string };
+  /** Photos and samples from the workshop CLP shared, or asks them to approve (clp-api shared/bulk-samples.mjs). */
+  samples?: RequestSample[];
+};
+/** A proof, sample or finished-goods photos from the workshop: its files, CLP's note, where it stands, their change. */
+export type RequestSample = {
+  id: string;
+  kind: 'proof' | 'sample' | 'finished';
+  files: { url: string; name: string; image: boolean }[];
+  status: 'shared' | 'waiting' | 'approved' | 'changes';
+  note: string;
+  at: string;
+  reply?: { note: string; at: string };
+  decidedAt?: string;
 };
 /** What a requester does with their quote request or order (My quote requests). */
-export type RequestAction = 'approve-quote' | 'ask-changes' | 'decline' | 'new-artwork';
-export type RequestActionInput = { note?: string; logo?: string; link?: string };
+export type RequestAction = 'approve-quote' | 'ask-changes' | 'decline' | 'new-artwork' | 'approve-proof' | 'proof-changes' | 'submit-payment' | 'add-file' | 'approve-sample' | 'sample-changes';
+export type RequestActionInput = { note?: string; logo?: string; link?: string; kind?: PayKind; method?: PayMethod; reference?: string; sentOn?: string; fileKey?: FileKey; name?: string; data?: string; text?: string; sampleId?: string };
+export type FileKey = 'vector' | 'stitch' | 'threads' | 'inks' | 'yarns' | 'print' | 'roster' | 'mockup' | 'back' | 'logos' | 'fonts' | 'refs';
+/**
+ * A production file category the order needs (clp-api shared/file-specs.mjs): its name, what it takes (files of these
+ * types, or text like thread colors), whether it's required or takes several, where it stands, CLP's note, what was sent.
+ */
+export type ProductionFile = {
+  label: string;
+  hint: string;
+  type: 'file' | 'text';
+  accept?: string[];
+  required: boolean;
+  multiple?: boolean;
+  status: 'missing' | 'review' | 'approved' | 'changes' | 'clp' | 'optional';
+  note: string;
+  versions: { url?: string; text?: string; name: string; at: string; by: 'client' | 'clp' }[];
+};
+export type PayKind = 'deposit' | 'full' | 'balance';
+/** How the client pays (no card until the payment provider is connected). */
+export type PayMethod = 'bank' | 'zelle' | 'check';
+export type PayOption = { kind: PayKind; amount: number };
+export type PayMoney = { total: number; deposit: number; paid: number; pending: number; balance: number; depositMet: boolean };
+export type Payment = { id: string; kind: PayKind; amount: number; method: string; reference: string; sentOn?: string; note?: string; status: 'submitted' | 'confirmed' | 'rejected'; at: string; confirmedAt?: string; reviewNote?: string };
+export type PayTo = { payee: string; bank: string; zelle: string; checks: string; note: string };
 export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'createdAt' | 'design' | 'mockup' | 'brief' | 'addons' | 'mode' | 'contact'> & {
   mode?: 'logo' | 'design';
   brief?: string;

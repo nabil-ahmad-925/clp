@@ -1,4 +1,4 @@
-import type { CardButton, Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
+ import type { CardButton, Cta, DirectoryFilter, DirectoryItem, Provider } from './types';
 import display from './data/listingDisplay.json';
 import kinds from './data/listingKinds.json';
 

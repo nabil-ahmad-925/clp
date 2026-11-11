@@ -1275,7 +1275,7 @@
 
 .doneSteps {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -1300,6 +1300,16 @@
 
 .doneSteps > span[data-on='true'] i {
   background: #dcbd7d;
+}
+
+/* The step it's at now (the artwork check, right after sending): half lit. */
+.doneSteps > span[data-now='true'] {
+  color: #dcbd7d;
+  font-weight: 700;
+}
+
+.doneSteps > span[data-now='true'] i {
+  background: linear-gradient(90deg, #dcbd7d 50%, #333 50%);
 }
 
 .doneBtns {
