@@ -10,34 +10,36 @@ import { money, type WsItem } from '@/content/wholesale';
 import { imageDataUrl } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
 import RequestFiles from './RequestFiles';
+import RequestCheckpoints from './RequestCheckpoints';
 import RequestPay from './RequestPay';
 import RequestSamples, { sampleWaiting } from './RequestSamples';
 import RequestStage from './RequestStage';
+import RequestShipping from './RequestShipping';
 import WsMock from './WsMock';
+import RequestFinding from './sourcing/RequestFinding';
+import { findingIt } from '@/content/sourcing';
 import w from './wholesale.module.css';
 
 const CLP_EMAIL = 'hello@competelikepros.com';
 const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'];
-const TRACK_URLS: Record<string, string> = {
-  UPS: 'https://www.ups.com/track?tracknum=',
-  FedEx: 'https://www.fedex.com/fedextrack/?trknbr=',
-  USPS: 'https://tools.usps.com/go/TrackConfirmAction?tLabels=',
-  DHL: 'https://www.dhl.com/us-en/home/tracking/tracking-express.html?tracking-id=',
-};
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 const expired = (r: BulkRequest) => r.status === 'quoted' && Boolean(r.quote) && new Date(r.quote!.validUntil).getTime() < Date.now();
-/** What needs the requester: a quote or proof to approve, or new artwork to send. */
-export const needsYou = (r: BulkRequest) => r.status === 'changes' || proofWaiting(r) || sampleWaiting(r) || (canPay(r) && ['deposit', 'in-production'].includes(r.status)) || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
+/** CLP's change to one of their files, or a paid service offer, waits on their answer. */
+const fileChangeWaiting = (r: BulkRequest) => Object.values(r.files ?? {}).some((f) => f?.status === 'client') || (r.services ?? []).some((s) => s.status === 'offered');
+/** What needs the requester: a quote, proof, photos or a file change to approve, or new artwork to send. */
+export const needsYou = (r: BulkRequest) => r.status === 'changes' || proofWaiting(r) || sampleWaiting(r) || fileChangeWaiting(r) || (canPay(r) && ['deposit', 'in-production'].includes(r.status)) || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
 
 /** Where a request is (the board's chips and its 5-step tracker). */
 function statusOf(r: BulkRequest): [string, string, string, number] {
+  // A "Can't Find It?" request until our quote (content/sourcing.ts).
+  if (findingIt(r)) return ['Finding it for you', '#FBF3E2', '#8A6D2F', 0];
   const stage = stageChip(r);
   if (stage) return [...stage, r.status === 'in-production' ? 3 : r.status === 'proof' ? 2 : 1];
   if (r.status === 'changes') return ['Changes requested', '#FBEAE8', '#B03A2E', 0];
   if (r.status === 'art') return ['Preparing your quote', '#F2F1ED', '#444444', 0];
   if (r.status === 'quoted') return expired(r) ? ['Quote expired', '#F2F1ED', '#666666', 1] : ['Quote ready', '#111111', '#FFFFFF', 1];
   if (r.status === 'in-production') return ['In production', '#E7F3EC', '#1E7A45', 3];
-  if (r.status === 'shipped') return ['Shipped', '#E7F3EC', '#1E7A45', 4];
+  if (r.status === 'shipped') return r.shipping?.deliveredAt ? ['Delivered', '#E7F3EC', '#1E7A45', 4] : ['Shipped', '#E7F3EC', '#1E7A45', 4];
   if (r.status === 'closed') return [r.reply?.kind === 'declined' ? 'Declined' : 'Closed', '#F2F1ED', '#666666', 0];
   if (r.reply?.kind === 'changes') return ['Updating your quote', '#F2F1ED', '#444444', 1];
   return ['Preparing your quote', '#F2F1ED', '#444444', 0];
@@ -45,6 +47,8 @@ function statusOf(r: BulkRequest): [string, string, string, number] {
 
 /** The note on a request: who it's from and what it says. */
 function noteOf(r: BulkRequest): [string, string, string] | null {
+  // Its steps say where it is (RequestFinding).
+  if (findingIt(r)) return null;
   const q = r.quote;
   if (r.status === 'quoted' && q)
     return [
@@ -166,7 +170,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
   return (
     <div className={w.reqCard} data-on={needsYou(r)}>
       <span className={w.reqThumbBig}>
-        {r.mockup ? <img src={r.mockup} alt="" /> : it ? <WsMock item={it} asset={ws.asset(ws.lg)} color={ws.ic} className={w.cardSvgFull} /> : <span className={w.reqThumbNone}>{r.itemName.slice(0, 1)}</span>}
+        {r.mockup ? <img src={r.mockup} alt="" /> : r.sourcing?.photo ? <img src={r.sourcing.photo} alt="" /> : it ? <WsMock item={it} asset={ws.asset(ws.lg)} color={ws.ic} className={w.cardSvgFull} /> : <span className={w.reqThumbNone}>{r.itemName.slice(0, 1)}</span>}
       </span>
       <div className={w.reqBody}>
         <div className={w.reqTop}>
@@ -194,34 +198,14 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
             <span>{n[1]}</span>
           </div>
         )}
+        <RequestFinding r={r} />
+        <RequestCheckpoints r={r} />
         <RequestPay r={r} />
-        <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />
+        {/* Files are asked for once it's found and quoted. */}
+        {!findingIt(r) && <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />}
         <RequestStage r={r} busy={busy} act={(action, input) => void act(action, input)} />
         <RequestSamples r={r} busy={busy} act={(action, input) => void act(action, input)} />
-        {r.status === 'shipped' && r.shipping && (
-          <div className={w.reqTrackBox}>
-            <strong>TRACKING</strong>
-            {r.shipping.boxes.map((b, i) => (
-              <div key={i}>
-                <strong>
-                  Box {i + 1} of {r.shipping!.boxes.length}
-                </strong>
-                <span>
-                  {b.carrier} · {b.number}
-                  <span>Shipped {day(r.shipping!.shippedAt)}</span>
-                </span>
-                {TRACK_URLS[b.carrier] ? (
-                  <a href={TRACK_URLS[b.carrier] + encodeURIComponent(b.number)} target="_blank" rel="noopener noreferrer">
-                    Track ↗
-                  </a>
-                ) : (
-                  <span />
-                )}
-              </div>
-            ))}
-            <span className={w.fine}>We e-mail you when each box ships, with its tracking link.</span>
-          </div>
-        )}
+        <RequestShipping r={r} busy={busy} act={(action, input) => void act(action, input)} />
         {r.status === 'changes' && (
           <div className={w.reqFile}>
             <span>

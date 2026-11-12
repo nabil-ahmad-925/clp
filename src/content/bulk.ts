@@ -2,6 +2,8 @@ import catalog from './data/bulkCatalog.json';
 import { cartId } from './cart';
 import { call, read } from './partnerPages';
 import { partnerCall } from './partnerSession';
+import type { Address } from './address';
+import type { ClientSourcing, SourcingInput } from './sourcing';
 
 /**
  * Bulk & Operations (the shop's /shop/?view=bulk): CLP's catalog of team kits, staff gear, event supplies, inflatables,
@@ -112,9 +114,12 @@ export type BulkRequest = {
   mockup: string;
   status: string;
   createdAt: string;
-  contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string } | null;
+  /** Who and where: `address` is the full delivery address (content/address.ts); older requests have `deliverTo` text. */
+  contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string; address?: Address | null } | null;
   /** Its reference (R-1A2B3C), as CLP's e-mails give it. */
   ref?: string;
+  /** A "Can't Find It?" request (content/sourcing.ts): what we're finding for them and its 3 steps. */
+  sourcing?: ClientSourcing | null;
   /** CLP's quote: per piece, total, when it's ready, how long the quote holds. */
   quote?: { unitPrice: number; total: number; qty: number; lead: string; validUntil: string; sentAt: string };
   /** CLP's artwork check: sent back with a note, or approved; "resubmitted" once they sent a new file. */
@@ -135,8 +140,22 @@ export type BulkRequest = {
   /** CLP's payment details, only while something can be paid. */
   payTo?: PayTo;
   po?: { number: string };
-  proof?: { url: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; reply?: { note: string; at: string }; approvedAt?: string };
-  shipping?: { boxes: { carrier: string; number: string }[]; shippedAt: string };
+  /** The proof: its file, what it shows (color, placement, size, method), where it stands, their change. */
+  proof?: { url: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; details?: { color: string; placement: string; size: string; method: string }; reply?: { note: string; at: string }; approvedAt?: string };
+  /** Its shipment (clp-api shared/bulk-shipping.mjs): boxes, when it should arrive, the tracking corrected, its delivery. */
+  shipping?: { boxes: { carrier: string; number: string; status?: 'shipped' | 'out' | 'delivered'; outAt?: string; deliveredAt?: string }[]; shippedAt: string; eta?: string; etaWas?: string; delayedAt?: string; trackingAt?: string; deliveredAt?: string; deliveredBy?: 'clp' | 'client' };
+  /** Opens its tracking page (/track/), made when it ships. */
+  trackKey?: string;
+  /** Who they sent their upload link to (Send to My Designer, clp-api shared/upload-link.mjs). */
+  designer?: { email: string; at: string; note?: string } | null;
+  /** Paid artwork services we offered on their files, and their answers (clp-api shared/file-services.mjs). */
+  services?: { id: string; kind: string; label: string; fileKey: FileKey; price: number; note?: string; status: 'offered' | 'accepted' | 'declined' | 'cancelled'; at: string; decidedAt?: string; askedBy?: 'client' }[];
+  /** The two checkpoints: their files cleared for manufacturing, and their proof approved (clp-api shared/client-history.mjs). */
+  checkpoints?: { files: { cleared: boolean; at?: string }; proof: { approved: boolean; at?: string } };
+  /** Their own history of the order, newest first: what they and we did, with dates. */
+  history?: { at: string; text: string }[];
+  /** They let CLP make technical fixes to their files without asking (vectorizing, background, resolution, digitizing). */
+  fileAuth?: { technical: boolean; at: string };
   /** Photos and samples from the workshop CLP shared, or asks them to approve (clp-api shared/bulk-samples.mjs). */
   samples?: RequestSample[];
 };
@@ -152,23 +171,36 @@ export type RequestSample = {
   decidedAt?: string;
 };
 /** What a requester does with their quote request or order (My quote requests). */
-export type RequestAction = 'approve-quote' | 'ask-changes' | 'decline' | 'new-artwork' | 'approve-proof' | 'proof-changes' | 'submit-payment' | 'add-file' | 'approve-sample' | 'sample-changes';
-export type RequestActionInput = { note?: string; logo?: string; link?: string; kind?: PayKind; method?: PayMethod; reference?: string; sentOn?: string; fileKey?: FileKey; name?: string; data?: string; text?: string; sampleId?: string };
-export type FileKey = 'vector' | 'stitch' | 'threads' | 'inks' | 'yarns' | 'print' | 'roster' | 'mockup' | 'back' | 'logos' | 'fonts' | 'refs';
+export type RequestAction = 'approve-quote' | 'ask-changes' | 'decline' | 'new-artwork' | 'approve-proof' | 'proof-changes' | 'submit-payment' | 'add-file' | 'approve-sample' | 'sample-changes' | 'approve-file-change' | 'decline-file-change' | 'authorize-fixes' | 'accept-service' | 'decline-service' | 'confirm-delivered' | 'ask-clp-make' | 'send-to-designer';
+export type RequestActionInput = { note?: string; logo?: string; link?: string; kind?: PayKind; method?: PayMethod; reference?: string; sentOn?: string; fileKey?: FileKey; name?: string; data?: string; text?: string; sampleId?: string; on?: boolean; serviceId?: string; email?: string };
+/** A production file category (clp-api shared/file-specs.mjs), or one CLP asked for (`ask-…`). */
+export type FileKey = 'vector' | 'png' | 'small' | `ask-${string}` | 'stitch' | 'threads' | 'inks' | 'yarns' | 'print' | 'roster' | 'mockup' | 'back' | 'logos' | 'fonts' | 'refs';
+/** What an uploaded file really is (clp-api shared/file-info.mjs): vector or raster, pixel size and DPI, too small to print well. */
+export type FileInfo = { kind: 'vector' | 'raster' | 'other'; width?: number; height?: number; dpi?: number; low?: boolean };
 /**
  * A production file category the order needs (clp-api shared/file-specs.mjs): its name, what it takes (files of these
  * types, or text like thread colors), whether it's required or takes several, where it stands, CLP's note, what was sent.
  */
 export type ProductionFile = {
   label: string;
+  /** When CLP asked them for it (Request a File, clp-api shared/file-asks.mjs). */
+  asked?: string;
   hint: string;
   type: 'file' | 'text';
   accept?: string[];
   required: boolean;
   multiple?: boolean;
-  status: 'missing' | 'review' | 'approved' | 'changes' | 'clp' | 'optional';
+  /** CLP can make it for them (Have CLP Do It, at CLP's fee). */
+  clpMakes?: boolean;
+  /** client: our change waits on their approval · declined: they asked us for another change (clp-api shared/file-review.mjs). */
+  status: 'missing' | 'review' | 'approved' | 'changes' | 'clp' | 'optional' | 'client' | 'declined';
   note: string;
-  versions: { url?: string; text?: string; name: string; at: string; by: 'client' | 'clp' }[];
+  /** Why we asked for a new file (with status changes). */
+  reason?: 'vector' | 'resolution' | 'color' | 'background' | 'info' | 'other';
+  /** Their note asking us for another change (with status declined). */
+  reply?: { note: string; at: string };
+  /** Every version, oldest first (none is ever overwritten): ours say what we changed and did, and who approved it. */
+  versions: { url?: string; text?: string; name: string; at: string; by: 'client' | 'clp'; change?: 'as-sent' | 'format' | 'technical' | 'design'; done?: string; clientApproval?: { by: 'client' | 'clp'; at: string }; info?: FileInfo }[];
 };
 export type PayKind = 'deposit' | 'full' | 'balance';
 /** How the client pays (no card until the payment provider is connected). */
@@ -177,13 +209,15 @@ export type PayOption = { kind: PayKind; amount: number };
 export type PayMoney = { total: number; deposit: number; paid: number; pending: number; balance: number; depositMet: boolean };
 export type Payment = { id: string; kind: PayKind; amount: number; method: string; reference: string; sentOn?: string; note?: string; status: 'submitted' | 'confirmed' | 'rejected'; at: string; confirmedAt?: string; reviewNote?: string };
 export type PayTo = { payee: string; bank: string; zelle: string; checks: string; note: string };
-export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'createdAt' | 'design' | 'mockup' | 'brief' | 'addons' | 'mode' | 'contact'> & {
+export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'createdAt' | 'design' | 'mockup' | 'brief' | 'addons' | 'mode' | 'contact' | 'sourcing'> & {
   mode?: 'logo' | 'design';
   brief?: string;
   addons?: string[];
   design?: StudioDesign | null;
   mockup?: string;
   contact?: BulkRequest['contact'];
+  /** Asks CLP to find it (content/sourcing.ts): it's sent as the custom item. */
+  sourcing?: SourcingInput;
 };
 
 /** A guest's quote requests (this browser's) and sending one. */

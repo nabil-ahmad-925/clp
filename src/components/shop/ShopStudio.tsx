@@ -31,11 +31,16 @@ import {
   uploadGuestImage,
   type BulkItem,
   type BulkKind,
+  type BulkRequest,
   type StudioDesign,
 } from '@/content/bulk';
 import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { FONT_STYLE, isLight, mockupPng, saveFile } from './Mockup';
+import DeliveryAddress from './DeliveryAddress';
+import StudioGate from './StudioGate';
+import { useDeliveryAddress } from './useDeliveryAddress';
+import SendFilesNow from './SendFilesNow';
 import { Chevron, LockIcon } from './shopIcons';
 import { studioFontVariables } from './studioFonts';
 import { SAMPLE_LOGO, imageDataUrl, useStudio, type StudioBrand } from './useStudio';
@@ -117,8 +122,8 @@ const dataBlob = async (url: string) => (await fetch(url)).blob();
  * The design studio (/shop/?view=studio&item=<id>[&design=<id>], the Shop design): a CLP partner designs a bulk item
  * in their brand (templates, colours, patterns, their logo with clean-up and print locations, text, names and numbers),
  * sees it from every side, then saves it, asks for a bulk quote or orders it. Brand guidelines (the partner's kit,
- * locked) limit every choice to what's approved. Guests design here too and ask for a bulk quote with their details
- * (saving, ordering and partner pricing need a partner sign-in).
+ * locked) limit every choice to what's approved. Designing is for approved partners only: a guest or a signed-in member
+ * sees StudioGate (sign in, apply, or ask for a quote on the item).
  */
 export default function ShopStudio() {
   const params = useSearchParams();
@@ -134,6 +139,7 @@ export default function ShopStudio() {
         Opening the design studio…
       </div>
     );
+  if (!brand.partner) return <StudioGate item={item} member={Boolean(brand.user)} />;
   return <Studio key={`${item.id}|${designId}`} item={item} designId={designId} brand={brand} go={(href) => router.push(href)} />;
 }
 
@@ -141,6 +147,8 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
   // A guest (not a signed-in partner): a bulk quote with their details, no saving, ordering or partner pricing.
   const guest = !brand.partner;
   const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: '' });
+  // Where a quote or an order goes: one of their saved addresses, or a new one.
+  const delivery = useDeliveryAddress(!guest);
   const kit = brand.kit;
   const locked = kit.locked;
   const shape = item.shape;
@@ -165,6 +173,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
   const [busy, setBusy] = useState<'' | BulkKind | 'logo'>('');
   const [saved, setSaved] = useState(false);
   const [done, setDone] = useState<'' | 'quote' | 'order'>('');
+  const [sent, setSent] = useState<BulkRequest | null>(null);
   const [error, setError] = useState('');
   const preview = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -338,6 +347,8 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
       return setSaved(true);
     }
     if (guest && (!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact.email.trim()))) return setError('Enter your name and a valid email for the quote.');
+    const address = kind === 'saved' || guest ? null : delivery.check();
+    if (kind !== 'saved' && !guest && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
       const design = await persisted();
@@ -360,12 +371,17 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
         addons,
         design,
         mockup,
+        ...(address ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', address } } : {}),
       };
-      if (guest) await sendGuestQuote({ ...input, kind: 'quote', contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } });
+      if (guest) setSent(await sendGuestQuote({ ...input, kind: 'quote', contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } }));
       else if (kind === 'saved' && savedId) await updateDesign(savedId, input);
       else {
         const r = await createDesign(input);
         if (kind === 'saved') setSavedId(r.id);
+        else {
+          setSent(r);
+          void delivery.keep();
+        }
       }
       if (kind === 'saved') setSaved(true);
       else setDone(kind);
@@ -884,6 +900,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <span className={st.doneMark}>✓</span>
                 <strong>{done === 'order' ? 'Order placed' : 'Bulk quote requested'}</strong>
                 <span>{done === 'order' ? 'Order received. We’ll send a production proof to approve, then it’s made and shipped in bulk.' : 'Our team will send your bulk quote within 2 business days.'}</span>
+                {sent && <SendFilesNow request={sent} partner={!guest} />}
                 <div className={st.doneBtns}>
                   <button type="button" className={st.outlineBtn} onClick={() => setDone('')}>
                     Keep Designing
@@ -988,6 +1005,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <textarea className={st.input} aria-label="Anything else" rows={2} maxLength={2000} placeholder="Anything else? Sizes, colors, deadline" value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} />
               </div>
             )}
+            {!guest && <DeliveryAddress d={delivery} />}
             {error && <span className={st.error}>{error}</span>}
             {!guest && (
               <button type="button" className={st.buy} disabled={Boolean(busy) || Number(qty) < min} onClick={() => send('order')}>

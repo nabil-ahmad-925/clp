@@ -6,6 +6,7 @@ import { createDesign, sendGuestQuote, uploadGuestImage, type BulkKind, type Bul
 import { uploadImage } from '@/content/partnerSession';
 import { ADMIN_URL } from '@/content/partnerPages';
 import { shopHref } from '@/content/storefront';
+import SendFilesNow from './SendFilesNow';
 import {
   APPAREL,
   LOCN,
@@ -31,6 +32,9 @@ import { ACCEPT, AssetChip, useUpload } from './BrandAssets';
 import { mockupPng } from './Mockup';
 import WholesaleCard, { SaveModal } from './WholesaleCard';
 import WholesaleStudio from './WholesaleStudio';
+import DeliveryAddress from './DeliveryAddress';
+import DesignGate from './DesignGate';
+import { useDeliveryAddress } from './useDeliveryAddress';
 import WsMock from './WsMock';
 import { LargePhoto, PhotoStrip } from './WsPhotos';
 import { imageDataUrl, type StudioBrand } from './useStudio';
@@ -92,11 +96,13 @@ export default function WholesaleItem({
   const [qty, setQty] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState('');
   // A signed-in CLP member's name and email to start with (a guest types theirs).
-  const [contact, setContact] = useState({ name: studio.user?.name ?? '', organization: '', email: studio.user?.email ?? '', inHands: '', deliverTo: shipTo });
+  const [contact, setContact] = useState({ name: studio.user?.name ?? '', organization: '', email: studio.user?.email ?? '', inHands: '' });
+  // Where it goes: the full address (a signed-in client's saved ones, or a new one), started from the shop's place.
+  const delivery = useDeliveryAddress(Boolean(studio.user), shipTo);
   const [saving, setSaving] = useState(false);
   const [busy, setBusy] = useState<BulkKind | ''>('');
   const [error, setError] = useState('');
-  const [done, setDone] = useState<{ kind: BulkKind; ref: string } | null>(null);
+  const [done, setDone] = useState<{ kind: BulkKind; ref: string; r: BulkRequest } | null>(null);
   const mockRef = useRef<HTMLSpanElement>(null);
   // How a partner wants it, on items CLP lets them sell to their members: Buy wholesale, or Sell to members.
   const [mode, setMode] = useState<'ws' | 'sell'>('ws');
@@ -180,17 +186,20 @@ export default function WholesaleItem({
     setError('');
     if (!enough) return setError(`Add at least ${item.min} pieces.`);
     if (!partner && (!contact.name.trim() || !EMAIL.test(contact.email.trim()))) return setError('Enter your name and a valid email for the quote.');
+    const address = kind === 'saved' ? null : delivery.check();
+    if (kind !== 'saved' && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
       // An uploaded logo goes with the request as a link (a guest's image is kept with their cart first).
-      const imgs = uniq.filter((a) => a.kind === 'img' && a.src);
+      // Designing is a partner's: a guest's or member's quote goes without a design (their files come right after it).
+      const imgs = partner ? uniq.filter((a) => a.kind === 'img' && a.src) : [];
       let logo = '';
       for (const a of imgs) {
         const url = /^https:\/\//.test(a.src!) ? a.src! : await uploadGuestImage(await imageDataUrl(a.src!, 1500));
         if (!logo) logo = url;
       }
       let mockup = '';
-      const svg = mockRef.current?.querySelector('svg');
+      const svg = partner ? mockRef.current?.querySelector('svg') : null;
       if (svg) {
         try {
           mockup = partner ? await uploadImage(await mockupPng(svg as SVGSVGElement)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg as SVGSVGElement, 800), 800));
@@ -202,14 +211,13 @@ export default function WholesaleItem({
       const colorName = palette.find(([c]) => c === color)?.[1] ?? color;
       const brief = [
         `${item.name} (${item.brand}) · ${colorName} · ${total} pieces${sizeLine && sizes.length > 1 ? ` (${sizeLine})` : ''}`,
-        `Design: ${designSummary(item, design, ws.asset, players.length) || 'no artwork yet'}`,
+        partner ? `Design: ${designSummary(item, design, ws.asset, players.length) || 'no artwork yet'}` : 'Design: none yet (their logo files come with the request)',
         Object.keys(design.ros).some((l) => design.ros[l]) ? `Names & numbers: ${players.map((p) => `${p.name} ${p.num}`).join(', ')}` : '',
         `${kind === 'order' ? 'Order' : 'Estimate'}: ${money(amount)} (${money(amount / total)}/ea, ${item.deco[0]})`,
         notes.trim() ? `Notes: ${notes.trim()}` : '',
       ]
         .filter(Boolean)
         .join('\n');
-      const deliverTo = contact.deliverTo.trim();
       const input = {
         itemId: item.id,
         kind,
@@ -223,14 +231,15 @@ export default function WholesaleItem({
         design: { base: /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#111111', logo, logoOn: Boolean(logo), wholesaleItem: item.id, spots: used } as unknown as StudioDesign,
         mockup,
         ...(partner
-          ? deliverTo
-            ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo } }
+          ? address
+            ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', address } }
             : {}
-          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo, message: notes.trim(), logoLink: '' } }),
+          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), message: notes.trim(), logoLink: '', address } }),
       };
       const r = partner ? await createDesign(input) : await sendGuestQuote(input);
       onSent(r);
-      setDone({ kind, ref: r.ref ?? '' });
+      void delivery.keep();
+      setDone({ kind, ref: r.ref ?? '', r });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send it. Please try again.');
     } finally {
@@ -300,7 +309,7 @@ export default function WholesaleItem({
         <div className={w.itemGrid}>
           <div className={w.itemLeft}>
             <span className={w.itemMock} ref={mockRef}>
-              <WsMock item={item} loc={loc} asset={ws.asset(design.art[loc] ?? '')} color={color} design={spotOf(design, loc, player)} show={ws.mock} className={w.cardSvgFull} label={`${item.name}, ${LOCN[loc]}`} />
+              <WsMock item={item} loc={loc} asset={partner ? ws.asset(design.art[loc] ?? '') : undefined} color={color} design={spotOf(design, loc, player)} show={ws.mock} className={w.cardSvgFull} label={`${item.name}, ${LOCN[loc]}`} />
               <LargePhoto item={item} index={photo} />
               <span className={w.spotTag}>{photo < 0 ? LOCN[loc] : `Photo ${photo + 1}`}</span>
               <button type="button" className={w.saveFav} aria-pressed={fav} onClick={() => setSaving(true)}>
@@ -413,44 +422,55 @@ export default function WholesaleItem({
               </div>
             </div>
 
-            <div className={w.step}>
-              <span className={w.stepHead}>
-                <span className={w.stepN}>2</span>
-                <strong>Artwork</strong>
-              </span>
-              <span className={w.stepNote}>
-                Pick artwork for <strong>{LOCN[loc]}</strong>.{locs.length > 1 ? ' Switch spots under the mockup.' : ''}
-              </span>
-              <div className={w.artRow}>
-                <button type="button" className={w.noneBtn} aria-pressed={!design.art[loc]} onClick={() => change({ art: { ...design.art, [loc]: '' } })}>
-                  None
-                </button>
-                {assetChips.map((a) => (
-                  <AssetChip key={a.id} a={a} on={design.art[loc] === a.id} onPick={() => change({ art: { ...design.art, [loc]: a.id } })} />
-                ))}
-                <button type="button" className={w.moreBtn} onClick={() => setStudioOpen('brand')}>
-                  All {ws.assets.length} assets →
-                </button>
-                <button type="button" className={w.addBtn} aria-label="Upload a file" title="Upload a file" disabled={uploading} onClick={() => fileRef.current?.click()}>
-                  {uploading ? '…' : '+'}
-                </button>
-                <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />
-              </div>
-              {uploadError && (
-                <span className={w.error} role="alert">
-                  {uploadError}
+            {/* Designing (artwork per spot, the asset library, the studio) is for approved partners only. */}
+            {partner ? (
+              <div className={w.step}>
+                <span className={w.stepHead}>
+                  <span className={w.stepN}>2</span>
+                  <strong>Artwork</strong>
                 </span>
-              )}
-              <div className={w.studioBox}>
-                <span>
-                  <strong>Want to design fully?</strong>
-                  <span>{summary || 'Move, resize and rotate your logo, and add text, on each print spot.'}</span>
+                <span className={w.stepNote}>
+                  Pick artwork for <strong>{LOCN[loc]}</strong>.{locs.length > 1 ? ' Switch spots under the mockup.' : ''}
                 </span>
-                <button type="button" className={w.darkBtn} onClick={() => setStudioOpen('edit')}>
-                  Design Now
-                </button>
+                <div className={w.artRow}>
+                  <button type="button" className={w.noneBtn} aria-pressed={!design.art[loc]} onClick={() => change({ art: { ...design.art, [loc]: '' } })}>
+                    None
+                  </button>
+                  {assetChips.map((a) => (
+                    <AssetChip key={a.id} a={a} on={design.art[loc] === a.id} onPick={() => change({ art: { ...design.art, [loc]: a.id } })} />
+                  ))}
+                  <button type="button" className={w.moreBtn} onClick={() => setStudioOpen('brand')}>
+                    All {ws.assets.length} assets →
+                  </button>
+                  <button type="button" className={w.addBtn} aria-label="Upload a file" title="Upload a file" disabled={uploading} onClick={() => fileRef.current?.click()}>
+                    {uploading ? '…' : '+'}
+                  </button>
+                  <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />
+                </div>
+                {uploadError && (
+                  <span className={w.error} role="alert">
+                    {uploadError}
+                  </span>
+                )}
+                <div className={w.studioBox}>
+                  <span>
+                    <strong>Want to design fully?</strong>
+                    <span>{summary || 'Move, resize and rotate your logo, and add text, on each print spot.'}</span>
+                  </span>
+                  <button type="button" className={w.darkBtn} onClick={() => setStudioOpen('edit')}>
+                    Design Now
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className={w.step}>
+                <span className={w.stepHead}>
+                  <span className={w.stepN}>2</span>
+                  <strong>Artwork</strong>
+                </span>
+                <DesignGate member={Boolean(studio.user)} />
+              </div>
+            )}
 
             {!sell && (
               <div className={w.step}>
@@ -485,12 +505,7 @@ export default function WholesaleItem({
                   <strong>Notes for our designers</strong>
                 </span>
                 <textarea className={w.textarea} rows={3} maxLength={1500} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Placement details, names and numbers, deadline, event date…" />
-                {partner && (
-                  <label className={w.field}>
-                    Deliver to
-                    <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or ZIP" />
-                  </label>
-                )}
+                {partner && <DeliveryAddress d={delivery} />}
               </div>
             )}
 
@@ -541,11 +556,8 @@ export default function WholesaleItem({
                     In-hands date
                     <input type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
                   </label>
-                  <label className={`${w.field} ${w.fieldWide}`}>
-                    Deliver to
-                    <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or ZIP" />
-                  </label>
                 </div>
+                <DeliveryAddress d={delivery} />
               </div>
             )}
 
@@ -613,6 +625,7 @@ export default function WholesaleItem({
                 <span className={w.doneText}>
                   {done.kind === 'order' ? 'Next, send your production files (vector logo and the rest) from Quote Requests. We send a final proof before production.' : `You’ll get a quote from ${handlerOf(item)} within 2 business days. Send your production files from Quote Requests to start sooner.`}
                 </span>
+                <SendFilesNow request={done.r} partner={partner} />
                 <span className={w.doneSteps}>
                   {TRACK.map((label, i) => (
                     <span key={label} data-on={i === 0} data-now={i === 1}>
@@ -683,7 +696,7 @@ export default function WholesaleItem({
       </section>
 
       {saving && <SaveModal item={item} ws={ws} onClose={() => setSaving(false)} />}
-      {studioOpen && (
+      {studioOpen && partner && (
         <WholesaleStudio
           item={item}
           studio={studio}

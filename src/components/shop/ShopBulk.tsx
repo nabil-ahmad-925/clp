@@ -28,6 +28,10 @@ import {
   type RequestActionInput,
 } from '@/content/bulk';
 import { canPay, proofWaiting } from '@/content/bulkStages';
+import SendFilesNow from './SendFilesNow';
+import RequestShipping from './RequestShipping';
+import DeliveryAddress from './DeliveryAddress';
+import { useDeliveryAddress } from './useDeliveryAddress';
 import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import { SRC, WS_DECOS, WS_SOURCES, type WsItem, type WsSource } from '@/content/wholesale';
@@ -42,6 +46,8 @@ import { useBulkRequests } from './useBulkRequests';
 import { BrandAssetsBar } from './BrandAssets';
 import WholesaleCard, { CustomCard } from './WholesaleCard';
 import WholesaleItem from './WholesaleItem';
+import FindItPage from './sourcing/FindItPage';
+import { useNoResultLog } from './sourcing/useNoResultLog';
 import WholesaleRequests, { needsYou as wsNeedsYou } from './WholesaleRequests';
 import { useWholesale, useWholesaleCatalog } from './wholesaleStore';
 import { ListToolbar, ShopSearch, nextQuery, titleCase, type ListChip } from './shopListing';
@@ -78,6 +84,7 @@ const STATUS: Record<string, [string, string, string]> = {
   proof: ['Your proof', '#111111', '#FFFFFF'],
   'in-production': ['In production', '#E7F3EC', '#1E7A45'],
   shipped: ['Shipped', '#E6EEF8', '#1B4F8C'],
+  delivered: ['Delivered', '#E7F3EC', '#1E7A45'],
   declined: ['Declined', '#F0EEE9', '#666666'],
   closed: ['Closed', '#F0EEE9', '#666666'],
 };
@@ -89,6 +96,7 @@ const statusKey = (r: BulkRequest) => {
   if (PRICING.includes(r.status)) return r.reply?.kind === 'changes' ? 'updating' : r.kind === 'order' ? 'order' : 'quote';
   if (r.status === 'quoted') return expired(r) ? 'expired' : 'quoted';
   if (r.status === 'closed' && r.reply?.kind === 'declined') return 'declined';
+  if (r.status === 'shipped' && r.shipping?.deliveredAt) return 'delivered';
   return r.status;
 };
 const statusOf = (r: BulkRequest) => STATUS[statusKey(r)] ?? STATUS.quote;
@@ -146,6 +154,8 @@ export default function ShopBulk() {
   const sorter = (x: WsItem, y: WsItem) =>
     sort === 'low' ? x.price - y.price : sort === 'high' ? y.price - x.price : sort === 'fast' ? (x.stock === 'in' ? 0 : 1) - (y.stock === 'in' ? 0 : 1) : sort === 'az' ? x.name.localeCompare(y.name) : 0;
   const items = ALL.filter(pass).sort(sorter);
+  // A search that finds nothing in the whole catalog (not just under a filter) is counted for CLP's Sourcing requests.
+  useNoResultLog(q, !ALL.some((i) => passWith({ cat: '', src: '', brand: '', deco: '', stock: '' }, i)), Boolean(catalog.data));
   // How many a filter's choice would show (the dropdown's counts and "Show N results").
   const countWith = (k: keyof typeof f, v: string) => ALL.filter((i) => passWith({ ...f, [k]: v }, i)).length;
   const any = Boolean(q || loc || Object.values(f).some(Boolean));
@@ -247,6 +257,16 @@ export default function ShopBulk() {
           )}
         </div>
         <div className={s.bottomSpace} />
+        {drawers}
+      </div>
+    );
+  }
+
+  // "Can't Find It?": we find it for them (started from their search).
+  if (get('find') === '1') {
+    return (
+      <div className={b.bulk}>
+        <FindItPage studio={studio} what={get('what')} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} />
         {drawers}
       </div>
     );
@@ -445,7 +465,7 @@ export default function ShopBulk() {
               <button type="button" onClick={() => set({ q: '', loc: '', wcat: '', src: '', brand: '', deco: '', stock: '' })}>
                 Clear Filters
               </button>
-              <Link href={shopHref({ view: 'bulk', item: 'custom' })}>Have Us Find It</Link>
+              <Link href={shopHref({ view: 'bulk', find: '1', what: q, loc })}>Have Us Find It</Link>
             </span>
           </div>
         ) : view === 'list' ? (
@@ -459,7 +479,7 @@ export default function ShopBulk() {
             {items.map((it) => (
               <WholesaleCard key={it.id} item={it} href={hrefOf(it)} ws={ws} />
             ))}
-            <CustomCard href={shopHref({ view: 'bulk', item: 'custom' })} />
+            <CustomCard href={shopHref({ view: 'bulk', find: '1', what: q, loc })} />
           </div>
         )}
       </section>
@@ -536,13 +556,17 @@ function BulkItemPage({
   const [place, setPlace] = useState('front');
   const [text, setText] = useState('');
   const [prio, setPrio] = useState<string[]>([]);
-  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: loc });
+  // A signed-in member's name and email to start with (a guest types theirs).
+  const [contact, setContact] = useState({ name: studio.user?.name ?? '', organization: '', email: studio.user?.email ?? '', inHands: '', message: '', logoLink: '' });
+  // Where it goes: the full address (a signed-in client's saved ones, or a new one), started from the shop's place.
+  const delivery = useDeliveryAddress(Boolean(studio.user), loc);
   const views = VIEWS[item.shape] ?? [['front', 'Front']];
   const [shown, setShown] = useState(views[0][0]);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [done, setDone] = useState<BulkKind | null>(null);
+  const [sent, setSent] = useState<BulkRequest | null>(null);
   const [downloaded, setDownloaded] = useState(false);
   const svgWrap = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -587,14 +611,6 @@ function BulkItemPage({
     locations: [],
     style: 0,
   });
-  /** A guest's logo as a link for their quote: their image (or the sample) kept with the cart, then used from there. */
-  const guestLogo = async () => {
-    const logo = studio.logo;
-    if (!logo || /^https:\/\//.test(logo)) return logo;
-    const url = await uploadGuestImage(await imageDataUrl(logo));
-    studio.setLogo(url);
-    return url;
-  };
 
   const send = async (kind: BulkKind) => {
     setError('');
@@ -602,20 +618,17 @@ function BulkItemPage({
     if (!partner) {
       if (!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact.email.trim())) return setError('Enter your name and a valid email.');
     }
+    const address = kind === 'saved' ? null : delivery.check();
+    if (kind !== 'saved' && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
-      let logo = studio.logo;
-      if (!partner) {
-        try {
-          logo = await guestLogo();
-        } catch (err) {
-          throw new Error(err instanceof Error && err.message ? `${err.message} Or remove your logo and send a link to it instead.` : 'Could not add your logo. Try again.');
-        }
-      }
+      // Designing is a partner's: a guest's or member's quote goes without a design (their logo comes as a link, or a
+      // file right after it), and CLP makes the placement mockup.
+      const logo = partner ? studio.logo : '';
       let mockup = '';
-      if (kind !== 'saved' && svg()) {
+      if (partner && kind !== 'saved' && svg()) {
         try {
-          mockup = partner ? await uploadImage(await mockupPng(svg()!)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800));
+          mockup = await uploadImage(await mockupPng(svg()!));
         } catch {
           // The request goes without its picture.
         }
@@ -628,18 +641,23 @@ function BulkItemPage({
         priorities: prio,
         ...(partner
           ? {
-              ...(contact.deliverTo.trim() ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: contact.deliverTo.trim() } } : {}),
+              ...(address ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', address } } : {}),
               mode,
               brief,
               design: design(logo),
               mockup,
             }
-          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() }, design: design(logo), mockup }),
+          : { contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), address }, design: design(logo), mockup }),
       };
       const r = partner ? await createDesign(input) : await sendGuestQuote(input);
       onSent(r);
       if (kind === 'saved') setSaved(true);
-      else setDone(kind);
+      else {
+        setDone(kind);
+        setSent(r);
+        // A new address they asked to keep goes on their account (never failing the request).
+        void delivery.keep();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not send it. Please try again.');
     } finally {
@@ -673,10 +691,10 @@ function BulkItemPage({
       <Mockup
         shape={item.shape}
         base={studio.color}
-        logo={studio.logo || undefined}
-        placeholder
+        logo={partner ? studio.logo || undefined : undefined}
+        placeholder={partner}
         place={isApparel(item.shape) ? place : 'center'}
-        text={text}
+        text={partner ? text : ''}
         view={shown}
         className={b.dialogSvg}
         label={`${item.name} mockup`}
@@ -710,7 +728,7 @@ function BulkItemPage({
         <div className={s.thumbs}>
           {views.map(([v, label]) => (
             <button key={v} type="button" className={`${s.thumb} ${b.viewThumb} ${shown === v ? s.thumbOn : ''}`} aria-label={label} aria-pressed={shown === v} onClick={() => setShown(v)}>
-              <Mockup shape={item.shape} base={studio.color} logo={studio.logo || undefined} placeholder place={isApparel(item.shape) ? place : 'center'} text={text} view={v} className={b.dialogSvg} />
+              <Mockup shape={item.shape} base={studio.color} logo={partner ? studio.logo || undefined : undefined} placeholder={partner} place={isApparel(item.shape) ? place : 'center'} text={partner ? text : ''} view={v} className={b.dialogSvg} />
             </button>
           ))}
         </div>
@@ -741,7 +759,7 @@ function BulkItemPage({
             <div className={b.leftStack}>
               <span className={b.leftHead}>
                 <span className={b.leftKicker}>{partner ? 'DESIGN STUDIO' : 'PREVIEW'}</span>
-                <span className={b.leftNote}>{partner ? 'Partner tool' : 'Your logo and color'}</span>
+                <span className={b.leftNote}>{partner ? 'Partner tool' : 'The item in your color'}</span>
               </span>
               {gallery}
               <div className={b.row}>
@@ -750,7 +768,7 @@ function BulkItemPage({
                   <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
                 ))}
               </div>
-              {isApparel(item.shape) && (
+              {partner && isApparel(item.shape) && (
                 <div className={b.row}>
                   <span className={b.rowLabel}>Placement</span>
                   {[
@@ -763,7 +781,7 @@ function BulkItemPage({
                   ))}
                 </div>
               )}
-              {!studio.kit.locked && (
+              {partner && !studio.kit.locked && (
                 <div className={b.row}>
                   <span className={b.rowLabel}>Logo</span>
                   <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
@@ -780,18 +798,20 @@ function BulkItemPage({
                   )}
                 </div>
               )}
-              <div className={b.row}>
-                <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
-                <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
-              </div>
+              {partner && (
+                <div className={b.row}>
+                  <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
+                  <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
+                </div>
+              )}
               <button type="button" className={b.underline} onClick={download}>
                 {downloaded ? 'Downloaded ✓' : 'Download Mockup'}
               </button>
               {!partner && (
                 <div className={b.partnerBox}>
                   <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
-                  <strong>The full design studio is for approved partners</strong>
-                  <span>Approved CLP partners also get templates, patterns, print locations, saved designs and partner pricing.</span>
+                  <strong>Designing is for approved CLP partners</strong>
+                  <span>Ask for your quote and send your logo files right after it, and our designers set it up with you. Approved partners design here themselves, with templates, patterns, print locations, saved designs and partner pricing.</span>
                   <span className={b.partnerBoxLinks}>
                     <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
                     <button type="button" onClick={onSignIn}>
@@ -812,6 +832,7 @@ function BulkItemPage({
                 ? `${item.name} is in production review. We’ll send a final proof to approve, then it’s made and shipped in bulk.`
                 : `${item.name} is with our sourcing team. Expect your custom quote within 2 business days. Send your production files from My Quote Requests to start sooner.`}
             </span>
+            {sent && <SendFilesNow request={sent} partner={partner} />}
             <div className={b.doneBtns}>
               <button type="button" className={b.btnDark} onClick={onBack}>
                 Keep Browsing
@@ -906,10 +927,7 @@ function BulkItemPage({
                       <textarea rows={3} value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Theme, colors, patterns, materials, who it’s for" />
                     </label>
                   )}
-                  <label className={b.field}>
-                    Deliver to
-                    <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or destination" />
-                  </label>
+                  <DeliveryAddress d={delivery} />
                 </div>
                 <div className={b.priceBox}>
                   <span className={b.priceHead}>
@@ -961,11 +979,8 @@ function BulkItemPage({
                       In-hands date
                       <input type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
                     </label>
-                    <label className={b.field}>
-                      Deliver to
-                      <input value={contact.deliverTo} maxLength={160} autoComplete="address-level2" onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} placeholder="City or destination" />
-                    </label>
                   </div>
+                  <DeliveryAddress d={delivery} />
                   <label className={b.field}>
                     What do you have in mind?
                     <textarea rows={3} maxLength={2000} value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} placeholder="Colors, logo placement, sizes, anything you want designed" />
@@ -1002,12 +1017,6 @@ function BulkItemPage({
 
 /* ---------------------------------------------------------------- my designs / requests */
 
-const TRACK_URLS: Record<string, string> = {
-  UPS: 'https://www.ups.com/track?tracknum=',
-  FedEx: 'https://www.fedex.com/fedextrack/?trknbr=',
-  USPS: 'https://tools.usps.com/go/TrackConfirmAction?tLabels=',
-  DHL: 'https://www.dhl.com/us-en/home/tracking/tracking-express.html?tracking-id=',
-};
 const money = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 /** Where a request is on its way: requested, quoted, in production, shipped. */
@@ -1303,23 +1312,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
         </div>
       )}
 
-      {r.status === 'shipped' && r.shipping && (
-        <div className={b.reqTrack}>
-          <span className={b.reqWho}>TRACKING</span>
-          {r.shipping.boxes.map((x, i) => (
-            <span key={i} className={b.reqBox}>
-              <span>
-                Box {i + 1} of {r.shipping!.boxes.length} · {x.carrier} · {x.number}
-              </span>
-              {TRACK_URLS[x.carrier] && (
-                <a href={TRACK_URLS[x.carrier] + encodeURIComponent(x.number)} target="_blank" rel="noopener noreferrer">
-                  Track ↗
-                </a>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
+      <RequestShipping r={r} busy={busy} act={(action, input) => void act(action, input)} />
 
       {closed && <div className={b.reqNote}>{r.reply?.kind === 'declined' ? `You declined this quote ${day(r.reply.at)}.` : 'This request is closed. Contact us if you’d like to pick it up again.'}</div>}
       {error && (

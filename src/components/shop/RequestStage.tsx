@@ -30,6 +30,16 @@ export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: s
           Open Proof
         </a>
       </span>
+      {r.proof.details && (
+        <span style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '2px 12px', fontSize: 13 }}>
+          {[['Product color', r.proof.details.color], ['Logo placement', r.proof.details.placement], ['Logo size', r.proof.details.size], ['Method', r.proof.details.method]].map(([k, v]) => (
+            <span key={k} style={{ display: 'contents' }}>
+              <b>{k}</b>
+              <span>{v}</span>
+            </span>
+          ))}
+        </span>
+      )}
       {proofWaiting(r) && (
         <>
           {asking && (

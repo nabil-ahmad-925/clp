@@ -1,0 +1,178 @@
+/* The order tracking page (/track/): one column, the site's header over it. */
+.page {
+  min-height: 70vh;
+  padding: calc(var(--header-height) + 40px) 16px 72px;
+  background: #fff;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.kicker {
+  color: #8a6f33;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 40px;
+  line-height: 1.1;
+}
+
+.sub {
+  margin: 0;
+  color: #555;
+  font-size: 15px;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #e7f3ec;
+  color: #1e7a45;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chip[data-tone='transit'] {
+  background: #e6eef8;
+  color: #1b4f8c;
+}
+
+.note {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7f6f3;
+  font-size: 15px;
+}
+
+.late {
+  border: 1px solid #e8b9b3;
+  background: #fbeae8;
+  color: #8a2a20;
+}
+
+/* The five steps: across on wide screens, down on phones. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 4px solid #e8e6e0;
+  color: #888;
+  font-size: 13px;
+}
+
+.step[data-done='true'] {
+  border-top-color: #111;
+  color: #111;
+}
+
+.step b {
+  font-size: 14px;
+}
+
+.boxes {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px;
+  border: 1px solid #ebe8e1;
+  border-radius: 12px;
+}
+
+.box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ebe8e1;
+  font-size: 14px;
+}
+
+.box:last-child {
+  border-bottom: 0;
+}
+
+.box > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.box small {
+  color: #666;
+  font-size: 13px;
+}
+
+.box a {
+  color: #111;
+  font-weight: 700;
+}
+
+.help {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.help a {
+  color: #111;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 30px;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .step {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 0 10px 12px;
+    border-top: 0;
+    border-left: 4px solid #e8e6e0;
+  }
+
+  .step[data-done='true'] {
+    border-left-color: #111;
+  }
+
+  .box {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .box > a {
+    grid-column: 1 / -1;
+  }
+}
