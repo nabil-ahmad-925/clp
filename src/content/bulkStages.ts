@@ -26,6 +26,8 @@ export function stageChip(r: BulkRequest): [string, string, string] | null {
   if (paymentPending(r)) return ['Payment being confirmed', '#F2F1ED', '#444444'];
   if (r.status === 'deposit') return lastRejected(r) ? ['Payment not received', '#FBEAE8', '#B03A2E'] : ['Deposit due', '#FBF3E2', '#8A6F33'];
   if (proofWaiting(r)) return ['Proof to approve', '#111111', '#FFFFFF'];
+  // Approved: the maker is starting production (it moves to In production when they do).
+  if (r.status === 'proof' && r.proof?.state === 'approved') return ['Proof approved', '#E7F3EC', '#1E7A45'];
   if (r.status === 'proof') return ['Preparing your proof', '#F2F1ED', '#444444'];
   if (r.status === 'in-production' && balanceDue(r)) return ['Balance due', '#FBF3E2', '#8A6F33'];
   return null;

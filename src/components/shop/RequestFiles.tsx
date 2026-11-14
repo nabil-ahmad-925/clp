@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { BulkRequest, FileKey, ProductionFile, RequestAction, RequestActionInput } from '@/content/bulk';
+import CollapsibleBox from './CollapsibleBox';
 import FileRow from './FileRow';
 import FileServiceOffer from './FileServiceOffer';
 import HaveClpDoIt from './HaveClpDoIt';
@@ -29,17 +30,25 @@ function FixesChoice({ r, busy, act }: { r: BulkRequest; busy: string; act: Act 
  * mockup, a stitch file and thread colors, ink colors, print-ready artwork, a roster…), then the optional extras. Each
  * is sent as a file (up to 350 KB), a link, or text. CLP checks each for production, makes technical fixes (with their
  * say-so, else they approve them) and sends any design change to them to approve. Every version stays in its history.
+ * Closed by default: its header says where they stand (what's needed, what we're checking, what waits on them).
  */
-export default function RequestFiles({ r, busy, act }: { r: BulkRequest; busy: string; act: Act }) {
+export default function RequestFiles({ r, busy, act, defaultOpen = false }: { r: BulkRequest; busy: string; act: Act; defaultOpen?: boolean }) {
   const [more, setMore] = useState(false);
   const all = Object.entries(r.files ?? {}) as [FileKey, ProductionFile][];
   if (!all.length || !OPEN.includes(r.status)) return null;
   const required = all.filter(([, f]) => f.required);
   const optional = all.filter(([, f]) => !f.required);
   const done = required.every(([, f]) => f.status === 'approved');
+  // The summary on its (closed by default) header: where the required files stand, what waits on them.
+  const count = (test: (f: ProductionFile) => boolean) => required.filter(([, f]) => test(f)).length;
+  const needed = count((f) => f.status === 'missing' || f.status === 'changes');
+  const checking = count((f) => f.status === 'review');
+  const toApprove = all.filter(([, f]) => f.status === 'client').length;
+  const summary = done
+    ? 'All approved'
+    : [`${count((f) => f.status === 'approved')} of ${required.length} approved`, needed ? `${needed} needed` : '', checking ? `${checking} we’re checking` : '', toApprove ? `${toApprove} to approve` : ''].filter(Boolean).join(' · ');
   return (
-    <div className={st.box}>
-      <strong>PRODUCTION FILES</strong>
+    <CollapsibleBox title="PRODUCTION FILES" summary={summary} on={toApprove > 0} defaultOpen={defaultOpen}>
       <span>
         {done ? 'All required files are approved. Thank you.' : 'We make your order from these. Send each one, we check it before your proof.'}
         {r.needsMethod ? ' We’ll confirm how it’s made, and the optional files marked “If we use…” may be needed then.' : ''}
@@ -70,6 +79,6 @@ export default function RequestFiles({ r, busy, act }: { r: BulkRequest; busy: s
             <FileServiceOffer r={r} k={k} busy={busy} act={act} />
           </FileRow>
         ))}
-    </div>
+    </CollapsibleBox>
   );
 }

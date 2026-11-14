@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createDesign, sendGuestQuote, uploadGuestImage, type BulkKind, type BulkRequest, type StudioDesign } from '@/content/bulk';
 import { uploadImage } from '@/content/partnerSession';
 import { ADMIN_URL } from '@/content/partnerPages';
@@ -13,18 +13,18 @@ import {
   METALS,
   SHAPES,
   amountOf,
-  backDay,
   breaksOf,
   colorFor,
   colorsOf,
   firstLoc,
   handlerOf,
   money,
-  notifyWhenBack,
   programOf,
   sellInMyStore,
+  shareOf,
   tierOf,
   type WsProgram,
+  type WsShares,
   type WsAsset,
   type WsItem,
 } from '@/content/wholesale';
@@ -33,10 +33,14 @@ import { mockupPng } from './Mockup';
 import WholesaleCard, { SaveModal } from './WholesaleCard';
 import WholesaleStudio from './WholesaleStudio';
 import DeliveryAddress from './DeliveryAddress';
-import DesignGate from './DesignGate';
 import { useDeliveryAddress } from './useDeliveryAddress';
+import { guestImage, preloadGuestImage } from './guestUploads';
 import WsMock from './WsMock';
 import { LargePhoto, PhotoStrip } from './WsPhotos';
+import NotifyBack from './NotifyBack';
+import SpecSheet from './SpecSheet';
+import { availFor, colorPhotoOf, sizeNote, stockLine } from '@/content/wsStock';
+import { relatedRows } from '@/content/wsRelated';
 import { imageDataUrl, type StudioBrand } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
 import { DEFAULT_PLAYERS, designSummary, emptyDesign, locsOf, rosterOf, spotOf, spotSummary, usedLocs, type WsDesign } from './wsDesign';
@@ -56,6 +60,7 @@ export default function WholesaleItem({
   item,
   all,
   notify,
+  shares,
   studio,
   ws,
   loc: shipTo,
@@ -66,6 +71,8 @@ export default function WholesaleItem({
   all: WsItem[];
   /** CLP takes "Notify me" on back-ordered items. */
   notify: boolean;
+  /** What partners earn per program now (Programs & pricing). */
+  shares?: Partial<WsShares>;
   studio: StudioBrand;
   ws: Wholesale;
   loc: string;
@@ -141,17 +148,20 @@ export default function WholesaleItem({
   const sizes = item.sizes.length ? item.sizes : ['Qty'];
   const total = sizes.reduce((n, z) => n + (Number(qty[z]) || 0), 0);
   const enough = total >= item.min;
-  const over = item.stock === 'in' && total > item.avail;
+  const inColor = availFor(item, color);
+  const over = item.stock === 'in' && total > inColor;
   const used = usedLocs(item, design);
   const uniq = [...new Set(locs.map((l) => design.art[l]).filter(Boolean))].map((id) => ws.asset(id)).filter((a): a is WsAsset => Boolean(a));
+  // A guest's artwork starts uploading as soon as it's on the design: Request a quote then waits for little or nothing.
+  const pending = uniq.filter((a) => a.kind === 'img' && a.src).map((a) => a.src!).join('|');
+  useEffect(() => {
+    if (!pending) return;
+    for (const src of pending.split('|')) preloadGuestImage(src);
+  }, [pending]);
   const pend = uniq.filter((a) => a.status !== 'ok');
   const amount = amountOf(item, total, Math.max(1, uniq.length));
   const tier = tierOf(item, total);
-  const [stockDot, stockTxt] = item.back
-    ? ['#B03A2E', `Back-ordered at the supplier · back about ${backDay(item.back)} · min ${item.min}`]
-    : item.stock === 'in'
-      ? ['#1E7A45', `${item.avail} in stock · ships in ${item.lead} · min ${item.min}`]
-      : ['#C9A44C', `Made to order · ${item.lead} · min ${item.min}`];
+  const [stockDot, stockTxt] = stockLine(item, color);
   const tagLine = item.src === 'brand' ? `${item.brand.toUpperCase()} · NAME BRAND` : item.src === 'direct' ? 'CLP DIRECT · MADE BY A MAKER PARTNER' : 'DISTRIBUTOR PARTNER · IN STOCK';
   const canOrder = partner && enough && !pend.length && uniq.length > 0 && item.stock === 'in' && !item.back && !over;
   // Sell to members (partners, on items with a program): the retail price they set (never under the lowest) and their share.
@@ -161,8 +171,8 @@ export default function WholesaleItem({
   const retailMin = item.retailMin ?? 0;
   const retailAsked = Number(retailText.replace(/[^0-9.]/g, '')) || 0;
   const retailLow = retailAsked < retailMin;
-  const earn = (retailLow ? retailMin : retailAsked) * program.share;
-  const pctOf = (id: WsProgram) => `${Math.round(programOf(id).share * 100)}%`;
+  const earn = (retailLow ? retailMin : retailAsked) * shareOf(prog, shares);
+  const pctOf = (id: WsProgram) => `${Math.round(shareOf(id, shares) * 100)}%`;
   const sellText =
     item.programs.length > 1
       ? `Add it to your store and earn ${pctOf('pod')} on every sale, or run a pre-order and earn ${pctOf('pre')}. CLP makes and ships it.`
@@ -178,7 +188,7 @@ export default function WholesaleItem({
   else checks.push(['✓', '#1E7A45', 'Artwork approved', `${uniq.map((a) => a.name).join(', ')} · ${uniq.length} ${uniq.length === 1 ? 'print spot' : 'print spots'}`]);
   checks.push(
     enough
-      ? ['✓', '#1E7A45', `${total} pieces`, item.stock === 'in' ? (over ? `More than we have in stock (${item.avail}). We’ll quote the rest.` : `In stock · ships in ${item.lead}`) : `Made to order · ${item.lead}`]
+      ? ['✓', '#1E7A45', `${total} pieces`, item.stock === 'in' ? (over ? `More than we have in stock (${inColor}). We’ll quote the rest.` : `In stock · ships in ${item.lead}`) : `Made to order · ${item.lead}`]
       : ['!', '#999999', total ? `Add ${item.min - total} more` : 'Add quantities', `Minimum order is ${item.min} ${item.min === 1 ? 'piece' : 'pieces'}.`],
   );
 
@@ -190,28 +200,26 @@ export default function WholesaleItem({
     if (kind !== 'saved' && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
-      // An uploaded logo goes with the request as a link (a guest's image is kept with their cart first).
-      // Designing is a partner's: a guest's or member's quote goes without a design (their files come right after it).
-      const imgs = partner ? uniq.filter((a) => a.kind === 'img' && a.src) : [];
-      let logo = '';
-      for (const a of imgs) {
-        const url = /^https:\/\//.test(a.src!) ? a.src! : await uploadGuestImage(await imageDataUrl(a.src!, 1500));
-        if (!logo) logo = url;
-      }
-      let mockup = '';
-      const svg = partner ? mockRef.current?.querySelector('svg') : null;
-      if (svg) {
+      // Their artwork as links (a guest's kept with their cart, most already uploaded when picked) and the mockup of the
+      // design go up together, not one after the other.
+      const imgs = uniq.filter((a) => a.kind === 'img' && a.src);
+      const svg = mockRef.current?.querySelector('svg');
+      const picture = async () => {
+        if (!svg) return '';
         try {
-          mockup = partner ? await uploadImage(await mockupPng(svg as SVGSVGElement)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg as SVGSVGElement, 800), 800));
+          return partner ? await uploadImage(await mockupPng(svg as SVGSVGElement)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg as SVGSVGElement, 800), 800));
         } catch {
           // The request goes without its picture.
+          return '';
         }
-      }
+      };
+      const [urls, mockup] = await Promise.all([Promise.all(imgs.map((a) => guestImage(a.src!))), picture()]);
+      const logo = urls[0] ?? '';
       const sizeLine = sizes.filter((z) => Number(qty[z]) > 0).map((z) => (z === 'Qty' ? `${qty[z]}` : `${z} ${qty[z]}`)).join(' · ');
       const colorName = palette.find(([c]) => c === color)?.[1] ?? color;
       const brief = [
         `${item.name} (${item.brand}) · ${colorName} · ${total} pieces${sizeLine && sizes.length > 1 ? ` (${sizeLine})` : ''}`,
-        partner ? `Design: ${designSummary(item, design, ws.asset, players.length) || 'no artwork yet'}` : 'Design: none yet (their logo files come with the request)',
+        `Design: ${designSummary(item, design, ws.asset, players.length) || 'no artwork yet'}`,
         Object.keys(design.ros).some((l) => design.ros[l]) ? `Names & numbers: ${players.map((p) => `${p.name} ${p.num}`).join(', ')}` : '',
         `${kind === 'order' ? 'Order' : 'Estimate'}: ${money(amount)} (${money(amount / total)}/ea, ${item.deco[0]})`,
         notes.trim() ? `Notes: ${notes.trim()}` : '',
@@ -268,29 +276,24 @@ export default function WholesaleItem({
   };
 
   // What the box's buttons do: a request's kind, or nothing yet (a disabled button).
-  let primary: [string, BulkKind | null] = ['Request a quote', 'quote'];
+  let primary: [string, BulkKind | null] = ['Request a Quote', 'quote'];
   let secondary: [string, BulkKind] | null = null;
   let fine = `Quoted by ${handlerOf(item)} within 2 business days.`;
   if (!partner) {
-    primary = [enough ? 'Request a quote' : `Add at least ${item.min} to request a quote`, enough ? 'quote' : null];
+    primary = [enough ? 'Request a Quote' : `Add at Least ${item.min} to Request a Quote`, enough ? 'quote' : null];
     fine = 'Anyone can request a quote. Partners get pricing, mockups and online ordering.';
   } else if (!uniq.length) {
-    primary = ['Choose artwork to continue', null];
-    secondary = ['Request a quote without art', 'quote'];
+    primary = ['Choose Artwork to Continue', null];
+    secondary = ['Request a Quote Without Art', 'quote'];
     fine = 'No logo yet? Our designers can make a proof from your notes.';
-  } else if (!enough) primary = [`Add at least ${item.min} pieces`, null];
+  } else if (!enough) primary = [`Add at Least ${item.min} Pieces`, null];
   else if (canOrder) {
-    primary = [`Place order · ${money(amount)}`, 'order'];
-    secondary = ['Request a quote instead', 'quote'];
+    primary = [`Place Order · ${money(amount)}`, 'order'];
+    secondary = ['Request a Quote Instead', 'quote'];
     fine = 'We send a final proof before anything is made. Taxes and shipping on your invoice.';
   } else fine = `${item.stock === 'mto' ? 'Made to order. ' : pend.length ? 'New artwork is checked with your quote. ' : 'More than we have in stock. '}Quoted by ${handlerOf(item)} within 2 business days.`;
 
-  const rel = all.filter((x) => x.id !== item.id && x.cat === item.cat).slice(0, 4);
-  const relWith = all.filter((x) => x.id !== item.id && x.cat !== item.cat).slice(0, 4);
-  const rows: [string, string, WsItem[], string, string][] = [
-    ['Often ordered together', 'Teams that order this usually add these', relWith, 'Shop all', shopHref({ view: 'bulk' })],
-    ['More like this', `Similar ${item.cat.toLowerCase()} from our brands and makers`, rel.length ? rel : all.filter((x) => x.id !== item.id).slice(4, 8), `See all ${item.cat.toLowerCase()}`, shopHref({ view: 'bulk', wcat: item.cat })],
-  ];
+  const rows = relatedRows(item, all);
   const assetChips = [...ws.assets.filter((a) => a.id === design.art[loc]), ...ws.assets.filter((a) => a.id !== design.art[loc]).slice(0, design.art[loc] ? 1 : 2)];
   const summary = designSummary(item, design, ws.asset, players.length);
 
@@ -309,8 +312,8 @@ export default function WholesaleItem({
         <div className={w.itemGrid}>
           <div className={w.itemLeft}>
             <span className={w.itemMock} ref={mockRef}>
-              <WsMock item={item} loc={loc} asset={partner ? ws.asset(design.art[loc] ?? '') : undefined} color={color} design={spotOf(design, loc, player)} show={ws.mock} className={w.cardSvgFull} label={`${item.name}, ${LOCN[loc]}`} />
-              <LargePhoto item={item} index={photo} />
+              <WsMock item={item} loc={loc} asset={ws.asset(design.art[loc] ?? '')} color={color} design={spotOf(design, loc, player)} show={ws.mock} className={w.cardSvgFull} label={`${item.name}, ${LOCN[loc]}`} />
+              <LargePhoto item={item} index={photo} color={color} />
               <span className={w.spotTag}>{photo < 0 ? LOCN[loc] : `Photo ${photo + 1}`}</span>
               <button type="button" className={w.saveFav} aria-pressed={fav} onClick={() => setSaving(true)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill={fav ? '#B03A2E' : 'none'} stroke={fav ? '#B03A2E' : '#111111'} strokeWidth="2" strokeLinejoin="round" aria-hidden>
@@ -339,7 +342,8 @@ export default function WholesaleItem({
                 );
               })}
             </div>
-            <PhotoStrip item={item} picked={photo} onPick={setPhoto} />
+            <PhotoStrip item={item} picked={photo} onPick={setPhoto} color={color} />
+            <SpecSheet item={item} />
             <span className={w.muted}>Mockups are previews. You get a final proof before anything is made.</span>
           </div>
 
@@ -414,7 +418,12 @@ export default function WholesaleItem({
               </span>
               <div className={w.colorChips}>
                 {palette.map(([c, name]) => (
-                  <button key={c} type="button" className={w.colorChip} aria-pressed={color === c} onClick={() => (sh.fixed ? setMetal(c) : ws.update({ ic: c }))}>
+                  <button key={c} type="button" className={w.colorChip} aria-pressed={color === c} onClick={() => {
+                    if (sh.fixed) setMetal(c);
+                    else ws.update({ ic: c });
+                    // CLP's photo of this color shows large (the mockup is a spot away).
+                    if (colorPhotoOf(item, c)) setPhoto(0);
+                  }}>
                     <span style={{ background: c }} />
                     {name}
                   </button>
@@ -422,55 +431,45 @@ export default function WholesaleItem({
               </div>
             </div>
 
-            {/* Designing (artwork per spot, the asset library, the studio) is for approved partners only. */}
-            {partner ? (
-              <div className={w.step}>
-                <span className={w.stepHead}>
-                  <span className={w.stepN}>2</span>
-                  <strong>Artwork</strong>
-                </span>
-                <span className={w.stepNote}>
-                  Pick artwork for <strong>{LOCN[loc]}</strong>.{locs.length > 1 ? ' Switch spots under the mockup.' : ''}
-                </span>
-                <div className={w.artRow}>
-                  <button type="button" className={w.noneBtn} aria-pressed={!design.art[loc]} onClick={() => change({ art: { ...design.art, [loc]: '' } })}>
-                    None
-                  </button>
-                  {assetChips.map((a) => (
-                    <AssetChip key={a.id} a={a} on={design.art[loc] === a.id} onPick={() => change({ art: { ...design.art, [loc]: a.id } })} />
-                  ))}
-                  <button type="button" className={w.moreBtn} onClick={() => setStudioOpen('brand')}>
-                    All {ws.assets.length} assets →
-                  </button>
-                  <button type="button" className={w.addBtn} aria-label="Upload a file" title="Upload a file" disabled={uploading} onClick={() => fileRef.current?.click()}>
-                    {uploading ? '…' : '+'}
-                  </button>
-                  <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />
-                </div>
-                {uploadError && (
-                  <span className={w.error} role="alert">
-                    {uploadError}
-                  </span>
-                )}
-                <div className={w.studioBox}>
-                  <span>
-                    <strong>Want to design fully?</strong>
-                    <span>{summary || 'Move, resize and rotate your logo, and add text, on each print spot.'}</span>
-                  </span>
-                  <button type="button" className={w.darkBtn} onClick={() => setStudioOpen('edit')}>
-                    Design Now
-                  </button>
-                </div>
+            {/* Anyone designs here (a guest, a member, a partner): their artwork goes with the request. */}
+            <div className={w.step}>
+              <span className={w.stepHead}>
+                <span className={w.stepN}>2</span>
+                <strong>Artwork</strong>
+              </span>
+              <span className={w.stepNote}>
+                Pick artwork for <strong>{LOCN[loc]}</strong>.{locs.length > 1 ? ' Switch spots under the mockup.' : ''}
+              </span>
+              <div className={w.artRow}>
+                <button type="button" className={w.noneBtn} aria-pressed={!design.art[loc]} onClick={() => change({ art: { ...design.art, [loc]: '' } })}>
+                  None
+                </button>
+                {assetChips.map((a) => (
+                  <AssetChip key={a.id} a={a} on={design.art[loc] === a.id} onPick={() => change({ art: { ...design.art, [loc]: a.id } })} />
+                ))}
+                <button type="button" className={w.moreBtn} onClick={() => setStudioOpen('brand')}>
+                  All {ws.assets.length} assets →
+                </button>
+                <button type="button" className={w.addBtn} aria-label="Upload a file" title="Upload a file" disabled={uploading} onClick={() => fileRef.current?.click()}>
+                  {uploading ? '…' : '+'}
+                </button>
+                <input ref={fileRef} type="file" accept={ACCEPT} hidden onChange={upload} />
               </div>
-            ) : (
-              <div className={w.step}>
-                <span className={w.stepHead}>
-                  <span className={w.stepN}>2</span>
-                  <strong>Artwork</strong>
+              {uploadError && (
+                <span className={w.error} role="alert">
+                  {uploadError}
                 </span>
-                <DesignGate member={Boolean(studio.user)} />
+              )}
+              <div className={w.studioBox}>
+                <span>
+                  <strong>Want to design fully?</strong>
+                  <span>{summary || 'Move, resize and rotate your logo, and add text, on each print spot.'}</span>
+                </span>
+                <button type="button" className={w.darkBtn} onClick={() => setStudioOpen('edit')}>
+                  Design Now
+                </button>
               </div>
-            )}
+            </div>
 
             {!sell && (
               <div className={w.step}>
@@ -481,7 +480,10 @@ export default function WholesaleItem({
                 <div className={w.qtyGrid} style={{ gridTemplateColumns: `repeat(${sizes.length > 1 ? sizes.length : 5}, minmax(0, 1fr))` }}>
                   {sizes.map((z) => (
                     <label key={z} className={w.qtyCell}>
-                      <span>{z}</span>
+                      <span>
+                        {z}
+                        {sizeNote(item, color, z) && <em className={w.sizeNote}> · {sizeNote(item, color, z)}</em>}
+                      </span>
                       <input type="text" inputMode="numeric" value={qty[z] ?? ''} placeholder="0" aria-label={`Quantity ${z}`} onChange={(e) => setQty({ ...qty, [z]: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
                     </label>
                   ))}
@@ -696,7 +698,7 @@ export default function WholesaleItem({
       </section>
 
       {saving && <SaveModal item={item} ws={ws} onClose={() => setSaving(false)} />}
-      {studioOpen && partner && (
+      {studioOpen && (
         <WholesaleStudio
           item={item}
           studio={studio}
@@ -723,37 +725,5 @@ export default function WholesaleItem({
         />
       )}
     </>
-  );
-}
-
-/** "Notify me": an email (a signed-in partner's to start with) for the day a back-ordered item is back. */
-function NotifyBack({ itemId, email: start }: { itemId: string; email: string }) {
-  const [email, setEmail] = useState(start);
-  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
-  const [error, setError] = useState('');
-  if (state === 'done') return <strong className={w.backDone}>✓ We’ll email {email.trim()} the day it’s back.</strong>;
-  return (
-    <form
-      className={w.backForm}
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (!EMAIL.test(email.trim())) return setError('Enter a valid email.');
-        setState('busy');
-        setError('');
-        try {
-          await notifyWhenBack(itemId, email.trim());
-          setState('done');
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Could not save that. Please try again.');
-          setState('idle');
-        }
-      }}
-    >
-      <input type="email" aria-label="Your email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <button type="submit" disabled={state === 'busy'}>
-        {state === 'busy' ? 'Saving…' : 'Notify Me'}
-      </button>
-      {error && <span className={w.backError}>{error}</span>}
-    </form>
   );
 }

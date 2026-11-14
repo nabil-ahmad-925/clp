@@ -43,7 +43,8 @@ export default function SendFilesNow({ request, partner }: { request: BulkReques
           </button>
         </span>
       </div>
-      {open && <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />}
+      {/* Asked for just now: open. */}
+      {open && <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} defaultOpen />}
       {error && (
         <p role="alert" style={{ margin: 0, color: '#b42318', fontSize: 13 }}>
           {error}

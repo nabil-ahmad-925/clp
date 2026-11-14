@@ -102,7 +102,7 @@
   text-decoration: none;
 }
 
-/* Photos from the workshop: each picture as a thumbnail that opens full size, a PDF or a link by name. */
+/* Photos from the maker: each picture as a thumbnail that opens full size, a PDF or a link by name. */
 .shots {
   display: flex;
   flex-wrap: wrap;
@@ -119,12 +119,59 @@
   background: #f2f1ed;
 }
 
-.shotFile {
-  display: inline-block;
-  padding: 7px 12px;
+/* A proof's PDF or link: a card the size of a photo, its type or site and Open. */
+.fileCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 84px;
+  height: 84px;
+  padding: 6px;
+  box-sizing: border-box;
   border: 1px solid #ebe8e1;
   border-radius: 8px;
-  font-size: 13px;
+  background: #ffffff;
+  color: #111111;
+  text-decoration: none;
+}
+
+.shots a {
+  text-decoration: none;
+}
+
+.shots a:hover .fileCard {
+  border-color: #c9c4b8;
+}
+
+.linkMark {
+  width: 22px;
+  height: 22px;
+}
+
+.fileType {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.fileHost {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileOpen {
+  color: #6b6b6b;
+  font-size: 10.5px;
+  font-weight: 600;
 }
 
 .sample {
@@ -151,4 +198,15 @@
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+}
+
+/* The proofs sent before the one now, behind Show Earlier Proofs. */
+.earlier {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.earlier > .sample {
+  width: 100%;
 }

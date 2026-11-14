@@ -153,15 +153,17 @@ export class PartnerApiError extends Error {
   }
 }
 
-export async function call<T>(path: string, init?: RequestInit): Promise<T> {
+/** A call to the API. `timeoutMs`: how long it may take (15 s; longer for an upload on a slow connection). */
+export async function call<T>(path: string, init?: RequestInit & { timeoutMs?: number }): Promise<T> {
   if (!API_URL) throw new PartnerApiError(0, 'Partner pages aren’t available right now.');
+  const { timeoutMs = 15_000, ...rest } = init ?? {};
   let res: Response;
   try {
     res = await fetch(`${API_URL}${path}`, {
       cache: 'no-store',
-      signal: AbortSignal.timeout(15_000),
-      ...init,
-      headers: { ...(init?.body ? { 'content-type': 'application/json' } : {}), ...(init?.headers as Record<string, string> | undefined) },
+      signal: AbortSignal.timeout(timeoutMs),
+      ...rest,
+      headers: { ...(rest.body ? { 'content-type': 'application/json' } : {}), ...(rest.headers as Record<string, string> | undefined) },
     });
   } catch {
     throw new PartnerApiError(0, 'Could not reach CLP. Check your connection and try again.');

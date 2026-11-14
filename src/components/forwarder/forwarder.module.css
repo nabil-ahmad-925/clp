@@ -1,0 +1,131 @@
+/* A forwarder's link (/forwarder/): the shipment's details and their quote or tracking form. */
+.rows {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid #e5e5e2;
+}
+
+.rows > div {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e2;
+  font-size: 14px;
+}
+
+.rows dt {
+  color: #666;
+}
+
+.rows dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #f7f6f3;
+}
+
+.label {
+  color: #8a6f33;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+}
+
+.text {
+  margin: 0;
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d9d6cf;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+
+.field input[aria-invalid='true'] {
+  border-color: #b03a2e;
+}
+
+.dark {
+  align-self: flex-start;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dark:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error {
+  margin: 0;
+  color: #b03a2e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.done {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #e7f3ec;
+  color: #1e7a45;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

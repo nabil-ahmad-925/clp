@@ -19,9 +19,10 @@ import WsMock from './WsMock';
 import RequestFinding from './sourcing/RequestFinding';
 import { findingIt } from '@/content/sourcing';
 import w from './wholesale.module.css';
+import RequestTrack from './RequestTrack';
+import RequestsLoading from './RequestsLoading';
 
 const CLP_EMAIL = 'hello@competelikepros.com';
-const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'];
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 const expired = (r: BulkRequest) => r.status === 'quoted' && Boolean(r.quote) && new Date(r.quote!.validUntil).getTime() < Date.now();
 /** CLP's change to one of their files, or a paid service offer, waits on their answer. */
@@ -29,20 +30,24 @@ const fileChangeWaiting = (r: BulkRequest) => Object.values(r.files ?? {}).some(
 /** What needs the requester: a quote, proof, photos or a file change to approve, or new artwork to send. */
 export const needsYou = (r: BulkRequest) => r.status === 'changes' || proofWaiting(r) || sampleWaiting(r) || fileChangeWaiting(r) || (canPay(r) && ['deposit', 'in-production'].includes(r.status)) || (r.status === 'quoted' && Boolean(r.quote) && !expired(r));
 
-/** Where a request is (the board's chips and its 5-step tracker). */
+/**
+ * Where a request is: the board's chip and the tracker step it's at now (RequestTrack: 0 Submitted, 1 Quote, 2 Files &
+ * proof, 3 In production, 4 Shipped; 5 all done). Sent, it's at the quote, as the "Quote requested" screen shows.
+ */
 function statusOf(r: BulkRequest): [string, string, string, number] {
   // A "Can't Find It?" request until our quote (content/sourcing.ts).
-  if (findingIt(r)) return ['Finding it for you', '#FBF3E2', '#8A6D2F', 0];
+  if (findingIt(r)) return ['Finding it for you', '#FBF3E2', '#8A6D2F', 1];
   const stage = stageChip(r);
-  if (stage) return [...stage, r.status === 'in-production' ? 3 : r.status === 'proof' ? 2 : 1];
-  if (r.status === 'changes') return ['Changes requested', '#FBEAE8', '#B03A2E', 0];
-  if (r.status === 'art') return ['Preparing your quote', '#F2F1ED', '#444444', 0];
+  // The quote approved: the deposit, files and proof come next, then production.
+  if (stage) return [...stage, r.status === 'in-production' ? 3 : 2];
+  if (r.status === 'changes') return ['Changes requested', '#FBEAE8', '#B03A2E', 1];
+  if (r.status === 'art') return ['Preparing your quote', '#F2F1ED', '#444444', 1];
   if (r.status === 'quoted') return expired(r) ? ['Quote expired', '#F2F1ED', '#666666', 1] : ['Quote ready', '#111111', '#FFFFFF', 1];
   if (r.status === 'in-production') return ['In production', '#E7F3EC', '#1E7A45', 3];
-  if (r.status === 'shipped') return r.shipping?.deliveredAt ? ['Delivered', '#E7F3EC', '#1E7A45', 4] : ['Shipped', '#E7F3EC', '#1E7A45', 4];
+  if (r.status === 'shipped') return r.shipping?.deliveredAt ? ['Delivered', '#E7F3EC', '#1E7A45', 5] : ['Shipped', '#E7F3EC', '#1E7A45', 4];
   if (r.status === 'closed') return [r.reply?.kind === 'declined' ? 'Declined' : 'Closed', '#F2F1ED', '#666666', 0];
   if (r.reply?.kind === 'changes') return ['Updating your quote', '#F2F1ED', '#444444', 1];
-  return ['Preparing your quote', '#F2F1ED', '#444444', 0];
+  return ['Preparing your quote', '#F2F1ED', '#444444', 1];
 }
 
 /** The note on a request: who it's from and what it says. */
@@ -60,7 +65,13 @@ function noteOf(r: BulkRequest): [string, string, string] | null {
   if (r.status === 'changes') return ['FROM THE CLP TEAM', r.art?.note || 'Your artwork needs a change before production.', '#FBEAE8'];
   if (r.reply?.kind === 'changes' && r.status !== 'closed') return ['YOUR REQUEST', `You asked for changes ${day(r.reply.at)}: “${r.reply.note}”. We’ll send an updated quote.`, '#F7F6F3'];
   if (r.art?.state === 'resubmitted' && ['art', 'quote', 'maker', 'maker-in'].includes(r.status)) return ['YOUR UPDATE', `New file sent ${day(r.art.at)}. Our team is checking it with your quote.`, '#F7F6F3'];
+  // Made (the finished-goods photos): what's left to pay before it ships.
+  if (r.status === 'in-production' && r.producedAt) {
+    const left = r.money?.balance ?? 0;
+    return ['PRODUCTION COMPLETE', left > 0 && !r.po ? `Your order is made. Pay the remaining ${money(left)} and we ship it right away.` : 'Your order is made. It ships soon, and we’ll e-mail you the tracking.', left > 0 && !r.po ? '#FBF3E2' : '#F7F6F3'];
+  }
   if (r.status === 'in-production') return ['UPDATE', `Approved${r.approvedAt ? ` ${day(r.approvedAt)}` : ''}${q ? ` · ${money(q.total)}` : ''}. It’s being made${q?.lead ? `, ready in ${q.lead}` : ''}. We’ll e-mail you the tracking when it ships.`, '#F7F6F3'];
+  if (r.status === 'proof' && r.proof?.state === 'approved') return ['UPDATE', 'Thanks for approving your proof. Production is starting: we’ll update you as it’s made.', '#F7F6F3'];
   if (r.status === 'closed' && r.reply?.kind === 'declined') return ['YOUR REQUEST', `You declined this quote ${day(r.reply.at)}.`, '#F7F6F3'];
   if (['quote', 'maker', 'maker-in', 'new', 'art'].includes(r.status)) {
     return ['UPDATE', 'We’re preparing your quote. Expect it within 2 business days. Send your production files below so we can start right away.', '#F7F6F3'];
@@ -83,8 +94,11 @@ export default function WholesaleRequests({
   ws,
   onChange,
   onSaved,
+  loading = false,
 }: {
   items: BulkRequest[];
+  /** Still loading them: placeholders, never "No quote requests yet". */
+  loading?: boolean;
   /** The live catalog (empty while it loads: the requests show with their own names). */
   catalog: WsItem[];
   partner: boolean;
@@ -104,7 +118,7 @@ export default function WholesaleRequests({
           <span>Production files, quotes and orders in one place.</span>
         </span>
         <span className={w.reqPageRight}>
-          <span>{waiting ? `${waiting} ${waiting === 1 ? 'needs' : 'need'} your attention` : 'Nothing needs you right now'}</span>
+          <span>{loading ? 'Loading your requests…' : waiting ? `${waiting} ${waiting === 1 ? 'needs' : 'need'} your attention` : 'Nothing needs you right now'}</span>
           {partner && saved > 0 && onSaved && (
             <button type="button" className={w.pillBtn} onClick={onSaved}>
               Saved designs ({saved})
@@ -115,7 +129,8 @@ export default function WholesaleRequests({
           </button>
         </span>
       </div>
-      {list.length === 0 && (
+      {loading && <RequestsLoading />}
+      {!loading && list.length === 0 && (
         <div className={w.empty}>
           <strong>No quote requests yet</strong>
           <span>Open any item, add your logo and quantities, and request a quote. It shows here with every update.</span>
@@ -160,7 +175,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
     setBusy('new-artwork');
     setError('');
     try {
-      const logo = partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1500));
+      const logo = partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1200, 200_000));
       await act('new-artwork', { logo });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That file didn’t upload. Try a PNG or JPG.');
@@ -183,14 +198,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
           </span>
         </div>
         {r.status !== 'closed' && (
-          <div className={w.reqTrack}>
-            {TRACK.map((label, i) => (
-              <span key={label} data-on={i <= step} data-now={i === step}>
-                <i />
-                {label}
-              </span>
-            ))}
-          </div>
+          <RequestTrack now={step} />
         )}
         {n && (
           <div className={w.reqNoteBox} style={{ background: n[2] }}>
@@ -251,7 +259,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
           <span className={w.reqActs}>
             {r.status === 'quoted' && q && !expired(r) && (
               <button type="button" className={w.darkMd} disabled={Boolean(busy)} onClick={() => act('approve-quote')}>
-                {busy === 'approve-quote' ? 'Approving…' : `Approve quote · ${money(q.total)}`}
+                {busy === 'approve-quote' ? 'Approving…' : `Approve Quote · ${money(q.total)}`}
               </button>
             )}
             {r.status === 'quoted' && (
@@ -259,7 +267,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
                 <button type="button" className={w.lightMd} aria-expanded={open === 'changes'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'changes' ? '' : 'changes')}>
                   Ask for Changes
                 </button>
-                <button type="button" className={w.textBtn} aria-expanded={open === 'decline'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'decline' ? '' : 'decline')}>
+                <button type="button" className={`${w.lightMd} ${w.declineBtn}`} aria-expanded={open === 'decline'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'decline' ? '' : 'decline')}>
                   Decline
                 </button>
               </>

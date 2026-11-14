@@ -37,7 +37,7 @@ export function useFindIt(studio: StudioBrand, start: { what: string; loc: strin
     setUploading(true);
     setError('');
     try {
-      setPhoto(partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1500)));
+      setPhoto(partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1200, 200_000)));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That photo didn’t upload. Try a PNG or JPG.');
     } finally {

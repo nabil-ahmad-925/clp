@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import type { BulkRequest, RequestAction, RequestActionInput } from '@/content/bulk';
+import { proofFilesOf, type BulkRequest, type RequestAction, type RequestActionInput } from '@/content/bulk';
 import { proofWaiting } from '@/content/bulkStages';
 import st from './requestStage.module.css';
+import EarlierProofs from './EarlierProofs';
+import ProofFiles from './ProofFiles';
 
 const money = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
 /**
- * A request's proof on the shop: being prepared, to approve or change, or the change they asked. (Paying is
- * RequestPay.) Nothing for any other status.
+ * A request's proof on the shop: being prepared, to approve (every file of it shown: pictures, PDFs, links; New when
+ * it replaced an earlier one) or change, or the change they asked. The earlier proofs follow. (Paying is RequestPay.)
+ * Nothing for any other status.
  */
 export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: string; act: (action: RequestAction, input?: RequestActionInput) => void }) {
   const [asking, setAsking] = useState(false);
@@ -19,17 +22,29 @@ export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: s
   const paid = r.po ? `Purchase order ${r.po.number} received.` : r.money?.paid ? `${money(r.money.paid)} received.` : '';
   if (!r.proof) return <div className={st.box}><strong>YOUR PROOF IS NEXT</strong><span>{paid} We’re preparing your proof and will e-mail you to approve it before anything is made.</span></div>;
   if (r.proof.state === 'changes') {
-    return <div className={st.box}><strong>YOUR CHANGE</strong><span>You asked {r.proof.reply ? `${day(r.proof.reply.at)}: “${r.proof.reply.note}”` : 'for a change'}. We’ll send a new proof.</span></div>;
+    return (
+      <div className={st.box}>
+        <strong>YOUR CHANGE</strong>
+        <span>You asked {r.proof.reply ? `${day(r.proof.reply.at)}: “${r.proof.reply.note}”` : 'for a change'}. We’ll send a new proof.</span>
+        <ProofFiles files={proofFilesOf(r.proof)} />
+        <EarlierProofs list={r.proofHistory} />
+      </div>
+    );
   }
   return (
     <div className={st.box} data-on={proofWaiting(r)}>
-      <strong>YOUR PROOF</strong>
-      <span>
-        {paid} Here’s exactly how it will be made.{r.proof.note ? ` ${r.proof.note}.` : ''}{' '}
-        <a href={r.proof.url} target="_blank" rel="noopener noreferrer">
-          Open Proof
-        </a>
+      <span className={st.sampleHead}>
+        <strong>YOUR PROOF</strong>
+        {(r.proofHistory?.length ?? 0) > 0 && (
+          <span className={st.chip} style={{ background: '#111111', color: '#FFFFFF' }}>
+            New
+          </span>
+        )}
       </span>
+      <span>
+        {paid} Here’s exactly how it will be made.{r.proof.note ? ` ${r.proof.note}.` : ''}
+      </span>
+      <ProofFiles files={proofFilesOf(r.proof)} />
       {r.proof.details && (
         <span style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '2px 12px', fontSize: 13 }}>
           {[['Product color', r.proof.details.color], ['Logo placement', r.proof.details.placement], ['Logo size', r.proof.details.size], ['Method', r.proof.details.method]].map(([k, v]) => (
@@ -65,6 +80,7 @@ export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: s
           </span>
         </>
       )}
+      <EarlierProofs list={r.proofHistory} />
     </div>
   );
 }

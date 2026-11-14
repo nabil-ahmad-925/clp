@@ -46,6 +46,7 @@ import { useBulkRequests } from './useBulkRequests';
 import { BrandAssetsBar } from './BrandAssets';
 import WholesaleCard, { CustomCard } from './WholesaleCard';
 import WholesaleItem from './WholesaleItem';
+import { guestImage, preloadGuestImage } from './guestUploads';
 import FindItPage from './sourcing/FindItPage';
 import { useNoResultLog } from './sourcing/useNoResultLog';
 import WholesaleRequests, { needsYou as wsNeedsYou } from './WholesaleRequests';
@@ -55,6 +56,8 @@ import { imageDataUrl, useStudio, type StudioBrand } from './useStudio';
 import b from './bulk.module.css';
 import s from './shop.module.css';
 import w from './wholesale.module.css';
+import CountBadge from './CountBadge';
+import { useHydrated } from './useHydrated';
 
 /** The bulk tiles' colours (a partner's brand colours first, when they have any). */
 const DEFAULT_SWATCHES = ['#111111', '#FFFFFF', '#0B2A5B', '#7A1F2B', '#1D6363', '#C8102E', '#2E7D32', '#DCBD7D'];
@@ -160,6 +163,8 @@ export default function ShopBulk() {
   const countWith = (k: keyof typeof f, v: string) => ALL.filter((i) => passWith({ ...f, [k]: v }, i)).length;
   const any = Boolean(q || loc || Object.values(f).some(Boolean));
   const favCount = ALL.filter((i) => ws.isFav(i.id)).length;
+  // Favorites live in this browser: known once the page is running here (the server's first paint can't know them).
+  const hydrated = useHydrated();
   const hrefOf = (it: WsItem) => shopHref({ view: 'bulk', item: it.id });
   const keyOf = (k: keyof typeof f) => (k === 'cat' ? 'wcat' : k);
   // The board's filters (Products, Source, Brand, Decoration, Availability) in the site's filter dropdowns.
@@ -229,7 +234,7 @@ export default function ShopBulk() {
             ← Back to Wholesale
           </Link>
         </div>
-        <WholesaleRequests items={reqs.items} catalog={ALL} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
+        <WholesaleRequests items={reqs.items} loading={!reqs.loaded} catalog={ALL} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
         {drawers}
       </div>
     );
@@ -282,7 +287,7 @@ export default function ShopBulk() {
         {wsIt ? (
           <>
             <section className={s.thinBand} data-header-tone="light" />
-            <WholesaleItem key={wsIt.id} item={wsIt} all={ALL} notify={catalog.data.notify} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
+            <WholesaleItem key={wsIt.id} item={wsIt} all={ALL} notify={catalog.data.notify} shares={catalog.data.shares} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
           </>
         ) : it ? (
           <BulkItemPage
@@ -446,11 +451,11 @@ export default function ShopBulk() {
               <path d="M12 21 3.5 12.7A5 5 0 0 1 12 6a5 5 0 0 1 8.5 6.7z" />
             </svg>
             Favorites
-            <span>{favCount}</span>
+            <CountBadge n={favCount} loading={!hydrated} />
           </Link>
           <Link href={shopHref({ view: 'bulk', reqs: '1' })} className={w.favBtn}>
             Quote Requests
-            {reqs.loaded && <span data-alert={reqs.items.some(wsNeedsYou)}>{reqs.items.filter((r) => r.kind !== 'saved').length}</span>}
+            <CountBadge n={reqs.items.filter((r) => r.kind !== 'saved').length} loading={!reqs.loaded} alert={reqs.items.some(wsNeedsYou)} />
           </Link>
           </span>
         </div>
@@ -612,6 +617,18 @@ function BulkItemPage({
     style: 0,
   });
 
+  /** A guest's logo as a link for their quote: their image (or the sample) kept with the cart, then used from there. */
+  const guestLogo = async () => {
+    const logo = studio.logo;
+    if (!logo || /^https:\/\//.test(logo)) return logo;
+    const url = await guestImage(logo);
+    studio.setLogo(url);
+    return url;
+  };
+  // A guest's logo starts uploading as soon as it's chosen: Send Quote Request then waits for little or nothing.
+  const logoNow = partner ? '' : studio.logo;
+  useEffect(() => preloadGuestImage(logoNow), [logoNow]);
+
   const send = async (kind: BulkKind) => {
     setError('');
     if (item.styles.length && !chosen.length && kind !== 'saved') return setError('Select at least one style.');
@@ -622,17 +639,26 @@ function BulkItemPage({
     if (kind !== 'saved' && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
-      // Designing is a partner's: a guest's or member's quote goes without a design (their logo comes as a link, or a
-      // file right after it), and CLP makes the placement mockup.
-      const logo = partner ? studio.logo : '';
-      let mockup = '';
-      if (partner && kind !== 'saved' && svg()) {
+      // A guest's or member's logo goes as a link: their image kept with the cart first (a partner's is in their media);
+      // it and the mockup go up together.
+      const theLogo = async () => {
+        if (partner) return studio.logo;
         try {
-          mockup = await uploadImage(await mockupPng(svg()!));
+          return await guestLogo();
+        } catch (err) {
+          throw new Error(err instanceof Error && err.message ? `${err.message} Or remove your logo and send a link to it instead.` : 'Could not add your logo. Try again.');
+        }
+      };
+      const picture = async () => {
+        if (kind === 'saved' || !svg()) return '';
+        try {
+          return partner ? await uploadImage(await mockupPng(svg()!)) : await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800));
         } catch {
           // The request goes without its picture.
+          return '';
         }
-      }
+      };
+      const [logo, mockup] = await Promise.all([theLogo(), picture()]);
       const input = {
         itemId: item.id,
         kind,
@@ -691,10 +717,10 @@ function BulkItemPage({
       <Mockup
         shape={item.shape}
         base={studio.color}
-        logo={partner ? studio.logo || undefined : undefined}
-        placeholder={partner}
+        logo={studio.logo || undefined}
+        placeholder
         place={isApparel(item.shape) ? place : 'center'}
-        text={partner ? text : ''}
+        text={text}
         view={shown}
         className={b.dialogSvg}
         label={`${item.name} mockup`}
@@ -728,7 +754,7 @@ function BulkItemPage({
         <div className={s.thumbs}>
           {views.map(([v, label]) => (
             <button key={v} type="button" className={`${s.thumb} ${b.viewThumb} ${shown === v ? s.thumbOn : ''}`} aria-label={label} aria-pressed={shown === v} onClick={() => setShown(v)}>
-              <Mockup shape={item.shape} base={studio.color} logo={partner ? studio.logo || undefined : undefined} placeholder={partner} place={isApparel(item.shape) ? place : 'center'} text={partner ? text : ''} view={v} className={b.dialogSvg} />
+              <Mockup shape={item.shape} base={studio.color} logo={studio.logo || undefined} placeholder place={isApparel(item.shape) ? place : 'center'} text={text} view={v} className={b.dialogSvg} />
             </button>
           ))}
         </div>
@@ -759,7 +785,7 @@ function BulkItemPage({
             <div className={b.leftStack}>
               <span className={b.leftHead}>
                 <span className={b.leftKicker}>{partner ? 'DESIGN STUDIO' : 'PREVIEW'}</span>
-                <span className={b.leftNote}>{partner ? 'Partner tool' : 'The item in your color'}</span>
+                <span className={b.leftNote}>{partner ? 'Partner tool' : 'Your logo and color'}</span>
               </span>
               {gallery}
               <div className={b.row}>
@@ -768,7 +794,7 @@ function BulkItemPage({
                   <button key={c} type="button" aria-label={`Color ${c}`} aria-pressed={studio.color === c} className={b.rowSwatch} style={{ background: c, boxShadow: studio.color === c ? '0 0 0 2px #111111' : undefined }} onClick={() => studio.setColor(c)} />
                 ))}
               </div>
-              {partner && isApparel(item.shape) && (
+              {isApparel(item.shape) && (
                 <div className={b.row}>
                   <span className={b.rowLabel}>Placement</span>
                   {[
@@ -781,7 +807,7 @@ function BulkItemPage({
                   ))}
                 </div>
               )}
-              {partner && !studio.kit.locked && (
+              {!studio.kit.locked && (
                 <div className={b.row}>
                   <span className={b.rowLabel}>Logo</span>
                   <button type="button" className={b.logoBtn} onClick={() => fileRef.current?.click()} disabled={busy === 'logo'}>
@@ -798,20 +824,18 @@ function BulkItemPage({
                   )}
                 </div>
               )}
-              {partner && (
-                <div className={b.row}>
-                  <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
-                  <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
-                </div>
-              )}
+              <div className={b.row}>
+                <span className={`${b.rowLabel} ${b.rowLabelFixed}`}>Text</span>
+                <input className={b.input} value={text} maxLength={18} onChange={(e) => setText(e.target.value)} placeholder="Team name, event or year" />
+              </div>
               <button type="button" className={b.underline} onClick={download}>
                 {downloaded ? 'Downloaded ✓' : 'Download Mockup'}
               </button>
               {!partner && (
                 <div className={b.partnerBox}>
                   <span className={b.partnerBoxKicker}>FOR CLP PARTNERS</span>
-                  <strong>Designing is for approved CLP partners</strong>
-                  <span>Ask for your quote and send your logo files right after it, and our designers set it up with you. Approved partners design here themselves, with templates, patterns, print locations, saved designs and partner pricing.</span>
+                  <strong>The full design studio is for approved partners</strong>
+                  <span>Approved CLP partners also get templates, patterns, print locations, saved designs and partner pricing.</span>
                   <span className={b.partnerBoxLinks}>
                     <BecomePartner className={b.goldBtn}>Apply to become a partner</BecomePartner>
                     <button type="button" onClick={onSignIn}>
@@ -1179,7 +1203,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
     setBusy('new-artwork');
     setError('');
     try {
-      const logo = partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1500));
+      const logo = partner ? await uploadImage(file) : await uploadGuestImage(await imageDataUrl(file, 1200, 200_000));
       await act('new-artwork', { logo, note: note.trim() });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That file didn’t upload. Try a PNG or JPG.');
@@ -1265,7 +1289,7 @@ function RequestDetail({ r, partner, onChange }: { r: BulkRequest; partner: bool
           <div className={b.reqBtns}>
             {!expired(r) && (
               <button type="button" className={b.reqGold} disabled={Boolean(busy)} onClick={() => act('approve-quote')}>
-                {busy === 'approve-quote' ? 'Approving…' : `Approve quote · ${money(q.total)}`}
+                {busy === 'approve-quote' ? 'Approving…' : `Approve Quote · ${money(q.total)}`}
               </button>
             )}
             <button type="button" className={b.reqLight} aria-expanded={open === 'changes'} disabled={Boolean(busy)} onClick={() => setOpen(open === 'changes' ? '' : 'changes')}>

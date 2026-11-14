@@ -92,8 +92,8 @@ export default function FileRow({ k, f, busy, act, children }: { k: FileKey; f: 
             <input type="file" accept={accept.map((a) => `.${a}`).join(',')} hidden aria-label={`Upload ${f.label}`} disabled={Boolean(busy)} onChange={(e) => (void upload(e.target.files?.[0]), (e.target.value = ''))} />
           </label>
           <input value={link} placeholder="or paste a link (https://…)" aria-label={`Link to your ${f.label}`} maxLength={590} onChange={(e) => setLink(e.target.value)} style={field} />
-          <button type="button" className={st.text} disabled={Boolean(busy) || !link.trim()} onClick={() => act('add-file', { fileKey: k, link: link.trim() })}>
-            Send Link
+          <button type="button" className={st.light} disabled={Boolean(busy) || !link.trim()} onClick={() => act('add-file', { fileKey: k, link: link.trim() })}>
+            Send
           </button>
         </span>
       )}

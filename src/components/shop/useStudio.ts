@@ -143,13 +143,14 @@ export function useStudio(): StudioBrand {
     fetchMyPartnerPage().then(
       (page) => {
         if (!live) return;
-        const kit = { ...EMPTY_KIT, ...(page.brand ?? {}) };
+        // No page in the answer (an account still setting up): their name, no kit, never stuck loading.
+        const kit = { ...EMPTY_KIT, ...(page?.brand ?? {}) };
         setLoaded({
           userId: user.userId,
           kit,
-          name: page.name ?? user.access?.partnerName ?? '',
-          logo: kit.logos[0]?.src || page.logo || '',
-          colors: kit.colors.length ? kit.colors : [page.color || DEFAULT_COLOR],
+          name: page?.name ?? user.access?.partnerName ?? user.name ?? '',
+          logo: kit.logos[0]?.src || page?.logo || '',
+          colors: kit.colors.length ? kit.colors : [page?.color || DEFAULT_COLOR],
         });
       },
       () => live && setLoaded({ userId: user.userId, kit: EMPTY_KIT, name: user.access?.partnerName ?? user.name ?? '', logo: '', colors: [DEFAULT_COLOR] }),

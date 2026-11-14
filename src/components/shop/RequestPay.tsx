@@ -29,13 +29,15 @@ export default function RequestPay({ r }: { r: BulkRequest }) {
   const balance = opts.find((o) => o.kind === 'balance');
   const deposit = opts.find((o) => o.kind === 'deposit');
   const rejected = lastRejected(r);
+  // The shipping price CLP sent (freight, duties and handling as one number) is part of the total.
+  const ship = r.shipment?.price;
   return (
     <div className={st.box} data-on="true">
       <strong>{rejected ? 'PAYMENT NOT RECEIVED' : balance ? 'BALANCE DUE' : 'DEPOSIT DUE'}</strong>
       <span>
         {rejected ? `We couldn’t find your ${money(rejected.amount)} payment. ${rejected.reviewNote ?? ''} ` : ''}
         {balance
-          ? `${money(balance.amount)} is left to pay before your order ships. You’ve paid ${money(m.paid)} of ${money(m.total)}.`
+          ? `${money(balance.amount)} is left to pay before your order ships. You’ve paid ${money(m.paid)} of ${money(m.total)}${ship ? `, which includes ${money(ship.amount)} shipping` : ''}.`
           : `A 50% deposit (${money(deposit?.amount ?? m.deposit)}) starts your proof and production. Or pay all ${money(m.balance)} now.`}
       </span>
       <span className={st.acts}>

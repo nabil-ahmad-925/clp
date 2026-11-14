@@ -18,6 +18,12 @@ export function OrderSummary({ r }: { r: BulkRequest }) {
       </strong>
       <span className={p.mut}>{[r.ref, r.quote ? `${money(r.quote.unitPrice)} each` : ''].filter(Boolean).join(' · ')}</span>
       <dl className={p.rows}>
+        {r.shipment?.price && (
+          <>
+            <dt>Shipping (freight, duties and handling)</dt>
+            <dd>{money(r.shipment.price.amount)}</dd>
+          </>
+        )}
         <dt>Order total</dt>
         <dd>{money(m.total)}</dd>
         <dt>Deposit (50%)</dt>

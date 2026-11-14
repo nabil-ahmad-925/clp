@@ -52,11 +52,23 @@ export type WsItem = {
   programs: WsProgram[];
   retail?: number;
   retailMin?: number;
+  /** The photo shown when a client picks a color ('#RRGGBB' → photo URL). */
+  colorPhotos?: Record<string, string>;
+  /** The photos on its spec sheet, in order (none: its first photo). */
+  specPhotos?: string[];
+  /** Pieces per color and size ('#RRGGBB|M'); `avail` is their total. None: stock is kept as a total only. */
+  variantStock?: Record<string, number>;
+  /** Related items CLP picked (ids of live items; shown both ways). */
+  related?: string[];
 };
 export type WsProgram = 'pod' | 'pre';
-/** The programs partners sell with: print on demand (25% of each sale) and pre-order (50%). */
+/** The programs partners sell with: print on demand and pre-order (their words; the shares come from the catalog). */
 export const PROGRAMS = config.programs as { id: WsProgram; label: string; share: number; blurb: string; note: string }[];
 export const programOf = (id: WsProgram) => PROGRAMS.find((p) => p.id === id)!;
+/** What partners earn per program now (CLP's Programs & pricing, sent with the catalog), as fractions of the price. */
+export type WsShares = Record<WsProgram, number>;
+/** A program's share in force: the catalog's (an older API without it: the defaults the API itself falls back to). */
+export const shareOf = (id: WsProgram, shares?: Partial<WsShares>) => shares?.[id] ?? programOf(id).share;
 
 /**
  * "Sell to members": the item with the partner's artwork as a print-on-demand product in their store (CLP checks the
@@ -65,7 +77,7 @@ export const programOf = (id: WsProgram) => PROGRAMS.find((p) => p.id === id)!;
 export const sellInMyStore = (input: { itemId: string; program: WsProgram; price: number; mockup: string; color: string; logo: string; spots: string[] }) =>
   partnerCall<{ item: { id: string; approval: string; status: string } }>('/my/partner/store/wholesale', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
 /** The catalog: its items, the categories and brands they use (the filters), and whether back-ordered items take "Notify me". */
-export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean };
+export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean; shares?: WsShares };
 /** Its main print spot: the one its photo shows (CLP's logo spot), else the drawing's first. */
 export const firstLoc = (it: WsItem) => (it.photos[0] ? frontSpotOf(it).loc : Object.keys(SHAPES[it.shape]?.P ?? SHAPES.tee.P)[0]);
 

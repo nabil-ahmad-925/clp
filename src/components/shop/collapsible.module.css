@@ -1,0 +1,54 @@
+/* A section of a request on Quote Requests that opens and closes (components/shop/CollapsibleBox). */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.summary {
+  flex: 1;
+  min-width: 0;
+  color: #555;
+  font-size: 13px;
+}
+
+.chev {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #d9d6cf;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.head:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (max-width: 560px) {
+  .head {
+    flex-wrap: wrap;
+  }
+
+  .summary {
+    order: 3;
+    flex-basis: 100%;
+  }
+}

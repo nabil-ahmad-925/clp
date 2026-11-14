@@ -1,13 +1,15 @@
 'use client';
-/* eslint-disable @next/next/no-img-element -- photos from the workshop, shown as CLP shared them. */
 
 import { useState } from 'react';
 import type { BulkRequest, RequestAction, RequestActionInput, RequestSample } from '@/content/bulk';
 import st from './requestStage.module.css';
+import CollapsibleBox from './CollapsibleBox';
+import SampleFileTile from './SampleFileTile';
 
-const KIND: Record<RequestSample['kind'], string> = { proof: 'Proof', sample: 'Sample', finished: 'Your finished order' };
+// Two kinds of proof: before production, and the finished order (an older request's 'sample' reads as a proof).
+const KIND: Record<RequestSample['kind'], string> = { proof: 'Proof', sample: 'Proof', finished: 'Finished proof' };
 const STATUS: Record<RequestSample['status'], [string, string, string]> = {
-  shared: ['From the workshop', '#F2F1ED', '#444444'],
+  shared: ['From the maker', '#F2F1ED', '#444444'],
   waiting: ['Please approve', '#111111', '#FFFFFF'],
   approved: ['Approved', '#E7F3EC', '#1E7A45'],
   changes: ['Change asked', '#FBEAE8', '#B03A2E'],
@@ -31,12 +33,10 @@ function SampleRow({ s, busy, act }: { s: RequestSample; busy: string; act: Act 
       {s.note && <span>{s.note}</span>}
       <span className={st.shots}>
         {s.files.map((f, i) => (
-          <a key={`${f.url}-${i}`} href={f.url} target="_blank" rel="noopener noreferrer" title={f.name}>
-            {f.image ? <img src={f.url} alt={f.name} loading="lazy" /> : <span className={st.shotFile}>{f.name}</span>}
-          </a>
+          <SampleFileTile key={`${f.url}-${i}`} f={f} />
         ))}
       </span>
-      {s.status === 'changes' && s.reply && <span>You asked {day(s.reply.at)}: “{s.reply.note}”. We’ll send new photos.</span>}
+      {s.status === 'changes' && s.reply && <span>You asked {day(s.reply.at)}: “{s.reply.note}”. We’ll send a new proof.</span>}
       {s.status === 'waiting' && (
         <>
           {asking && (
@@ -66,23 +66,22 @@ function SampleRow({ s, busy, act }: { s: RequestSample; busy: string; act: Act 
   );
 }
 
-/** Something from the workshop waits for their approval. */
+/** Something from the maker waits for their approval. */
 export const sampleWaiting = (r: BulkRequest) => (r.samples ?? []).some((s) => s.status === 'waiting');
 
 /**
- * Photos and samples from the workshop on Quote Requests (the design's "Photos from the maker"): what CLP shared, and
- * what it asks them to approve before it goes on (a finished order ships once they approve it). Newest first.
+ * Proofs from the maker on Quote Requests (the design's "From the maker"): what CLP checked and shared, and what it
+ * asks them to approve before it goes on. Newest first.
  */
 export default function RequestSamples({ r, busy, act }: { r: BulkRequest; busy: string; act: Act }) {
   const list = [...(r.samples ?? [])].sort((x, y) => y.at.localeCompare(x.at));
   if (!list.length) return null;
   return (
-    <div className={st.box} data-on={sampleWaiting(r)}>
-      <strong>PHOTOS FROM THE WORKSHOP</strong>
+    <CollapsibleBox title="PROOFS FROM THE MAKER" summary={`${list.length} ${list.length === 1 ? 'proof' : 'proofs'}${sampleWaiting(r) ? ' · waiting on you' : ''}`} on={sampleWaiting(r)} defaultOpen>
       <span>{sampleWaiting(r) ? 'Please take a look and approve, or tell us what to change.' : 'How your order is coming along.'}</span>
       {list.map((s) => (
         <SampleRow key={s.id} s={s} busy={busy} act={act} />
       ))}
-    </div>
+    </CollapsibleBox>
   );
 }

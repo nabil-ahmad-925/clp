@@ -38,9 +38,9 @@ import { uploadImage } from '@/content/partnerSession';
 import { shopHref } from '@/content/storefront';
 import Mockup, { FONT_STYLE, isLight, mockupPng, saveFile } from './Mockup';
 import DeliveryAddress from './DeliveryAddress';
-import StudioGate from './StudioGate';
 import { useDeliveryAddress } from './useDeliveryAddress';
 import SendFilesNow from './SendFilesNow';
+import { guestImage, preloadGuestImage } from './guestUploads';
 import { Chevron, LockIcon } from './shopIcons';
 import { studioFontVariables } from './studioFonts';
 import { SAMPLE_LOGO, imageDataUrl, useStudio, type StudioBrand } from './useStudio';
@@ -122,8 +122,8 @@ const dataBlob = async (url: string) => (await fetch(url)).blob();
  * The design studio (/shop/?view=studio&item=<id>[&design=<id>], the Shop design): a CLP partner designs a bulk item
  * in their brand (templates, colours, patterns, their logo with clean-up and print locations, text, names and numbers),
  * sees it from every side, then saves it, asks for a bulk quote or orders it. Brand guidelines (the partner's kit,
- * locked) limit every choice to what's approved. Designing is for approved partners only: a guest or a signed-in member
- * sees StudioGate (sign in, apply, or ask for a quote on the item).
+ * locked) limit every choice to what's approved. Guests and members design here too and ask for a bulk quote with their
+ * details (saving, ordering and partner pricing need a partner sign-in).
  */
 export default function ShopStudio() {
   const params = useSearchParams();
@@ -139,16 +139,17 @@ export default function ShopStudio() {
         Opening the design studio…
       </div>
     );
-  if (!brand.partner) return <StudioGate item={item} member={Boolean(brand.user)} />;
   return <Studio key={`${item.id}|${designId}`} item={item} designId={designId} brand={brand} go={(href) => router.push(href)} />;
 }
 
 function Studio({ item, designId, brand, go }: { item: BulkItem; designId: string; brand: StudioBrand; go: (href: string) => void }) {
   // A guest (not a signed-in partner): a bulk quote with their details, no saving, ordering or partner pricing.
   const guest = !brand.partner;
-  const [contact, setContact] = useState({ name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', deliverTo: '' });
+  // A signed-in member's name and e-mail to start with (a guest types theirs).
+  const [contact, setContact] = useState({ name: brand.user?.name ?? '', organization: '', email: brand.user?.email ?? '', inHands: '', message: '', logoLink: '' });
   // Where a quote or an order goes: one of their saved addresses, or a new one.
-  const delivery = useDeliveryAddress(!guest);
+  // (A signed-in member picks from their saved addresses too; a guest types it.)
+  const delivery = useDeliveryAddress(Boolean(brand.user));
   const kit = brand.kit;
   const locked = kit.locked;
   const shape = item.shape;
@@ -329,12 +330,15 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
   };
 
   const svg = () => preview.current?.querySelector('svg') as SVGSVGElement | null;
+  // A guest's logo starts uploading as soon as it's on the design: the quote then waits for little or nothing.
+  const guestLogoNow = guest ? d.logo : '';
+  useEffect(() => preloadGuestImage(guestLogoNow), [guestLogoNow]);
 
   /** The design with its logo uploaded (a cleaned-up or new file is sent to CLP's media first). */
   const persisted = async (): Promise<StudioDesign> => {
     if (!d.logo || /^https:\/\//.test(d.logo)) return d;
     // A guest's logo is kept with their cart (as their quote's); a partner's goes to CLP's media.
-    const url = guest ? await uploadGuestImage(await imageDataUrl(d.logo)) : await uploadImage(await dataBlob(d.logo));
+    const url = guest ? await guestImage(d.logo) : await uploadImage(await dataBlob(d.logo));
     setD((x) => ({ ...x, logo: url }));
     return { ...d, logo: url };
   };
@@ -347,19 +351,22 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
       return setSaved(true);
     }
     if (guest && (!contact.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact.email.trim()))) return setError('Enter your name and a valid email for the quote.');
-    const address = kind === 'saved' || guest ? null : delivery.check();
-    if (kind !== 'saved' && !guest && !address) return setError('Enter the full delivery address with its ZIP code.');
+    // Every quote and order ships to a full address with its ZIP code (the API's rule), a guest's too.
+    const address = kind === 'saved' ? null : delivery.check();
+    if (kind !== 'saved' && !address) return setError('Enter the full delivery address with its ZIP code.');
     setBusy(kind);
     try {
-      const design = await persisted();
-      let mockup = '';
-      if (kind !== 'saved' && svg()) {
+      // The logo and the mockup go up together, not one after the other.
+      const picture = async () => {
+        if (kind === 'saved' || !svg()) return '';
         try {
-          mockup = guest ? await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800)) : await uploadImage(await mockupPng(svg()!));
+          return guest ? await uploadGuestImage(await imageDataUrl(await mockupPng(svg()!, 800), 800)) : await uploadImage(await mockupPng(svg()!));
         } catch {
           // The request goes without its picture.
+          return '';
         }
-      }
+      };
+      const [design, mockup] = await Promise.all([persisted(), picture()]);
       const total = Math.max(Number(qty) || 0, 1);
       const input = {
         itemId: item.id,
@@ -373,7 +380,10 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
         mockup,
         ...(address ? { contact: { name: '', organization: '', email: '', inHands: '', message: '', logoLink: '', address } } : {}),
       };
-      if (guest) setSent(await sendGuestQuote({ ...input, kind: 'quote', contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), deliverTo: contact.deliverTo.trim() } }));
+      if (guest) {
+        setSent(await sendGuestQuote({ ...input, kind: 'quote', contact: { ...contact, name: contact.name.trim(), email: contact.email.trim(), address } }));
+        void delivery.keep();
+      }
       else if (kind === 'saved' && savedId) await updateDesign(savedId, input);
       else {
         const r = await createDesign(input);
@@ -997,7 +1007,6 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <input className={st.input} aria-label="Name" placeholder="Name" maxLength={120} autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
                 <input className={st.input} aria-label="Email" type="email" placeholder="Email" maxLength={200} autoComplete="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
                 <input className={st.input} aria-label="Organization" placeholder="Team, school or company" maxLength={120} autoComplete="organization" value={contact.organization} onChange={(e) => setContact({ ...contact, organization: e.target.value })} />
-                <input className={st.input} aria-label="Deliver to" placeholder="Deliver to (city)" maxLength={160} value={contact.deliverTo} onChange={(e) => setContact({ ...contact, deliverTo: e.target.value })} />
                 <label className={st.field}>
                   In-hands date
                   <input className={st.input} type="date" value={contact.inHands} onChange={(e) => setContact({ ...contact, inHands: e.target.value })} />
@@ -1005,7 +1014,7 @@ function Studio({ item, designId, brand, go }: { item: BulkItem; designId: strin
                 <textarea className={st.input} aria-label="Anything else" rows={2} maxLength={2000} placeholder="Anything else? Sizes, colors, deadline" value={contact.message} onChange={(e) => setContact({ ...contact, message: e.target.value })} />
               </div>
             )}
-            {!guest && <DeliveryAddress d={delivery} />}
+            <DeliveryAddress d={delivery} />
             {error && <span className={st.error}>{error}</span>}
             {!guest && (
               <button type="button" className={st.buy} disabled={Boolean(busy) || Number(qty) < min} onClick={() => send('order')}>

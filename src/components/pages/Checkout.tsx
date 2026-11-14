@@ -138,7 +138,7 @@ export default function Checkout() {
   };
 
   const field = (key: keyof typeof errors) => (tried && errors[key] ? <span className={styles.fieldError}>{errors[key]}</span> : null);
-  const payLabel = sending ? (online && !nothingToPay ? 'Opening secure payment…' : 'Placing your order…') : nothingToPay ? 'Place order · $0.00' : online ? `Pay ${money(totals?.total ?? 0)}` : 'Place order';
+  const payLabel = sending ? (online && !nothingToPay ? 'Opening secure payment…' : 'Placing your order…') : nothingToPay ? 'Place Order · $0.00' : online ? `Pay ${money(totals?.total ?? 0)}` : 'Place Order';
 
   return (
     <>

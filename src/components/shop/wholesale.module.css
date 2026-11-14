@@ -1067,6 +1067,11 @@
   text-align: center;
 }
 
+.sizeNote {
+  color: #b03a2e;
+  font-style: normal;
+}
+
 .qtyCell input,
 .qtyOne {
   box-sizing: border-box;
@@ -2060,7 +2065,8 @@
 .studio {
   position: fixed;
   inset: 0;
-  z-index: 400;
+  /* Over the site's header (z 9999, components/layout/SiteHeader): the studio has its own top bar. */
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   background: #e7e5e0;
@@ -3342,8 +3348,14 @@
   background: #111;
 }
 
+/* The step it's at now: half lit, like the "Quote requested" screen. */
 .reqTrack > span[data-now='true'] {
+  color: #8a6f33;
   font-weight: 800;
+}
+
+.reqTrack > span[data-now='true'] i {
+  background: linear-gradient(90deg, #dcbd7d 50%, #e5e5e2 50%);
 }
 
 .reqNoteBox {
@@ -3504,6 +3516,16 @@
 .lightSm:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+/* Decline a quote: a button like the others beside it, in red (it closes the request). */
+.declineBtn {
+  border-color: #efcfca;
+  color: #b03a2e;
+}
+
+.declineBtn:hover:not(:disabled) {
+  background: #fbeae8;
 }
 
 .textBtn {
@@ -3953,5 +3975,74 @@
 
   .modes {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Loading: shimmering placeholders and the count badges' spinner. */
+.shimmer {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(100deg, #ecebe7 30%, #f6f5f2 50%, #ecebe7 70%) 0 0 / 300% 100%;
+  animation: wsShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes wsShimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.reqLoading {
+  display: grid;
+  gap: 16px;
+}
+
+.reqLoadingCard {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #ebe8e1;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.reqLoadingPic {
+  flex: none;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+}
+
+.reqLoadingLines {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .reqLoadingPic {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+.countSpin {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: wsSpin 0.8s linear infinite;
+}
+
+@keyframes wsSpin {
+  to {
+    transform: rotate(360deg);
   }
 }

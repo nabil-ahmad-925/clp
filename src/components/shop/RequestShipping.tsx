@@ -3,6 +3,7 @@ import type { BulkRequest, RequestAction, RequestActionInput } from '@/content/b
 import { BOX_WORDS } from '@/content/track';
 import st from './requestStage.module.css';
 import w from './wholesale.module.css';
+import CollapsibleBox from './CollapsibleBox';
 
 type Act = (action: RequestAction, input: RequestActionInput) => void;
 const TRACK_URLS: Record<string, string> = {
@@ -27,8 +28,7 @@ export default function RequestShipping({ r, busy, act }: { r: BulkRequest; busy
   if (!s) return null;
   const n = s.boxes.length;
   return (
-    <div className={w.reqTrackBox}>
-      <strong>{s.deliveredAt ? 'DELIVERED' : 'TRACKING'}</strong>
+    <CollapsibleBox className={w.reqTrackBox} title={s.deliveredAt ? 'DELIVERED' : 'TRACKING'} summary={`${n} ${n === 1 ? 'box' : 'boxes'}${s.deliveredAt ? ` · delivered ${day(s.deliveredAt)}` : s.eta ? ` · arrives by ${day(s.eta)}` : ''}`} defaultOpen>
       {s.boxes.map((b, i) => (
         <div key={`${b.number}-${i}`}>
           <strong>
@@ -66,6 +66,6 @@ export default function RequestShipping({ r, busy, act }: { r: BulkRequest; busy
         </span>
       )}
       {s.trackingAt && !s.deliveredAt && <span className={w.fine}>{`Tracking updated ${day(s.trackingAt)}.`}</span>}
-    </div>
+    </CollapsibleBox>
   );
 }

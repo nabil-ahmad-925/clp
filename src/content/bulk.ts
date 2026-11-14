@@ -1,6 +1,6 @@
 import catalog from './data/bulkCatalog.json';
 import { cartId } from './cart';
-import { call, read } from './partnerPages';
+import { PartnerApiError, call, read } from './partnerPages';
 import { partnerCall } from './partnerSession';
 import type { Address } from './address';
 import type { ClientSourcing, SourcingInput } from './sourcing';
@@ -116,6 +116,8 @@ export type BulkRequest = {
   createdAt: string;
   /** Who and where: `address` is the full delivery address (content/address.ts); older requests have `deliverTo` text. */
   contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string; address?: Address | null } | null;
+  /** When production finished (the maker's finished-goods photos): the balance is paid, then it ships. */
+  producedAt?: string;
   /** Its reference (R-1A2B3C), as CLP's e-mails give it. */
   ref?: string;
   /** A "Can't Find It?" request (content/sourcing.ts): what we're finding for them and its 3 steps. */
@@ -130,6 +132,8 @@ export type BulkRequest = {
   /** After the quote: the 50% deposit due and what CLP received, a verified buyer's PO, and the proof to approve. */
   /** The money (clp-api shared/bulk-payments.mjs): total, 50% deposit, paid, waiting for CLP, left; what can be paid now. */
   money?: PayMoney;
+  /** How it travels and the shipping price CLP sent (freight, duties and handling as one number, part of the total). */
+  shipment?: { mode?: 'ground' | 'air' | 'sea' | 'express'; price?: { amount: number; note: string; sentAt: string } };
   payOptions?: PayOption[];
   payments?: Payment[];
   /** The production files it needs (a vector logo, a stitch file for embroidery, a print-ready file for sublimation). */
@@ -141,7 +145,10 @@ export type BulkRequest = {
   payTo?: PayTo;
   po?: { number: string };
   /** The proof: its file, what it shows (color, placement, size, method), where it stands, their change. */
-  proof?: { url: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; details?: { color: string; placement: string; size: string; method: string }; reply?: { note: string; at: string }; approvedAt?: string };
+  /** The proof: every file of it (pictures, PDFs, links), our note, where it stands and what it shows. */
+  proof?: { files?: ProofFile[]; url?: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; details?: { color: string; placement: string; size: string; method: string }; reply?: { note: string; at: string }; approvedAt?: string };
+  /** The proofs sent before it, newest first: their files, where each stood and the change asked. */
+  proofHistory?: { files?: ProofFile[]; url?: string; note: string; sentAt: string; state: 'sent' | 'changes' | 'approved'; reply?: { note: string; at: string } }[];
   /** Its shipment (clp-api shared/bulk-shipping.mjs): boxes, when it should arrive, the tracking corrected, its delivery. */
   shipping?: { boxes: { carrier: string; number: string; status?: 'shipped' | 'out' | 'delivered'; outAt?: string; deliveredAt?: string }[]; shippedAt: string; eta?: string; etaWas?: string; delayedAt?: string; trackingAt?: string; deliveredAt?: string; deliveredBy?: 'clp' | 'client' };
   /** Opens its tracking page (/track/), made when it ships. */
@@ -159,7 +166,12 @@ export type BulkRequest = {
   /** Photos and samples from the workshop CLP shared, or asks them to approve (clp-api shared/bulk-samples.mjs). */
   samples?: RequestSample[];
 };
-/** A proof, sample or finished-goods photos from the workshop: its files, CLP's note, where it stands, their change. */
+/** A proof from the workshop (before production, or the finished order): its files, CLP's note, where it stands, their change. */
+/** One file of a proof (a picture, a PDF, a link to more). */
+export type ProofFile = { url: string; name: string; image: boolean };
+/** A proof's files: its list, or an API before the list's single `url` (clp-api shared/proof-files.mjs proofFilesOf). */
+export const proofFilesOf = (p?: { files?: ProofFile[]; url?: string } | null): ProofFile[] =>
+  p?.files?.length ? p.files : p?.url ? [{ url: p.url, name: 'Proof', image: /\.(jpe?g|png|svg|webp)$/i.test(p.url.split(/[?#]/)[0] ?? '') }] : [];
 export type RequestSample = {
   id: string;
   kind: 'proof' | 'sample' | 'finished';
@@ -222,10 +234,25 @@ export type BulkInput = Omit<BulkRequest, 'id' | 'itemName' | 'status' | 'create
 
 /** A guest's quote requests (this browser's) and sending one. */
 export const guestRequests = () => read<{ items: BulkRequest[] }>(`/cart/${cartId()}/bulk`).then((r) => r.items);
-export const sendGuestQuote = (input: BulkInput) => call<{ item: BulkRequest }>(`/cart/${cartId()}/bulk`, { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
+// 30 s: a quote with a long design on a slow connection (never retried: it would be sent twice).
+export const sendGuestQuote = (input: BulkInput) => call<{ item: BulkRequest }>(`/cart/${cartId()}/bulk`, { method: 'POST', body: JSON.stringify(input), timeoutMs: 30_000 }).then((r) => r.item);
 /** Keeps an image for a guest's quote (their logo or its mockup, a PNG, JPG or WebP data URL) and answers its address. */
-export const uploadGuestImage = (image: string) =>
-  call<{ url: string }>(`/cart/${cartId()}/images`, { method: 'POST', body: JSON.stringify({ image }) }).then((r) => r.url);
+// An upload may take a while on a slow connection (60 s), and is tried once more when the connection drops (a second
+// copy of an image is harmless): before, a 15 s limit cut it off and the whole quote failed ("Could not reach CLP").
+export async function uploadGuestImage(image: string): Promise<string> {
+  const once = () => call<{ url: string }>(`/cart/${cartId()}/images`, { method: 'POST', body: JSON.stringify({ image }), timeoutMs: 60_000 }).then((r) => r.url);
+  try {
+    return await once();
+  } catch (err) {
+    if (!(err instanceof PartnerApiError) || err.status !== 0) throw err;
+    try {
+      return await once();
+    } catch (again) {
+      if (again instanceof PartnerApiError && again.status === 0) throw new PartnerApiError(0, 'Your image didn’t upload: the connection is slow or dropped. Try again, or send it after your request from Quote Requests.');
+      throw again;
+    }
+  }
+}
 
 /** A guest approves or declines their quote, asks for changes, or sends new artwork. */
 export const guestRequestAction = (id: string, action: RequestAction, input: RequestActionInput = {}) =>
