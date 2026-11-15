@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { BulkRequest, RequestAction, RequestActionInput, RequestSample } from '@/content/bulk';
+import { sampleWaiting } from '@/content/requestStatus';
 import st from './requestStage.module.css';
 import CollapsibleBox from './CollapsibleBox';
 import SampleFileTile from './SampleFileTile';
@@ -66,8 +67,8 @@ function SampleRow({ s, busy, act }: { s: RequestSample; busy: string; act: Act 
   );
 }
 
-/** Something from the maker waits for their approval. */
-export const sampleWaiting = (r: BulkRequest) => (r.samples ?? []).some((s) => s.status === 'waiting');
+/** Something from the maker waits for their approval (content/requestStatus.ts). */
+export { sampleWaiting };
 
 /**
  * Proofs from the maker on Quote Requests (the design's "From the maker"): what CLP checked and shared, and what it

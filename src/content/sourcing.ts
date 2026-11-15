@@ -19,8 +19,8 @@ export type ClientSourcing = {
 };
 export type SourcingInput = { what: string; budgetMin?: number; budgetMax?: number; photo?: string; link?: string };
 
-/** Still being found: CLP hasn't replied with its quote yet (the last step). */
-export const findingIt = (r: { sourcing?: ClientSourcing | null }) => Boolean(r.sourcing) && !r.sourcing!.steps.at(-1)?.done;
+/** Still being found: CLP hasn't replied with its quote yet (content/requestStatus.ts). */
+export { findingIt } from './requestStatus';
 
 /** "$8–10 each", "up to $10 each", or ''. */
 export function budgetWords(s: Pick<ClientSourcing, 'budgetMin' | 'budgetMax'>) {
