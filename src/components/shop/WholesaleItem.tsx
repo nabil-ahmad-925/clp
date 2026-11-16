@@ -38,6 +38,7 @@ import { guestImage, preloadGuestImage } from './guestUploads';
 import WsMock from './WsMock';
 import { LargePhoto, PhotoStrip } from './WsPhotos';
 import NotifyBack from './NotifyBack';
+import SimilarInStock from './SimilarInStock';
 import SpecSheet from './SpecSheet';
 import { availFor, colorPhotoOf, sizeNote, stockLine } from '@/content/wsStock';
 import { relatedRows } from '@/content/wsRelated';
@@ -60,6 +61,7 @@ export default function WholesaleItem({
   item,
   all,
   notify,
+  suggestAlt = false,
   shares,
   studio,
   ws,
@@ -71,6 +73,8 @@ export default function WholesaleItem({
   all: WsItem[];
   /** CLP takes "Notify me" on back-ordered items. */
   notify: boolean;
+  /** A back-ordered item offers a similar one to order now. */
+  suggestAlt?: boolean;
   /** What partners earn per program now (Programs & pricing). */
   shares?: Partial<WsShares>;
   studio: StudioBrand;
@@ -355,10 +359,15 @@ export default function WholesaleItem({
                 <span style={{ background: stockDot }} />
                 {stockTxt}
               </span>
-              {item.back && notify && (
+              {item.back && (notify || suggestAlt) && (
                 <div className={w.backBox}>
-                  <span>Get an email the day it’s back in stock. You can still request a quote now and we’ll hold your spot in line.</span>
-                  <NotifyBack itemId={item.id} email={studio.user?.email ?? ''} />
+                  {notify && (
+                    <>
+                      <span>Get an email the day it’s back in stock. You can still request a quote now and we’ll hold your spot in line.</span>
+                      <NotifyBack itemId={item.id} email={studio.user?.email ?? ''} />
+                    </>
+                  )}
+                  {suggestAlt && <SimilarInStock item={item} all={all} />}
                 </div>
               )}
               <span className={w.itemDesc}>{item.desc}</span>

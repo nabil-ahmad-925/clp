@@ -77,7 +77,8 @@ export const shareOf = (id: WsProgram, shares?: Partial<WsShares>) => shares?.[i
 export const sellInMyStore = (input: { itemId: string; program: WsProgram; price: number; mockup: string; color: string; logo: string; spots: string[] }) =>
   partnerCall<{ item: { id: string; approval: string; status: string } }>('/my/partner/store/wholesale', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
 /** The catalog: its items, the categories and brands they use (the filters), and whether back-ordered items take "Notify me". */
-export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean; shares?: WsShares };
+/** suggestAlt: a back-ordered item offers a similar one to order now (Programs & pricing's back-order rule). */
+export type WsCatalog = { items: WsItem[]; categories: string[]; brands: string[]; notify: boolean; suggestAlt?: boolean; shares?: WsShares };
 /** Its main print spot: the one its photo shows (CLP's logo spot), else the drawing's first. */
 export const firstLoc = (it: WsItem) => (it.photos[0] ? frontSpotOf(it).loc : Object.keys(SHAPES[it.shape]?.P ?? SHAPES.tee.P)[0]);
 

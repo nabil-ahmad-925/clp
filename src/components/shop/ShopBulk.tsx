@@ -287,7 +287,7 @@ export default function ShopBulk() {
         {wsIt ? (
           <>
             <section className={s.thinBand} data-header-tone="light" />
-            <WholesaleItem key={wsIt.id} item={wsIt} all={ALL} notify={catalog.data.notify} shares={catalog.data.shares} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
+            <WholesaleItem key={wsIt.id} item={wsIt} all={ALL} notify={catalog.data.notify} suggestAlt={Boolean(catalog.data.suggestAlt)} shares={catalog.data.shares} studio={studio} ws={ws} loc={loc} onSent={(r) => reqs.setItems((list) => [r, ...list.filter((x) => x.id !== r.id)])} onShowRequests={() => router.push(shopHref({ view: 'bulk', reqs: '1' }))} />
           </>
         ) : it ? (
           <BulkItemPage

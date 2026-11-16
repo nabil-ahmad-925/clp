@@ -4046,3 +4046,9 @@
     transform: rotate(360deg);
   }
 }
+
+.altLink {
+  font-weight: 700;
+  text-decoration: underline;
+  color: inherit;
+}
