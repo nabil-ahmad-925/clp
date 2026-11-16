@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import type { FileKey, ProductionFile, RequestAction, RequestActionInput } from '@/content/bulk';
 import FileApproval from './FileApproval';
 import FileHistory from './FileHistory';
+import FileThumb from './FileThumb';
 import { FILE_STATUS, REASON, infoWords } from './fileWords';
 import st from './requestStage.module.css';
 
@@ -25,7 +26,13 @@ function Sent({ f }: { f: ProductionFile }) {
   const shown = f.multiple ? f.versions : f.versions.slice(-1);
   if (!shown.length) return <span style={{ color: '#666', fontSize: 13 }}>{f.hint}</span>;
   return (
-    <span style={{ color: '#666', fontSize: 13, display: 'grid', gap: 2 }}>
+    <span style={{ color: '#666', fontSize: 13, display: 'grid', gap: 6 }}>
+      {/* What they sent, as previews (the client's rules: see the uploaded artwork). */}
+      {f.type === 'file' && (
+        <span className={st.shots}>
+          {shown.map((v, i) => (v.url ? <FileThumb key={`${v.url}-${i}`} v={v} /> : null))}
+        </span>
+      )}
       {shown.map((v, i) =>
         v.text ? (
           <span key={i}>Sent: {v.text}</span>

@@ -5,7 +5,9 @@ import type { BulkRequest, FileKey, ProductionFile, RequestAction, RequestAction
 import CollapsibleBox from './CollapsibleBox';
 import FileRow from './FileRow';
 import FileServiceOffer from './FileServiceOffer';
+import type { PhotoItem } from '@/content/wsDrawing';
 import HaveClpDoIt from './HaveClpDoIt';
+import LogoOnItem from './LogoOnItem';
 import SendToDesigner from './SendToDesigner';
 import st from './requestStage.module.css';
 
@@ -32,7 +34,7 @@ function FixesChoice({ r, busy, act }: { r: BulkRequest; busy: string; act: Act 
  * say-so, else they approve them) and sends any design change to them to approve. Every version stays in its history.
  * Closed by default: its header says where they stand (what's needed, what we're checking, what waits on them).
  */
-export default function RequestFiles({ r, busy, act, defaultOpen = false }: { r: BulkRequest; busy: string; act: Act; defaultOpen?: boolean }) {
+export default function RequestFiles({ r, busy, act, defaultOpen = false, item, color = '#F4F4F2' }: { r: BulkRequest; busy: string; act: Act; defaultOpen?: boolean; item?: PhotoItem; color?: string }) {
   const [more, setMore] = useState(false);
   const all = Object.entries(r.files ?? {}) as [FileKey, ProductionFile][];
   if (!all.length || !OPEN.includes(r.status)) return null;
@@ -60,6 +62,7 @@ export default function RequestFiles({ r, busy, act, defaultOpen = false }: { r:
           <span>Your design on the item. We check your files against it.</span>
         </a>
       )}
+      <LogoOnItem r={r} item={item} color={color} />
       {!done && <FixesChoice r={r} busy={busy} act={act} />}
       <SendToDesigner r={r} busy={busy} act={act} />
       {required.map(([k, f]) => (

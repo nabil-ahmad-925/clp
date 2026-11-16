@@ -71,10 +71,15 @@ export default function WholesaleRequests({
   onChange,
   onSaved,
   loading = false,
+  failed = false,
+  onRetry,
 }: {
   items: BulkRequest[];
   /** Still loading them: placeholders, never "No quote requests yet". */
   loading?: boolean;
+  /** The last load failed (shown with Try Again, never as an empty list). */
+  failed?: boolean;
+  onRetry?: () => void;
   /** The live catalog (empty while it loads: the requests show with their own names). */
   catalog: WsItem[];
   partner: boolean;
@@ -106,7 +111,18 @@ export default function WholesaleRequests({
         </span>
       </div>
       {loading && <RequestsLoading />}
-      {!loading && list.length === 0 && (
+      {!loading && failed && (
+        <div className={w.empty} role="alert">
+          <strong>We couldn’t load your quote requests</strong>
+          <span>Check your connection and try again. Your requests are safe.</span>
+          {onRetry && (
+            <button type="button" className={w.darkSm} onClick={onRetry}>
+              Try Again
+            </button>
+          )}
+        </div>
+      )}
+      {!loading && !failed && list.length === 0 && (
         <div className={w.empty}>
           <strong>No quote requests yet</strong>
           <span>Open any item, add your logo and quantities, and request a quote. It shows here with every update.</span>
@@ -186,7 +202,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
         <RequestCheckpoints r={r} />
         <RequestPay r={r} />
         {/* Files are asked for once it's found and quoted. */}
-        {!findingIt(r) && <RequestFiles r={r} busy={busy} act={(action, input) => void act(action, input)} />}
+        {!findingIt(r) && <RequestFiles r={r} item={it} color={ws.ic} busy={busy} act={(action, input) => void act(action, input)} />}
         <RequestStage r={r} busy={busy} act={(action, input) => void act(action, input)} />
         <RequestSamples r={r} busy={busy} act={(action, input) => void act(action, input)} />
         <RequestShipping r={r} busy={busy} act={(action, input) => void act(action, input)} />

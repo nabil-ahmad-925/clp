@@ -176,18 +176,21 @@ export async function call<T>(path: string, init?: RequestInit & { timeoutMs?: n
 /** Waits before retrying a read the API turned away as busy (503/429: its Lambdas are at their concurrency limit). */
 const BUSY_RETRIES_MS = [400, 1000, 2000];
 
-/** A read, retried while the API is busy. */
-export async function read<T>(path: string): Promise<T> {
+/** Runs a read, trying again while the API turns it away as busy (503/429). */
+export async function retryBusy<T>(run: () => Promise<T>): Promise<T> {
   for (const wait of BUSY_RETRIES_MS) {
     try {
-      return await call<T>(path);
+      return await run();
     } catch (err) {
       if (!(err instanceof PartnerApiError) || (err.status !== 503 && err.status !== 429)) throw err;
       await new Promise((r) => setTimeout(r, wait));
     }
   }
-  return call<T>(path);
+  return run();
 }
+
+/** A read, retried while the API is busy. */
+export const read = <T,>(path: string): Promise<T> => retryBusy(() => call<T>(path));
 
 export const partnersEnabled = Boolean(API_URL);
 

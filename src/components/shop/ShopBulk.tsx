@@ -234,7 +234,7 @@ export default function ShopBulk() {
             ← Back to Wholesale
           </Link>
         </div>
-        <WholesaleRequests items={reqs.items} loading={!reqs.loaded} catalog={ALL} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
+        <WholesaleRequests items={reqs.items} loading={!reqs.loaded} failed={reqs.failed} onRetry={reqs.reload} catalog={ALL} partner={partner} ws={ws} onChange={(r) => reqs.setItems((list) => list.map((x) => (x.id === r.id ? r : x)))} onSaved={() => setReqsOpen(true)} />
         {drawers}
       </div>
     );

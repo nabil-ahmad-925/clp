@@ -1,6 +1,6 @@
 import catalog from './data/bulkCatalog.json';
 import { cartId } from './cart';
-import { PartnerApiError, call, read } from './partnerPages';
+import { PartnerApiError, call, read, retryBusy } from './partnerPages';
 import { partnerCall } from './partnerSession';
 import type { Address } from './address';
 import type { ClientSourcing, SourcingInput } from './sourcing';
@@ -259,7 +259,8 @@ export const guestRequestAction = (id: string, action: RequestAction, input: Req
   call<{ item: BulkRequest }>(`/cart/${cartId()}/bulk/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ action, ...input }) }).then((r) => r.item);
 
 /** A signed-in partner's designs, quote requests and orders. */
-export const myDesigns = () => partnerCall<{ items: BulkRequest[] }>('/my/designs').then((r) => r.items);
+// A read: tried again while the API is busy (its Lambdas turn parallel calls away), like the guest's.
+export const myDesigns = () => retryBusy(() => partnerCall<{ items: BulkRequest[] }>('/my/designs')).then((r) => r.items);
 export const createDesign = (input: BulkInput) => partnerCall<{ item: BulkRequest }>('/my/designs', { method: 'POST', body: JSON.stringify(input) }).then((r) => r.item);
 export const updateDesign = (id: string, input: BulkInput) =>
   partnerCall<{ item: BulkRequest }>(`/my/designs/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(input) }).then((r) => r.item);

@@ -13,12 +13,15 @@ import { guestRequests, myDesigns, type BulkRequest } from '@/content/bulk';
 export function useBulkRequests(partner: boolean, ready: boolean) {
   const [items, setItems] = useState<BulkRequest[]>([]);
   const [loaded, setLoaded] = useState(false);
+  // The last load failed: the list may be missing requests, so it says so (never "No quote requests yet").
+  const [failed, setFailed] = useState(false);
   const latest = useRef(0);
   const reload = useCallback(() => {
     const n = ++latest.current;
     (partner ? myDesigns() : guestRequests()).then(
-      (list) => n === latest.current && (setItems(list), setLoaded(true)),
-      () => n === latest.current && (setItems([]), setLoaded(true)),
+      (list) => n === latest.current && (setItems(list), setFailed(false), setLoaded(true)),
+      // Keeps what it already had: a failed refresh doesn't wipe the list.
+      () => n === latest.current && (setFailed(true), setLoaded(true)),
     );
   }, [partner]);
   useEffect(() => {
@@ -34,5 +37,5 @@ export function useBulkRequests(partner: boolean, ready: boolean) {
       stop();
     };
   }, [ready, reload]);
-  return { items, setItems, reload, loaded };
+  return { items, setItems, reload, loaded, failed };
 }

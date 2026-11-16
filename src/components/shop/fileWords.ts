@@ -44,6 +44,19 @@ export function versionTag(f: Pick<ProductionFile, 'status' | 'versions'>, v: Ve
   return what;
 }
 
+/** A version the browser can draw: a PNG or JPG they uploaded (served inline), or a link straight to one. */
+export const isPicture = (v?: Version) => Boolean(v?.url) && (/\.(png|jpe?g)$/i.test(v?.name ?? '') || /\.(png|jpe?g)$/i.test(v?.url?.split(/[?#]/)[0] ?? ''));
+/** A version's type for its preview card: "SVG", "PDF", or LINK for another site's page. */
+export const typeOf = (v: Version) => /\.([a-z0-9]{2,4})$/i.exec(v.name)?.[1]?.toUpperCase() ?? 'LINK';
+/** The picture of their logo to draw on the item: the newest picture among the logo files, in this order. */
+export function logoPicture(files: Partial<Record<string, ProductionFile>>, keys = ['png', 'vector', 'small']): Version | undefined {
+  for (const k of keys) {
+    const v = files[k]?.versions.at(-1);
+    if (isPicture(v)) return v;
+  }
+  return undefined;
+}
+
 /** What their file is, in words, and a heads-up when it's small: "PNG, 900 × 700 px, may be too small (we'll check it)". */
 export function infoWords(v?: Version): string {
   const i = v?.info;
