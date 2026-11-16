@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { GiftItem, PublicLink, SellProduct } from '@/content/links';
 import styles from '../preorders/Preorder.module.css';
+import Unavailable from '../preorders/Unavailable';
 import GiftLink from './GiftLink';
 import LockedLink from './LockedLink';
 import SellLink from './SellLink';
@@ -13,7 +14,7 @@ const CLOSED: Partial<Record<PublicLink['phase'], string>> = { closed: 'This lin
 /** A share link: its heading, then the lock, the products for sale, or the free picks. */
 export default function LinkView({ page, link }: { page: string; link: string }) {
   const { data, key, error, unlock } = useLink(page, link);
-  if (error) return <p className={styles.error}>{error}</p>;
+  if (error) return <Unavailable error={error} what="link" />;
   if (!data) return <p className={styles.muted}>Loading…</p>;
   const closed = CLOSED[data.phase];
   return (

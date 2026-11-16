@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { PublicPreorder } from '@/content/preorders';
+import Countdown from './Countdown';
 import { phaseLine, progressOf } from './preorderMath';
 import styles from './Preorder.module.css';
 
@@ -17,6 +18,8 @@ export default function PreorderHero({ preorder: p }: { preorder: PublicPreorder
       </span>
       <h1 className={styles.title}>{p.name}</h1>
       <p className={styles.phase}>{phaseLine(p)}</p>
+      {p.phase === 'open' && <Countdown to={p.endsAt} label="Orders close in" />}
+      {p.phase === 'scheduled' && <Countdown to={p.opensAt} label="Orders open in" />}
       {eventLine(p) && <p className={styles.meta}>Handed out at {eventLine(p)}</p>}
       {(p.phase === 'open' || p.phase === 'scheduled') && (
         <>

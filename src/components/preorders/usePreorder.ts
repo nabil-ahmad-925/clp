@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { getPreorder, type PublicPreorder } from '@/content/preorders';
+import { loadErrorOf, type LoadError } from './Unavailable';
 
 /** A pre-order by its id, or the message to show when it can't be loaded. */
 export function usePreorder(id: string) {
   const [preorder, setPreorder] = useState<PublicPreorder | null>(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<LoadError | null>(null);
   useEffect(() => {
     let live = true;
     getPreorder(id).then(
       (p) => live && setPreorder(p),
-      (err) => live && setError(err instanceof Error ? err.message : 'Could not load this pre-order.'),
+      (err) => live && setError(loadErrorOf(err, 'Could not load this pre-order.')),
     );
     return () => {
       live = false;

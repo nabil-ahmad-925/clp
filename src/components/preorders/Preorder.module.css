@@ -371,3 +371,72 @@
     flex: 1 1 100%;
   }
 }
+
+/* The live countdown (Countdown.tsx): dark, like the partner's "Buyers see" preview. */
+.countdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  max-width: 520px;
+  margin-top: 6px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #121212;
+  color: #fff;
+}
+
+.countdownLabel {
+  color: #d9b77e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.countdownParts {
+  display: flex;
+  gap: 8px;
+}
+
+.countdownParts > span {
+  display: grid;
+  justify-items: center;
+  min-width: 48px;
+  color: #cfcac0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdownParts strong {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+/* A link or pre-order that can't be opened (Unavailable.tsx): a calm notice, not an error bar. */
+.notice {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  max-width: 620px;
+  padding: 28px 24px;
+  border: 1px solid #e6e1d7;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.noticeTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.noticeLink {
+  margin-top: 4px;
+  color: #111;
+  font-weight: 700;
+  text-decoration: underline;
+}
