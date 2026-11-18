@@ -84,6 +84,8 @@ export type PartnerVideo = {
 export type PartnerPageData = PartnerCardData & {
   /** The Donate button (header and About tab), or null when the partner hasn't turned it on. */
   donations?: PartnerDonations | null;
+  /** The partner's own Google Analytics and Meta Pixel IDs (their page only; content/partnerTags.ts), or null. */
+  analytics?: { ga4: string; pixel: string } | null;
   highlights: string[];
   stats: { value: string; label: string }[];
   photos: { src: string; caption: string }[];

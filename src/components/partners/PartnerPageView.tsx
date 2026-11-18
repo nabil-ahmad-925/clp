@@ -59,6 +59,7 @@ import { luminance, paletteOf, rgbOf } from './page/palette';
 import { titleCase } from './page/titleCase';
 import { VIDEO_SOURCES, embedOf } from './page/videos';
 import DonateButton from './donate/DonateButton';
+import PartnerTags from './page/PartnerTags';
 import SupportCard from './donate/SupportCard';
 import SubscribeButton from './subscribe/SubscribeButton';
 import SubscribeDialog from './subscribe/SubscribeDialog';
@@ -361,6 +362,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
               </button>
               <SubscribeButton slug={page.slug} onOpen={() => setSubscribing(true)} />
               <DonateButton name={page.name} short={page.short} donations={page.donations} />
+              <PartnerTags analytics={page.analytics} />
             </div>
           </div>
         </section>
