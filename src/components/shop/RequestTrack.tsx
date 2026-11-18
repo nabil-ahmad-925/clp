@@ -1,16 +1,15 @@
+import { CLIENT_STEPS, type StepState } from '@/content/requestStatus';
 import w from './wholesale.module.css';
 
-export const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'] as const;
-
 /**
- * A request's 5-step tracker on Quote Requests, read like the "Quote requested" screen's: the steps done are full, the
- * step it's at now (`now`: its index) is half lit, the rest are to come. `now` past the last (5): all done (delivered).
+ * A request's tracker on Quote Requests (content/requestStatus.ts trackOf): the steps done are full, the steps it's at
+ * now are half lit (Files and Payment can both be), the rest are to come.
  */
-export default function RequestTrack({ now }: { now: number }) {
+export default function RequestTrack({ steps }: { steps: StepState[] }) {
   return (
     <div className={w.reqTrack}>
-      {TRACK.map((label, i) => (
-        <span key={label} data-on={i < now} data-now={i === now}>
+      {CLIENT_STEPS.map((label, i) => (
+        <span key={label} data-on={steps[i] === 'done'} data-now={steps[i] === 'now'}>
           <i />
           {label}
         </span>

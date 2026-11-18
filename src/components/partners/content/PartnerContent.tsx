@@ -18,7 +18,7 @@ export const contentCount = (page: PartnerPageData, albums: LiveAlbum[], videos:
 
 /**
  * Content (the handoff's "Photos & videos"): the partner's photo albums (each opens its gallery page), their own photos
- * (My page in the admin, A to Z, each opening large here) and their YouTube videos (played in the page). All, Albums,
+ * (My page in the admin, A to Z, each opening large here) and their videos (played in the page). All, Albums,
  * Photos and Videos filter them.
  */
 export default function PartnerContent({ page, albums, videos, onVideo }: Props) {

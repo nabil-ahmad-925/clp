@@ -38,7 +38,7 @@ export default function RequestPay({ r }: { r: BulkRequest }) {
         {rejected ? `We couldn’t find your ${money(rejected.amount)} payment. ${rejected.reviewNote ?? ''} ` : ''}
         {balance
           ? `${money(balance.amount)} is left to pay before your order ships. You’ve paid ${money(m.paid)} of ${money(m.total)}${ship ? `, which includes ${money(ship.amount)} shipping` : ''}.`
-          : `A 50% deposit (${money(deposit?.amount ?? m.deposit)}) starts your proof and production. Or pay all ${money(m.balance)} now.`}
+          : `A 50% deposit (${money(deposit?.amount ?? m.deposit)}) starts production once your proof is approved. Or pay all ${money(m.balance)} now.`}
       </span>
       <span className={st.acts}>
         <Link href={payHref(r.id)} className={st.dark}>

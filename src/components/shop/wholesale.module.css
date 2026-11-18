@@ -1280,7 +1280,7 @@
 
 .doneSteps {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -3321,7 +3321,7 @@
 
 .reqTrack {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -3346,6 +3346,15 @@
 
 .reqTrack > span[data-on='true'] i {
   background: #111;
+}
+
+/* Seven steps: on a phone they wrap to two rows. */
+@media (max-width: 560px) {
+  .reqTrack,
+  .doneSteps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 10px;
+  }
 }
 
 /* The step it's at now: half lit, like the "Quote requested" screen. */

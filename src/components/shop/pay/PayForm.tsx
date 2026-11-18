@@ -6,7 +6,7 @@ import { money } from './PaySummary';
 import p from './pay.module.css';
 
 const OPTION_WORDS: Record<PayKind, [string, string]> = {
-  deposit: ['50% deposit', 'Starts your proof and production. The rest is due before shipping.'],
+  deposit: ['50% deposit', 'Starts production once your proof is approved. The rest is due before shipping.'],
   full: ['Pay in full', 'Nothing more to pay later.'],
   balance: ['Balance', 'What’s left. Your order ships once it’s confirmed.'],
 };

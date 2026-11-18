@@ -18,7 +18,8 @@ const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 
 export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: string; act: (action: RequestAction, input?: RequestActionInput) => void }) {
   const [asking, setAsking] = useState(false);
   const [note, setNote] = useState('');
-  if (r.status !== 'proof') return null;
+  // The proof runs side by side with the deposit: shown once it's on its way (before that, the payment is RequestPay).
+  if (r.status !== 'proof' && !(r.status === 'deposit' && r.proof)) return null;
   const paid = r.po ? `Purchase order ${r.po.number} received.` : r.money?.paid ? `${money(r.money.paid)} received.` : '';
   if (!r.proof) return <div className={st.box}><strong>YOUR PROOF IS NEXT</strong><span>{paid} We’re preparing your proof and will e-mail you to approve it before anything is made.</span></div>;
   if (r.proof.state === 'changes') {
@@ -43,6 +44,7 @@ export default function RequestStage({ r, busy, act }: { r: BulkRequest; busy: s
       </span>
       <span>
         {paid} Here’s exactly how it will be made.{r.proof.note ? ` ${r.proof.note}.` : ''}
+        {r.status === 'deposit' && (r.proof.state === 'approved' ? ' You approved it. Production starts as soon as your deposit is in.' : ' Production starts once you approve it and your deposit is in.')}
       </span>
       <ProofFiles files={proofFilesOf(r.proof)} />
       {r.proof.details && (

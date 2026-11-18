@@ -58,6 +58,7 @@ import { Overlay, PaletteContext } from './page/Overlay';
 import { luminance, paletteOf, rgbOf } from './page/palette';
 import { titleCase } from './page/titleCase';
 import { VIDEO_SOURCES, embedOf } from './page/videos';
+import DonateButton from './donate/DonateButton';
 import SupportCard from './donate/SupportCard';
 import SubscribeButton from './subscribe/SubscribeButton';
 import SubscribeDialog from './subscribe/SubscribeDialog';
@@ -160,7 +161,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
     [page.color, type.color, page.colorMode, page.buttonColor, page.buttonText],
   );
   const sectionOn = (id: string) => page.sections.find((x) => x.id === id)?.on !== false;
-  // The Content tab: the partner's photo albums (each opens its gallery), their own photos and their YouTube videos.
+  // The Content tab: the partner's photo albums (each opens its gallery), their own photos and their videos.
   const [albums, setAlbums] = useState<LiveAlbum[]>([]);
   useEffect(() => {
     let live = true;
@@ -173,7 +174,8 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
       live = false;
     };
   }, [page.slug]);
-  const youtube = (page.videos ?? []).filter((v) => v.source === 'youtube');
+  // Every video the partner shows, from any of its sites (YouTube, Instagram, TikTok, Vimeo).
+  const videos = page.videos ?? [];
 
   // Their open roles (the jobs board's, posted by this partner).
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -193,7 +195,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
   const tabs = (
     [
       ['about', 'About', 0, true],
-      ['content', 'Content', contentCount(page, albums, youtube), sectionOn('photos') && contentCount(page, albums, youtube) > 0],
+      ['content', 'Content', contentCount(page, albums, videos), sectionOn('photos') && contentCount(page, albums, videos) > 0],
       ['experiences', 'Experiences', experiences.length, sectionOn('experiences') && experiences.length > 0],
       ['jobs', 'Jobs', jobs.length, sectionOn('jobs') && jobs.length > 0],
       ['partnerships', 'Partnerships', collabs.length, sectionOn('partnerships') && collabs.length > 0],
@@ -358,6 +360,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
                 Contact
               </button>
               <SubscribeButton slug={page.slug} onOpen={() => setSubscribing(true)} />
+              <DonateButton name={page.name} short={page.short} donations={page.donations} />
             </div>
           </div>
         </section>
@@ -384,7 +387,7 @@ export default function PartnerPageView({ data }: { data: PartnerPageResponse })
             {shown === 'about' && (
               <About page={page} experiences={exps} onOpen={open} waitOf={waitOf} onAll={has('experiences') ? () => pick('experiences') : undefined} onMember={setMember} onSubscribe={() => setSubscribing(true)} />
             )}
-            {shown === 'content' && <PartnerContent page={page} albums={albums} videos={youtube} onVideo={setVideo} />}
+            {shown === 'content' && <PartnerContent page={page} albums={albums} videos={videos} onVideo={setVideo} />}
             {shown === 'experiences' && <Experiences page={page} items={experiences} onOpen={open} waitOf={waitOf} />}
             {shown === 'jobs' && <Jobs page={page} jobs={jobs} onOpen={setJob} />}
             {shown === 'partnerships' && <Partnerships collabs={collabs} />}

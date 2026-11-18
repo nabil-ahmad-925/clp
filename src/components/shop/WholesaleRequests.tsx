@@ -4,7 +4,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { designAction, guestRequestAction, uploadGuestImage, type BulkRequest, type RequestAction, type RequestActionInput } from '@/content/bulk';
-import { expired, findingIt, needsYou, statusOf } from '@/content/requestStatus';
+import { expired, findingIt, needsYou, statusOf, trackOf } from '@/content/requestStatus';
 import { uploadImage } from '@/content/partnerSession';
 import { money, type WsItem } from '@/content/wholesale';
 import { imageDataUrl } from './useStudio';
@@ -26,15 +26,26 @@ const day = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 
 // Where a request stands and whether it waits on them: content/requestStatus.ts (the partner admin uses it too).
 export { needsYou };
 
+/** A cancelled order's refund, in words. */
+function refundText(r: BulkRequest) {
+  const f = r.refund;
+  if (!f || f.paid <= 0) return 'Nothing was paid, so nothing is owed.';
+  if (f.due <= 0) return `All ${money(f.paid)} you paid was refunded.`;
+  return f.due < f.paid ? `We’re paying back the other ${money(f.due)} of the ${money(f.paid)} you paid, the way you paid.` : `We’re paying back the ${money(f.paid)} you paid, the way you paid.`;
+}
+
 /** The note on a request: who it's from and what it says. */
 function noteOf(r: BulkRequest): [string, string, string] | null {
   // Its steps say where it is (RequestFinding).
   if (findingIt(r)) return null;
+  // Paused or cancelled by CLP: what it means for them (clp-api shared/bulk-hold.mjs, bulk-cancel.mjs).
+  if (r.hold && r.status !== 'closed') return ['ON HOLD', r.hold.note || 'We’ve paused your order for now. We’ll be in touch about what’s next.', '#FBF3E2'];
+  if (r.status === 'closed' && r.cancelled) return ['CANCELLED', `${r.cancelled.reason.replace(/[.!]*$/, '.')} ${refundText(r)}`, '#F7F6F3'];
   const q = r.quote;
   if (r.status === 'quoted' && q)
     return [
       'QUOTE FROM THE CLP TEAM',
-      `${money(q.unitPrice)} each · ${q.qty} pieces · ${money(q.total)} total${q.lead ? ` · ready in ${q.lead}` : ''}. ${expired(r) ? `Expired ${day(q.validUntil)}. Ask for changes and we’ll send an updated one.` : `Valid until ${day(q.validUntil)}. Approve it and a 50% deposit starts your proof and production.`}`,
+      `${money(q.unitPrice)} each · ${q.qty} pieces · ${money(q.total)} total${q.lead ? ` · ready in ${q.lead}` : ''}. ${expired(r) ? `Expired ${day(q.validUntil)}. Ask for changes and we’ll send an updated one.` : `Valid until ${day(q.validUntil)}. Approve it and a 50% deposit starts production.`}`,
       '#F7F6F3',
     ];
   if (r.status === 'quoted') return ['QUOTE FROM THE CLP TEAM', 'We e-mailed you your quote. Reply to that e-mail to approve it or ask for changes.', '#F7F6F3'];
@@ -143,7 +154,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
   const [note, setNote] = useState('');
   const [link, setLink] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-  const [chip, bg, fg, step] = statusOf(r);
+  const [chip, bg, fg] = statusOf(r);
   const n = noteOf(r);
   const q = r.quote;
   const act = async (action: RequestAction, input: RequestActionInput = {}) => {
@@ -190,7 +201,7 @@ function RequestCard({ r, item: it, partner, ws, onChange, onContact }: { r: Bul
           </span>
         </div>
         {r.status !== 'closed' && (
-          <RequestTrack now={step} />
+          <RequestTrack steps={trackOf(r)} />
         )}
         {n && (
           <div className={w.reqNoteBox} style={{ background: n[2] }}>

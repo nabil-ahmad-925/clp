@@ -118,6 +118,10 @@ export type BulkRequest = {
   contact?: { name: string; organization: string; email: string; inHands: string; message: string; logoLink: string; deliverTo?: string; address?: Address | null } | null;
   /** When production finished (the maker's finished-goods photos): the balance is paid, then it ships. */
   producedAt?: string;
+  /** On hold by CLP (its note to you), and cancelled before it shipped (why, and the refund): clp-api shared/bulk-hold.mjs, bulk-cancel.mjs. */
+  hold?: { at: string; note: string };
+  cancelled?: { reason: string; at: string };
+  refund?: { paid: number; refunded: number; due: number };
   /** Its reference (R-1A2B3C), as CLP's e-mails give it. */
   ref?: string;
   /** A "Can't Find It?" request (content/sourcing.ts): what we're finding for them and its 3 steps. */

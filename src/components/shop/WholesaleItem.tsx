@@ -42,13 +42,13 @@ import SimilarInStock from './SimilarInStock';
 import SpecSheet from './SpecSheet';
 import { availFor, colorPhotoOf, sizeNote, stockLine } from '@/content/wsStock';
 import { relatedRows } from '@/content/wsRelated';
+import { CLIENT_STEPS } from '@/content/requestStatus';
 import { imageDataUrl, type StudioBrand } from './useStudio';
 import type { Wholesale } from './wholesaleStore';
 import { DEFAULT_PLAYERS, designSummary, emptyDesign, locsOf, rosterOf, spotOf, spotSummary, usedLocs, type WsDesign } from './wsDesign';
 import w from './wholesale.module.css';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TRACK = ['Submitted', 'Quote', 'Files & proof', 'In production', 'Shipped'];
 
 /**
  * An item's page (the Wholesale board's): its mockup with the print spots under it, the item's price breaks, then item
@@ -638,8 +638,8 @@ export default function WholesaleItem({
                 </span>
                 <SendFilesNow request={done.r} partner={partner} />
                 <span className={w.doneSteps}>
-                  {TRACK.map((label, i) => (
-                    <span key={label} data-on={i === 0} data-now={i === 1}>
+                  {CLIENT_STEPS.map((label, i) => (
+                    <span key={label} data-on={false} data-now={i === 0}>
                       <i />
                       {label}
                     </span>
